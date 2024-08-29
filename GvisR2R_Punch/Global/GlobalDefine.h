@@ -2196,15 +2196,12 @@ struct stDlgMenu01
 struct stDlgMenu03
 {
 	CString Ready, Run, Reset, Stop;
-	//CString ConnectModuleRecoiler, ConnectModulePunch, ConnectModuleAoiDn, ConnectModuleAoiUp, ConnectModuleUncoiler;
-	//CString FeedCwRecoiler, FeedCcwRecoiler, ChuckPcbRecoiler, DancerRecoiler, JoinUpLfRecoiler, JoinDnRtRecoiler;
-	//CString JoinVacuumRecoiler, ChuckPaperRecoiler, PaperCwRecoiler, PaperCcwRecoiler, RewinderRecoiler, RewinderPcbPaperRecoiler;
 	CString ConnectModule;
-	CString ChuckPcbRecoiler, JoinClampRecoiler, PcbShaftSupportRecoiler;
+	CString ChuckPcbRecoiler, ChuckPaperRecoiler, JoinClampRecoiler, PcbShaftSupportRecoiler;
 	CString EpcActHomeRecoiler, EpcActFirstRecoiler, EpcActSecondRecoiler, EpcActThirdRecoiler, EpcAutoRecoiler, EpcManualRecoiler;
 	CString EpcHomeRecoiler, EpcInRecoiler, EpcOutRecoiler, PcbInverterCwRecoiler, PcbInverterCcwRecoiler;
 	CString PaperInverterCwRecoiler, PaperInverterCcwRecoiler, DancerUpperRecoiler, DancerFixerRecoiler;
-	CString FeedCwPunch, FeedCcwPunch, TensionCwPunch, TensionCcwPunch, FeedHomePunch, FeedVacuumPunch; //PcbPushPunch, TensionClampPunch, FeedClampPunch 
+	CString FeedCwPunch, FeedCcwPunch, TensionCwPunch, TensionCcwPunch, FeedHomePunch, FeedVacuumPunch, FeedClampPunch, TensionClampPunch; //PcbPushPunch 
 	CString TableBlowerPunch, TableVacuumPunch, TableCylinderPunch, TableClampDnPunch, TableClampForwardPunch, PunchStartPunch;
 	CString FeedCwAoiDn, FeedCcwAoiDn, TensionCwAoiDn, TensionCcwAoiDn, FeedHomeAoiDn, FeedVacuumAoiDn, TableBlowerAoiDn, TableVacuumAoiDn, TableCylinderAoiDn;
 	CString FeedClampAoiDn, TensionClampAoiDn, CleanRollerUpAoiDn, CleanRollerDnAoiDn, CleanRollerPushAoiDn, TestStartAoiDn;
@@ -2222,7 +2219,7 @@ struct stDlgMenu03
 	CString EpcActHomeUncoiler, EpcActFirstUncoiler, EpcActSecondUncoiler, EpcActThirdUncoiler, EpcAutoUncoiler, EpcManualUncoiler;
 	CString EpcHomeUncoiler, EpcInUncoiler, EpcOutUncoiler, PcbInverterCwUncoiler, PcbInverterCcwUncoiler;
 	CString PaperInverterCwUncoiler, PaperInverterCcwUncoiler;
-	CString FeedOnePanel;
+	CString FeedOnePanel, AllDancerUpDn, AllDancerFixOnOff;
 
 	//CString TensionOnPunch, TensionOnAoi, TensionOnEngrave, UltrasonicSpeedAoiDn;
 	//CString UseCore150mmRecoiler, UseCore150mmUncoiler, FeedOnePanel;
@@ -2235,23 +2232,9 @@ struct stDlgMenu03
 		Stop = _T("MB400007");
 
 		ConnectModule = _T("MB40000F");
-		//ConnectModuleRecoiler = _T("MB005801");
-		//ConnectModulePunch = _T("MB005511");
-		//ConnectModuleAoiDn = _T("MB005701");
-		//ConnectModuleAoiUp = _T("MB005601");
-		//ConnectModuleUncoiler = _T("MB005401");
-		//FeedCwRecoiler = _T("MB00580C");
-		//FeedCcwRecoiler = _T("MB00580D");
+
 		ChuckPcbRecoiler = _T("MB400160");
-		//DancerRecoiler = _T("MB005802");
-		//JoinUpLfRecoiler = _T("MB005805");
-		//JoinDnRtRecoiler = _T("MB005806");
-		//JoinVacuumRecoiler = _T("MB00580F");
-		//ChuckPaperRecoiler = _T("MB005808");
-		//PaperCwRecoiler = _T("MB005809");
-		//PaperCcwRecoiler = _T("MB00580A");
-		//RewinderRecoiler = _T("MB005803");
-		//RewinderPcbPaperRecoiler = _T("MB005804");
+		ChuckPaperRecoiler = _T("MB400161");
 		JoinClampRecoiler = _T("MB400162");
 		PcbShaftSupportUncoiler = _T("MB400163");
 		EpcActHomeRecoiler = _T("MB400164");
@@ -2276,7 +2259,8 @@ struct stDlgMenu03
 		TensionCcwPunch = _T("MB400143");
 		FeedHomePunch = _T("MB400144");
 		FeedVacuumPunch = _T("MB400145");
-		//FeedClampPunch = _T("MB005519");
+		FeedClampPunch = _T("MB400146");
+		TensionClampPunch = _T("MB400147");
 		//PcbPushPunch = _T("MB005516");
 		TableVacuumPunch = _T("MB400148");
 		TableBlowerPunch = _T("MB400149");
@@ -2284,7 +2268,6 @@ struct stDlgMenu03
 		TableClampDnPunch = _T("MB40014B");
 		TableClampForwardPunch = _T("MB40014C");
 		PunchStartPunch = _T("MB400150");
-		//TensionClampPunch = _T("MB00551A");
 
 		FeedCwAoiDn = _T("MB40010A");
 		FeedCcwAoiDn = _T("MB40010B");
@@ -2382,6 +2365,8 @@ struct stDlgMenu03
 		//UseCore150mmUncoiler = _T("MB44017F");
 
 		FeedOnePanel = _T("MB40000E");
+		AllDancerUpDn  = _T("MB40005B");
+		AllDancerFixOnOff = _T("MB40005C");
 	}
 };
 
