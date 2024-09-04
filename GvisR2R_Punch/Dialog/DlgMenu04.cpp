@@ -1,4 +1,4 @@
-// DlgMenu04.cpp : implementation file
+2// DlgMenu04.cpp : implementation file
 //
 
 #include "stdafx.h"

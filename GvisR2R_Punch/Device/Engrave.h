@@ -188,10 +188,10 @@ public:
 	void SetEngItsCode();
 
 	// SetInfo()
-	void SetModelUpName();
+	void SetModelName();
 	//void SetModelDnName();
-	void SetLotUpName();
-	void SetLotDnName();
+	void SetLotName();
+	//void SetLotDnName();
 	void SetLayerUpName();
 	void SetLayerDnName();
 	void SetLoadMstInfo();
@@ -375,8 +375,6 @@ public:
 	// Etc
 	void SwAoiEmg(BOOL bOn);
 	void IsSwAoiEmg(BOOL bOn);
-	//void SwBufRolSol(BOOL bOn);
-	//void SwMkDnSol(BOOL bOn);
 
 	// Recoiler
 	void SwRcRelation(BOOL bOn);

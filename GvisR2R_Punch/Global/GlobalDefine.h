@@ -9,8 +9,10 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include "../Device/MotionParam.h"
 
-#define TEST_MODE		1
+
+//#define TEST_MODE		1
 
 #ifndef MAX_STRIP
 	#define MAX_STRIP				4
@@ -25,7 +27,7 @@
 #ifdef TEST_MODE
 	#define TEST_SHOT				2
 	#define PATH_REELMAP			_T("C:\\R2RSet\\Test\\ReelMap.txt")
-//#define PATH_REELMAP			_T("C:\\R2RSet\\Test\\ReelMapData.txt")
+	//#define PATH_REELMAP			_T("C:\\R2RSet\\Test\\ReelMapData.txt")
 	#define PATH_REELMAP_UP			PATH_REELMAP	//_T("C:\\R2RSet\\Test\\ReelMapDataUp.txt")
 	#define PATH_REELMAP_DN			PATH_REELMAP	//_T("C:\\R2RSet\\Test\\ReelMapDataDn.txt")
 	#define PATH_REELMAP_ALL_UP		PATH_REELMAP	//_T("C:\\R2RSet\\Test\\ReelMapDataAllUp.txt")
@@ -512,22 +514,8 @@ enum SAPP3_CODE{	SAPP3_OPEN = 0,
 					SAPP3_PAD = 8,
 					SAPP3_VHOPEN_NOVH_VHALIGN_VHDEF = 9
 				};
-/*
-enum SliceDI_0{	DI_ESTOP=0, DI_START=1, DI_FOOT=2, DI_READY=3, DI_VACUUM=4, 
-				DI_FDOOR=7, DI_LDOOR=8, DI_RDOOR=9, DI_BDOOR=10 };
 
-enum SliceDI_1{	DI_COVER1F=16, DI_COVER1B=17, DI_COVER2F=18, DI_COVER2B=19, DI_PD_ERROR=23, DI_LDI0=28, 
-				DI_LDI1=29, DI_LDI2=30, DI_LDI3=31 };
 
-enum SliceDO_2{	DO_STARTFLY=0, DO_STOPFLY=1, DO_LAMP1=2, DO_LAMP2=3, DO_LAMP3=4,
-				DO_LAMP4=5, DO_LAMP5=6, DO_LAMP6=7, DO_STARTLAMP=8, DO_READYLAMP=9,
-				DO_SOLSMOG=10, DO_SOL3=11, DO_SOLCOVER1=12, DO_SOLCOVER2=13 };
-
-enum SliceDO_3{ DO_MC=16, DO_RINGBLOWER=17, DO_SOLPANEL=19, DO_TOWERR=20, DO_TOWERY=21, DO_TOWERG=22, 
-				DO_DSP_PWR=25, DO_BUZZER=26, DO_LASER_OFF=27, DO_LDO0=28, DO_LDO1=29, DO_LDO2=30, DO_LDO3=31 };
-
-enum SliceDO_4{ DO_INK_MK=0 };
-*/
 #define DLY_INK_MK			300
 
 #define  MAX_PROCNODENUM			60    // Max ProcNodeNum : 600mm/2.5um = 48 
@@ -583,34 +571,6 @@ typedef struct {
 #define MAX_DISP_PNL				6
 #define MAX_PCR_PNL					24
 
-// #define RGN_STRIP_VARIABLE_NUM	23		// REGION_STRIP 구조체에서 배열을 제외한 변수의 갯수
-// #define MAX_NodeNumX			200
-// #define MAX_NodeNumY			200
-// #define MAX_NMSWATH				100
-// 
-// typedef struct {
-// 	int nMode;											// 0 : Full Mode, 1 : Strip Mode
-// 	int nMSwath;										// 모터가 움직일 회수.
-// 	int NodeNumX, NodeNumY;								// 각 축당 셀 갯수
-// 	int PanelPixelX, PanelPixelY;						// 전체 판넬 이미지의 크기
-// 	int OvrXPix, OvrYPix;								// 각 축으로 오버랩되는 부분의 크기
-// 	int ProcSizeX, ProcSizeY;							// 각 축당 셀의 크기
-// 	int nCell;											// 전체 셀 갯수
-// 	int nIPU;											// AOI의 IPU 갯수
-// 	int CameraValidPixel;								// 실제 검사하기 위해 사용되는 이미지의 X축 크기
-// 	int nScanMarginX, nScanMarginY;						// 실제 사용되는 이미지에 각 축방향으로 더해지는 여분 이미지의 크기 Ex) nScanMarginX = (8192 ? CameraValidPixel)/2
-// 	int nRegionX, nRegionY;								// Reserved Data
-// 	int nCellDivideX, nCellDivideY;						// 한 스트립당 각 축 방향 셀 갯수
-// 	int nCADPinPosPixX, nCADPinPosPixY;					// Pin Position X, y
-// 	int nProcMarginX, nProcMarginY;						// Reserved Data
-// 	int StPosX[MAX_NodeNumX * MAX_NodeNumY];			// 각 셀의 왼쪽 윗부분의 X 위치
-// 	int StPosY[MAX_NodeNumX * MAX_NodeNumY];			// 각 셀의 왼쪽 윗부분의 Y 위치
-// 	int EdPosX[MAX_NodeNumX * MAX_NodeNumY];			// 각 셀의 오른쪽 아래부분의 X 위치
-// 	int EdPosY[MAX_NodeNumX * MAX_NodeNumY];			// 각 셀의 오른쪽 아래부분의 Y 위치
-// 	int XSwathPixPos[MAX_NMSWATH];						// 모터가 움직이기 시작하는 위치
-// } REGION_STRIP;		//Total 100476 Byte
-
-
 #define MENU01_STC_DEFINFO_HARF		6
 #define MAX_PCR						4
 
@@ -636,7 +596,6 @@ enum IMG_KIND { CAD_IMG=0, DEF_IMG=1 };
 enum ALIGN_METHODE { ONE_POINT = 1, TWO_POINT, THREE_POINT, FOUR_POINT };
 
 enum WORK_MODE { MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2, MODE_MIDDLE = 3 };
-
 
 
 struct stSystem
@@ -728,21 +687,21 @@ struct stSystem
 struct stEngraveInfo
 {
 	CString sProcessNum;
-	CString sModelUp, sLayerUp, sLotUp, sSerialUp, sCompletedSerialUp;
-	CString sModelDn, sLayerDn, sLotDn, sSerialDn, sCompletedSerialDn;
+	CString sModel, sLayerUp, sLot, sSerialUp, sCompletedSerialUp;
+	CString sLayerDn, sSerialDn, sCompletedSerialDn;
 	CString sSerialEng;
-	CString sInnerModelUp, sInnerLayerUp, sInnerLotUp;
-	CString sInnerModelDn, sInnerLayerDn, sInnerLotDn;
+	CString sInnerModel, sInnerLayerUp, sInnerLot;
+	CString sInnerLayerDn;
 	CString sEngItsCode;
 
 	stEngraveInfo()
 	{
 		sProcessNum = _T("");
-		sModelUp = _T(""); sLayerUp = _T(""); sLotUp = _T(""); sSerialUp = _T(""); sCompletedSerialUp = _T("");
-		sModelDn = _T(""); sLayerDn = _T(""); sLotDn = _T(""); sSerialDn = _T(""); sCompletedSerialDn = _T("");
+		sModel = _T(""); sLayerUp = _T(""); sLot = _T(""); sSerialUp = _T(""); sCompletedSerialUp = _T("");
+		sLayerDn = _T(""); sSerialDn = _T(""); sCompletedSerialDn = _T("");
 		sSerialEng = _T("");
-		sInnerModelUp = _T(""); sInnerLayerUp = _T(""); sInnerLotUp = _T("");
-		sInnerModelDn = _T(""); sInnerLayerDn = _T(""); sInnerLotDn = _T("");
+		sInnerModel = _T(""); sInnerLayerUp = _T(""); sInnerLot = _T("");
+		sInnerLayerDn = _T("");
 		sEngItsCode = _T("");
 	}
 };
@@ -750,11 +709,11 @@ struct stEngraveInfo
 struct stLastJob
 {
 	CString sProcessNum;
-	CString sModelUp, sLayerUp, sLotUp, sSerialUp, sCompletedSerialUp;
-	CString sModelDn, sLayerDn, sLotDn, sSerialDn, sCompletedSerialDn;
+	CString sModel, sLayerUp, sLot, sSerialUp, sCompletedSerialUp;
+	CString sLayerDn, sSerialDn, sCompletedSerialDn;
 	CString sSerialEng;
-	CString sInnerModelUp, sInnerLayerUp, sInnerLotUp;
-	CString sInnerModelDn, sInnerLayerDn, sInnerLotDn;
+	CString sInnerModel, sInnerLayerUp, sInnerLot;
+	CString sInnerLayerDn;
 
 	CString sSelUserName, sReelTotLen, sOnePnlLen;
 	BOOL bLotSep;
@@ -797,11 +756,11 @@ struct stLastJob
 	stLastJob()
 	{
 		sProcessNum = _T("");
-		sModelUp = _T(""); sLayerUp = _T(""); sLotUp = _T(""); sSerialUp = _T(""); sCompletedSerialUp = _T("");
-		sModelDn = _T(""); sLayerDn = _T(""); sLotDn = _T(""); sSerialDn = _T(""); sCompletedSerialDn = _T("");
+		sModel = _T(""); sLayerUp = _T(""); sLot = _T(""); sSerialUp = _T(""); sCompletedSerialUp = _T("");
+		sLayerDn = _T(""); sSerialDn = _T(""); sCompletedSerialDn = _T("");
 		sSerialEng = _T("");
-		sInnerModelUp = _T(""); sInnerLayerUp = _T(""); sInnerLotUp = _T("");
-		sInnerModelDn = _T(""); sInnerLayerDn = _T(""); sInnerLotDn = _T("");
+		sInnerModel = _T(""); sInnerLayerUp = _T(""); sInnerLot = _T("");
+		sInnerLayerDn = _T(""); 
 
 		sSelUserName = _T(""); sReelTotLen = _T(""); sOnePnlLen = _T("");
 		bLotSep = FALSE;
@@ -851,73 +810,6 @@ struct stLastJob
 		bDispContRun = FALSE; bDispLotEnd = FALSE;
 	}
 };
-
-//struct stMotion
-//{
-//	BOOL bBufHomming;
-//	CString sLmtFdAdjOffSet;	// Feeding량 Offset보정용 초과값설정. [mm]
-//	CString sLmtFdOvrNum;		// Feeding량 연속 초과값 초과횟수 설정. [회]
-//	CString sLmtFdErr;			// Feeding량 Offset보정(설비정지) 한계값 설정. [mm]
-//	CString sMkTq;				// Tension Servo 0 Gain Torque Value. Plus Value is Feeding direction torque[Kgf].
-//	CString sAoiTq;				// Tension Servo 0 Gain Torque Value. Plus Value is Feeding direction torque[Kgf].
-//	CString sMkFdDist, sMkFdVel, sMkFdAcc;
-//	CString sMkJogVel, sMkJogAcc;
-//	CString sMkFdTotLen, sMkTotVel, sMkPatlVel; //
-//	CString sAoiFdDist, sAoiFdVel, sAoiFdAcc;
-//	CString sAoiJogVel, sAoiJogAcc;
-//	CString sAoiFdTotLen, sAoiTotVel, sAoiPatlVel; //
-//	CString sPinPosX[2], sPinPosY[2];
-//	CString sStPosX[2], sStPosY[2];
-//	CString sMkEdPosX[2], sMkEdPosY[2];
-//	CString sStBufPos, sBufHomeSpd, sBufHomeAcc;
-//	CString sMkFdLead, sAoiFdLead;
-//	CString sFdInitDist, sFdAoiAoiDistShot;//, sBufStdPosDist;
-//	BOOL bStNewPrdt, bMkTq, bAoiTq;
-//	CString sMkFdVacOff, sAoiFdVacOff;
-//	CString sSafeZone, sCollisionLength, sCollisionMargin;
-//	CString sAlignResultPosX[2][2], sAlignResultPosY[2][2], sAlignResultTheta[2][2], sAlignResultScore[2][2]; // [Cam][Pos]
-//
-//	stMotion()
-//	{
-//		bBufHomming = FALSE;
-//		sLmtFdAdjOffSet = _T("");		// Feeding량 Offset보정용 초과값설정. [mm]
-//		sLmtFdOvrNum = _T("");		// Feeding량 연속 초과값 초과횟수 설정. [회]
-//		sLmtFdErr = _T("");			// Feeding량 Offset보정(설비정지) 한계값 설정. [mm]
-//		sMkTq = _T("");				// Tension Servo 0 Gain Torque Value. Plus Value is Feeding direction torque[Kgf].
-//		sAoiTq = _T("");				// Tension Servo 0 Gain Torque Value. Plus Value is Feeding direction torque[Kgf].
-//		sMkFdDist = _T(""); sMkFdVel = _T(""); sMkFdAcc = _T("");
-//		sMkJogVel = _T(""); sMkJogAcc = _T("");
-//		sMkFdTotLen = _T(""); sMkTotVel = _T(""); sMkPatlVel = _T("");
-//		sAoiFdDist = _T(""); sAoiFdVel = _T(""); sAoiFdAcc = _T("");
-//		sAoiJogVel = _T(""); sAoiJogAcc = _T("");
-//		sAoiFdTotLen = _T(""); sAoiTotVel = _T(""); sAoiPatlVel = _T("");
-//		sPinPosX[0] = _T(""); sPinPosY[0] = _T("");
-//		sPinPosX[1] = _T(""); sPinPosY[1] = _T("");
-//		sStPosX[0] = _T(""); sStPosY[0] = _T("");
-//		sStPosX[1] = _T(""); sStPosY[1] = _T("");
-//		sMkEdPosX[0] = _T(""); sMkEdPosY[0] = _T("");
-//		sMkEdPosX[1] = _T(""); sMkEdPosY[1] = _T("");
-//		sStBufPos = _T(""); sBufHomeSpd = _T(""); sBufHomeAcc = _T("");
-//		sMkFdLead = _T(""); sAoiFdLead = _T("");
-//		sFdInitDist = _T(""); sFdAoiAoiDistShot = _T("");//sBufStdPosDist="");
-//		bStNewPrdt = FALSE; bMkTq = FALSE; bAoiTq = FALSE;
-//		sMkFdVacOff = _T(""); sAoiFdVacOff = _T("");
-//		sSafeZone = _T("");
-//		sCollisionLength = _T("");
-//		sCollisionMargin = _T("");
-//
-//		for (int k = 0; k < 2; k++)
-//		{
-//			for (int i = 0; i < 2; i++)
-//			{
-//				sAlignResultPosX[k][i] = _T("");
-//				sAlignResultPosY[k][i] = _T("");
-//				sAlignResultTheta[k][i] = _T("");
-//				sAlignResultScore[k][i] = _T("");
-//			}
-//		}
-//	}
-//};
 
 struct stMarking
 {
@@ -1156,21 +1048,6 @@ struct stYield
 };
 
 
-// struct stMasterInfo
-// {
-// 	double dPixelSize;
-// 	CString strMasterLocation, strCADImgPath, strCADImgBackUpPath, strTwoMetalOppLayer;
-// 	int nImageCompression;
-// 	BOOL bTwoMetalInspection;
-// 
-// 	stMasterInfo()
-// 	{
-// 		dPixelSize=0.0;
-// 		strMasterLocation=""); strCADImgPath=""); strCADImgBackUpPath=""); strTwoMetalOppLayer="");
-// 		nImageCompression=0;
-// 		bTwoMetalInspection=FALSE;
-// 	}
-// };
 
 struct stSliceIo
 {
@@ -1997,28 +1874,6 @@ struct stStatus
 };
 
 
-// struct stAlignMark
-// {
-// 	float X1, Y1;
-// 	float X2, Y2;
-// 
-// 	stAlignMark()
-// 	{
-// 		X1=0.0; Y1=0.0;
-// 		X2=0.0; Y2=0.0;
-// 	}
-// };
-
-// struct stPieceMark
-// {
-// 	float X, Y;
-// 
-// 	stPieceMark()
-// 	{
-// 		X=0.0; Y=0.0;
-// 	}
-// };
-
 struct stMpeIoWrite
 {
 	int nIdx;
@@ -2376,7 +2231,7 @@ struct stDlgMenu04
 	CString FeedSpeed, FeedAcc, FeedOnSpeed;//FeedTorquePunch, FeedTorqueAoi, FeedTorqueEngrave, 
 	CString FeedOnAcc, FeedLeadPitchAoi, FeedLeadPitchPunch, FeedLeadPitchEngrave;
 	CString BufferPosStAoi, BufferPosStEngrave, FeedLengthFromAoiToPunch, ShotNumFromAoiUpToAoiDn;
-	CString FeedLengthFromEngraveToAoi;//  , FeedSpeed2dCode, FeedAcc2dCode;
+	CString FeedLengthFromEngraveToAoi, FeedSpeed2dCode, FeedAcc2dCode;
 
 	stDlgMenu04()
 	{
@@ -2401,8 +2256,8 @@ struct stDlgMenu04
 		FeedLengthFromAoiToPunch = _T("ML45008");
 		ShotNumFromAoiUpToAoiDn = _T("ML45010");
 		FeedLengthFromEngraveToAoi = _T("ML45024");
-		//FeedSpeed2dCode = _T("ML45060");
-		//FeedAcc2dCode = _T("ML45062");
+		FeedSpeed2dCode = _T("ML45060");
+		FeedAcc2dCode = _T("ML45062");
 	}
 };
 

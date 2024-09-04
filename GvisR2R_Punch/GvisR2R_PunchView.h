@@ -211,9 +211,6 @@ class CGvisR2R_PunchView : public CFormView
 	BOOL m_bTIM_CAMMASTER_UPDATE;
 	CString m_sMyMsg; int m_nTypeMyMsg;
 	int m_nVsBufLastSerial[2];
-	//BOOL m_bOpenShareUp, m_bOpenShareDn;
-
-	//	int m_nMsgShiftX, m_nMsgShiftY;
 
 	int m_nStepElecChk;
 	BOOL m_bStopFeeding;
@@ -367,7 +364,7 @@ public:
 	int m_nTotMk[2], m_nCurMk[2]; // [0]: 좌 MK, [1]: 우 MK
 	int m_nPrevTotMk[2], m_nPrevCurMk[2]; // [0]: 좌 MK, [1]: 우 MK
 	int m_nPrevStepAuto, m_nPrevMkStAuto;
-	BOOL bPcrInShare[2], bPcrInShareVs[2];
+	BOOL m_bPcrInShare[2], m_bPcrInShareVs[2];
 	BOOL m_bRcvSig[_SigInx::_EndIdx];
 	//stRcvSig m_stRcvSig;
 	CMpDevice* m_pMpe;
@@ -420,7 +417,7 @@ public:
 	BOOL m_nAoiDnAutoSerial, m_nAoiDnAutoSerialPrev;
 
 	// Auto Sequence
-	BOOL m_bAuto, m_bManual, m_bOneCycle;
+	BOOL m_bAuto, m_bManual;// , m_bOneCycle;
 	BOOL m_bMkTmpStop, m_bAoiLdRun, m_bAoiLdRunF;
 	BOOL m_bTHREAD_MK[4];	// [0] Auto-Left, [1] Auto-Right, [2] Manual-Left, [3] Manual-Right
 	BOOL m_bTHREAD_DISP_DEF;
@@ -504,6 +501,9 @@ public:
 	BOOL m_bDoneMk[2];			// [nCam] : TRUE(Punching 완료), FALSE(Punching 미완료)
 	BOOL m_bReMark[2];			// [nCam] : TRUE(Punching 다시시작), FALSE(pass)
 
+	BOOL m_bJoinContinue;		// 이음매 이어가기
+	//BOOL m_bChangeModel, m_bChangeLot, m_bChangeLayer;
+
 	int m_nMonAlmF, m_nClrAlmF;
 	BOOL m_bLotEnd, m_bLotEndF, m_bLastProc, m_bLastProcFromUp, m_bLastProcFromEng;
 	BOOL m_bMkSt, m_bMkStSw;
@@ -574,11 +574,8 @@ public:
 	void RestoreReelmap();
 	CString GetProcessNum();
 
-	//CString GetRmapPath(int nRmap, stModelInfo stInfo);
-	//CString GetRmapPath(int nRmap);
 	void DispMain(CString sMsg, COLORREF rgb = RGB(0, 255, 0));
 	int DoDispMain();
-	//	CString GetDispMain();
 	void GetDispMsg(CString &strMsg, CString &strTitle);
 	void DispMsg(CString strMsg, CString strTitle = _T(""), COLORREF color = RGB(255, 0, 0), DWORD dwDispTime = 0, BOOL bOverWrite = TRUE);
 	void ClrDispMsg();
@@ -594,15 +591,11 @@ public:
 
 	void TowerLamp(COLORREF color, BOOL bOn, BOOL bWink = FALSE);
 	void DispTowerWinker();
-	// 	void DispBtnWinker(int nDly=0);
 	void Buzzer(BOOL bOn, int nCh = 0);
 	int MyPassword(CString strMsg, int nCtrlId = 0);
 
 	void GetInput();
 	void GetEnc();
-	// 	void GetIO();
-	// 	void SetIO();
-	// 	void ChkTqSpd();
 	void SetAoiFdPitch(double dPitch);
 	void SetMkFdPitch(double dPitch);
 
@@ -651,6 +644,8 @@ public:
 	void SetBufHomeParam(double dVel, double dAcc);
 	void DispLotStTime();
 	void SetListBuf();
+
+	void DispMainOnAutoStart();
 
 	static UINT ThreadProc0(LPVOID lpContext); // DoMark0(), DoMark1()
 	static UINT ThreadProc1(LPVOID lpContext); // ChkCollision()
@@ -719,13 +714,6 @@ public:
 	void Shift2DummyBuf();
 	void Shift2Mk();
 	void CompletedMk(int nCam); // 0: Only Cam0, 1: Only Cam1, 2: Cam0 and Cam1, 3: None
-	void SetTestSts(int nStep);
-	BOOL IsMkFdSts();		// not used
-	void SetAoiFd();		// not used
-	void SetMkFd();			// not used
-	BOOL IsMkFd();			// not used
-	BOOL IsAoiFd();			// not used
-	void SetMkFd(double dDist);
 	void SetDelay(int mSec, int nId = 0);
 	BOOL WaitDelay(int nId = 0);				// F:Done, T:On Waiting....
 	void SetDelay0(int mSec, int nId = 0);
@@ -755,7 +743,6 @@ public:
 	void InitAuto(BOOL bInit = TRUE);
 	void Mk0();
 	void Mk1();
-	//BOOL IsMk();
 	BOOL IsReMk();
 	BOOL IsMkDone();
 	BOOL IsAoiTblVac();
@@ -781,12 +768,19 @@ public:
 	BOOL IsShareDn();
 	int GetShareUp();
 	int GetShareDn();
+	void CheckShareUp(int nSerial);
+	void CheckShareDn(int nSerial);
 
 	BOOL IsShareVs();
 	BOOL IsShareVsUp();
 	BOOL IsShareVsDn();
 	int GetShareVsUp();
 	int GetShareVsDn();
+	void CheckShareVsUp(int nSerial);
+	void CheckShareVsDn(int nSerial);
+
+	void TurnLastProc();
+	void TurnLastProcVs();
 
 	BOOL IsBuffer(int nNum = 0);
 	BOOL IsBufferUp();
@@ -855,19 +849,17 @@ public:
 	BOOL IsMoveDone();
 	BOOL IsMoveDone0();
 	BOOL IsMoveDone1();
-	void Ink(BOOL bOn = TRUE);
+
 	BOOL UpdateReelmap(int nSerial);
 	BOOL UpdateReelmapInner(int nSerial);
 	BOOL MakeItsFile(int nSerial);
 
-	// 	void LoadMstInfo();
 	void InitInfo();
 	void InitReelmap();
 	void InitReelmapUp();
 	void InitReelmapDn();
 	BOOL IsPinMkData();
 	BOOL IsPinData();
-	// 	BOOL IsMkOffsetData();
 	BOOL CopyDefImg(int nSerial);
 	BOOL CopyDefImg(int nSerial, CString sNewLot);
 	BOOL CopyDefImgUp(int nSerial, CString sNewLot = _T(""));
@@ -902,7 +894,6 @@ public:
 	BOOL IsInitPos0();
 	BOOL IsInitPos1();
 	BOOL IsMkEdPos1();
-	// 	void MkDnSol(BOOL bDn);
 	void LotEnd();
 	void Winker(int nId, int nDly = 20); // 0:Ready, 1:Reset, 2:Run, 3:Stop
 	void ResetWinker(); // 0:Ready, 1:Reset, 2:Run, 3:Stop
@@ -927,15 +918,10 @@ public:
 	void StopTimWinker(int nId);
 	BOOL IsShowLive();
 	BOOL IsChkTmpStop();
-	// 	void ResetReelmap();
 	BOOL ChkLastProc();
-	//	double GetAoiFdLen();
 	double GetAoiUpFdLen();
 	double GetAoiDnFdLen();
 	BOOL IsVerify();
-	//BOOL IsFixPcs();
-	//BOOL IsFixPcsUp();
-	//BOOL IsFixPcsDn();
 	BOOL IsFixPcsUp(int nSerial);
 	BOOL IsFixPcsDn(int nSerial);
 	BOOL IsReview();
@@ -947,10 +933,6 @@ public:
 	BOOL IsJogRtUp0();
 	BOOL IsJogRtDn1();
 	BOOL IsJogRtUp1();
-	//void OpenShareUp(BOOL bOpen = TRUE);
-	//void OpenShareDn(BOOL bOpen = TRUE);
-	//BOOL IsOpenShareUp();
-	//BOOL IsOpenShareDn();
 	void ResetMotion();
 	void ResetMotion(int nMsId);
 	unsigned long ChkDoor(); // 0: All Closed , Open Door Index : Doesn't all closed. (Bit3: F, Bit2: L, Bit1: R, Bit0; B)
@@ -959,8 +941,6 @@ public:
 	BOOL IsVs();
 	BOOL IsVsUp();
 	BOOL IsVsDn();
-	void SetDummyUp();
-	void SetDummyDn();
 	//BOOL MakeDummyUp(int nErr);
 	//BOOL MakeDummyDn(int nErr);
 	int GetAoiUpSerial();
@@ -1002,8 +982,6 @@ public:
 	BOOL IsMk0Done();
 	BOOL IsMk1Done();
 	void InitIoWrite();
-	void SetTestSts0(BOOL bOn);
-	void SetTestSts1(BOOL bOn);
 
 	void SetLastProc();
 	BOOL IsLastProc();
@@ -1036,9 +1014,6 @@ public:
 	void CycleStop();
 	BOOL ChkLotCutPos();
 	BOOL OpenReelmapFromBuf(int nSerial);
-	int GetAoiUpDummyShot();
-	int GetAoiDnDummyShot();
-	void SetAoiDummyShot(int nAoi, int nDummy);
 
 	void SetPathAtBuf();
 	void SetPathAtBufUp();

@@ -147,8 +147,6 @@ void CDlgMenu03::OnShowWindow(BOOL bShow, UINT nStatus)
 void CDlgMenu03::AtDlgShow()
 {
 	LoadImg();
-	//m_bTIM_MENU03_DISP = TRUE;
-	//SetTimer(TIM_MENU03_DISP, 300, NULL);	// Disp();
 	SetTimer(TIM_CHK_MREG, 300, NULL);
 
 	UpdateSignal();
@@ -156,7 +154,6 @@ void CDlgMenu03::AtDlgShow()
 
 void CDlgMenu03::AtDlgHide()
 {
-	//m_bTIM_MENU03_DISP = FALSE;
 	DelImg();
 }
 
@@ -384,7 +381,6 @@ BOOL CDlgMenu03::OnInitDialog()
 	SetTimer(TIM_MENU03_DISP, 300, NULL);	// Disp();
 
 	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
 }
 
 void CDlgMenu03::InitGroup()
@@ -1273,8 +1269,6 @@ void CDlgMenu03::DispMain()
 	{
 		if (myStcTitle[33].GetImageBk() != LBL_IMG_DN)
 			myStcTitle[33].SetImageBk(LBL_IMG_DN);	// 자 동
-		if (myStcTitle[34].GetImageBk() != LBL_IMG_UP)
-			myStcTitle[34].SetImageBk(LBL_IMG_UP);	// 1회 운전
 		if (myStcTitle[35].GetImageBk() != LBL_IMG_UP)
 			myStcTitle[35].SetImageBk(LBL_IMG_UP);	// 수 동 
 	}
@@ -1282,26 +1276,13 @@ void CDlgMenu03::DispMain()
 	{
 		if (myStcTitle[33].GetImageBk() != LBL_IMG_UP)
 			myStcTitle[33].SetImageBk(LBL_IMG_UP);	// 자 동
-		if (myStcTitle[34].GetImageBk() != LBL_IMG_UP)
-			myStcTitle[34].SetImageBk(LBL_IMG_UP);	// 1회 운전
 		if (myStcTitle[35].GetImageBk() != LBL_IMG_DN)
 			myStcTitle[35].SetImageBk(LBL_IMG_DN);	// 수 동 
-	}
-	else if (pDoc->Status.bOneCycle)	// OneCycl
-	{
-		if (myStcTitle[33].GetImageBk() != LBL_IMG_UP)
-			myStcTitle[33].SetImageBk(LBL_IMG_UP);	// 자 동
-		if (myStcTitle[34].GetImageBk() != LBL_IMG_DN)
-			myStcTitle[34].SetImageBk(LBL_IMG_DN);	// 1회 운전
-		if (myStcTitle[35].GetImageBk() != LBL_IMG_UP)
-			myStcTitle[35].SetImageBk(LBL_IMG_UP);	// 수 동 
 	}
 	else
 	{
 		if (myStcTitle[33].GetImageBk() != LBL_IMG_UP)
 			myStcTitle[33].SetImageBk(LBL_IMG_UP);	// 자 동
-		if (myStcTitle[34].GetImageBk() != LBL_IMG_UP)
-			myStcTitle[34].SetImageBk(LBL_IMG_UP);	// 1회 운전
 		if (myStcTitle[35].GetImageBk() != LBL_IMG_UP)
 			myStcTitle[35].SetImageBk(LBL_IMG_UP);	// 수 동 
 	}
@@ -2938,20 +2919,10 @@ BOOL CDlgMenu03::DoReset()
 			}
 			pView->m_bCont = TRUE; pDoc->SetStatus(_T("General"), _T("bCont"), pView->m_bCont);
 		}
-		pView->m_nDebugStep = 1; pView->DispThreadTick();
-		pView->InitAuto(bInit);
 
-		pView->m_nDebugStep = 2; pView->DispThreadTick();
+		pView->InitAuto(bInit);
 		pView->SetPathAtBuf();
 
-		pView->m_nDebugStep = 3; pView->DispThreadTick();
-		pView->SetAoiDummyShot(0, pView->GetAoiUpDummyShot());
-
-		pView->m_nDebugStep = 4; pView->DispThreadTick();
-		if(bDualTest)
-			pView->SetAoiDummyShot(1, pView->GetAoiDnDummyShot());
-
-		pView->m_nDebugStep = 5; pView->DispThreadTick();
 		pView->m_bAoiFdWrite[0] = FALSE; pDoc->SetStatus(_T("General"), _T("bAoiFdWrite[0]"), pView->m_bAoiFdWrite[0]);
 		pView->m_bAoiFdWrite[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bAoiFdWrite[1]"), pView->m_bAoiFdWrite[1]);
 		pView->m_bAoiFdWriteF[0] = FALSE; pDoc->SetStatus(_T("General"), _T("bAoiFdWriteF[0]"), pView->m_bAoiFdWriteF[0]);
@@ -3001,16 +2972,12 @@ BOOL CDlgMenu03::DoReset()
 			}
 		}
 
-		pView->m_nDebugStep = 12; pView->DispThreadTick();
 		pView->TowerLamp(RGB_RED, TRUE, FALSE);
-		pView->m_nDebugStep = 13; pView->DispThreadTick();
-		pView->m_nDebugStep = 14; pView->DispThreadTick();
+		//pView->DispStsBar(_T("정지-2"), 0);
 		pView->DispMain(_T("정 지"), RGB_RED);	
-		pView->m_nDebugStep = 15; pView->DispThreadTick();
 		SwAoiReset(TRUE);
 		pView->OpenReelmap();
 
-		pView->m_nDebugStep = 16; pView->DispThreadTick();
 		if(bInit)
 		{
 			// 초기화
@@ -3022,7 +2989,6 @@ BOOL CDlgMenu03::DoReset()
 			// 이어가기
 			pView->SetListBuf();
 		}
-		pView->m_nDebugStep = 17; pView->DispThreadTick();
 		
 		return TRUE;
 	}
@@ -3139,62 +3105,6 @@ void CDlgMenu03::SwEngraveTq(BOOL bOn)
 }
 
 // [Marking]
-
-BOOL CDlgMenu03::IsMkTblBlw()
-{
-	if (!pDoc->m_pMpeIo)
-		return FALSE;
-
-	// MpeIO
-	int nInSeg = pDoc->MkIo.MpeIo.nInSeg;
-	int nOutSeg = pDoc->MkIo.MpeIo.nOutSeg;
-
-	BOOL bOn = FALSE;
-	bOn = pDoc->m_pMpeIo[nInSeg + 5] & (0x01<<2);		//[29] 마킹부 테이블 브로워 스위치 램프
-	return bOn;
-}
-
-BOOL CDlgMenu03::IsMkFdVac()
-{
-	if (!pDoc->m_pMpeIo)
-		return FALSE;
-
-	// MpeIO
-	int nInSeg = pDoc->MkIo.MpeIo.nInSeg;
-	int nOutSeg = pDoc->MkIo.MpeIo.nOutSeg;
-
-	BOOL bOn = FALSE;
-	bOn = pDoc->m_pMpeIo[nInSeg + 5] & (0x01<<5);	//[29] MB003715,	Y4255	,	마킹부 피딩 진공 스위치 램프
-	return bOn;
-}
-
-BOOL CDlgMenu03::IsMkTqVac()
-{
-	if (!pDoc->m_pMpeIo)
-		return FALSE;
-
-	// MpeIO
-	int nInSeg = pDoc->MkIo.MpeIo.nInSeg;
-	int nOutSeg = pDoc->MkIo.MpeIo.nOutSeg;
-
-	BOOL bOn = FALSE;
-	bOn = pDoc->m_pMpeIo[nInSeg + 5] & (0x01<<6);		//[29] MB003716,	Y4256	,	마킹부 토크 진공 스위치 램프
-	return bOn;
-}
-
-BOOL CDlgMenu03::IsMkTblVac() 
-{
-	if (!pDoc->m_pMpeIo)
-		return FALSE;
-
-	// MpeIO
-	int nInSeg = pDoc->MkIo.MpeIo.nInSeg;
-	int nOutSeg = pDoc->MkIo.MpeIo.nOutSeg;
-
-	BOOL bOn = FALSE;
-	bOn = pDoc->m_pMpeIo[nInSeg + 5] & (0x01<<7);		//[29] MB003717,	Y4257	,	마킹부 테이블 진공 스위치 램프
-	return bOn;
-}
 
 BOOL CDlgMenu03::IsBufRolSol() 
 {

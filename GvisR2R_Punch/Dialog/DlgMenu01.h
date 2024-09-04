@@ -98,6 +98,8 @@ class CDlgMenu01 : public CDialog
 	BOOL IsWinkMkR();
 	void WinkMkR(BOOL bOn);
 
+	void ResetLotChange();
+
 // Construction
 public:
 	CDlgMenu01(CWnd* pParent = NULL);   // standard constructor
@@ -211,6 +213,7 @@ public:
 	void SwitchReelmapDisp(int nSelRmap);	// 20130315
 	void DispReelmapDisp();					// 20130321
 
+	void ResetJoinContinue();
 
 // Dialog Data
 	//{{AFX_DATA(CDlgMenu01)

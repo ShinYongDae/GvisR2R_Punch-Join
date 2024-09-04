@@ -70,14 +70,12 @@ CDlgMenu02::CDlgMenu02(CWnd* pParent /*=NULL*/)
 	m_nBtnAlignCam0Pos = 0;
 	m_nBtnAlignCam1Pos = 0;
 	m_nSpd = 1;
-// 	m_bMkDnSolOff = FALSE;
 
 	m_nSelectCam0Pos = 0;
 	m_nSelectCam1Pos = 0;
 
 	m_lChk = 0L;
 	m_pDlgUtil03 = NULL;
-	//m_pDlgUtil06 = NULL;
 
 	m_bLockTimer = FALSE;
 }
@@ -515,12 +513,6 @@ BOOL CDlgMenu02::OnInitDialog()
 
 	myStcData2[3].SetText(pDoc->WorkingInfo.Vision[1].sResX);
 	myStcData2[4].SetText(pDoc->WorkingInfo.Vision[1].sResY);
-
-// 	if(pDoc->m_pSpecLocal)
-// 	{
-// 		CfPoint ptOfst(pDoc->m_pSpecLocal->m_dPcsOffsetX, pDoc->m_pSpecLocal->m_dPcsOffsetY);
-// 		SetMkPos(ptOfst);
-// 	}
 
 	m_bTIM_BUF_ENC = TRUE;
  	SetTimer(TIM_BUF_ENC, 100, NULL);
@@ -2315,17 +2307,10 @@ void CDlgMenu02::SetPinPos(int nCam, CfPoint ptPnt)
 void CDlgMenu02::OnBtnPinSave() 
 {
 	// TODO: Add your control notification handler code here
-//	pView->ShiftMsgPos(0, -430);
-//	if(IDNO == pView->MessageBox(_T("Do you want to save Pin Position?"), "",  MB_YESNO))
-//	if(IDNO == pView->DoMyMsgBox(_T("Do you want to save Pin Position?"), MB_YESNO))
 	if(IDNO == pView->MsgBox(_T("Do you want to save Pin Position?"), 0, MB_YESNO))
 	{
-//		pView->ShiftMsgPos(0, 0);
 		return;
 	}
-//	pView->ShiftMsgPos(0, 0);
-
-// 	pView->MyMsgBox(_T("Do you want to save Pin Position?"), MB_YESNO, (long)200);
 
 	CfPoint ptPnt;
 	ptPnt.x = pView->m_dEnc[AXIS_X0];
@@ -2342,7 +2327,6 @@ void CDlgMenu02::OnBtnPinSave()
  	{
  		pDoc->SetMkPnt(CAM_LF);
  	}
-
 }
 
 void CDlgMenu02::OnBtnPinSave2() 
@@ -2570,14 +2554,6 @@ void CDlgMenu02::OnChkMkOffsetSt()
 		m_dStOffsetX = pView->m_dEnc[AXIS_X0];
 		m_dStOffsetY = pView->m_dEnc[AXIS_Y0];
 
-// 		bOn = pDoc->m_pSliceIo[7] & (0x01<<10) ? TRUE : FALSE;	// 마킹부 토크 클램프 스위치 램프 -> 마킹부 마킹 실린더 SOL
-// 		if(!bOn)
-// 		{
-// 			if(pView->m_pDlgMenu03)
-// 				pView->m_pDlgMenu03->SwMkDnSol(TRUE);
-// 			Sleep(300);
-// 		}
-
 		SwMarking();
 
 		CString str = _T("Find mark with jog button.");
@@ -2604,14 +2580,6 @@ void CDlgMenu02::OnChkMkOffsetSt2()
 		myBtn2[19].EnableWindow(FALSE);	// IDC_CHK_MK_OFFSET_ST
 		m_dStOffsetX = pView->m_dEnc[AXIS_X1];
 		m_dStOffsetY = pView->m_dEnc[AXIS_Y1];
-
-// 		bOn = pDoc->m_pSliceIo[7] & (0x01<<10) ? TRUE : FALSE;	// 마킹부 토크 클램프 스위치 램프 -> 마킹부 마킹 실린더 SOL
-// 		if(!bOn)
-// 		{
-// 			if(pView->m_pDlgMenu03)
-// 				pView->m_pDlgMenu03->SwMkDnSol(TRUE);
-// 			Sleep(300);
-// 		}
 
 		SwMarking2();
 

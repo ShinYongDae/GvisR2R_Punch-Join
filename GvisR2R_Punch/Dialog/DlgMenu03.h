@@ -142,18 +142,12 @@ public:
 
 	BOOL IsStop();
 
-	BOOL IsMkFdVac();		// not used
-	BOOL IsMkTqVac();		// not used
-	BOOL IsMkTblVac();		// not used
-	BOOL IsMkTblBlw();		// not used
-
 	BOOL IsAoiLdRun();
 	BOOL IsAoiFdVac();
 	BOOL IsBufRolSol();
 
 
 	// Torque Motor
-	void SwAoiTq(BOOL bOn);
 	void SwEngraveTq(BOOL bOn);
 
 	// AOI
@@ -163,7 +157,6 @@ public:
 	void SwReady();
 	void SwRun();
 	void SwStop();
-	void SwAoiTq();
 	void SwAoiRelation();
 
 	void SetCore150mmRecoiler(BOOL bOn);

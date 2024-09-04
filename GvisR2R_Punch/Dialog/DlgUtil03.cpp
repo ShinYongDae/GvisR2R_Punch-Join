@@ -209,7 +209,6 @@ void CDlgUtil03::AtDlgShow()
 	
 	LoadImg();
 	Disp(ROT_NONE);
-// 	Disp(ROT_CCW_90);
 }
 
 void CDlgUtil03::AtDlgHide()
@@ -811,66 +810,6 @@ void CDlgUtil03::OnBtnAllMkTest()
 		pView->StopAllMk();	
 	}
 }
-
-// void CDlgUtil03::DoDispenseTest()
-// {
-// 	BOOL bOn;
-// 	double pTgtPos[2];
-// 	pTgtPos[AXIS_Y] = _tstof(pDoc->WorkingInfo.Motion.sStPosY);
-// 	pTgtPos[AXIS_X] = _tstof(pDoc->WorkingInfo.Motion.sStPosX);
-// 	double dCurrX = pView->m_dEnc[AXIS_X];
-// 	double dCurrY = pView->m_dEnc[AXIS_Y];
-// 
-// 	double fLen, fVel, fAcc, fJerk;
-// 	fLen = sqrt( ((pTgtPos[AXIS_X] - dCurrX) * (pTgtPos[AXIS_X] - dCurrX)) + ((pTgtPos[AXIS_Y] - dCurrY) * (pTgtPos[AXIS_Y] - dCurrY)) );
-// 	if(fLen > 0.001)
-// 	{
-// // 		bOn = pDoc->m_pSliceIo[7] & (0x01<<10) ? TRUE : FALSE;	// 마킹부 토크 클램프 스위치 램프 -> 마킹부 마킹 실린더 SOL
-// // 		if(bOn)
-// // 		{
-// // 			if(pView->m_pDlgMenu03)
-// // 			{
-// // 				if(!pView->IsAuto())
-// // 					pView->m_pDlgMenu03->SwMkDnSol(FALSE);
-// // 			}
-// // 			Sleep(300);
-// // 		}
-// 
-// 		pView->m_pMotion->GetSpeedProfile(TRAPEZOIDAL, AXIS_X, fLen, fVel, fAcc, fJerk);
-// 		if(!pView->m_pMotion->Move(MS_XY, pTgtPos, fVel, fAcc, fAcc))
-// 		if(!pView->m_pMotion->Move(MS_XY, pTgtPos, fVel, fAcc, fAcc))
-// 			AfxMessageBox(_T("Move XY Error..."));
-// 	}
-// 
-// 	if(!pView->IsNoMk())
-// 	{
-// // 		bOn = pDoc->m_pSliceIo[7] & (0x01<<10) ? TRUE : FALSE;	// 마킹부 토크 클램프 스위치 램프 -> 마킹부 마킹 실린더 SOL
-// // 		if(!bOn)
-// // 		{
-// // 			if(pView->m_pDlgMenu03)
-// // 			{
-// // 				if(!pView->IsAuto())
-// // 					pView->m_pDlgMenu03->SwMkDnSol(TRUE);
-// // 			}
-// // 			Sleep(300);
-// // 		}
-// 
-// 		SetFurge();
-// 	}
-// }
-
-// void CDlgUtil03::SetFurge()
-// {
-// 	// Ink Marking ON
-// // 	pDoc->m_pSliceIo[7] |= (0x01<<12);	// 마킹부 마킹 콘트롤러 출력 1(전원공급) -> Purge
-// 	if(pView->m_pDlgMenu02)
-// 	{
-// 		pView->m_pDlgMenu02->SetMkCurPos();
-// 
-// // 		pView->m_pDlgMenu02->m_bMkDnSolOff = TRUE;
-// 		pView->m_pDlgMenu02->SetMkDlyOff();
-// 	}
-// }
 
 void CDlgUtil03::OnChkNoMk() 
 {

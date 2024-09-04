@@ -307,8 +307,6 @@ public:
 	BOOL MakeMkDir(stModelInfo stInfo);
 	BOOL MakeMkDir(CString sModel, CString sLot, CString sLayer);
 	BOOL MakeMkDir();
-	BOOL MakeMkDirUp();
-	BOOL MakeMkDirDn();
 	BOOL Shift2Mk(int nSerial);
 	void SetLastSerial(int nSerial);								// 릴맵 텍스트 파일의 수율정보를 업데이트함.
 	void SetCompletedSerial(int nSerial);
@@ -466,9 +464,6 @@ public:
 	CString m_sEngModel, m_sEngLayerUp;
 	CString m_sEngLayerDn;
 	int m_nWritedItsSerial;
-
-	BOOL MakeLayerMappingHeader();
-	BOOL MakeLayerMappingSerial(int nIdx, int nItsSerial);
 
 	int SearchFirstShotOnIts();
 	BOOL GetItsSerialInfo(int nItsSerial, BOOL &bDualTest, CString &sLot, CString &sLayerUp, CString &sLayerDn, int nOption=0);		// 내층에서의 ITS 시리얼의 정보

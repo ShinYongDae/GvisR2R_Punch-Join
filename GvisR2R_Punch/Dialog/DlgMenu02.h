@@ -111,14 +111,11 @@ public:
 	double m_dAoiUpFdOffsetX, m_dAoiUpFdOffsetY;
 	double m_dAoiDnFdOffsetX, m_dAoiDnFdOffsetY;
 	double m_dEngFdOffsetX, m_dEngFdOffsetY;
-// 	BOOL m_bMkDnSolOff;
 
 	double m_dOneShotRemainLen;
 	void DispOneShotRemainLen();
 
 	CDlgUtil03 *m_pDlgUtil03;
-	//CDlgUtil06 *m_pDlgUtil06;
-
 
 	BOOL Create();
 	void AtDlgShow();
