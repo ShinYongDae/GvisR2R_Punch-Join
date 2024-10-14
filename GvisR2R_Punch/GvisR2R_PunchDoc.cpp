@@ -7990,10 +7990,8 @@ void CGvisR2R_PunchDoc::SetEngraveToq(double dToq)
 	sData.Format(_T("%.3f"), dToq);
 	WorkingInfo.Motion.sEngraveTq = sData;
 	::WritePrivateProfileString(_T("Motion"), _T("ENGRAVE_TENSION_SERVO_TORQUE"), sData, sPath);
-//#ifdef USE_MPE
 //	long lData = (long)(dToq * 1000.0);
 //	pView->MpeWrite(pView->Plc.DlgMenu04.FeedTorqueEngrave, lData);	// 각인부 Tension 모터 토크값 (단위 Kgf * 1000)
-//#endif
 }
 
 double CGvisR2R_PunchDoc::GetEngraveToq()
@@ -9287,7 +9285,7 @@ void CGvisR2R_PunchDoc::SetEngraveReaderDist(double dLen)
 	WorkingInfo.Motion.s2DEngLen = WorkingInfo.Motion.sEngraveFdBarcodeOffset = sData;
 	::WritePrivateProfileString(_T("Motion"), _T("ENGRAVE_BARCODE_OFFSET"), sData, sPath);
 	long lData = (long)(dLen * 1000.0);
-	pView->MpeWrite(_T("ML45090"), lData);	// 각인위치에서 2D 바코드 리더기까지의 Offset (단위 mm * 1000)
+	pView->MpeWrite(pView->Plc.DlgMenu04.FeedLengthFromLaserToReader, lData);	// 각인위치에서 2D 바코드 리더기까지의 Offset (단위 mm * 1000)
 }
 
 double CGvisR2R_PunchDoc::GetEngraveReaderDist()
@@ -9297,12 +9295,12 @@ double CGvisR2R_PunchDoc::GetEngraveReaderDist()
 
 void CGvisR2R_PunchDoc::SetAoiReaderDist(double dLen)
 {
-	CString sData, sPath = PATH_WORKING_INFO;
-	sData.Format(_T("%.3f"), dLen);
-	WorkingInfo.Motion.sAoiFdBarcodeOffset = sData;
-	::WritePrivateProfileString(_T("Motion"), _T("AOI_BARCODE_OFFSET"), sData, sPath);
-	long lData = (long)(dLen * 1000.0);
-	pView->MpeWrite(_T("ML45092"), lData);	// AOI 검사위치에서 2D 바코드 리더기까지의 Offset (단위 mm * 1000)
+	//CString sData, sPath = PATH_WORKING_INFO;
+	//sData.Format(_T("%.3f"), dLen);
+	//WorkingInfo.Motion.sAoiFdBarcodeOffset = sData;
+	//::WritePrivateProfileString(_T("Motion"), _T("AOI_BARCODE_OFFSET"), sData, sPath);
+	//long lData = (long)(dLen * 1000.0);
+	//pView->MpeWrite(_T("ML45092"), lData);	// AOI 검사위치에서 2D 바코드 리더기까지의 Offset (단위 mm * 1000)
 }
 
 double CGvisR2R_PunchDoc::GetAoiReaderDist()
@@ -9312,12 +9310,12 @@ double CGvisR2R_PunchDoc::GetAoiReaderDist()
 
 void CGvisR2R_PunchDoc::SetMkReaderDist(double dLen)
 {
-	CString sData, sPath = PATH_WORKING_INFO;
-	sData.Format(_T("%.3f"), dLen);
-	WorkingInfo.Motion.sMkFdBarcodeOffset = sData;
-	::WritePrivateProfileString(_T("Motion"), _T("PUNCHING_BARCODE_OFFSET"), sData, sPath);
-	long lData = (long)(dLen * 1000.0);
-	pView->MpeWrite(_T("ML45094"), lData);	// Punching 시작위치에서 2D 바코드 리더기까지의 Offset (단위 mm * 1000)
+	//CString sData, sPath = PATH_WORKING_INFO;
+	//sData.Format(_T("%.3f"), dLen);
+	//WorkingInfo.Motion.sMkFdBarcodeOffset = sData;
+	//::WritePrivateProfileString(_T("Motion"), _T("PUNCHING_BARCODE_OFFSET"), sData, sPath);
+	//long lData = (long)(dLen * 1000.0);
+	//pView->MpeWrite(_T("ML45094"), lData);	// Punching 시작위치에서 2D 바코드 리더기까지의 Offset (단위 mm * 1000)
 }
 
 double CGvisR2R_PunchDoc::GetMkReaderDist()
@@ -9325,55 +9323,26 @@ double CGvisR2R_PunchDoc::GetMkReaderDist()
 	return (_tstof(WorkingInfo.Motion.sMkFdBarcodeOffset));
 }
 
-
-//void CGvisR2R_PunchDoc::SetOffsetInitPos(double dLen)
-//{
-//	CString sData, sPath = PATH_WORKING_INFO;
-//	sData.Format(_T("%.3f"), dLen);
-//	WorkingInfo.Motion.sOffsetInitPos = sData;
-//	::WritePrivateProfileString(_T("Motion"), _T("INIT_POSITION_OFFSET"), sData, sPath);
-//#ifdef USE_MPE
-//	long lData = (long)(_tstof(WorkingInfo.Motion.sOffsetInitPos) * 1000.0);
-//	pView->MpeWrite(_T("ML44046"), lData);	// 각인부, 검사부, 마킹부 offset 이송 값 (단위 mm * 1000)
-//#endif
-//}
-
-//double CGvisR2R_PunchDoc::GetOffsetInitPos()
-//{
-//	TCHAR szData[200];
-//	CString sPath = PATH_WORKING_INFO;
-//	if (0 < ::GetPrivateProfileString(_T("Motion"), _T("INIT_POSITION_OFFSET"), NULL, szData, sizeof(szData), sPath))
-//		WorkingInfo.Motion.sOffsetInitPos = CString(szData);
-//	else
-//	{
-//		//AfxMessageBox(_T("각인부, 검사부, 마킹부 offset 이송 값이 설정되어 있지 않습니다."), MB_ICONWARNING | MB_OK);
-//		WorkingInfo.Motion.sOffsetInitPos = CString(_T("0.0"));
-//	}
-//
-//	return (_tstof(WorkingInfo.Motion.sOffsetInitPos));
-//}
-
-
 void CGvisR2R_PunchDoc::Set2DReaderPosMoveVel(double dVel)
 {
-	CString sPath = PATH_WORKING_INFO;
-	CString sVal;
-	sVal.Format(_T("%.3f"), dVel);
-	WorkingInfo.Motion.sFdBarcodeOffsetVel = sVal;
-	::WritePrivateProfileString(_T("Motion"), _T("MARKING_FEEDING_SERVO_VEL"), sVal, sPath);
-	long lData = (long)(dVel * 1000.0);
-	pView->MpeWrite(pView->Plc.DlgMenu04.FeedSpeed2dCode, lData);	// 2D 바코드 리더기위치까지 Feeding 속도 (단위 mm/sec * 1000)
+	//CString sPath = PATH_WORKING_INFO;
+	//CString sVal;
+	//sVal.Format(_T("%.3f"), dVel);
+	//WorkingInfo.Motion.sFdBarcodeOffsetVel = sVal;
+	//::WritePrivateProfileString(_T("Motion"), _T("MARKING_FEEDING_SERVO_VEL"), sVal, sPath);
+	//long lData = (long)(dVel * 1000.0);
+	//pView->MpeWrite(pView->Plc.DlgMenu04.FeedSpeed2dCode, lData);	// 2D 바코드 리더기위치까지 Feeding 속도 (단위 mm/sec * 1000)
 }
 
 void CGvisR2R_PunchDoc::Set2DReaderPosMoveAcc(double dAcc)
 {
-	CString sPath = PATH_WORKING_INFO;
-	CString sVal;
-	sVal.Format(_T("%.3f"), dAcc);
-	WorkingInfo.Motion.sFdBarcodeOffsetAcc = sVal;
-	::WritePrivateProfileString(_T("Motion"), _T("MARKING_FEEDING_SERVO_ACC"), sVal, sPath);
-	long lData = (long)(dAcc * 1000.0);
-	pView->MpeWrite(pView->Plc.DlgMenu04.FeedAcc2dCode, lData);	// 2D 바코드 리더기위치까지 Feeding 가속도 (단위 mm/sec * 1000)
+	//CString sPath = PATH_WORKING_INFO;
+	//CString sVal;
+	//sVal.Format(_T("%.3f"), dAcc);
+	//WorkingInfo.Motion.sFdBarcodeOffsetAcc = sVal;
+	//::WritePrivateProfileString(_T("Motion"), _T("MARKING_FEEDING_SERVO_ACC"), sVal, sPath);
+	//long lData = (long)(dAcc * 1000.0);
+	//pView->MpeWrite(pView->Plc.DlgMenu04.FeedAcc2dCode, lData);	// 2D 바코드 리더기위치까지 Feeding 가속도 (단위 mm/sec * 1000)
 }
 
 double CGvisR2R_PunchDoc::Get2DReaderPosMoveVel()
@@ -9394,7 +9363,7 @@ void CGvisR2R_PunchDoc::SetEngraveFdPitch(double dPitch)
 	WorkingInfo.Motion.sEngraveFdLead = sVal;
 	::WritePrivateProfileString(_T("Motion"), _T("ENGRAVE_FEEDING_DRUM_LEAD_PITCH"), sVal, sPath);
 	long lData = (long)(dPitch * 1000.0);
-	pView->MpeWrite(_T("ML45026"), lData);	// 각인부 Feeding 롤러 Lead Pitch (단위 mm * 1000)
+	pView->MpeWrite(pView->Plc.DlgMenu04.FeedLeadPitchEngrave, lData);	// 각인부 Feeding 롤러 Lead Pitch (단위 mm * 1000)
 }
 
 double CGvisR2R_PunchDoc::GetEngraveFdPitch()
@@ -11900,6 +11869,10 @@ CString CGvisR2R_PunchDoc::GetItsPath(int nSerial, int nLayer)	// RMAP_UP, RMAP_
 	CString sPath, str;
 	CString sItsFolderPath = GetItsFolderPath();
 	CString sTime = pView->GetTimeIts();
+
+	int nPos = WorkingInfo.LastJob.sSelUserName.Find(_T('\r'));
+	if (nPos > 0)
+		WorkingInfo.LastJob.sSelUserName = WorkingInfo.LastJob.sSelUserName.Left(nPos);
 
 	switch (nLayer)
 	{

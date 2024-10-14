@@ -154,7 +154,6 @@ public:
 	void ClrDefImg();
 	void ClrDefImgUp();
 	void ClrDefImgDn();
-//	void ClrRmap();
 	void SetPnlNum();
 	void SetPnlDefNum();
 	void ClrInfo();

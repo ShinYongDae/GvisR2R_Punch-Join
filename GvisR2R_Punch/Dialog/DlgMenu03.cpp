@@ -965,7 +965,7 @@ void CDlgMenu03::InitBtn()
 	myBtn[27].SetBtnType(BTN_TYPE_CHECK);
 
 	myBtn[28].SubclassDlgItem(IDC_CHK_35, this);		// EPC HOME
-	myBtn[28].SetHwnd(this->GetSafeHwnd(), IDC_CHK_28);
+	myBtn[28].SetHwnd(this->GetSafeHwnd(), IDC_CHK_35);
 	myBtn[28].SetBoarder(FALSE);
 	myBtn[28].SetBtnType(BTN_TYPE_CHECK);
 
@@ -1288,15 +1288,37 @@ void CDlgMenu03::DispMain()
 	}
 
 	// [Torque Motor]
-	bOn = pDoc->WorkingInfo.Motion.bMkTq = pDoc->BtnStatus.Tq.Mk;
+	//bOn = pDoc->WorkingInfo.Motion.bMkTq = pDoc->BtnStatus.Tq.Mk;
+	//if (myBtn[2].GetImageBk() != bOn)
+	//	myBtn[2].SetCheck(bOn);
+
+	//bOn = pDoc->WorkingInfo.Motion.bAoiTq = pDoc->BtnStatus.Tq.Aoi;
+	//if (myBtn[3].GetImageBk() != bOn)
+	//	myBtn[3].SetCheck(bOn);
+
+	//bOn = pDoc->WorkingInfo.Motion.bEngraveTq = pDoc->BtnStatus.Tq.Eng;
+	//if (myBtn[83].GetImageBk() != bOn)
+	//	myBtn[83].SetCheck(bOn);
+
+	// [운전 모드]
+	bOn = pDoc->BtnStatus.RunMode.ConnectModule;
+	if (myBtn[47].GetImageBk() != bOn)
+		myBtn[47].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.RunMode.FeedOnePanel;
+	if (myBtn[87].GetImageBk() != bOn)
+		myBtn[87].SetCheck(bOn);
+
+	// [레이저]
+	bOn = pDoc->BtnStatus.Lsr.Laser340mm;
 	if (myBtn[2].GetImageBk() != bOn)
 		myBtn[2].SetCheck(bOn);
 
-	bOn = pDoc->WorkingInfo.Motion.bAoiTq = pDoc->BtnStatus.Tq.Aoi;
+	bOn = pDoc->BtnStatus.Lsr.Laser346mm;
 	if (myBtn[3].GetImageBk() != bOn)
 		myBtn[3].SetCheck(bOn);
 
-	bOn = pDoc->WorkingInfo.Motion.bEngraveTq = pDoc->BtnStatus.Tq.Eng;
+	bOn = pDoc->BtnStatus.Lsr.Laser380mm;
 	if (myBtn[83].GetImageBk() != bOn)
 		myBtn[83].SetCheck(bOn);
 
@@ -1360,14 +1382,23 @@ void CDlgMenu03::DispMain()
 		myBtn[69].SetCheck(bOn);
 	}
 
-	// [Core 150mm]
-	bOn = pDoc->WorkingInfo.LastJob.bCore150Recoiler = pDoc->BtnStatus.Core150.Rc;
+	// [댄서롤/버퍼롤]
+	bOn = pDoc->BtnStatus.Dancer.AllDancerUpDn;
 	if (myBtn[70].GetImageBk() != bOn)
 		myBtn[70].SetCheck(bOn);
 
-	bOn = pDoc->WorkingInfo.LastJob.bCore150Uncoiler = pDoc->BtnStatus.Core150.Uc;
+	bOn = pDoc->BtnStatus.Dancer.AllDancerFixOnOff;
 	if (myBtn[71].GetImageBk() != bOn)
 		myBtn[71].SetCheck(bOn);
+
+	// [Core 150mm]
+	//bOn = pDoc->WorkingInfo.LastJob.bCore150Recoiler = pDoc->BtnStatus.Core150.Rc;
+	//if (myBtn[70].GetImageBk() != bOn)
+	//	myBtn[70].SetCheck(bOn);
+
+	//bOn = pDoc->WorkingInfo.LastJob.bCore150Uncoiler = pDoc->BtnStatus.Core150.Uc;
+	//if (myBtn[71].GetImageBk() != bOn)
+	//	myBtn[71].SetCheck(bOn);
 }
 
 void CDlgMenu03::DispRecoiler()
@@ -1375,55 +1406,79 @@ void CDlgMenu03::DispRecoiler()
 	BOOL bOn;
 
 	// [Recoiler]
-	bOn = pDoc->BtnStatus.Rc.Relation;	// 리코일러 연동 온/오프 스위치 램프
+	bOn = pDoc->BtnStatus.Rc.ChuckPcb;			// 리코일러 제품척 클램프 스위치 램프
 	if (myBtn[4].GetImageBk() != bOn)
 		myBtn[4].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Rc.FdCw;	// 리코일러 제품휠 정회전 스위치 램프
+	bOn = pDoc->BtnStatus.Rc.ChuckPaper;		// 리코일러 간지척 클램프 스위치 램프
+	if (myBtn[88].GetImageBk() != bOn)
+		myBtn[88].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Rc.JoinClamp;			// 리코일러 이음매 클램프 스위치 램프
 	if (myBtn[5].GetImageBk() != bOn)
 		myBtn[5].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Rc.FdCcw;	// 리코일러 제품휠 역회전 스위치 램프
+	bOn = pDoc->BtnStatus.Rc.PcbShaftSupport;	// 리코일러 제품샤프트 지지대 스위치 램프
 	if (myBtn[6].GetImageBk() != bOn)
 		myBtn[6].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Rc.ReelChuck;	// 리코일러 제품척 클램프 스위치 램프
+	bOn = pDoc->BtnStatus.Rc.EpcActHome;		// 리코일러 EPC 액추에이터 HOME 스위치 램프
 	if (myBtn[41].GetImageBk() != bOn)
 		myBtn[41].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Rc.DcRlUpDn;	// 리코일러 댄서롤 상승/하강 스위치 램프
+	bOn = pDoc->BtnStatus.Rc.EpcActFirst;		// 리코일러 EPC 액추에이터 #1 스위치 램프
 	if (myBtn[42].GetImageBk() != bOn)
 		myBtn[42].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Rc.ReelJoinL;	// 리코일러 제품 이음매(좌) 스위치 램프
+	bOn = pDoc->BtnStatus.Rc.EpcActSecond;		// 리코일러 EPC 액추에이터 #2 스위치 램프
 	if (myBtn[43].GetImageBk() != bOn)
 		myBtn[43].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Rc.ReelJoinR;	// 리코일러 제품 이음매(우) 스위치 램프
+	bOn = pDoc->BtnStatus.Rc.EpcActThird;		// 리코일러 EPC 액추에이터 #3 스위치 램프
 	if (myBtn[7].GetImageBk() != bOn)
 		myBtn[7].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Rc.ReelJoinVac;	// 리코일러 제품 이음매 진공 스위치 램프
+	bOn = pDoc->BtnStatus.Rc.EpcAuto;			// 리코일러 EPC 자동 스위치 램프
+	if (myBtn[89].GetImageBk() != bOn)
+		myBtn[89].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Rc.EpcManual;			// 리코일러 EPC 수동 스위치 램프
+	if (myBtn[90].GetImageBk() != bOn)
+		myBtn[90].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Rc.EpcHome;			// 리코일러 EPC 원점 스위치 램프
+	if (myBtn[93].GetImageBk() != bOn)
+		myBtn[93].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Rc.EpcIn;				// 리코일러 EPC In 스위치 램프
+	if (myBtn[91].GetImageBk() != bOn)
+		myBtn[91].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Rc.EpcOut;			// 리코일러 EPC Out 스위치 램프
+	if (myBtn[92].GetImageBk() != bOn)
+		myBtn[92].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Rc.PcbInverterCw;		// 리코일러 제품 인버터 정방향 스위치 램프
 	if (myBtn[8].GetImageBk() != bOn)
 		myBtn[8].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Rc.PprChuck;	// 리코일러 간지척 클램프 스위치 램프
+	bOn = pDoc->BtnStatus.Rc.PcbInverterCcw;	// 리코일러 제품 인버터 역방향 스위치 램프
 	if (myBtn[44].GetImageBk() != bOn)
 		myBtn[44].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Rc.PprCw;	// 리코일러 간지휠 정회전 스위치 램프
+	bOn = pDoc->BtnStatus.Rc.PaperInverterCw;	// 리코일러 간지 인버터 정방향 스위치 램프
 	if (myBtn[45].GetImageBk() != bOn)
 		myBtn[45].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Rc.PprCcw;	// 리코일러 간지휠 역회전 스위치 램프
+	bOn = pDoc->BtnStatus.Rc.PaperInverterCcw;	// 리코일러 간지 인버터 역방향 스위치 램프
 	if (myBtn[46].GetImageBk() != bOn)
 		myBtn[46].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Rc.Rewine;	// 리코일러 Rewinder 동작 스위치 램프
+	bOn = pDoc->BtnStatus.Rc.DancerUpper;		// 리코일러 댄서롤 상승 스위치 램프
 	if (myBtn[66].GetImageBk() != bOn)
 		myBtn[66].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Rc.RewineReelPpr;	// 리코일러 Rewinder 제품 & 간지 스위치 램프
+	bOn = pDoc->BtnStatus.Rc.DancerFixer;		// 리코일러 댄서롤 고정 스위치 램프
 	if (myBtn[67].GetImageBk() != bOn)
 		myBtn[67].SetCheck(bOn);
 }
@@ -1433,52 +1488,60 @@ void CDlgMenu03::DispPunch()
 	BOOL bOn;
 
 	// [Marking]
-	bOn = pDoc->BtnStatus.Mk.Relation;	// 마킹부 연동 온/오프 스위치 램프
+	bOn = pDoc->BtnStatus.Mk.FeedCw;			// 마킹부 피딩 정방향 스위치 램프
 	if (myBtn[9].GetImageBk() != bOn)
 		myBtn[9].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Mk.FdCw;	// 마킹부 피딩 정회전 스위치 램프
+	bOn = pDoc->BtnStatus.Mk.FeedCcw;			// 마킹부 피딩 역방향 스위치 램프
+	if (myBtn[94].GetImageBk() != bOn)
+		myBtn[94].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Mk.TensionCw;			// 마킹부 텐션 정방향 스위치 램프
 	if (myBtn[10].GetImageBk() != bOn)
 		myBtn[10].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Mk.FdCcw;	// 마킹부 피딩 역회전 스위치 램프
+	bOn = pDoc->BtnStatus.Mk.TensionCcw;		// 마킹부 텐션 역방향 스위치 램프
 	if (myBtn[11].GetImageBk() != bOn)
 		myBtn[11].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Mk.FdVac;	// 마킹부 피딩 진공 스위치 램프
+	bOn = pDoc->BtnStatus.Mk.FeedHome;			// 마킹부 피딩 HOME 스위치 램프
 	if (myBtn[12].GetImageBk() != bOn)
 		myBtn[12].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Mk.PushUp;	// 마킹부 제품푸쉬 스위치 램프 // 마킹부 토크 진공 스위치 램프 - X
+	bOn = pDoc->BtnStatus.Mk.FeedVacuum;		//  마킹부 피딩 진공 스위치 램프
 	if (myBtn[13].GetImageBk() != bOn)
 		myBtn[13].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Mk.TblBlw;	// 마킹부 테이블 브로워 스위치 램프
+	bOn = pDoc->BtnStatus.Mk.FeedClamp;			// 마킹부 피딩 클램프 스위치 램프
 	if (myBtn[14].GetImageBk() != bOn)
 		myBtn[14].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Mk.TblVac;	// 마킹부 테이블 진공 스위치 램프
+	bOn = pDoc->BtnStatus.Mk.TensionClamp;		// 마킹부 텐션 클램프 스위치 램프  
 	if (myBtn[15].GetImageBk() != bOn)
 		myBtn[15].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Mk.FdClp;	// 마킹부 피딩 클램프 스위치 램프
+	bOn = pDoc->BtnStatus.Mk.TableVacuum;		// 마킹부 테이블 진공 스위치 램프
 	if (myBtn[51].GetImageBk() != bOn)
 		myBtn[51].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Mk.TqClp;	// 마킹부 토크 클램프 스위치 램프
+	bOn = pDoc->BtnStatus.Mk.TableBlower;		// 마킹부 테이블 에어블로어 스위치 
 	if (myBtn[52].GetImageBk() != bOn)
 		myBtn[52].SetCheck(bOn);
 
-	bOn = pDoc->WorkingInfo.LastJob.bMkOnePnl = pDoc->BtnStatus.Mk.MvOne; // 마킹부 한판넬 이송
+	bOn = pDoc->BtnStatus.Mk.TableCylinder;		// 마킹부 테이블 실린더 스위치 램프
 	if (myBtn[16].GetImageBk() != bOn)
 		myBtn[16].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Mk.LsrPt;	// 마킹부 레이져 포인터 스위치 램프
-	if (myBtn[49].GetImageBk() != bOn)
+	bOn = pDoc->BtnStatus.Mk.TableClampDn;		// 마킹부 테이블 클램프 하강 스위치 램프
+	if (myBtn[49].GetCheck() != bOn)
 		myBtn[49].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Mk.DcRSol;	// 마킹부 댄서롤 상승/하강 스위치 램프
-	if (myBtn[48].GetCheck() != bOn)
+	bOn = pDoc->BtnStatus.Mk.TableClampForward;	// 마킹부 테이블 클램프 전진 스위치 램프
+	if (myBtn[95].GetImageBk() != bOn)
+		myBtn[95].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Mk.PunchStart;		// 마킹부 마킹 시작 스위치 램프
+	if (myBtn[48].GetImageBk() != bOn)
 		myBtn[48].SetCheck(bOn);
 }
 
@@ -1487,53 +1550,73 @@ void CDlgMenu03::DispAoiDn()
 	BOOL bOn;
 
 	// [하면 AOI]
-	bOn = pDoc->BtnStatus.AoiDn.Relation;	// 검사부 하 연동 온/오프 스위치 램프
+	bOn = pDoc->BtnStatus.AoiDn.FeedCw;				// 검사부 하 피딩 정방향 스위치 램프
 	if (myBtn[55].GetImageBk() != bOn)
 		myBtn[55].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiDn.FdCw;	// 검사부 하 피딩 정회전 스위치 램프
+	bOn = pDoc->BtnStatus.AoiDn.FeedCcw;			// 검사부 하 피딩 역방향 스위치 램프
+	if (myBtn[96].GetImageBk() != bOn)
+		myBtn[96].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.AoiDn.TensionCw;			// 검사부 하 텐션 정방향 스위치 램프
 	if (myBtn[56].GetImageBk() != bOn)
 		myBtn[56].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiDn.FdCcw;	// 검사부 하 피딩 역회전 스위치 램프
+	bOn = pDoc->BtnStatus.AoiDn.TensionCcw;			// 검사부 하 텐션 역방향 스위치 램프
 	if (myBtn[57].GetImageBk() != bOn)
 		myBtn[57].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiDn.FdVac;	// 검사부 하 피딩 진공 스위치 램프
+	bOn = pDoc->BtnStatus.AoiDn.FeedHome;			// 검사부 하 피딩 HOME 스위치 램프
 	if (myBtn[58].GetImageBk() != bOn)
 		myBtn[58].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiDn.PushUp;	// 검사부 하 제품푸쉬 스위치 램프 // (토크 진공 스위치 램프) - X
+	bOn = pDoc->BtnStatus.AoiDn.FeedVacuum;			// 검사부 하 피딩 진공 스위치 램프
 	if (myBtn[59].GetImageBk() != bOn)
 		myBtn[59].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiDn.TblBlw;	// 검사부 하 테이블 브로워 스위치 램프
+	bOn = pDoc->BtnStatus.AoiDn.FeedClamp;			// 검사부 하 피딩 클램프 스위치 램프
 	if (myBtn[60].GetImageBk() != bOn)
 		myBtn[60].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiDn.TblVac;	// 검사부 하 테이블 진공 스위치 램프
+	bOn = pDoc->BtnStatus.AoiDn.TensionClamp;		// 검사부 하 텐션 클램프 스위치 램프
 	if (myBtn[61].GetImageBk() != bOn)
 		myBtn[61].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiDn.FdClp;	// 검사부 하 피딩 클램프 스위치 램프
+	bOn = pDoc->BtnStatus.AoiDn.TableVacuum;		// 검사부 하 테이블 진공 스위치 램프
 	if (myBtn[62].GetImageBk() != bOn)
 		myBtn[62].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiDn.TqClp;	// 검사부 하 텐션 클램프 스위치 램프 
+	bOn = pDoc->BtnStatus.AoiDn.TableBlower;		// 검사부 하 테이블 에어블로어 스위치 램프
 	if (myBtn[63].GetImageBk() != bOn)
 		myBtn[63].SetCheck(bOn);
 
-	bOn = pDoc->WorkingInfo.LastJob.bAoiOnePnl = pDoc->BtnStatus.AoiDn.MvOne; // 검사부 하 한판넬 이송
+	bOn = pDoc->BtnStatus.AoiDn.TableCylinder;		// 검사부 하 테이블 실린더 스위치 램프
 	if (myBtn[64].GetImageBk() != bOn)
 		myBtn[64].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiDn.LsrPt;	// 검사부 하 레이져 포인터 스위치 램프
+	bOn = pDoc->BtnStatus.AoiDn.CleanRollerUp;		// 검사부 하 클린롤러 상부 스위치 램프
 	if (myBtn[65].GetImageBk() != bOn)
 		myBtn[65].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiDn.VelSonicBlw;	// 검사부 하 초음파 세정기 스위치 램프
+	bOn = pDoc->BtnStatus.AoiDn.CleanRollerDn;		// 검사부 하 클린롤러 하부 스위치 램프
 	if (myBtn[86].GetImageBk() != bOn)
 		myBtn[86].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.AoiDn.CleanRollerPush;	// 검사부 하 클린롤러 누름 스위치 램프
+	if (myBtn[97].GetImageBk() != bOn)
+		myBtn[97].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.AoiDn.TestStart;			// 검사부 하 AOI 상면 검사 시작 스위치 램프
+	if (myBtn[98].GetImageBk() != bOn)
+		myBtn[98].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.AoiDn.BufferRollerUp;		// 검사부 하 버퍼롤 상승 스위치 램프
+	if (myBtn[99].GetImageBk() != bOn)
+		myBtn[99].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.AoiDn.BufferRollerFix;	// 검사부 하 버퍼롤 고정 스위치 램프
+	if (myBtn[100].GetImageBk() != bOn)
+		myBtn[100].SetCheck(bOn);
 }
 
 void CDlgMenu03::DispAoiUp()
@@ -1541,107 +1624,159 @@ void CDlgMenu03::DispAoiUp()
 	BOOL bOn;
 
 	// [상면 AOI]
-	bOn = pDoc->BtnStatus.AoiUp.Relation;	// 검사부 상 연동 온/오프 스위치 램프
+	bOn = pDoc->BtnStatus.AoiUp.FeedCw;	// 검사부 상 피딩 정방향 스위치 램프
 	if (myBtn[17].GetImageBk() != bOn)
 		myBtn[17].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiUp.FdCw;	// 검사부 상 피딩 정회전 스위치 램프
+	bOn = pDoc->BtnStatus.AoiUp.FeedCcw;	// 검사부 상 피딩 역방향 스위치 램프
+	if (myBtn[101].GetImageBk() != bOn)
+		myBtn[101].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.AoiUp.TensionCw;	// 검사부 상 텐션 정방향 스위치 램프
 	if (myBtn[18].GetImageBk() != bOn)
 		myBtn[18].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiUp.FdCcw;	// 검사부 상 피딩 역회전 스위치 램프
+	bOn = pDoc->BtnStatus.AoiUp.TensionCcw;	// 검사부 상 텐션 역방향 스위치 램프
 	if (myBtn[19].GetImageBk() != bOn)
 		myBtn[19].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiUp.FdVac;	// 검사부 상 피딩 진공 스위치 램프
+	bOn = pDoc->BtnStatus.AoiUp.FeedHome;	// 검사부 상 피딩 HOME 스위치 램프
 	if (myBtn[20].GetImageBk() != bOn)
 		myBtn[20].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiUp.PushUp;	// 검사부 상 제품푸쉬 스위치 램프 // (토크 진공 스위치 램프) - X
+	bOn = pDoc->BtnStatus.AoiUp.FeedVacuum;	// 검사부 상 피딩 진공 스위치 램프
 	if (myBtn[21].GetImageBk() != bOn)
 		myBtn[21].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiUp.TblBlw;	// 검사부 상 테이블 브로워 스위치 램프
+	bOn = pDoc->BtnStatus.AoiUp.FeedClamp;	// 검사부 상 피딩 클램프 스위치 램프
 	if (myBtn[22].GetImageBk() != bOn)
 		myBtn[22].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiUp.TblVac;	// 검사부 상 테이블 진공 스위치 램프
+	bOn = pDoc->BtnStatus.AoiUp.TensionClamp;	// 검사부 상 텐션 클램프 스위치 램프
 	if (myBtn[23].GetImageBk() != bOn)
 		myBtn[23].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiUp.FdClp;	// 검사부 상 피딩 클램프 스위치 램프
+	bOn = pDoc->BtnStatus.AoiUp.TableVacuum;	// 검사부 상 테이블 진공 스위치 램프
 	if (myBtn[53].GetImageBk() != bOn)
 		myBtn[53].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiUp.TqClp;	// 검사부 상 텐션 클램프 스위치 램프 
+	bOn = pDoc->BtnStatus.AoiUp.TableBlower; // 검사부 상 테이블 에어블로어 스위치 램프
 	if (myBtn[54].GetImageBk() != bOn)
 		myBtn[54].SetCheck(bOn);
 
-	bOn = pDoc->WorkingInfo.LastJob.bAoiOnePnl = pDoc->BtnStatus.AoiUp.MvOne; // 검사부 상 한판넬 이송
+	bOn = pDoc->BtnStatus.AoiUp.TableCylinder;	// 검사부 상 테이블 실린더 스위치 램프
 	if (myBtn[24].GetImageBk() != bOn)
 		myBtn[24].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiUp.LsrPt;	// 검사부 상 레이져 포인터 스위치 램프
+	bOn = pDoc->BtnStatus.AoiUp.CleanRollerUp; // 검사부 상 클린롤러 상부 스위치 램프
 	if (myBtn[50].GetImageBk() != bOn)
 		myBtn[50].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.AoiUp.CleanRollerDn;	// 검사부 상 클린롤러 하부 스위치 램프
+	if (myBtn[102].GetImageBk() != bOn)
+		myBtn[102].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.AoiUp.CleanRollerPush; // 검사부 상 클린롤러 누름 스위치 램프
+	if (myBtn[103].GetImageBk() != bOn)
+		myBtn[103].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.AoiUp.TestStart;	// 검사부 상 검사 시작 스위치 램프
+	if (myBtn[104].GetImageBk() != bOn)
+		myBtn[104].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.AoiUp.UltrasonicDn; // 검사부 상 초음파 세정기 하강 스위치 램프
+	if (myBtn[105].GetImageBk() != bOn)
+		myBtn[105].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.AoiUp.UltrasonicRun;	// 검사부 상 초음파 세정기 운전 스위치 램프
+	if (myBtn[106].GetImageBk() != bOn)
+		myBtn[106].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.AoiUp.UltrasonicSpeed;	// 검사부 상 초음파 세정기 속도 스위치 램프
+	if (myBtn[107].GetImageBk() != bOn)
+		myBtn[107].SetCheck(bOn);
 }
 
 void CDlgMenu03::DispEngrave()
 {
 	BOOL bOn;
 
-	bOn = pDoc->BtnStatus.Eng.Relation;	// 각인부 연동 온/오프 스위치 램프 IDC_CHK_72
+	bOn = pDoc->BtnStatus.Eng.FeedCw;			// 각인부 피딩 정방향 스위치 램프
 	if (myBtn[72].GetImageBk() != bOn)
 		myBtn[72].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Eng.FdCw;	// 각인부 피딩 정회전 스위치 램프 IDC_CHK_73
+	bOn = pDoc->BtnStatus.Eng.FeedCcw;			// 각인부 피딩 역방향 스위치 램프
+	if (myBtn[84].GetImageBk() != bOn)
+		myBtn[84].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Eng.TensionCw;		// 각인부 텐션 정방향 스위치 램프
 	if (myBtn[73].GetImageBk() != bOn)
 		myBtn[73].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Eng.FdCcw;	// 각인부 피딩 역회전 스위치 램프 IDC_CHK_74
+	bOn = pDoc->BtnStatus.Eng.TensionCcw;		// 각인부 텐션 역방향 스위치 램프
 	if (myBtn[74].GetImageBk() != bOn)
 		myBtn[74].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Eng.FdVac;	// 각인부 피딩 진공 스위치 램프 IDC_CHK_75
+	bOn = pDoc->BtnStatus.Eng.FeedHome;			// 각인부 피딩 HOME 스위치 램프
 	if (myBtn[75].GetImageBk() != bOn)
 		myBtn[75].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Eng.PushUp;	// 각인부 제품푸쉬 스위치 램프 IDC_CHK_76 // 마킹부 토크 진공 스위치 램프 - X
+	bOn = pDoc->BtnStatus.Eng.FeedVacuum;		// 각인부 피딩 진공 스위치 램프
 	if (myBtn[76].GetImageBk() != bOn)
 		myBtn[76].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Eng.TblBlw;	// 각인부 테이블 브로워 스위치 램프 IDC_CHK_77
+	bOn = pDoc->BtnStatus.Eng.FeedClamp;		// 각인부 피딩 클램프 스위치 램프
 	if (myBtn[77].GetImageBk() != bOn)
 		myBtn[77].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Eng.TblVac;	// 각인부 테이블 진공 스위치 램프 IDC_CHK_78
+	bOn = pDoc->BtnStatus.Eng.TensionClamp;		// 각인부 텐션 클램프 스위치 램프
 	if (myBtn[78].GetImageBk() != bOn)
 		myBtn[78].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Eng.FdClp;	// 각인부 피딩 클램프 스위치 램프 IDC_CHK_82
+	bOn = pDoc->BtnStatus.Eng.TableVacuum;		// 각인부 테이블 진공 스위치 램프
 	if (myBtn[79].GetImageBk() != bOn)
 		myBtn[79].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Eng.TqClp;	// 각인부 토크 클램프 스위치 램프 IDC_CHK_83
+	bOn = pDoc->BtnStatus.Eng.TableBlower;		// 각인부 테이블 에어블로어 스위치 램프
 	if (myBtn[80].GetImageBk() != bOn)
 		myBtn[80].SetCheck(bOn);
 
-	bOn = pDoc->WorkingInfo.LastJob.bEngraveOnePnl = pDoc->BtnStatus.Eng.MvOne; // 각인부 한판넬 이송 IDC_CHK_79
+	bOn = pDoc->BtnStatus.Eng.TableCylinder;	// 각인부 테이블 실린더 스위치 램프
 	if (myBtn[81].GetImageBk() != bOn)
 		myBtn[81].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Eng.LsrPt;	// 각인부 레이져 포인터 스위치 램프 IDC_CHK_81
+
+	bOn = pDoc->BtnStatus.Eng.UltrasonicDown;	// 각인부 초음파 세정기 하강 스위치 램프
 	if (myBtn[82].GetImageBk() != bOn)
 		myBtn[82].SetCheck(bOn);
 
-
-	bOn = pDoc->BtnStatus.Eng.VelSonicBlw;	// 각인부 초음파 세정기 스위치 램프 IDC_CHK_87
+	bOn = pDoc->BtnStatus.Eng.UltrasonicRun;	// 각인부 초음파 세정기 운전 스위치 램프
 	if (myBtn[85].GetImageBk() != bOn)
 		myBtn[85].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Eng.DcRSol;	// 각인부 댄서롤 상승/하강 스위치 램프 IDC_CHK_80
-	if (myBtn[84].GetImageBk() != bOn)
-		myBtn[84].SetCheck(bOn);
+	bOn = pDoc->BtnStatus.Eng.UltrasonicSpeed;	// 각인부 초음파 세정기 속도 스위치 램프
+	if (myBtn[108].GetImageBk() != bOn)
+		myBtn[108].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Eng.DancerUpper;		// 각인부 버퍼롤 상승 스위치 램프
+	if (myBtn[109].GetImageBk() != bOn)
+		myBtn[109].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Eng.DancerFixer;		// 각인부 버퍼롤 고정 스위치 램프
+	if (myBtn[110].GetImageBk() != bOn)
+		myBtn[110].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Eng.AlignStart;		// 각인부 정렬 시작 스위치 램프
+	if (myBtn[111].GetImageBk() != bOn)
+		myBtn[111].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Eng.LaserStart;		// 각인부 각인 시작 스위치 램프
+	if (myBtn[112].GetImageBk() != bOn)
+		myBtn[112].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Eng.ReadStart;		// 각인부 리딩 시작 스위치 램프
+	if (myBtn[113].GetImageBk() != bOn)
+		myBtn[113].SetCheck(bOn);
 }
 
 void CDlgMenu03::DispUncoiler()
@@ -1649,57 +1784,81 @@ void CDlgMenu03::DispUncoiler()
 	BOOL bOn;
 
 	// [Uncoiler]
-	bOn = pDoc->BtnStatus.Uc.Relation;		//[24] 언코일러 연동 온/오프 스위치 램프
+	bOn = pDoc->BtnStatus.Uc.ChuckPcb;			// 언코일러 제품척 클램프 스위치 램프
 	if (myBtn[25].GetImageBk() != bOn)
 		myBtn[25].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Uc.FdCw;		// 언코일러 제품휠 정회전 스위치 램프
+	bOn = pDoc->BtnStatus.Uc.ChuckPaper;		// 언코일러 간지척 클램프 스위치 램프
+	if (myBtn[40].GetImageBk() != bOn)
+		myBtn[40].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Uc.JoinClamp;			// 언코일러 이음매 클램프 스위치 램프
 	if (myBtn[26].GetImageBk() != bOn)
 		myBtn[26].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Uc.FdCcw;		// 언코일러 제품휠 역회전 스위치 램프
+	bOn = pDoc->BtnStatus.Uc.PcbShaftSupport;	// 언코일러 제품샤프트 지지대 스위치 램프
 	if (myBtn[27].GetImageBk() != bOn)
 		myBtn[27].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Uc.ReelChuck;		// 언코일러 제품척 클램프 스위치 램프
-	if (myBtn[35].GetImageBk() != bOn)
-		myBtn[35].SetCheck(bOn);
-
-	bOn = pDoc->BtnStatus.Uc.DcRlUpDn;		// 언코일러 댄서롤 상승/하강 스위치 램프
+	bOn = pDoc->BtnStatus.Uc.EpcActHome;		// 언코일러 EPC 액추에이터 HOME 스위치 램프
 	if (myBtn[28].GetImageBk() != bOn)
 		myBtn[28].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Uc.ReelJoinL;		// 언코일러 제품 이음매(좌) 스위치 램프
-	if (myBtn[30].GetImageBk() != bOn)
-		myBtn[30].SetCheck(bOn);
-
-	bOn = pDoc->BtnStatus.Uc.ReelJoinR;		// 언코일러 제품 이음매(우) 스위치 램프
-	if (myBtn[37].GetImageBk() != bOn)
-		myBtn[37].SetCheck(bOn);
-
-	bOn = pDoc->BtnStatus.Uc.ReelJoinVac;		// 언코일러 제품 이음매 진공 스위치 램프
-	if (myBtn[38].GetImageBk() != bOn)
-		myBtn[38].SetCheck(bOn);
-
-	bOn = pDoc->BtnStatus.Uc.PprChuck;		// 언코일러 간지척 클램프 스위치 램프
-	if (myBtn[31].GetImageBk() != bOn)
-		myBtn[31].SetCheck(bOn);
-
-	bOn = pDoc->BtnStatus.Uc.PprCw;		// 언코일러 간지휠 정회전 스위치 램프
-	if (myBtn[32].GetImageBk() != bOn)
-		myBtn[32].SetCheck(bOn);
-
-	bOn = pDoc->BtnStatus.Uc.PprCcw;		// 언코일러 간지휠 역회전 스위치 램프
-	if (myBtn[39].GetImageBk() != bOn)
-		myBtn[39].SetCheck(bOn);
-
-	bOn = pDoc->BtnStatus.Uc.ClRlUpDn;		// 언코일러 클린롤러 상승/하강 스위치 램프
+	bOn = pDoc->BtnStatus.Uc.EpcActFirst;		// 언코일러 EPC 액추에이터 #1 스위치 램프
 	if (myBtn[29].GetImageBk() != bOn)
 		myBtn[29].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Uc.ClRlPshUpDn;		// 언코일러 클린롤러누름 상승/하강 스위치 램프
+	bOn = pDoc->BtnStatus.Uc.EpcActSecond;		// 언코일러 EPC 액추에이터 #2 스위치 램프
+	if (myBtn[30].GetImageBk() != bOn)
+		myBtn[30].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Uc.EpcActThird;		// 언코일러 EPC 액추에이터 #3 스위치 램프 
+	if (myBtn[37].GetImageBk() != bOn)
+		myBtn[37].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Uc.EpcAuto;			// 언코일러 EPC 자동 스위치 램프
+	if (myBtn[114].GetImageBk() != bOn)
+		myBtn[114].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Uc.EpcManual;			// 언코일러 EPC 수동 스위치 램프
+	if (myBtn[115].GetImageBk() != bOn)
+		myBtn[115].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Uc.EpcHome;			// 언코일러 EPC 원점 스위치 램프 
+	if (myBtn[118].GetImageBk() != bOn)
+		myBtn[118].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Uc.EpcIn;				// 언코일러 EPC In 스위치 램프
+	if (myBtn[116].GetImageBk() != bOn)
+		myBtn[116].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Uc.EpcOut;			// 언코일러 EPC Out 스위치 램프
+	if (myBtn[117].GetImageBk() != bOn)
+		myBtn[117].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Uc.PcbInverterCw;		// 언코일러 제품 인버터 정방향 스위치 램프
+	if (myBtn[32].GetImageBk() != bOn)
+		myBtn[32].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Uc.PcbInverterCcw;	// 언코일러 제품 인버터 역방향 스위치 램프 
+	if (myBtn[31].GetImageBk() != bOn)
+		myBtn[31].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Uc.PaperInverterCw;	// 언코일러 간지 인버터 정방향 스위치 램프 
+	if (myBtn[35].GetImageBk() != bOn)
+		myBtn[35].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Uc.PaperInverterCcw;	// 언코일러 간지 인버터 역방향 스위치 램프
 	if (myBtn[36].GetImageBk() != bOn)
 		myBtn[36].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Uc.DancerUpper;		// 언코일러 댄서롤 상승 스위치 램프
+	if (myBtn[38].GetImageBk() != bOn)
+		myBtn[38].SetCheck(bOn);
+
+	bOn = pDoc->BtnStatus.Uc.DancerFixer;		// 언코일러 댄서롤 고정 스위치 램프 
+	if (myBtn[39].GetImageBk() != bOn)
+		myBtn[39].SetCheck(bOn);
 }
 
 void CDlgMenu03::OnTimer(UINT_PTR nIDEvent)//(UINT nIDEvent)
@@ -1797,7 +1956,7 @@ void CDlgMenu03::OnTimer(UINT_PTR nIDEvent)//(UINT nIDEvent)
 		{
 			m_bTIM_CHK_DONE_READY = FALSE;
 			pView->m_bReadyDone = TRUE; pDoc->SetStatus(_T("General"), _T("bReadyDone"), pView->m_bReadyDone);
-			pView->MpeWrite(_T("MB400203"), 0);	// PLC 운전준비 완료(PC가 확인하고 Reset시킴.)MB440100
+			pView->MpeWrite(pView->Plc.DlgMenu01.PlcReadyDone, 0);	// PLC 운전준비 완료(PC가 확인하고 Reset시킴.)MB440100
 		}
 		else
 		{
@@ -2025,19 +2184,19 @@ void CDlgMenu03::SwMpeBtn(int nCtrlID, long lData)
 
 	// Laser
 	case IDC_CHK_2:			// 340mm 스위치
-		pView->MpeWrite(pView->Plc.DlgInfo.Use340mm, 1);
+		pView->MpeWrite(pView->Plc.DlgInfo.Laser340mm, 1);
 		Sleep(300);
-		pView->MpeWrite(pView->Plc.DlgInfo.Use340mm, 0);
+		pView->MpeWrite(pView->Plc.DlgInfo.Laser340mm, 0);
 		break;
 	case IDC_CHK_3:			// 346mm 스위치
-		pView->MpeWrite(pView->Plc.DlgInfo.Use346mm, 1);
+		pView->MpeWrite(pView->Plc.DlgInfo.Laser346mm, 1);
 		Sleep(300);
-		pView->MpeWrite(pView->Plc.DlgInfo.Use346mm, 0);
+		pView->MpeWrite(pView->Plc.DlgInfo.Laser346mm, 0);
 		break;
 	case IDC_CHK_84:			// 380mm 스위치
-		pView->MpeWrite(pView->Plc.DlgInfo.Use380mm, 1);
+		pView->MpeWrite(pView->Plc.DlgInfo.Laser380mm, 1);
 		Sleep(300);
-		pView->MpeWrite(pView->Plc.DlgInfo.Use380mm, 0);
+		pView->MpeWrite(pView->Plc.DlgInfo.Laser380mm, 0);
 		break;
 
 	// Feed Direction
@@ -2888,7 +3047,7 @@ BOOL CDlgMenu03::DoReset()
 		{
 			m_bTIM_CHK_DONE_READY = FALSE;
 			pView->m_bReadyDone = FALSE; pDoc->SetStatus(_T("General"), _T("bReadyDone"), pView->m_bReadyDone);
-			pView->MpeWrite(_T("MB400203"), 0);	// PLC 운전준비 완료(PC가 확인하고 Reset시킴.)MB440100
+			pView->MpeWrite(pView->Plc.DlgMenu01.PlcReadyDone, 0);	// PLC 운전준비 완료(PC가 확인하고 Reset시킴.)MB440100
 		}
 		pView->ClrDispMsg();
 
@@ -2973,7 +3132,6 @@ BOOL CDlgMenu03::DoReset()
 		}
 
 		pView->TowerLamp(RGB_RED, TRUE, FALSE);
-		//pView->DispStsBar(_T("정지-2"), 0);
 		pView->DispMain(_T("정 지"), RGB_RED);	
 		SwAoiReset(TRUE);
 		pView->OpenReelmap();
@@ -3073,7 +3231,7 @@ void CDlgMenu03::SwStop()
 
 	pView->DispMain(_T("정 지"), RGB_RED);
 	pView->TowerLamp(RGB_RED, TRUE, FALSE);
-	pView->MpeWrite(_T("MB440162"), 1); // 마킹부 정지 스위치 램프 ON(PC가 On/Off시킴)
+	pView->MpeWrite(pView->Plc.DlgMenu03.LampStop, 1); // 마킹부 정지 스위치 램프 ON(PC가 On/Off시킴)
 	pView->ClrDispMsg();
 }
 
@@ -3198,14 +3356,14 @@ void CDlgMenu03::SwAoiReset(BOOL bOn)
 {
 	if(bOn)
 	{
-		pView->MpeWrite(_T("MB00382A"), 1); // 검사부 상 Reset <-> Y436A I/F
-		pView->MpeWrite(_T("MB00392A"), 1); // 검사부 하 Reset <-> Y446A I/F
+		pView->MpeWrite(pView->Plc.DlgMenu01.ResetAoiUp, 1); // 검사부 상 Reset <-> Y436A I/F
+		pView->MpeWrite(pView->Plc.DlgMenu01.ResetAoiDn, 1); // 검사부 하 Reset <-> Y446A I/F
 		SetTimer(TIM_AOI_RESET_OFF, 500, NULL);
 	}
 	else
 	{
-		pView->MpeWrite(_T("MB00382A"), 0); // 검사부 상 Reset <-> Y436A I/F
-		pView->MpeWrite(_T("MB00392A"), 0); // 검사부 하 Reset <-> Y446A I/F
+		pView->MpeWrite(pView->Plc.DlgMenu01.ResetAoiUp, 0); // 검사부 상 Reset <-> Y436A I/F
+		pView->MpeWrite(pView->Plc.DlgMenu01.ResetAoiDn, 0); // 검사부 하 Reset <-> Y446A I/F
 	}
 }
 

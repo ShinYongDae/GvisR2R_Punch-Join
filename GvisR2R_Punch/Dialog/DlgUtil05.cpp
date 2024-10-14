@@ -308,16 +308,6 @@ void CDlgUtil05::OnBtn00()
 				pDoc->m_pMpeIo[m_nSegment] &= ~(0x01<<_tstoi(m_strParam[1])); // m_strParam[2] : DblSol Index
 		}
 	}
-// 	else if(m_nIdxSliceIo > -1)
-// 	{
-// 		bOn = pDoc->m_pSliceIo[m_nSegment] & (0x01<<m_nIdxSliceIo);
-// 		if(!bOn)
-// 		{
-// 			pDoc->m_pSliceIo[m_nSegment] |= (0x01<<m_nIdxSliceIo);
-// 			if(IsDblSol())
-// 				pDoc->m_pSliceIo[m_nSegment] &= ~(0x01<<_tstoi(m_strParam[2])); // m_strParam[2] : DblSol Index
-// 		}
-// 	}
 	else
 		AfxMessageBox(_T("Failed IO control..."));
 #endif
@@ -339,16 +329,6 @@ void CDlgUtil05::OnBtn01()
 				pDoc->m_pMpeIo[m_nSegment] |= (0x01<<_tstoi(m_strParam[1])); // m_strParam[2] : DblSol Index
 		}
 	}
-// 	else if(m_nIdxSliceIo > -1)
-// 	{
-// 		bOn = pDoc->m_pSliceIo[m_nSegment] & (0x01<<m_nIdxSliceIo);
-// 		if(bOn)
-// 		{
-// 			pDoc->m_pSliceIo[m_nSegment] &= ~(0x01<<m_nIdxSliceIo);
-// 			if(IsDblSol())
-// 				pDoc->m_pSliceIo[m_nSegment] |= (0x01<<_tstoi(m_strParam[2])); // m_strParam[2] : DblSol Index
-// 		}
-// 	}
 	else
 		AfxMessageBox(_T("Failed IO control..."));
 #endif
@@ -379,8 +359,6 @@ void CDlgUtil05::DispIo()
 #ifdef USE_MPE
 	if(m_nIdxMpeIo > -1)
 		bStatus = pDoc->m_pMpeIo[m_nSegment] & (0x01<<m_nIdxMpeIo);
-// 	else if(m_nIdxSliceIo > -1)
-// 		bStatus = pDoc->m_pSliceIo[m_nSegment] & (0x01<<m_nIdxSliceIo);
 #endif
 	if(bStatus)
 	{

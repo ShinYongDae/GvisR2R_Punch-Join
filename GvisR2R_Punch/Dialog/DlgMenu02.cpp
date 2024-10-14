@@ -3289,7 +3289,7 @@ void CDlgMenu02::OnBtnBuffHome()
 	if(pDoc->WorkingInfo.Motion.bBufHomming)
 	{
 		pView->DispMsg(_T("Homming"),_T("Searching Buffer Home Position..."),RGB_GREEN,2000,TRUE);
-		//pView->MpeWrite(_T("MB440152"), 1);	// 마킹부 버퍼롤러 홈동작 ON
+		//pView->MpeWrite(pView->Plc.DlgMenu04.BufferHomming, 1);	// 마킹부 버퍼롤러 홈동작 ON
 		pView->m_bBufHomeDone = FALSE;
 		if(pView->m_pDlgMenu03)
 			pView->m_pDlgMenu03->ChkBufHomeDone();
@@ -3300,7 +3300,7 @@ void CDlgMenu02::OnBtnBuffInitMove()
 {
 	// TODO: Add your control notification handler code here
 	pView->DispMsg(_T("Moving"),_T("Searching Buffer Initial Position..."),RGB_GREEN,2000,TRUE);
-	pView->MpeWrite(_T("MB44015A"), 1);	// 마킹부 버퍼 초기위치 이동(PC가 ON, PLC가 OFF)
+	pView->MpeWrite(pView->Plc.DlgMenu04.BufferInitPosMove, 1);	// 마킹부 버퍼 초기위치 이동(PC가 ON, PLC가 OFF)
 	if(pView->m_pDlgMenu03)
 		pView->m_pDlgMenu03->ChkBufInitDone();
 }

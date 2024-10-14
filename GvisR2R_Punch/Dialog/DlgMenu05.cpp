@@ -3937,7 +3937,6 @@ int CDlgMenu05::LoadPCRUpFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 	nFileSize = nFileSize - nTemp - 1;
 	pDoc->m_pPcr[0][nIdx]->m_nErrPnl = _tstoi(strHeaderErrorInfo);
 
-
 	// Model
 	nTemp = strFileData.Find(',', 0);
 	strModel = strFileData.Left(nTemp);
@@ -3952,39 +3951,21 @@ int CDlgMenu05::LoadPCRUpFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 	nFileSize = nFileSize - nTemp - 1;
 	pDoc->m_pPcr[0][nIdx]->m_sLayer = strLayer;
 
-	if (pDoc->WorkingInfo.System.bUseITS)
-	{
-		// Lot
-		nTemp = strFileData.Find(',', 0);
-		strLot = strFileData.Left(nTemp);
-		strFileData.Delete(0, nTemp + 1);
-		nFileSize = nFileSize - nTemp - 1;
-		pDoc->m_pPcr[0][nIdx]->m_sLot = strLot;
+	// Lot
+	nTemp = strFileData.Find(',', 0);
+	strLot = strFileData.Left(nTemp);
+	strFileData.Delete(0, nTemp + 1);
+	nFileSize = nFileSize - nTemp - 1;
+	pDoc->m_pPcr[0][nIdx]->m_sLot = strLot;
 
-		// Its Code
-		nTemp = strFileData.Find('\n', 0);
-		sItsCode = strFileData.Left(nTemp);
-		strFileData.Delete(0, nTemp + 1);
-		nFileSize = nFileSize - nTemp - 1;
-		pDoc->m_pPcr[0][nIdx]->m_sItsCode = sItsCode;
-	}
-	else
-	{
-		// Lot
-		nTemp = strFileData.Find(',', 0);
-		strLot = strFileData.Left(nTemp);
-		strFileData.Delete(0, nTemp + 1);
-		nFileSize = nFileSize - nTemp - 1;
-		pDoc->m_pPcr[0][nIdx]->m_sLot = strLot;
+	// Its Code
+	nTemp = strFileData.Find('\n', 0);
+	sItsCode = strFileData.Left(nTemp);
+	strFileData.Delete(0, nTemp + 1);
+	nFileSize = nFileSize - nTemp - 1;
+	pDoc->m_pPcr[0][nIdx]->m_sItsCode = sItsCode;
 
-		// Lot
-		nTemp = strFileData.Find('\n', 0);
-		strLot = strFileData.Left(nTemp);
-		strFileData.Delete(0, nTemp + 1);
-		nFileSize = nFileSize - nTemp - 1;
-		pDoc->m_pPcr[0][nIdx]->m_sLot = strLot;
-	}
-
+	// Total Defect Numbers
 	nTemp = strFileData.Find('\n', 0);
 	strTotalBadPieceNum = strFileData.Left(nTemp);;
 	strFileData.Delete(0, nTemp + 1);
@@ -3995,7 +3976,6 @@ int CDlgMenu05::LoadPCRUpFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 		pDoc->m_sEngModel = strModel;
 		pDoc->m_sEngLotNum = strLot;
 		pDoc->m_sEngLayerUp = strLayer;
-		//pDoc->m_sEngLayerDn = strModel;
 		if (pDoc->WorkingInfo.System.bUseITS)
 			pDoc->m_sItsCode = sItsCode;
 	}
@@ -4026,22 +4006,6 @@ int CDlgMenu05::LoadPCRUpFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 			if (pDoc->WorkingInfo.System.bStripPcsRgnBin)	// DTS용
 			{
 				pDoc->m_pPcr[0][nIdx]->m_pDefPcs[i] = _tstoi(strPieceID);
-
-				//switch (pDoc->m_Master[0].MasterInfo.nActionCode)	// 0 : Rotation / Mirror 적용 없음(CAM Data 원본), 1 : 좌우 미러, 2 : 상하 미러, 3 : 180 회전, 4 : 270 회전(CCW), 5 : 90 회전(CW)
-				//{
-				//case 0:
-				//	pDoc->m_pPcr[0][nIdx]->m_pDefPcs[i] = _tstoi(strPieceID);
-				//	break;
-				//case 1:
-				//	pDoc->m_pPcr[0][nIdx]->m_pDefPcs[i] = pDoc->MirrorLR(_tstoi(strPieceID));
-				//	break;
-				//case 3:
-				//	pDoc->m_pPcr[0][nIdx]->m_pDefPcs[i] = pDoc->Rotate180(_tstoi(strPieceID));
-				//	break;
-				//default:
-				//	pDoc->m_pPcr[0][nIdx]->m_pDefPcs[i] = _tstoi(strPieceID);
-				//	break;
-				//}
 			}
 			else
 				pDoc->m_pPcr[0][nIdx]->m_pDefPcs[i] = _tstoi(strPieceID);
@@ -4105,7 +4069,6 @@ int CDlgMenu05::LoadPCRUpFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 	}
 
 	return (1); // 1(정상)
-				// 	return(m_pPcr[0][nIdx]->m_nErrPnl);
 }
 
 int CDlgMenu05::LoadPCRDnFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(Align Error, 노광불량), -2(Lot End)
@@ -4128,7 +4091,6 @@ int CDlgMenu05::LoadPCRDnFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 	{
 		strFileData.Format(_T("PCR파일이 설정되지 않았습니다."));
 		pView->MsgBox(strFileData);
-		//AfxMessageBox(strFileData);
 		return(2);
 	}
 
@@ -4136,7 +4098,6 @@ int CDlgMenu05::LoadPCRDnFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 	{
 		strFileData.Format(_T("PCR[1]관련 메모리가 할당되지 않았습니다."));
 		pView->MsgBox(strFileData);
-		//AfxMessageBox(strFileData);
 		return(2);
 	}
 
@@ -4159,8 +4120,6 @@ int CDlgMenu05::LoadPCRDnFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 		}
 	}
 
-	//strcpy(FileD, sPath);
-	//_tcscpy(FileD, sPath);
 	StringToChar(sPath, FileD);
 
 	if ((fp = fopen(FileD, "r")) != NULL)
@@ -4170,11 +4129,9 @@ int CDlgMenu05::LoadPCRDnFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 		fseek(fp, 0, SEEK_SET);
 
 		/* Allocate space for a path name */
-		//FileData = (char*)malloc( nFileSize );
 		FileData = (char*)calloc(nFileSize + 1, sizeof(char));
 
 		nRSize = fread(FileData, sizeof(char), nFileSize, fp);
-		//strFileData.Format(_T("%s"), CharToString(FileData));
 		strFileData = CharToString(FileData);
 		fclose(fp);
 		free(FileData);
@@ -4183,7 +4140,6 @@ int CDlgMenu05::LoadPCRDnFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 	{
 		strFileData.Format(_T("PCR[Dn] 파일이 존재하지 않습니다.\r\n%s"), sPath);
 		pView->MsgBox(strFileData);
-		//		AfxMessageBox(strFileData);
 		return(2);
 	}
 
@@ -4202,12 +4158,6 @@ int CDlgMenu05::LoadPCRDnFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 	nFileSize = nFileSize - nTemp - 1;
 	pDoc->m_pPcr[1][nIdx]->m_nErrPnl = _tstoi(strHeaderErrorInfo);
 
-	//if (m_pPcrInner[1][nIdx]->m_nErrPnl == -1)
-	//{
-	//	int syd = 1;
-	//}
-
-
 	// Model
 	nTemp = strFileData.Find(',', 0);
 	strModel = strFileData.Left(nTemp);
@@ -4222,39 +4172,21 @@ int CDlgMenu05::LoadPCRDnFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 	nFileSize = nFileSize - nTemp - 1;
 	pDoc->m_pPcr[1][nIdx]->m_sLayer = strLayer;
 
-	if (pDoc->WorkingInfo.System.bUseITS)
-	{
-		// Lot
-		nTemp = strFileData.Find(',', 0);
-		strLot = strFileData.Left(nTemp);
-		strFileData.Delete(0, nTemp + 1);
-		nFileSize = nFileSize - nTemp - 1;
-		pDoc->m_pPcr[1][nIdx]->m_sLot = strLot;
+	// Lot
+	nTemp = strFileData.Find(',', 0);
+	strLot = strFileData.Left(nTemp);
+	strFileData.Delete(0, nTemp + 1);
+	nFileSize = nFileSize - nTemp - 1;
+	pDoc->m_pPcr[1][nIdx]->m_sLot = strLot;
 
-		// Its Code
-		nTemp = strFileData.Find('\n', 0);
-		sItsCode = strFileData.Left(nTemp);
-		strFileData.Delete(0, nTemp + 1);
-		nFileSize = nFileSize - nTemp - 1;
-		pDoc->m_pPcr[1][nIdx]->m_sItsCode = sItsCode;
-	}
-	else
-	{
-		// Lot
-		nTemp = strFileData.Find(',', 0);
-		strLot = strFileData.Left(nTemp);
-		strFileData.Delete(0, nTemp + 1);
-		nFileSize = nFileSize - nTemp - 1;
-		pDoc->m_pPcr[1][nIdx]->m_sLot = strLot;
+	// Its Code
+	nTemp = strFileData.Find('\n', 0);
+	sItsCode = strFileData.Left(nTemp);
+	strFileData.Delete(0, nTemp + 1);
+	nFileSize = nFileSize - nTemp - 1;
+	pDoc->m_pPcr[1][nIdx]->m_sItsCode = sItsCode;
 
-		// Lot
-		nTemp = strFileData.Find('\n', 0);
-		strLot = strFileData.Left(nTemp);
-		strFileData.Delete(0, nTemp + 1);
-		nFileSize = nFileSize - nTemp - 1;
-		pDoc->m_pPcr[1][nIdx]->m_sLot = strLot;
-	}
-
+	// Total Defect Numbers
 	nTemp = strFileData.Find('\n', 0);
 	strTotalBadPieceNum = strFileData.Left(nTemp);;
 	strFileData.Delete(0, nTemp + 1);
@@ -4265,7 +4197,6 @@ int CDlgMenu05::LoadPCRDnFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 	{
 		pDoc->m_sEngModel = strModel;
 		pDoc->m_sEngLotNum = strLot;
-		//pDoc->m_sEngLayerUp = strLayer;
 		pDoc->m_sEngLayerDn = strLayer;
 		if (pDoc->WorkingInfo.System.bUseITS)
 			pDoc->m_sItsCode = sItsCode;
@@ -4296,22 +4227,6 @@ int CDlgMenu05::LoadPCRDnFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 			if (pDoc->WorkingInfo.System.bStripPcsRgnBin)	// DTS용
 			{
 				pDoc->m_pPcr[1][nIdx]->m_pDefPcs[i] = _tstoi(strPieceID);
-
-				//switch (pDoc->m_Master[1].MasterInfo.nActionCode)	// 0 : Rotation / Mirror 적용 없음(CAM Data 원본), 1 : 좌우 미러, 2 : 상하 미러, 3 : 180 회전, 4 : 270 회전(CCW), 5 : 90 회전(CW)
-				//{
-				//case 0:
-				//	pDoc->m_pPcr[1][nIdx]->m_pDefPcs[i] = _tstoi(strPieceID);
-				//	break;
-				//case 1:
-				//	pDoc->m_pPcr[1][nIdx]->m_pDefPcs[i] = pDoc->MirrorLR(_tstoi(strPieceID));
-				//	break;
-				//case 3:
-				//	pDoc->m_pPcr[1][nIdx]->m_pDefPcs[i] = pDoc->Rotate180(_tstoi(strPieceID));
-				//	break;
-				//default:
-				//	pDoc->m_pPcr[1][nIdx]->m_pDefPcs[i] = _tstoi(strPieceID);
-				//	break;
-				//}
 			}
 			else
 				pDoc->m_pPcr[1][nIdx]->m_pDefPcs[i] = pDoc->MirrorLR(_tstoi(strPieceID));	// 초기 양면검사기용
@@ -4340,7 +4255,6 @@ int CDlgMenu05::LoadPCRDnFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 			pDoc->m_pPcr[1][nIdx]->m_pDefType[i] = _tstoi(strBadName);
 
 			// Temp for ITS - m_pPcr[0][nIdx]->m_pDefPcs[i] = Rotate180(_tstoi(strPieceID));
-			//pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->Rotate180(pDoc->m_pPcr[1][nIdx]->m_pDefPcs[i]), nC, nR);
 			pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_pPcr[1][nIdx]->m_pDefPcs[i], nC, nR);
 			pDoc->m_pPcr[1][nIdx]->m_arDefType[nR][nC] = pDoc->m_pPcr[1][nIdx]->m_pDefType[i];
 			pDoc->m_pPcr[1][nIdx]->m_arPcrLineNum[nR][nC] = i;
@@ -4372,12 +4286,10 @@ int CDlgMenu05::LoadPCRDnFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 			strFileData.Delete(0, nTemp + 1);
 			nFileSize = nFileSize - nTemp - 1;
 			pDoc->m_pPcr[1][nIdx]->m_pMk[i] = _tstoi(strMarkingCode);
-
 		}
 	}
 
 	return (1); // 1(정상)
-				//return(m_pPcr[1][nIdx]->m_nErrPnl);
 }
 
 

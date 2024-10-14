@@ -3825,6 +3825,10 @@ BOOL CReelMap::WriteIts(int nItsSerial)
 
 BOOL CReelMap::MakeItsFile(int nSerial, int nLayer) // RMAP_UP, RMAP_DN, RMAP_INNER_UP, RMAP_INNER_DN
 {
+	int nPos = pDoc->WorkingInfo.LastJob.sSelUserName.Find(_T('\r'));
+	if (nPos > 0)
+		pDoc->WorkingInfo.LastJob.sSelUserName = pDoc->WorkingInfo.LastJob.sSelUserName.Left(nPos);
+
 	MakeDirIts();
 
 	CString sMsg;

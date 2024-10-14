@@ -193,7 +193,6 @@ class CGvisR2R_PunchView : public CFormView
 	BOOL m_bTIM_DISP_STATUS, m_bTIM_MPE_IO;
 
 	CString m_sPrevMyMsg;
-	//stMyMsgBox stMyMsgData;
 	CString m_sTick, m_sDispTime;
 	DWORD m_dwSetDlySt[10], m_dwSetDlyEd[10];
 	DWORD m_dwSetDlySt0[10], m_dwSetDlyEd0[10];
@@ -804,7 +803,6 @@ public:
 	int GetBufferDn1(int *pPrevSerial = NULL);
 
 	//	BOOL ChkLotEnd(CString sPath);
-	BOOL ChkMkTmpStop(); // 사용하지않음.
 	BOOL IsMkTmpStop();
 	BOOL IsAuto();
 	void Marking();
@@ -1218,6 +1216,7 @@ public:
 	BOOL GetMkStSignal();
 	void LoadSerial();
 	BOOL MpeWrite(CString strRegAddr, long lData, BOOL bCheck = FALSE);
+	long MpeRead(CString strRegAddr);
 
 // 재정의입니다.
 public:

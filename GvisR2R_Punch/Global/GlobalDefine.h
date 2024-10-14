@@ -1156,6 +1156,67 @@ struct stBtnMain
 	}
 };
 
+struct stBtnRunMode
+{
+	BOOL ConnectModule, FeedOnePanel;
+
+	stBtnRunMode()
+	{
+		Init();
+	}
+
+	void Init()
+	{
+		ConnectModule = FALSE; FeedOnePanel = FALSE;
+	}
+};
+
+struct stBtnLaser
+{
+	BOOL Laser380mm, Laser346mm, Laser340mm;
+
+	stBtnLaser()
+	{
+		Init();
+	}
+
+	void Init()
+	{
+		Laser380mm = FALSE; Laser346mm = FALSE; Laser340mm = FALSE;
+	}
+};
+
+struct stBtnFeedDir
+{
+	BOOL FeedCcwRecoiler, FeedCcwUncoiler;
+
+	stBtnFeedDir()
+	{
+		Init();
+	}
+
+	void Init()
+	{
+		FeedCcwRecoiler = FALSE; FeedCcwUncoiler = FALSE;
+	}
+};
+
+struct stBtnDancerRoll
+{
+	BOOL AllDancerUpDn, AllDancerFixOnOff;
+
+	stBtnDancerRoll()
+	{
+		Init();
+	}
+
+	void Init()
+	{
+		AllDancerUpDn = FALSE; AllDancerFixOnOff = FALSE;
+	}
+};
+
+
 struct stBtnMsg
 {
 	BOOL Yes, No, Ok, Cancel;
@@ -1274,261 +1335,333 @@ struct stBtnEtc
 
 struct stBtnRecoiler
 {
-	BOOL Relation, FdCw, FdCcw, ReelChuck;
-	BOOL DcRlUpDn, ReelJoinL, ReelJoinR, ReelJoinVac;
-	BOOL PprChuck, PprCw, PprCcw, Rewine, RewineReelPpr;
+	BOOL ChuckPcb, ChuckPaper, JoinClamp, PcbShaftSupport;
+	BOOL EpcActHome, EpcActFirst, EpcActSecond, EpcActThird;
+	BOOL PcbInverterCw, PcbInverterCcw, PaperInverterCw, PaperInverterCcw;
+	BOOL DancerUpper, DancerFixer, EpcAuto, EpcManual;
+	BOOL EpcIn, EpcOut, EpcHome;
 
-	BOOL PrevRelation, PrevFdCw, PrevFdCcw, PrevReelChuck;
-	BOOL PrevDcRlUpDn, PrevReelJoinL, PrevReelJoinR, PrevReelJoinVac;
-	BOOL PrevPprChuck, PrevPprCw, PrevPprCcw, PrevRewine, PrevRewineReelPpr;
+	BOOL PrevChuckPcb, PrevChuckPaper, PrevJoinClamp, PrevPcbShaftSupport;
+	BOOL PrevEpcActHome, PrevEpcActFirst, PrevEpcActSecond, PrevEpcActThird;
+	BOOL PrevPcbInverterCw, PrevPcbInverterCcw, PrevPaperInverterCw, PrevPaperInverterCcw;
+	BOOL PrevDancerUpper, PrevDancerFixer, PrevEpcAuto, PrevEpcManual;
+	BOOL PrevEpcIn, PrevEpcOut, PrevEpcHome;
 
-	BOOL IsRelation, IsFdCw, IsFdCcw, IsReelChuck;
-	BOOL IsDcRlUpDn, IsReelJoinL, IsReelJoinR, IsReelJoinVac;
-	BOOL IsPprChuck, IsPprCw, IsPprCcw, IsRewine, IsRewineReelPpr;
+	BOOL IsChuckPcb, IsChuckPaper, IsJoinClamp, IsPcbShaftSupport;
+	BOOL IsEpcActHome, IsEpcActFirst, IsEpcActSecond, IsEpcActThird;
+	BOOL IsPcbInverterCw, IsPcbInverterCcw, IsPaperInverterCw, IsPaperInverterCcw;
+	BOOL IsDancerUpper, IsDancerFixer, IsEpcAuto, IsEpcManual;
+	BOOL IsEpcIn, IsEpcOut, IsEpcHome;
 
-	BOOL IsPrevRelation, IsPrevFdCw, IsPrevFdCcw, IsPrevReelChuck;
-	BOOL IsPrevDcRlUpDn, IsPrevReelJoinL, IsPrevReelJoinR, IsPrevReelJoinVac;
-	BOOL IsPrevPprChuck, IsPrevPprCw, IsPrevPprCcw, IsPrevRewine, IsPrevRewineReelPpr;
+	BOOL IsPrevChuckPcb, IsPrevChuckPaper, IsPrevJoinClamp, IsPrevPcbShaftSupport;
+	BOOL IsPrevEpcActHome, IsPrevEpcActFirst, IsPrevEpcActSecond, IsPrevEpcActThird;
+	BOOL IsPrevPcbInverterCw, IsPrevPcbInverterCcw, IsPrevPaperInverterCw, IsPrevPaperInverterCcw;
+	BOOL IsPrevDancerUpper, IsPrevDancerFixer, IsPrevEpcAuto, IsPrevEpcManual;
+	BOOL IsPrevEpcIn, IsPrevEpcOut, IsPrevEpcHome;
 
 	stBtnRecoiler()
 	{
-		Relation = FALSE; FdCw = FALSE; FdCcw = FALSE; ReelChuck = FALSE;
-		DcRlUpDn = FALSE; ReelJoinL = FALSE; ReelJoinR = FALSE; ReelJoinVac = FALSE;
-		PprChuck = FALSE; PprCw = FALSE; PprCcw = FALSE; Rewine = FALSE; RewineReelPpr = FALSE;
+		ChuckPcb = FALSE; ChuckPaper = FALSE; JoinClamp = FALSE; PcbShaftSupport = FALSE;
+		EpcActHome = FALSE; EpcActFirst = FALSE; EpcActSecond = FALSE; EpcActThird = FALSE;
+		PcbInverterCw = FALSE; PcbInverterCcw = FALSE; PaperInverterCw = FALSE; PaperInverterCcw = FALSE;
+		DancerUpper = FALSE; DancerFixer = FALSE; EpcAuto = FALSE; EpcManual = FALSE;
+		EpcIn = FALSE; EpcOut = FALSE; EpcHome = FALSE;
 
-		PrevRelation = FALSE; PrevFdCw = FALSE; PrevFdCcw = FALSE; PrevReelChuck = FALSE;
-		PrevDcRlUpDn = FALSE; PrevReelJoinL = FALSE; PrevReelJoinR = FALSE; PrevReelJoinVac = FALSE;
-		PrevPprChuck = FALSE; PrevPprCw = FALSE; PrevPprCcw = FALSE; PrevRewine = FALSE; PrevRewineReelPpr = FALSE;
+		PrevChuckPcb = FALSE; PrevChuckPaper = FALSE; PrevJoinClamp = FALSE; PrevPcbShaftSupport = FALSE;
+		PrevEpcActHome = FALSE; PrevEpcActFirst = FALSE; PrevEpcActSecond = FALSE; PrevEpcActThird = FALSE;
+		PrevPcbInverterCw = FALSE; PrevPcbInverterCcw = FALSE; PrevPaperInverterCw = FALSE; PrevPaperInverterCcw = FALSE;
+		PrevDancerUpper = FALSE; PrevDancerFixer = FALSE; PrevEpcAuto = FALSE; PrevEpcManual = FALSE;
+		PrevEpcIn = FALSE; PrevEpcOut = FALSE; PrevEpcHome = FALSE;
 
-		IsRelation = FALSE; IsFdCw = FALSE; IsFdCcw = FALSE; IsReelChuck = FALSE;
-		IsDcRlUpDn = FALSE; IsReelJoinL = FALSE; IsReelJoinR = FALSE; IsReelJoinVac = FALSE;
-		IsPprChuck = FALSE; IsPprCw = FALSE; IsPprCcw = FALSE; IsRewine = FALSE; IsRewineReelPpr = FALSE;
+		IsChuckPcb = FALSE; IsChuckPaper = FALSE; IsJoinClamp = FALSE; IsPcbShaftSupport = FALSE;
+		IsEpcActHome = FALSE; IsEpcActFirst = FALSE; IsEpcActSecond = FALSE; IsEpcActThird = FALSE;
+		IsPcbInverterCw = FALSE; IsPcbInverterCcw = FALSE; IsPaperInverterCw = FALSE; IsPaperInverterCcw = FALSE;
+		IsDancerUpper = FALSE; IsDancerFixer = FALSE; IsEpcAuto = FALSE; IsEpcManual = FALSE;
+		IsEpcIn = FALSE; IsEpcOut = FALSE; IsEpcHome = FALSE;
 
-		IsPrevRelation = FALSE; IsPrevFdCw = FALSE; IsPrevFdCcw = FALSE; IsPrevReelChuck = FALSE;
-		IsPrevDcRlUpDn = FALSE; IsPrevReelJoinL = FALSE; IsPrevReelJoinR = FALSE; IsPrevReelJoinVac = FALSE;
-		IsPrevPprChuck = FALSE; IsPrevPprCw = FALSE; IsPrevPprCcw = FALSE; IsPrevRewine = FALSE; IsPrevRewineReelPpr = FALSE;
+		IsPrevChuckPcb = FALSE; IsPrevChuckPaper = FALSE; IsPrevJoinClamp = FALSE; IsPrevPcbShaftSupport = FALSE;
+		IsPrevEpcActHome = FALSE; IsPrevEpcActFirst = FALSE; IsPrevEpcActSecond = FALSE; IsPrevEpcActThird = FALSE;
+		IsPrevPcbInverterCw = FALSE; IsPrevPcbInverterCcw = FALSE; IsPrevPaperInverterCw = FALSE; IsPrevPaperInverterCcw = FALSE;
+		IsPrevDancerUpper = FALSE; IsPrevDancerFixer = FALSE; IsPrevEpcAuto = FALSE; IsPrevEpcManual = FALSE;
+		IsPrevEpcIn = FALSE; IsPrevEpcOut = FALSE; IsPrevEpcHome = FALSE;
 	}
 };
 
 struct stBtnPunch
 {
-	BOOL Relation, FdCw, FdCcw, FdVac;
-	BOOL PushUp, TblBlw, TblVac, FdClp;
-	BOOL TqClp, MvOne, LsrPt;
-	BOOL DcRSol;
+	BOOL FeedCw, FeedCcw, TensionCw, TensionCcw;
+	BOOL FeedHome, FeedVacuum, FeedClamp, TensionClamp;
+	BOOL TableVacuum, TableBlower, TableCylinder;
+	BOOL TableClampDn, TableClampForward, PunchStart;
 
-	BOOL PrevRelation, PrevFdCw, PrevFdCcw, PrevFdVac;
-	BOOL PrevPushUp, PrevTblBlw, PrevTblVac, PrevFdClp;
-	BOOL PrevTqClp, PrevMvOne, PrevLsrPt;
-	BOOL PrevDcRSol;
+	BOOL PrevFeedCw, PrevFeedCcw, PrevTensionCw, PrevTensionCcw;
+	BOOL PrevFeedHome, PrevFeedVacuum, PrevFeedClamp, PrevTensionClamp;
+	BOOL PrevTableVacuum, PrevTableBlower, PrevTableCylinder;
+	BOOL PrevTableClampDn, PrevTableClampForward, PrevPunchStart;
 
-	BOOL IsRelation, IsFdCw, IsFdCcw, IsFdVac;
-	BOOL IsPushUp, IsTblBlw, IsTblVac, IsFdClp;
-	BOOL IsTqClp, IsMvOne, IsLsrPt;
-	BOOL IsDcRSol;
+	BOOL IsFeedCw, IsFeedCcw, IsTensionCw, IsTensionCcw;
+	BOOL IsFeedHome, IsFeedVacuum, IsFeedClamp, IsTensionClamp;
+	BOOL IsTableVacuum, IsTableBlower, IsTableCylinder;
+	BOOL IsTableClampDn, IsTableClampForward, IsPunchStart;
 
-	BOOL IsPrevRelation, IsPrevFdCw, IsPrevFdCcw, IsPrevFdVac;
-	BOOL IsPrevPushUp, IsPrevTblBlw, IsPrevTblVac, IsPrevFdClp;
-	BOOL IsPrevTqClp, IsPrevMvOne, IsPrevLsrPt;
-	BOOL IsPrevDcRSol;
+	BOOL IsPrevFeedCw, IsPrevFeedCcw, IsPrevTensionCw, IsPrevTensionCcw;
+	BOOL IsPrevFeedHome, IsPrevFeedVacuum, IsPrevFeedClamp, IsPrevTensionClamp;
+	BOOL IsPrevTableVacuum, IsPrevTableBlower, IsPrevTableCylinder;
+	BOOL IsPrevTableClampDn, IsPrevTableClampForward, IsPrevPunchStart;
 
 	stBtnPunch()
 	{
-		Relation = FALSE; FdCw = FALSE; FdCcw = FALSE; FdVac = FALSE;
-		PushUp = FALSE; TblBlw = FALSE; TblVac = FALSE; FdClp = FALSE;
-		TqClp = FALSE; MvOne = FALSE; LsrPt = FALSE;
-		DcRSol = FALSE;
+		FeedCw = FALSE; FeedCcw = FALSE; TensionCw = FALSE; TensionCcw = FALSE;
+		FeedHome = FALSE; FeedVacuum = FALSE; FeedClamp = FALSE; TensionClamp = FALSE;
+		TableVacuum = FALSE; TableBlower = FALSE; TableCylinder = FALSE;
+		TableClampDn = FALSE; TableClampForward = FALSE; PunchStart = FALSE;
 
-		PrevRelation = FALSE; PrevFdCw = FALSE; PrevFdCcw = FALSE; PrevFdVac = FALSE;
-		PrevPushUp = FALSE; PrevTblBlw = FALSE; PrevTblVac = FALSE; PrevFdClp = FALSE;
-		PrevTqClp = FALSE; PrevMvOne = FALSE; PrevLsrPt = FALSE;
-		PrevDcRSol = FALSE;
+		PrevFeedCw = FALSE; PrevFeedCcw = FALSE; PrevTensionCw = FALSE; PrevTensionCcw = FALSE;
+		PrevFeedHome = FALSE; PrevFeedVacuum = FALSE; PrevFeedClamp = FALSE; PrevTensionClamp = FALSE;
+		PrevTableVacuum = FALSE; PrevTableBlower = FALSE; PrevTableCylinder = FALSE;
+		PrevTableClampDn = FALSE; PrevTableClampForward = FALSE; PrevPunchStart = FALSE;
 
-		IsRelation = FALSE; IsFdCw = FALSE; IsFdCcw = FALSE; IsFdVac = FALSE;
-		IsPushUp = FALSE; IsTblBlw = FALSE; IsTblVac = FALSE; IsFdClp = FALSE;
-		IsTqClp = FALSE; IsMvOne = FALSE; IsLsrPt = FALSE;
-		IsDcRSol = FALSE;
+		IsFeedCw = FALSE; IsFeedCcw = FALSE; IsTensionCw = FALSE; IsTensionCcw = FALSE;
+		IsFeedHome = FALSE; IsFeedVacuum = FALSE; IsFeedClamp = FALSE; IsTensionClamp = FALSE;
+		IsTableVacuum = FALSE; IsTableBlower = FALSE; IsTableCylinder = FALSE;
+		IsTableClampDn = FALSE; IsTableClampForward = FALSE; IsPunchStart = FALSE;
 
-		IsPrevRelation = FALSE; IsPrevFdCw = FALSE; IsPrevFdCcw = FALSE; IsPrevFdVac = FALSE;
-		IsPrevPushUp = FALSE; IsPrevTblBlw = FALSE; IsPrevTblVac = FALSE; IsPrevFdClp = FALSE;
-		IsPrevTqClp = FALSE; IsPrevMvOne = FALSE; IsPrevLsrPt = FALSE;
-		IsPrevDcRSol = FALSE;
+		IsPrevFeedCw = FALSE; IsPrevFeedCcw = FALSE; IsPrevTensionCw = FALSE; IsPrevTensionCcw = FALSE;
+		IsPrevFeedHome = FALSE; IsPrevFeedVacuum = FALSE; IsPrevFeedClamp = FALSE; IsPrevTensionClamp = FALSE;
+		IsPrevTableVacuum = FALSE; IsPrevTableBlower = FALSE; IsPrevTableCylinder = FALSE;
+		IsPrevTableClampDn = FALSE; IsPrevTableClampForward = FALSE; IsPrevPunchStart = FALSE;
 	}
 };
 
 struct stBtnAOIDn
 {
-	BOOL Relation, FdCw, FdCcw, FdVac;
-	BOOL PushUp, TblBlw, TblVac, FdClp;
-	BOOL TqClp, MvOne, LsrPt;
-	BOOL ClrRoll, VelSonicBlw, Test, Reset, LotEnd;
+	BOOL FeedCw, FeedCcw, TensionCw, TensionCcw;
+	BOOL FeedHome, FeedVacuum, FeedClamp, TensionClamp;
+	BOOL TableVacuum, TableBlower, TableCylinder;
+	BOOL CleanRollerUp, CleanRollerDn, CleanRollerPush;
+	BOOL TestStart, BufferRollerUp, BufferRollerFix;
 
-	BOOL PrevRelation, PrevFdCw, PrevFdCcw, PrevFdVac;
-	BOOL PrevPushUp, PrevTblBlw, PrevTblVac, PrevFdClp;
-	BOOL PrevTqClp, PrevMvOne, PrevLsrPt;
-	BOOL PrevClrRoll, PrevVelSonicBlw, PrevTest, PrevReset, PrevLotEnd;
+	BOOL PrevFeedCw, PrevFeedCcw, PrevTensionCw, PrevTensionCcw;
+	BOOL PrevFeedHome, PrevFeedVacuum, PrevFeedClamp, PrevTensionClamp;
+	BOOL PrevTableVacuum, PrevTableBlower, PrevTableCylinder;
+	BOOL PrevCleanRollerUp, PrevCleanRollerDn, PrevCleanRollerPush;
+	BOOL PrevTestStart, PrevBufferRollerUp, PrevBufferRollerFix;
 
-	BOOL IsRelation, IsFdCw, IsFdCcw, IsFdVac;
-	BOOL IsPushUp, IsTblBlw, IsTblVac, IsFdClp;
-	BOOL IsTqClp, IsMvOne, IsLsrPt;
-	BOOL IsClrRoll, IsVelSonicBlw, IsTest, IsReset, IsLotEnd;
+	BOOL IsFeedCw, IsFeedCcw, IsTensionCw, IsTensionCcw;
+	BOOL IsFeedHome, IsFeedVacuum, IsFeedClamp, IsTensionClamp;
+	BOOL IsTableVacuum, IsTableBlower, IsTableCylinder;
+	BOOL IsCleanRollerUp, IsCleanRollerDn, IsCleanRollerPush;
+	BOOL IsTestStart, IsBufferRollerUp, IsBufferRollerFix;
 
-	BOOL IsPrevRelation, IsPrevFdCw, IsPrevFdCcw, IsPrevFdVac;
-	BOOL IsPrevPushUp, IsPrevTblBlw, IsPrevTblVac, IsPrevFdClp;
-	BOOL IsPrevTqClp, IsPrevMvOne, IsPrevLsrPt;
-	BOOL IsPrevClrRoll, IsPrevVelSonicBlw, IsPrevTest, IsPrevReset, IsPrevLotEnd;
+	BOOL IsPrevFeedCw, IsPrevFeedCcw, IsPrevTensionCw, IsPrevTensionCcw;
+	BOOL IsPrevFeedHome, IsPrevFeedVacuum, IsPrevFeedClamp, IsPrevTensionClamp;
+	BOOL IsPrevTableVacuum, IsPrevTableBlower, IsPrevTableCylinder;
+	BOOL IsPrevCleanRollerUp, IsPrevCleanRollerDn, IsPrevCleanRollerPush;
+	BOOL IsPrevTestStart, IsPrevBufferRollerUp, IsPrevBufferRollerFix;
 
 	stBtnAOIDn()
 	{
-		Relation = FALSE; FdCw = FALSE; FdCcw = FALSE; FdVac = FALSE;
-		PushUp = FALSE; TblBlw = FALSE; TblVac = FALSE; FdClp = FALSE;
-		TqClp = FALSE; MvOne = FALSE; LsrPt = FALSE;
-		ClrRoll = FALSE; VelSonicBlw = FALSE; Test = FALSE; Reset = FALSE; LotEnd = FALSE;
+		FeedCw = FALSE; FeedCcw = FALSE; TensionCw = FALSE; TensionCcw = FALSE;
+		FeedHome = FALSE; FeedVacuum = FALSE; FeedClamp = FALSE; TensionClamp = FALSE;
+		TableVacuum = FALSE; TableBlower = FALSE; TableCylinder = FALSE;
+		CleanRollerUp = FALSE; CleanRollerDn = FALSE; CleanRollerPush = FALSE;
+		TestStart = FALSE; BufferRollerUp = FALSE; BufferRollerFix = FALSE;
 
-		PrevRelation = FALSE; PrevFdCw = FALSE; PrevFdCcw = FALSE; PrevFdVac = FALSE;
-		PrevPushUp = FALSE; PrevTblBlw = FALSE; PrevTblVac = FALSE; PrevFdClp = FALSE;
-		PrevTqClp = FALSE; PrevMvOne = FALSE; PrevLsrPt = FALSE;
-		PrevClrRoll = FALSE; PrevVelSonicBlw = FALSE; PrevTest = FALSE; PrevReset = FALSE; PrevLotEnd = FALSE;
+		PrevFeedCw = FALSE; PrevFeedCcw = FALSE; PrevTensionCw = FALSE; PrevTensionCcw = FALSE;
+		PrevFeedHome = FALSE; PrevFeedVacuum = FALSE; PrevFeedClamp = FALSE; PrevTensionClamp = FALSE;
+		PrevTableVacuum = FALSE; PrevTableBlower = FALSE; PrevTableCylinder = FALSE;
+		PrevCleanRollerUp = FALSE; PrevCleanRollerDn = FALSE; PrevCleanRollerPush = FALSE;
+		PrevTestStart = FALSE; PrevBufferRollerUp = FALSE; PrevBufferRollerFix = FALSE;
 
-		IsRelation = FALSE; IsFdCw = FALSE; IsFdCcw = FALSE; IsFdVac = FALSE;
-		IsPushUp = FALSE; IsTblBlw = FALSE; IsTblVac = FALSE; IsFdClp = FALSE;
-		IsTqClp = FALSE; IsMvOne = FALSE; IsLsrPt = FALSE;
-		IsClrRoll = FALSE; IsVelSonicBlw = FALSE; IsTest = FALSE; IsReset = FALSE; IsLotEnd = FALSE;
+		IsFeedCw = FALSE; IsFeedCcw = FALSE; IsTensionCw = FALSE; IsTensionCcw = FALSE;
+		IsFeedHome = FALSE; IsFeedVacuum = FALSE; IsFeedClamp = FALSE; IsTensionClamp = FALSE;
+		IsTableVacuum = FALSE; IsTableBlower = FALSE; IsTableCylinder = FALSE;
+		IsCleanRollerUp = FALSE; IsCleanRollerDn = FALSE; IsCleanRollerPush = FALSE;
+		IsTestStart = FALSE; IsBufferRollerUp = FALSE; IsBufferRollerFix = FALSE;
 
-		IsPrevRelation = FALSE; IsPrevFdCw = FALSE; IsPrevFdCcw = FALSE; IsPrevFdVac = FALSE;
-		IsPrevPushUp = FALSE; IsPrevTblBlw = FALSE; IsPrevTblVac = FALSE; IsPrevFdClp = FALSE;
-		IsPrevTqClp = FALSE; IsPrevMvOne = FALSE; IsPrevLsrPt = FALSE;
-		IsPrevClrRoll = FALSE; IsPrevVelSonicBlw = FALSE; IsPrevTest = FALSE; IsPrevReset = FALSE; IsPrevLotEnd = FALSE;
+		IsPrevFeedCw = FALSE; IsPrevFeedCcw = FALSE; IsPrevTensionCw = FALSE; IsPrevTensionCcw= FALSE;
+		IsPrevFeedHome = FALSE; IsPrevFeedVacuum = FALSE; IsPrevFeedClamp = FALSE; IsPrevTensionClamp = FALSE;
+		IsPrevTableVacuum = FALSE; IsPrevTableBlower = FALSE; IsPrevTableCylinder = FALSE;
+		IsPrevCleanRollerUp = FALSE; IsPrevCleanRollerDn = FALSE; IsPrevCleanRollerPush = FALSE;
+		IsPrevTestStart = FALSE; IsPrevBufferRollerUp = FALSE; IsPrevBufferRollerFix = FALSE;
 	}
 };
 
 struct stBtnAOIUp
 {
-	BOOL Relation, FdCw, FdCcw, FdVac;
-	BOOL PushUp, TblBlw, TblVac, FdClp;
-	BOOL TqClp, MvOne, LsrPt;
-	BOOL ClrRoll, TqVac, Test, Reset, LotEnd;
+	BOOL FeedCw, FeedCcw, TensionCw, TensionCcw;
+	BOOL FeedHome, FeedVacuum, FeedClamp, TensionClamp;
+	BOOL TableVacuum, TableBlower, TableCylinder; 
+	BOOL CleanRollerUp, CleanRollerDn, CleanRollerPush;
+	BOOL TestStart;
+	BOOL UltrasonicDn, UltrasonicRun, UltrasonicSpeed;
 
-	BOOL PrevRelation, PrevFdCw, PrevFdCcw, PrevFdVac;
-	BOOL PrevPushUp, PrevTblBlw, PrevTblVac, PrevFdClp;
-	BOOL PrevTqClp, PrevMvOne, PrevLsrPt;
-	BOOL PrevClrRoll, PrevTqVac, PrevTest, PrevReset, PrevLotEnd;
+	BOOL PrevFeedCw, PrevFeedCcw, PrevTensionCw, PrevTensionCcw;
+	BOOL PrevFeedHome, PrevFeedVacuum, PrevFeedClamp, PrevTensionClamp;
+	BOOL PrevTableVacuum, PrevTableBlower, PrevTableCylinder;
+	BOOL PrevCleanRollerUp, PrevCleanRollerDn, PrevCleanRollerPush;
+	BOOL PrevTestStart;
+	BOOL PrevUltrasonicDn, PrevUltrasonicRun, PrevUltrasonicSpeed;
 
-	BOOL IsRelation, IsFdCw, IsFdCcw, IsFdVac;
-	BOOL IsPushUp, IsTblBlw, IsTblVac, IsFdClp;
-	BOOL IsTqClp, IsMvOne, IsLsrPt;
-	BOOL IsClrRoll, IsTqVac, IsTest, IsReset, IsLotEnd;
+	BOOL IsFeedCw, IsFeedCcw, IsTensionCw, IsTensionCcw;
+	BOOL IsFeedHome, IsFeedVacuum, IsFeedClamp, IsTensionClamp;
+	BOOL IsTableVacuum, IsTableBlower, IsTableCylinder;
+	BOOL IsCleanRollerUp, IsCleanRollerDn, IsCleanRollerPush;
+	BOOL IsTestStart;
+	BOOL IsUltrasonicDn, IsUltrasonicRun, IsUltrasonicSpeed;
 
-	BOOL IsPrevRelation, IsPrevFdCw, IsPrevFdCcw, IsPrevFdVac;
-	BOOL IsPrevPushUp, IsPrevTblBlw, IsPrevTblVac, IsPrevFdClp;
-	BOOL IsPrevTqClp, IsPrevMvOne, IsPrevLsrPt;
-	BOOL IsPrevClrRoll, IsPrevTqVac, IsPrevTest, IsPrevReset, IsPrevLotEnd;
+	BOOL IsPrevFeedCw, IsPrevFeedCcw, IsPrevTensionCw, IsPrevTensionCcw;
+	BOOL IsPrevFeedHome, IsPrevFeedVacuum, IsPrevFeedClamp, IsPrevTensionClamp;
+	BOOL IsPrevTableVacuum, IsPrevTableBlower, IsPrevTableCylinder;
+	BOOL IsPrevCleanRollerUp, IsPrevCleanRollerDn, IsPrevCleanRollerPush;
+	BOOL IsPrevTestStart;
+	BOOL IsPrevUltrasonicDn, IsPrevUltrasonicRun, IsPrevUltrasonicSpeed;
 
 	stBtnAOIUp()
 	{
-		Relation = FALSE; FdCw = FALSE; FdCcw = FALSE; FdVac = FALSE;
-		PushUp = FALSE; TblBlw = FALSE; TblVac = FALSE; FdClp = FALSE;
-		TqClp = FALSE; MvOne = FALSE; LsrPt = FALSE;
-		ClrRoll = FALSE; TqVac = FALSE; Test = FALSE; Reset = FALSE; LotEnd = FALSE;
+		FeedCw = FALSE; FeedCcw = FALSE; TensionCw = FALSE; TensionCcw = FALSE;
+		FeedHome = FALSE; FeedVacuum = FALSE; FeedClamp = FALSE; TensionClamp = FALSE;
+		TableVacuum = FALSE; TableBlower = FALSE; TableCylinder = FALSE;
+		CleanRollerUp = FALSE; CleanRollerDn = FALSE; CleanRollerPush = FALSE;
+		TestStart = FALSE;
+		UltrasonicDn = FALSE; UltrasonicRun = FALSE; UltrasonicSpeed = FALSE;
 
-		PrevRelation = FALSE; PrevFdCw = FALSE; PrevFdCcw = FALSE; PrevFdVac = FALSE;
-		PrevPushUp = FALSE; PrevTblBlw = FALSE; PrevTblVac = FALSE; PrevFdClp = FALSE;
-		PrevTqClp = FALSE; PrevMvOne = FALSE; PrevLsrPt = FALSE;
-		PrevClrRoll = FALSE; PrevTqVac = FALSE; PrevTest = FALSE; PrevReset = FALSE; PrevLotEnd = FALSE;
+		PrevFeedCw = FALSE; PrevFeedCcw = FALSE; PrevTensionCw = FALSE; PrevTensionCcw = FALSE;
+		PrevFeedHome = FALSE; PrevFeedVacuum = FALSE; PrevFeedClamp = FALSE; PrevTensionClamp = FALSE;
+		PrevTableVacuum = FALSE; PrevTableBlower = FALSE; PrevTableCylinder = FALSE;
+		PrevCleanRollerUp = FALSE; PrevCleanRollerDn = FALSE; PrevCleanRollerPush = FALSE;
+		PrevTestStart = FALSE;
+		PrevUltrasonicDn = FALSE; PrevUltrasonicRun = FALSE; PrevUltrasonicSpeed = FALSE;
 
-		IsRelation = FALSE; IsFdCw = FALSE; IsFdCcw = FALSE; IsFdVac = FALSE;
-		IsPushUp = FALSE; IsTblBlw = FALSE; IsTblVac = FALSE; IsFdClp = FALSE;
-		IsTqClp = FALSE; IsMvOne = FALSE; IsLsrPt = FALSE;
-		IsClrRoll = FALSE; IsTqVac = FALSE; IsTest = FALSE; IsReset = FALSE; IsLotEnd = FALSE;
+		IsFeedCw = FALSE; IsFeedCcw = FALSE; IsTensionCw = FALSE; IsTensionCcw = FALSE;
+		IsFeedHome = FALSE; IsFeedVacuum = FALSE; IsFeedClamp = FALSE; IsTensionClamp = FALSE;
+		IsTableVacuum = FALSE; IsTableBlower = FALSE; IsTableCylinder = FALSE;
+		IsCleanRollerUp = FALSE; IsCleanRollerDn = FALSE; IsCleanRollerPush = FALSE;
+		IsTestStart = FALSE;
+		IsUltrasonicDn = FALSE; IsUltrasonicRun = FALSE; IsUltrasonicSpeed = FALSE;
 
-		IsPrevRelation = FALSE; IsPrevFdCw = FALSE; IsPrevFdCcw = FALSE; IsPrevFdVac = FALSE;
-		IsPrevPushUp = FALSE; IsPrevTblBlw = FALSE; IsPrevTblVac = FALSE; IsPrevFdClp = FALSE;
-		IsPrevTqClp = FALSE; IsPrevMvOne = FALSE; IsPrevLsrPt = FALSE;
-		IsPrevClrRoll = FALSE; IsPrevTqVac = FALSE; IsPrevTest = FALSE; IsPrevReset = FALSE; IsPrevLotEnd = FALSE;
+		IsPrevFeedCw = FALSE; IsPrevFeedCcw = FALSE; IsPrevTensionCw = FALSE; IsPrevTensionCcw = FALSE;
+		IsPrevFeedHome = FALSE; IsPrevFeedVacuum = FALSE; IsPrevFeedClamp = FALSE; IsPrevTensionClamp = FALSE;
+		IsPrevTableVacuum = FALSE; IsPrevTableBlower = FALSE; IsPrevTableCylinder = FALSE;
+		IsPrevCleanRollerUp = FALSE; IsPrevCleanRollerDn = FALSE; IsPrevCleanRollerPush = FALSE;
+		IsPrevTestStart = FALSE;
+		IsPrevUltrasonicDn = FALSE; IsPrevUltrasonicRun = FALSE; IsPrevUltrasonicSpeed = FALSE;
 	}
 };
 
 struct stBtnEngrave
 {
-	BOOL Relation, FdCw, FdCcw, FdVac;
-	BOOL PushUp, TblBlw, TblVac, FdClp;
-	BOOL TqClp, MvOne, LsrPt;
-	BOOL DcRSol, VelSonicBlw;
+	BOOL FeedCw, FeedCcw, TensionCw, TensionCcw;
+	BOOL FeedHome, FeedVacuum, FeedClamp, TensionClamp;
+	BOOL TableVacuum, TableBlower, TableCylinder;
+	BOOL UltrasonicDown, UltrasonicRun, UltrasonicSpeed;
+	BOOL DancerUpper, DancerFixer;
+	BOOL AlignStart, LaserStart, ReadStart;
 
-	BOOL PrevRelation, PrevFdCw, PrevFdCcw, PrevFdVac;
-	BOOL PrevPushUp, PrevTblBlw, PrevTblVac, PrevFdClp;
-	BOOL PrevTqClp, PrevMvOne, PrevLsrPt;
-	BOOL PrevDcRSol, PrevVelSonicBlw;
+	BOOL PrevFeedCw, PrevFeedCcw, PrevTensionCw, PrevTensionCcw;
+	BOOL PrevFeedHome, PrevFeedVacuum, PrevFeedClamp, PrevTensionClamp;
+	BOOL PrevTableVacuum, PrevTableBlower, PrevTableCylinder;
+	BOOL PrevUltrasonicDown, PrevUltrasonicRun, PrevUltrasonicSpeed;
+	BOOL PrevDancerUpper, PrevDancerFixer;
+	BOOL PrevAlignStart, PrevLaserStart, PrevReadStart;
 
-	BOOL IsRelation, IsFdCw, IsFdCcw, IsFdVac;
-	BOOL IsPushUp, IsTblBlw, IsTblVac, IsFdClp;
-	BOOL IsTqClp, IsMvOne, IsLsrPt;
-	BOOL IsDcRSol, IsVelSonicBlw;
+	BOOL IsFeedCw, IsFeedCcw, IsTensionCw, IsTensionCcw;
+	BOOL IsFeedHome, IsFeedVacuum, IsFeedClamp, IsTensionClamp;
+	BOOL IsTableVacuum, IsTableBlower, IsTableCylinder;
+	BOOL IsUltrasonicDown, IsUltrasonicRun, IsUltrasonicSpeed;
+	BOOL IsDancerUpper, IsDancerFixer;
+	BOOL IsAlignStart, IsLaserStart, IsReadStart;
 
-	BOOL IsPrevRelation, IsPrevFdCw, IsPrevFdCcw, IsPrevFdVac;
-	BOOL IsPrevPushUp, IsPrevTblBlw, IsPrevTblVac, IsPrevFdClp;
-	BOOL IsPrevTqClp, IsPrevMvOne, IsPrevLsrPt;
-	BOOL IsPrevDcRSol, IsPrevVelSonicBlw;
+	BOOL IsPrevFeedCw, IsPrevFeedCcw, IsPrevTensionCw, IsPrevTensionCcw;
+	BOOL IsPrevFeedHome, IsPrevFeedVacuum, IsPrevFeedClamp, IsPrevTensionClamp;
+	BOOL IsPrevTableVacuum, IsPrevTableBlower, IsPrevTableCylinder;
+	BOOL IsPrevUltrasonicDown, IsPrevUltrasonicRun, IsPrevUltrasonicSpeed;
+	BOOL IsPrevDancerUpper, IsPrevDancerFixer;
+	BOOL IsPrevAlignStart, IsPrevLaserStart, IsPrevReadStart;
 
 	stBtnEngrave()
 	{
-		Relation = FALSE; FdCw = FALSE; FdCcw = FALSE; FdVac = FALSE;
-		PushUp = FALSE; TblBlw = FALSE; TblVac = FALSE; FdClp = FALSE;
-		TqClp = FALSE; MvOne = FALSE; LsrPt = FALSE;
-		DcRSol = FALSE; DcRSol = FALSE; VelSonicBlw = FALSE;
+		FeedCw = FALSE; FeedCcw = FALSE; TensionCw = FALSE; TensionCcw = FALSE;
+		FeedHome = FALSE; FeedVacuum = FALSE; FeedClamp = FALSE; TensionClamp = FALSE;
+		TableVacuum = FALSE; TableBlower = FALSE; TableCylinder = FALSE;
+		UltrasonicDown = FALSE; UltrasonicRun = FALSE; UltrasonicSpeed = FALSE;
+		DancerUpper = FALSE; DancerFixer = FALSE;
+		AlignStart = FALSE; LaserStart = FALSE; ReadStart = FALSE;
 
-		PrevRelation = FALSE; PrevFdCw = FALSE; PrevFdCcw = FALSE; PrevFdVac = FALSE;
-		PrevPushUp = FALSE; PrevTblBlw = FALSE; PrevTblVac = FALSE; PrevFdClp = FALSE;
-		PrevTqClp = FALSE; PrevMvOne = FALSE; PrevLsrPt = FALSE;
-		PrevDcRSol = FALSE; PrevVelSonicBlw = FALSE;
+		PrevFeedCw = FALSE; PrevFeedCcw = FALSE; PrevTensionCw = FALSE; PrevTensionCcw = FALSE;
+		PrevFeedHome = FALSE; PrevFeedVacuum = FALSE; PrevFeedClamp = FALSE; PrevTensionClamp = FALSE;
+		PrevTableVacuum = FALSE; PrevTableBlower = FALSE; PrevTableCylinder = FALSE;
+		PrevUltrasonicDown = FALSE; PrevUltrasonicRun = FALSE; PrevUltrasonicSpeed = FALSE;
+		PrevDancerUpper = FALSE; PrevDancerFixer = FALSE;
+		PrevAlignStart = FALSE; PrevLaserStart = FALSE; PrevReadStart = FALSE;
 
-		IsRelation = FALSE; IsFdCw = FALSE; IsFdCcw = FALSE; IsFdVac = FALSE;
-		IsPushUp = FALSE; IsTblBlw = FALSE; IsTblVac = FALSE; IsFdClp = FALSE;
-		IsTqClp = FALSE; IsMvOne = FALSE; IsLsrPt = FALSE;
-		IsDcRSol = FALSE; IsDcRSol = FALSE;  IsVelSonicBlw = FALSE;
+		IsFeedCw = FALSE; IsFeedCcw = FALSE; IsTensionCw = FALSE; IsTensionCcw = FALSE;
+		IsFeedHome = FALSE; IsFeedVacuum = FALSE; IsFeedClamp = FALSE; IsTensionClamp = FALSE;
+		IsTableVacuum = FALSE; IsTableBlower = FALSE; IsTableCylinder = FALSE;
+		IsUltrasonicDown = FALSE; IsUltrasonicRun = FALSE; IsUltrasonicSpeed = FALSE;
+		IsDancerUpper = FALSE; IsDancerFixer = FALSE;
+		IsAlignStart = FALSE; IsLaserStart = FALSE; IsReadStart = FALSE;
 
-		IsPrevRelation = FALSE; IsPrevFdCw = FALSE; IsPrevFdCcw = FALSE; IsPrevFdVac = FALSE;
-		IsPrevPushUp = FALSE; IsPrevTblBlw = FALSE; IsPrevTblVac = FALSE; IsPrevFdClp = FALSE;
-		IsPrevTqClp = FALSE; IsPrevMvOne = FALSE; IsPrevLsrPt = FALSE;
-		IsPrevDcRSol = FALSE; IsPrevVelSonicBlw = FALSE;
+		IsPrevFeedCw = FALSE; IsPrevFeedCcw = FALSE; IsPrevTensionCw = FALSE; IsPrevTensionCcw = FALSE;
+		IsPrevFeedHome = FALSE; IsPrevFeedVacuum = FALSE; IsPrevFeedClamp = FALSE; IsPrevTensionClamp = FALSE;
+		IsPrevTableVacuum = FALSE; IsPrevTableBlower = FALSE; IsPrevTableCylinder = FALSE;
+		IsPrevUltrasonicDown = FALSE; IsPrevUltrasonicRun = FALSE; IsPrevUltrasonicSpeed = FALSE;
+		IsPrevDancerUpper = FALSE; IsPrevDancerFixer = FALSE;
+		IsPrevAlignStart = FALSE; IsPrevLaserStart = FALSE; IsPrevReadStart = FALSE;
 	}
 };
 
 struct stBtnUncoiler
 {
-	BOOL Relation, FdCw, FdCcw, ReelChuck;
-	BOOL DcRlUpDn, ReelJoinL, ReelJoinR, ReelJoinVac;
-	BOOL PprChuck, PprCw, PprCcw, ClRlUpDn, ClRlPshUpDn;
+	BOOL ChuckPcb, ChuckPaper, JoinClamp, PcbShaftSupport;
+	BOOL EpcActHome, EpcActFirst, EpcActSecond, EpcActThird;
+	BOOL PcbInverterCw, PcbInverterCcw, PaperInverterCw, PaperInverterCcw;
+	BOOL EpcAuto, EpcManual, EpcIn, EpcOut, EpcHome;
+	BOOL DancerUpper, DancerFixer;
 
-	BOOL PrevRelation, PrevFdCw, PrevFdCcw, PrevReelChuck;
-	BOOL PrevDcRlUpDn, PrevReelJoinL, PrevReelJoinR, PrevReelJoinVac;
-	BOOL PrevPprChuck, PrevPprCw, PrevPprCcw, PrevClRlUpDn, PrevClRlPshUpDn;
+	BOOL PrevChuckPcb, PrevChuckPaper, PrevJoinClamp, PrevPcbShaftSupport;
+	BOOL PrevEpcActHome, PrevEpcActFirst, PrevEpcActSecond, PrevEpcActThird;
+	BOOL PrevPcbInverterCw, PrevPcbInverterCcw, PrevPaperInverterCw, PrevPaperInverterCcw;
+	BOOL PrevEpcAuto, PrevEpcManual, PrevEpcIn, PrevEpcOut, PrevEpcHome;
+	BOOL PrevDancerUpper, PrevDancerFixer;
 
-	BOOL IsRelation, IsFdCw, IsFdCcw, IsReelChuck;
-	BOOL IsDcRlUpDn, IsReelJoinL, IsReelJoinR, IsReelJoinVac;
-	BOOL IsPprChuck, IsPprCw, IsPprCcw, IsClRlUpDn, IsClRlPshUpDn;
+	BOOL IsChuckPcb, IsChuckPaper, IsJoinClamp, IsPcbShaftSupport;
+	BOOL IsEpcActHome, IsEpcActFirst, IsEpcActSecond, IsEpcActThird;
+	BOOL IsPcbInverterCw, IsPcbInverterCcw, IsPaperInverterCw, IsPaperInverterCcw;
+	BOOL IsEpcAuto, IsEpcManual, IsEpcIn, IsEpcOut, IsEpcHome;
+	BOOL IsDancerUpper, IsDancerFixer;
 
-	BOOL IsPrevRelation, IsPrevFdCw, IsPrevFdCcw, IsPrevReelChuck;
-	BOOL IsPrevDcRlUpDn, IsPrevReelJoinL, IsPrevReelJoinR, IsPrevReelJoinVac;
-	BOOL IsPrevPprChuck, IsPrevPprCw, IsPrevPprCcw, IsPrevClRlUpDn, IsPrevClRlPshUpDn;
+	BOOL IsPrevChuckPcb, IsPrevChuckPaper, IsPrevJoinClamp, IsPrevPcbShaftSupport;
+	BOOL IsPrevEpcActHome, IsPrevEpcActFirst, IsPrevEpcActSecond, IsPrevEpcActThird;
+	BOOL IsPrevPcbInverterCw, IsPrevPcbInverterCcw, IsPrevPaperInverterCw, IsPrevPaperInverterCcw;
+	BOOL IsPrevEpcAuto, IsPrevEpcManual, IsPrevEpcIn, IsPrevEpcOut, IsPrevEpcHome;
+	BOOL IsPrevDancerUpper, IsPrevDancerFixer;
 
 	stBtnUncoiler()
 	{
-		Relation = FALSE; FdCw = FALSE; FdCcw = FALSE; ReelChuck = FALSE;
-		DcRlUpDn = FALSE; ReelJoinL = FALSE; ReelJoinR = FALSE; ReelJoinVac = FALSE;
-		PprChuck = FALSE; PprCw = FALSE; PprCcw = FALSE; ClRlUpDn = FALSE; ClRlPshUpDn = FALSE;
+		ChuckPcb = FALSE; ChuckPaper = FALSE; JoinClamp = FALSE; PcbShaftSupport = FALSE;
+		EpcActHome = FALSE; EpcActFirst = FALSE; EpcActSecond = FALSE; EpcActThird = FALSE;
+		PcbInverterCw = FALSE; PcbInverterCcw = FALSE; PaperInverterCw = FALSE; PaperInverterCcw = FALSE;
+		EpcAuto = FALSE; EpcManual = FALSE; EpcIn = FALSE; EpcOut = FALSE; EpcHome = FALSE;
+		DancerUpper = FALSE; DancerFixer = FALSE;
 
-		PrevRelation = FALSE; PrevFdCw = FALSE; PrevFdCcw = FALSE; PrevReelChuck = FALSE;
-		PrevDcRlUpDn = FALSE; PrevReelJoinL = FALSE; PrevReelJoinR = FALSE; PrevReelJoinVac = FALSE;
-		PrevPprChuck = FALSE; PrevPprCw = FALSE; PrevPprCcw = FALSE; PrevClRlUpDn = FALSE; PrevClRlPshUpDn = FALSE;
+		PrevChuckPcb = FALSE; PrevChuckPaper = FALSE; PrevJoinClamp = FALSE; PrevPcbShaftSupport = FALSE;
+		PrevEpcActHome = FALSE; PrevEpcActFirst = FALSE; PrevEpcActSecond = FALSE; PrevEpcActThird = FALSE;
+		PrevPcbInverterCw = FALSE; PrevPcbInverterCcw = FALSE; PrevPaperInverterCw = FALSE; PrevPaperInverterCcw = FALSE;
+		PrevEpcAuto = FALSE; PrevEpcManual = FALSE; PrevEpcIn = FALSE; PrevEpcOut = FALSE; PrevEpcHome = FALSE;
+		PrevDancerUpper = FALSE; PrevDancerFixer = FALSE;
 
-		IsRelation = FALSE; IsFdCw = FALSE; IsFdCcw = FALSE; IsReelChuck = FALSE;
-		IsDcRlUpDn = FALSE; IsReelJoinL = FALSE; IsReelJoinR = FALSE; IsReelJoinVac = FALSE;
-		IsPprChuck = FALSE; IsPprCw = FALSE; IsPprCcw = FALSE; IsClRlUpDn = FALSE; IsClRlPshUpDn = FALSE;
+		IsChuckPcb = FALSE; IsChuckPaper = FALSE; IsJoinClamp = FALSE; IsPcbShaftSupport = FALSE;
+		IsEpcActHome = FALSE; IsEpcActFirst = FALSE; IsEpcActSecond = FALSE; IsEpcActThird = FALSE;
+		IsPcbInverterCw = FALSE; IsPcbInverterCcw = FALSE; IsPaperInverterCw = FALSE; IsPaperInverterCcw = FALSE;
+		IsEpcAuto = FALSE; IsEpcManual = FALSE; IsEpcIn = FALSE; IsEpcOut = FALSE; IsEpcHome = FALSE;
+		IsDancerUpper = FALSE; IsDancerFixer = FALSE;
 
-		IsPrevRelation = FALSE; IsPrevFdCw = FALSE; IsPrevFdCcw = FALSE; IsPrevReelChuck = FALSE;
-		IsPrevDcRlUpDn = FALSE; IsPrevReelJoinL = FALSE; IsPrevReelJoinR = FALSE; IsPrevReelJoinVac = FALSE;
-		IsPrevPprChuck = FALSE; IsPrevPprCw = FALSE; IsPrevPprCcw = FALSE; IsPrevClRlUpDn = FALSE; IsPrevClRlPshUpDn = FALSE;
+		IsPrevChuckPcb = FALSE; IsPrevChuckPaper = FALSE; IsPrevJoinClamp = FALSE; IsPrevPcbShaftSupport = FALSE;
+		IsPrevEpcActHome = FALSE; IsPrevEpcActFirst = FALSE; IsPrevEpcActSecond = FALSE; IsPrevEpcActThird = FALSE;
+		IsPrevPcbInverterCw = FALSE; IsPrevPcbInverterCcw = FALSE; IsPrevPaperInverterCw = FALSE; IsPrevPaperInverterCcw = FALSE;
+		IsPrevEpcAuto = FALSE; IsPrevEpcManual = FALSE; IsPrevEpcIn = FALSE; IsPrevEpcOut = FALSE; IsPrevEpcHome = FALSE;
+		IsPrevDancerUpper = FALSE; IsPrevDancerFixer = FALSE;
 	}
 };
 
@@ -1587,6 +1720,10 @@ struct stBtnStatus
 	stBtnUncoiler Uc;
 	stBtnEngAuto EngAuto;
 	stBtnSettingEng SettingEng;
+	stBtnRunMode RunMode;
+	stBtnLaser Lsr;
+	stBtnFeedDir FeedDir;
+	stBtnDancerRoll Dancer;
 };
 
 
@@ -1873,7 +2010,6 @@ struct stStatus
 	}
 };
 
-
 struct stMpeIoWrite
 {
 	int nIdx;
@@ -1969,17 +2105,21 @@ struct stListBuf
 struct stDlgInfoReg
 {
 	CString TwoMetal, OneMetal, SampleTest, SampleTestShotNum;
-	CString ModeInner, ModeOutter; //SingleMode, 
+	CString ModeInner, ModeOutter;
 	CString FeedCcwRecoiler, FeedCcwUncoiler;
 	CString DoorSensorUncoiler, DoorSensorEngrave, DoorSensorAoiUp, DoorSensorAoiDn, DoorSensorPunch, DoorSensorRecoiler;
 	CString TotalReelLength, LotLength, LotCutLength, StopLength, UseStopLength, UseLotLength, OneShotLength;
-	CString CleanRollerAoiUp, CleanRollerAoiDn, Use380mm; //UltraSonicStTimeAoiUp, UltraSonicStTimeAoiDn,
+	CString CleanRollerAoiUp, CleanRollerAoiDn, Laser380mm;
 	CString UltraSonicEngrave, UltraSonicAoi;
-	CString UltraSonicStTimeAoi, Use346mm, Use340mm;
+	CString UltraSonicStTimeAoi, Laser346mm, Laser340mm;
+	CString SenserSaftyPunch;
+	CString LampCleanRollerAoiUp, LampCleanRollerAoiDn, LampUltraSonicAoi, LampUltraSonicEngrave, LampTwoMetal, LampOneMetal;
+	CString LampSampleTest, LampModeInner, LampModeOutter, LampFeedCcwRecoiler, LampFeedCcwUncoiler, LampDoorSensorUncoiler;
+	CString LampDoorSensorEngrave, LampDoorSensorAoiUp, LampDoorSensorAoiDn, LampDoorSensorPunch, LampDoorSensorRecoiler;
+	CString LampSenserSaftyPunch, LampUseStopLength, LampUseLotLength;
 
 	stDlgInfoReg()
 	{
-		//SingleMode = _T("MB44017A");
 		TwoMetal = _T("MB400020");
 		OneMetal = _T("MB400021");
 		SampleTest = _T("MB400022");
@@ -2003,20 +2143,41 @@ struct stDlgInfoReg
 		UseStopLength = _T("MB40000B");
 		UseLotLength = _T("MB40000C");
 		OneShotLength = _T("ML41030");
-		//UltraSonicStTimeAoiUp = _T("MW05942");
-		//UltraSonicStTimeAoiDn = _T("MW05940");
 		UltraSonicStTimeAoi = _T("MW41130");
-		Use380mm = _T("MB400054");
-		Use346mm = _T("MB400053");
-		Use340mm = _T("MB400052");
+		Laser380mm = _T("MB400054");
+		Laser346mm = _T("MB400053");
+		Laser340mm = _T("MB400052");
 		UltraSonicEngrave = _T("MB400062");
 		UltraSonicAoi = _T("MB400067");
+
+		SenserSaftyPunch = _T("MB40001A");
+		LampCleanRollerAoiUp = _T("MB400265");
+		LampCleanRollerAoiDn = _T("MB400266");
+		LampUltraSonicAoi = _T("MB400267");
+		LampUltraSonicEngrave = _T("MB400262");
+		LampTwoMetal = _T("MB400220");
+		LampOneMetal = _T("MB400221");
+		LampSampleTest = _T("MB400222");
+		LampModeInner = _T("MB400223");
+		LampModeOutter = _T("MB400224");
+		LampFeedCcwRecoiler = _T("MB400251");
+		LampFeedCcwUncoiler = _T("MB400250");
+		LampDoorSensorUncoiler = _T("MB400214");
+		LampDoorSensorEngrave = _T("MB400215");
+		LampDoorSensorAoiUp = _T("MB400216");
+		LampDoorSensorAoiDn = _T("MB400217");
+		LampDoorSensorPunch = _T("MB400218");
+		LampDoorSensorRecoiler = _T("MB400219");
+		LampSenserSaftyPunch = _T("MB40021A");
+		LampUseStopLength = _T("MB40020B");
+		LampUseLotLength = _T("MB40020C");
 	}
 };
 
 struct stDlgFrameHighReg
 {
-	CString FeedOffsetPunch, FeedOffsetAoiUp, FeedOffsetAoiDn, FeedOffsetEngrave; //FeedOffsetAoi
+	CString FeedOffsetPunch, FeedOffsetAoiUp, FeedOffsetAoiDn, FeedOffsetEngrave;
+	CString FeedOffsetWriteDoneAoiUp, FeedOffsetWriteDoneAoiDn, FeedOffsetWriteDoneEngrave;
 
 	stDlgFrameHighReg()
 	{
@@ -2024,27 +2185,85 @@ struct stDlgFrameHighReg
 		FeedOffsetAoiUp = _T("ML41062");
 		FeedOffsetAoiDn = _T("ML45064");
 		FeedOffsetEngrave = _T("ML41060");
+		FeedOffsetWriteDoneAoiUp = _T("MB40024D");
+		FeedOffsetWriteDoneAoiDn = _T("MB40024E");
+		FeedOffsetWriteDoneEngrave = _T("MB40024C");
 	}
 };
 
-
 struct stDlgMenu01
 {
-	//CString LastJobFromEngrave, LastJobFromAoiUp, LastJobFromAoiDn,
-	CString LastJob, LastShotNum, JobEnd, FeedCwPunch, FeedCwAoi, FeedCwEngrave;
+	CString DoLastJob, LastShotNum, JobEnd, FeedCwPunch, FeedCwAoi, FeedCwEngrave;
+	CString FeedTotalLengthPunch, FeedTotalLengthAoiDn, FeedTotalLengthAoiUp, FeedTotalLengthEngrave;
+	CString MarkingTotalLeft, MarkingCurrLeft, MarkingTotalRight, MarkingCurrRight, PlcReadyDone;
+	CString ResetAoiUp, ResetAoiDn, TestStartAoiUp, TestStartAoiDn, MarkingStart, MarkingDoing, MarkingDone;
+	CString JoinJob, AutoInitStatus, MarkingInitDone, FeedingDonePunch, TableVacuumAoiUp, LotEndAoiUp;
+	CString TableVacuumAoiDn, LotEndAoiDn, MarkingStartEngrave, FeedingDoneEngrave, Reading2dStartEngrave;
+	CString MarkingOnEngrave, MarkingDoneEngrave, Reading2dOnEngrave, Reading2dDoneEngrave, ReTestAlarmAoiUp;
+	CString ReTestAlarmAoiDn, TensionOnPunch, TensionOnAoi, TensionOnEngrave;
+	CString AlarmMonitor, AlarmMonitorRtn, AlarmClear, AlarmClearRtn, AlarmPage;
+	CString ProhibitFeedingPunch, MainMc, Buzzer1, Buzzer2;
+	CString LampJobEnd, LampDoLastJob;
+
 
 	stDlgMenu01()
 	{
-		//LastJobFromEngrave = _T("MB44019D");
-		//LastJobFromAoiUp = _T("MB440185");
-		//LastJobFromAoiDn = _T("MB440186");
-		LastJob = _T("MB400010");
+		DoLastJob = _T("MB400010");
 		LastShotNum = _T("MW41113");
 		JobEnd = _T("MB400009");
-
 		FeedCwPunch = _T("MB440161");
 		FeedCwAoi = _T("MB440160");
 		FeedCwEngrave = _T("MB440199");
+		FeedTotalLengthPunch = _T("ML41086");
+		FeedTotalLengthAoiDn = _T("ML41084");
+		FeedTotalLengthAoiUp = _T("ML41082");
+		FeedTotalLengthEngrave = _T("ML41080");
+		MarkingTotalLeft = _T("ML41072");
+		MarkingCurrLeft = _T("ML41074");
+		MarkingTotalRight = _T("ML41076");
+		MarkingCurrRight = _T("ML41078");
+		PlcReadyDone = _T("MB400203");
+		ResetAoiUp = _T("MB40011F");
+		ResetAoiDn = _T("MB40012F");
+		TestStartAoiUp = _T("MB400120");
+		TestStartAoiDn = _T("MB400136");
+		MarkingStart = _T("MB400350");
+		MarkingDoing = _T("MB400151");
+		MarkingDone = _T("MB400152");
+		JoinJob = _T("MB400009");
+		AutoInitStatus = _T("MB400208");
+		MarkingInitDone = _T("MB40017D");
+		FeedingDonePunch = _T("MB400243");
+		TableVacuumAoiUp = _T("MB400113");
+		LotEndAoiUp = _T("MB400124");
+		TableVacuumAoiDn = _T("MB40012C");
+		LotEndAoiDn = _T("MB40013A");
+		MarkingStartEngrave = _T("MB400303");
+		FeedingDoneEngrave = _T("MB400240");
+		Reading2dStartEngrave = _T("MB400306");
+		MarkingOnEngrave = _T("MB400104");
+		MarkingDoneEngrave = _T("MB400105");
+		Reading2dOnEngrave = _T("MB400107");
+		Reading2dDoneEngrave = _T("MB400108");
+		ReTestAlarmAoiUp = _T("MB40018D");
+		ReTestAlarmAoiDn = _T("MB40018E");
+		TensionOnPunch = _T("MB40017C");
+		TensionOnAoi = _T("MB40017B");
+		TensionOnEngrave = _T("MB40017B");
+		
+		AlarmMonitor = _T("MB400182");
+		AlarmMonitorRtn = _T("MB400382");
+		AlarmClear = _T("MB400183");
+		AlarmClearRtn = _T("MB400383");
+		AlarmPage = _T("ML40040");
+
+		ProhibitFeedingPunch = _T("MB40015C");
+		MainMc = _T("MB40035F");
+		Buzzer1 = _T("MB40001D");
+		Buzzer2 = _T("MB40001E");
+
+		LampJobEnd = _T("MB400209");
+		LampDoLastJob = _T("MB400210");
 	}
 };
 
@@ -2068,16 +2287,47 @@ struct stDlgMenu03
 	CString TableBlowerEngrave, TableVacuumEngrave, TableCylinderEngrave, FeedClampEngrave, TensionClampEngrave;
 	CString UltrasonicDownEngrave, UltrasonicRunEngrave, UltrasonicSpeedEngrave, DancerUpperEngrave, DancerFixerEngrave;
 	CString AlignStartEngrave, LaserStartEngrave, ReadStartEngrave;
-	//CString FeedCwUncoiler, FeedCcwUncoiler, JoinUpLfUncoiler, JoinDnRtUncoiler, JoinVacuumUncoiler;
-	//CString PaperCwUncoiler, PaperCcwUncoiler, CleannerUncoiler, CleannerPushUncoiler;
 	CString ChuckPcbUncoiler, DancerUpperUncoiler, DancerFixerUncoiler, JoinClampUncoiler, PcbShaftSupportUncoiler, ChuckPaperUncoiler;
 	CString EpcActHomeUncoiler, EpcActFirstUncoiler, EpcActSecondUncoiler, EpcActThirdUncoiler, EpcAutoUncoiler, EpcManualUncoiler;
 	CString EpcHomeUncoiler, EpcInUncoiler, EpcOutUncoiler, PcbInverterCwUncoiler, PcbInverterCcwUncoiler;
 	CString PaperInverterCwUncoiler, PaperInverterCcwUncoiler;
 	CString FeedOnePanel, AllDancerUpDn, AllDancerFixOnOff;
 
-	//CString TensionOnPunch, TensionOnAoi, TensionOnEngrave, UltrasonicSpeedAoiDn;
-	//CString UseCore150mmRecoiler, UseCore150mmUncoiler, FeedOnePanel;
+	CString PcrReceivedAoiUp, PcrReceivedAoiDn, PcrReceivedSerialAoiUp, PcrReceivedSerialAoiDn;
+	CString FeedingReadyEngrave, FeedingReadyPunch;
+
+	CString LampAlignDoneEngrave, LampMarkDoneEngrave, LampReadDoneEngrave, LampJobDoneEngrave, LampTestDoneAoiUp;
+	CString LampTestDoneAoiDn, LampMarkDonePunch, LampLaser340mm, LampLaser346mm, LampLaser380mm;
+
+	CString LampReady, LampRun, LampReset, LampStop, LampAuto, LampManual, LampConnectModule;
+	CString LampFeedOnePanel, LampAllDancerUpDn, LampAllDancerFixOnOff, LampFeedCcwRecoiler, LampFeedCcwUncoiler;
+
+	CString LampChuckPcbRecoiler, LampChuckPaperRecoiler, LampJoinClampRecoiler, LampPcbShaftSupportRecoiler, LampEpcActHomeRecoiler;
+	CString LampEpcActFirstRecoiler, LampEpcActSecondRecoiler, LampEpcActThirdRecoiler, LampPcbInverterCwRecoiler, LampPcbInverterCcwRecoiler;
+	CString LampPaperInverterCwRecoiler, LampPaperInverterCcwRecoiler, LampDancerUpperRecoiler, LampDancerFixerRecoiler,LampEpcAutoRecoiler;
+	CString LampEpcManualRecoiler, LampEpcInRecoiler, LampEpcOutRecoiler, LampEpcHomeRecoiler;
+
+	CString LampFeedCwPunch, LampFeedCcwPunch, LampTensionCwPunch, LampTensionCcwPunch, LampFeedHomePunch, LampFeedVacuumPunch;
+	CString LampFeedClampPunch, LampTensionClampPunch, LampTableVacuumPunch, LampTableBlowerPunch, LampTableCylinderPunch;
+	CString LampTableClampDnPunch, LampTableClampForwardPunch, LampPunchStartPunch;
+
+	CString LampFeedCwAoiDn, LampFeedCcwAoiDn, LampTensionCwAoiDn, LampTensionCcwAoiDn, LampFeedHomeAoiDn, LampFeedVacuumAoiDn;
+	CString LampFeedClampAoiDn, LampTensionClampAoiDn, LampTableVacuumAoiDn, LampTableBlowerAoiDn, LampTableCylinderAoiDn, LampCleanRollerUpAoiDn;
+	CString LampCleanRollerDnAoiDn, LampCleanRollerPushAoiDn, LampTestStartAoiDn, LampBufferRollerUpAoiDn, LampBufferRollerFixAoiDn;
+
+	CString LampFeedCwAoiUp, LampFeedCcwAoiUp, LampTensionCwAoiUp, LampTensionCcwAoiUp, LampFeedHomeAoiUp, LampFeedVacuumAoiUp, LampFeedClampAoiUp;
+	CString LampTensionClampAoiUp, LampTableVacuumAoiUp, LampTableBlowerAoiUp, LampTableCylinderAoiUp, LampCleanRollerUpAoiUp, LampCleanRollerDnAoiUp;
+	CString LampCleanRollerPushAoiUp, LampTestStartAoiUp, LampUltrasonicDnAoiUp, LampUltrasonicRunAoiUp, LampUltrasonicSpeedAoiUp;
+
+	CString LampFeedCwEngrave, LampFeedCcwEngrave, LampTensionCwEngrave, LampTensionCcwEngrave, LampFeedHomeEngrave, LampFeedVacuumEngrave;
+	CString LampFeedClampEngrave, LampTensionClampEngrave, LampTableVacuumEngrave, LampTableBlowerEngrave, LampTableCylinderEngrave, LampUltrasonicDownEngrave;
+	CString LampUltrasonicRunEngrave, LampUltrasonicSpeedEngrave, LampDancerUpperEngrave, LampDancerFixerEngrave, LampAlignStartEngrave;
+	CString LampLaserStartEngrave, LampReadStartEngrave;
+
+	CString LampChuckPcbUncoiler, LampChuckPaperUncoiler, LampJoinClampUncoiler, LampPcbShaftSupportUncoiler, LampEpcActHomeUncoiler, LampEpcActFirstUncoiler;
+	CString LampEpcActSecondUncoiler, LampEpcActThirdUncoiler, LampPcbInverterCwUncoiler, LampPcbInverterCcwUncoiler, LampPaperInverterCwUncoiler;
+	CString LampPaperInverterCcwUncoiler, LampDancerUpperUncoiler, LampDancerFixerUncoiler, LampEpcAutoUncoiler, LampEpcManualUncoiler;
+	CString LampEpcInUncoiler, LampEpcOutUncoiler, LampEpcHomeUncoiler;
 	
 	stDlgMenu03()
 	{
@@ -2085,6 +2335,13 @@ struct stDlgMenu03
 		Run = _T("MB400006");
 		Reset = _T("MB400182");
 		Stop = _T("MB400007");
+
+		PcrReceivedAoiUp = _T("MB400041");
+		PcrReceivedAoiDn = _T("MB400042");
+		FeedingReadyEngrave = _T("MB400040");
+		FeedingReadyPunch = _T("MB400043");
+		PcrReceivedSerialAoiUp = _T("MW41124");
+		PcrReceivedSerialAoiDn = _T("MW41126");
 
 		ConnectModule = _T("MB40000F");
 
@@ -2116,7 +2373,6 @@ struct stDlgMenu03
 		FeedVacuumPunch = _T("MB400145");
 		FeedClampPunch = _T("MB400146");
 		TensionClampPunch = _T("MB400147");
-		//PcbPushPunch = _T("MB005516");
 		TableVacuumPunch = _T("MB400148");
 		TableBlowerPunch = _T("MB400149");
 		TableCylinderPunch = _T("MB40014A");
@@ -2130,7 +2386,6 @@ struct stDlgMenu03
 		TensionCcwAoiDn = _T("MB40010D");
 		FeedHomeAoiDn = _T("MB40010E");
 		FeedVacuumAoiDn = _T("MB400129");
-		//PcbPushAoiDn = _T("MB005706");
 		TableBlowerAoiDn = _T("MB40012D");
 		TableVacuumAoiDn = _T("MB40012C");
 		TableCylinderAoiDn = _T("MB400130");
@@ -2149,7 +2404,6 @@ struct stDlgMenu03
 		TensionCcwAoiUp = _T("MB40010D");
 		FeedHomeAoiUp = _T("MB40010E");
 		FeedVacuumAoiUp = _T("MB400129");
-		//PcbPushAoiUp = _T("MB005606");
 		TableBlowerAoiUp = _T("MB400114");
 		TableVacuumAoiUp = _T("MB400113");
 		TableCylinderAoiUp = _T("MB400115");
@@ -2184,14 +2438,9 @@ struct stDlgMenu03
 		LaserStartEngrave = _T("MB400103");
 		ReadStartEngrave = _T("MB400106");
 
-		//FeedCwUncoiler = _T("MB00540C");
-		//FeedCcwUncoiler = _T("MB00540D");
 		ChuckPcbUncoiler = _T("MB400070");
 		DancerUpperUncoiler = _T("MB400084");
 		DancerFixerUncoiler = _T("MB400085");
-		//JoinUpLfUncoiler = _T("MB005405");
-		//JoinDnRtUncoiler = _T("MB005406");
-		//JoinVacuumUncoiler = _T("MB00540F");
 		JoinClampUncoiler = _T("MB400072");
 		PcbShaftSupportUncoiler = _T("MB400073");
 		ChuckPaperUncoiler = _T("MB005408");
@@ -2208,20 +2457,146 @@ struct stDlgMenu03
 		PcbInverterCcwUncoiler = _T("MB400081");
 		PaperInverterCwUncoiler = _T("MB400082");
 		PaperInverterCcwUncoiler = _T("MB400083");
-		//PaperCwUncoiler = _T("MB005409");
-		//PaperCcwUncoiler = _T("MB00540A");
-		//CleannerUncoiler = _T("MB005403");
-		//CleannerPushUncoiler = _T("MB005404");
-		//TensionOnPunch = _T("MB440155");
-		//TensionOnAoi = _T("MB440156");
-		//TensionOnEngrave = _T("MB440154");
-		//UltrasonicSpeedAoiDn = _T("MB44014F");
-		//UseCore150mmRecoiler = _T("MB44017E");
-		//UseCore150mmUncoiler = _T("MB44017F");
 
 		FeedOnePanel = _T("MB40000E");
 		AllDancerUpDn  = _T("MB40005B");
 		AllDancerFixOnOff = _T("MB40005C");
+
+		LampAlignDoneEngrave = _T("MB400244");
+		LampMarkDoneEngrave = _T("MB400245");
+		LampReadDoneEngrave = _T("MB400246");
+		LampJobDoneEngrave = _T("MB400247");
+		LampTestDoneAoiUp = _T("MB400248");
+		LampTestDoneAoiDn = _T("MB400249");
+		LampMarkDonePunch = _T("MB40024A");
+		LampLaser340mm = _T("MB400252");
+		LampLaser346mm = _T("MB400253");
+		LampLaser380mm = _T("MB400254");
+
+		LampReady = _T("MB400203");
+		LampRun = _T("MB400206");
+		LampReset = _T("MB400382");
+		LampStop = _T("MB400207");
+		LampAuto = _T("MB400205");
+		LampManual = _T("MB400201");
+		LampConnectModule = _T("MB40020F");
+		LampFeedOnePanel = _T("MB40020E");
+		LampAllDancerUpDn = _T("MB40025B");
+		LampAllDancerFixOnOff = _T("MB40025C");
+		LampFeedCcwRecoiler = _T("MB400251");
+		LampFeedCcwUncoiler = _T("MB400250");
+
+		LampChuckPcbRecoiler = _T("MB400360");
+		LampChuckPaperRecoiler = _T("MB400361");
+		LampJoinClampRecoiler = _T("MB400362");
+		LampPcbShaftSupportRecoiler = _T("MB400363");
+		LampEpcActHomeRecoiler = _T("MB400364");
+		LampEpcActFirstRecoiler = _T("MB400365");
+		LampEpcActSecondRecoiler = _T("MB400366");
+		LampEpcActThirdRecoiler = _T("MB400367");
+		LampPcbInverterCwRecoiler = _T("MB400370");
+		LampPcbInverterCcwRecoiler = _T("MB400371");
+		LampPaperInverterCwRecoiler = _T("MB400372");
+		LampPaperInverterCcwRecoiler = _T("MB400373");
+		LampDancerUpperRecoiler = _T("MB400374");
+		LampDancerFixerRecoiler = _T("MB400375");
+		LampEpcAutoRecoiler = _T("MB400369");
+		LampEpcManualRecoiler = _T("MB40036A");
+		LampEpcInRecoiler = _T("MB40036C");
+		LampEpcOutRecoiler = _T("MB40036D");
+		LampEpcHomeRecoiler = _T("MB40036B");
+
+		LampFeedCwPunch = _T("MB400340");
+		LampFeedCcwPunch = _T("MB400341");
+		LampTensionCwPunch = _T("MB400342");
+		LampTensionCcwPunch = _T("MB400343");
+		LampFeedHomePunch = _T("MB400344");
+		LampFeedVacuumPunch = _T("MB400345");
+		LampFeedClampPunch = _T("MB400346");
+		LampTensionClampPunch = _T("MB400347");
+		LampTableVacuumPunch = _T("MB400348");
+		LampTableBlowerPunch = _T("MB400349");
+		LampTableCylinderPunch = _T("MB40034A");
+		LampTableClampDnPunch = _T("MB40034B");
+		LampTableClampForwardPunch = _T("MB40034C");
+		LampPunchStartPunch = _T("MB400350");
+
+		LampFeedCwAoiDn = _T("MB40030A");
+		LampFeedCcwAoiDn = _T("MB40030B");
+		LampTensionCwAoiDn = _T("MB40030C");
+		LampTensionCcwAoiDn = _T("MB40030D");
+		LampFeedHomeAoiDn = _T("MB40030E");
+		LampFeedVacuumAoiDn = _T("MB400329");
+		LampFeedClampAoiDn = _T("MB40032A");
+		LampTensionClampAoiDn = _T("MB400333");
+		LampTableVacuumAoiDn = _T("MB40032C");
+		LampTableBlowerAoiDn = _T("MB40032D");
+		LampTableCylinderAoiDn = _T("MB400330");
+		LampCleanRollerUpAoiDn = _T("MB400318");
+		LampCleanRollerDnAoiDn = _T("MB400334");
+		LampCleanRollerPushAoiDn = _T("MB400335");
+		LampTestStartAoiDn = _T("MB400336");
+		LampBufferRollerUpAoiDn = _T("MB40033C");
+		LampBufferRollerFixAoiDn = _T("MB40033D");
+
+		LampFeedCwAoiUp = _T("MB40030A");
+		LampFeedCcwAoiUp = _T("MB40030B");
+		LampTensionCwAoiUp = _T("MB40030C");
+		LampTensionCcwAoiUp = _T("MB40030D");
+		LampFeedHomeAoiUp = _T("MB40030E");
+		LampFeedVacuumAoiUp = _T("MB400329");
+		LampFeedClampAoiUp = _T("MB400311");
+		LampTensionClampAoiUp = _T("MB400312");
+		LampTableVacuumAoiUp = _T("MB400313");
+		LampTableBlowerAoiUp = _T("MB400314");
+		LampTableCylinderAoiUp = _T("MB400315");
+		LampCleanRollerUpAoiUp = _T("MB400318");
+		LampCleanRollerDnAoiUp = _T("MB400319");
+		LampCleanRollerPushAoiUp = _T("MB40031A");
+		LampTestStartAoiUp = _T("MB400320");
+		LampUltrasonicDnAoiUp = _T("MB400326");
+		LampUltrasonicRunAoiUp = _T("MB400327");
+		LampUltrasonicSpeedAoiUp = _T("MB400328");
+
+		LampFeedCwEngrave = _T("MB400286");
+		LampFeedCcwEngrave = _T("MB400287");
+		LampTensionCwEngrave = _T("MB400288");
+		LampTensionCcwEngrave = _T("MB400289");
+		LampFeedHomeEngrave = _T("MB40028A");
+		LampFeedVacuumEngrave = _T("MB40028B");
+		LampFeedClampEngrave = _T("MB40028C");
+		LampTensionClampEngrave = _T("MB40028D");
+		LampTableVacuumEngrave = _T("MB400290");
+		LampTableBlowerEngrave = _T("MB400291");
+		LampTableCylinderEngrave = _T("MB400292");
+		LampUltrasonicDownEngrave = _T("MB400293");
+		LampUltrasonicRunEngrave = _T("MB400294");
+		LampUltrasonicSpeedEngrave = _T("MB400295");
+		LampDancerUpperEngrave = _T("MB400296");
+		LampDancerFixerEngrave = _T("MB400297");
+		LampAlignStartEngrave = _T("MB400300");
+		LampLaserStartEngrave = _T("MB400303");
+		LampReadStartEngrave = _T("MB400306");
+
+		LampChuckPcbUncoiler = _T("MB400270");
+		LampChuckPaperUncoiler = _T("MB400271");
+		LampJoinClampUncoiler = _T("MB400272");
+		LampPcbShaftSupportUncoiler = _T("MB400273");
+		LampEpcActHomeUncoiler = _T("MB400274");
+		LampEpcActFirstUncoiler = _T("MB400275");
+		LampEpcActSecondUncoiler = _T("MB400276");
+		LampEpcActThirdUncoiler = _T("MB400277");
+		LampPcbInverterCwUncoiler = _T("MB400280");
+		LampPcbInverterCcwUncoiler = _T("MB400281");
+		LampPaperInverterCwUncoiler = _T("MB400282");
+		LampPaperInverterCcwUncoiler = _T("MB400283");
+		LampDancerUpperUncoiler = _T("MB400284");
+		LampDancerFixerUncoiler = _T("MB400285");
+		LampEpcAutoUncoiler = _T("MB400279");
+		LampEpcManualUncoiler = _T("MB40027A");
+		LampEpcInUncoiler = _T("MB40027C");
+		LampEpcOutUncoiler = _T("MB40027D");
+		LampEpcHomeUncoiler = _T("MB40027B");
 	}
 };
 
@@ -2232,6 +2607,9 @@ struct stDlgMenu04
 	CString FeedOnAcc, FeedLeadPitchAoi, FeedLeadPitchPunch, FeedLeadPitchEngrave;
 	CString BufferPosStAoi, BufferPosStEngrave, FeedLengthFromAoiToPunch, ShotNumFromAoiUpToAoiDn;
 	CString FeedLengthFromEngraveToAoi, FeedSpeed2dCode, FeedAcc2dCode;
+	CString ShotNumFromAoiToPunch, FeedLengthFromAoiUpToAoiDn, ShotNumFromEngraveToAoi;
+	CString BufferInitPosMove, BufferHomming;
+	CString FeedLengthFromLaserToReader;
 
 	stDlgMenu04()
 	{
@@ -2241,23 +2619,30 @@ struct stDlgMenu04
 		FeedTorqueCcwAoi = _T("ML41046");
 		FeedTorqueCwEngrave = _T("ML41040");
 		FeedTorqueCcwEngrave = _T("ML41042");
-		//FeedTorquePunch = _T("ML45044");
-		//FeedTorqueAoi = _T("ML45042");
-		//FeedTorqueEngrave = _T("ML45050");
-		FeedSpeed = _T("ML45034");
-		FeedAcc = _T("ML45036");
+
+		FeedSpeed = _T("ML41032");
+		FeedAcc = _T("ML41034");
 		FeedOnSpeed = _T("ML45038");
-		FeedOnAcc = _T("ML45040");
-		FeedLeadPitchAoi = _T("ML45012");
-		FeedLeadPitchPunch = _T("ML45014");
-		FeedLeadPitchEngrave = _T("ML45020");
-		BufferPosStAoi = _T("ML45016");
-		BufferPosStEngrave = _T("ML45028");
-		FeedLengthFromAoiToPunch = _T("ML45008");
-		ShotNumFromAoiUpToAoiDn = _T("ML45010");
-		FeedLengthFromEngraveToAoi = _T("ML45024");
-		FeedSpeed2dCode = _T("ML45060");
-		FeedAcc2dCode = _T("ML45062");
+		FeedOnAcc = _T("ML41036");
+		FeedLeadPitchAoi = _T("ML41022");
+		FeedLeadPitchPunch = _T("ML41024");
+		FeedLeadPitchEngrave = _T("ML41020");
+		BufferPosStAoi = _T("ML41028");
+		BufferPosStEngrave = _T("ML41026");
+		FeedLengthFromAoiToPunch = _T("ML41014");
+		ShotNumFromAoiToPunch = _T("MW41102");
+
+		FeedLengthFromAoiUpToAoiDn = _T("ML41012");
+		ShotNumFromAoiUpToAoiDn = _T("MW41101");
+		FeedLengthFromEngraveToAoi = _T("ML41010");
+		ShotNumFromEngraveToAoi = _T("MW41100");
+
+		FeedSpeed2dCode = _T("");
+		FeedAcc2dCode = _T("");
+
+		BufferInitPosMove = _T("MB40015A");
+		BufferHomming = _T("MB40015B");
+		FeedLengthFromLaserToReader = _T("ML41060");
 	}
 };
 

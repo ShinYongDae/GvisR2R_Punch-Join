@@ -835,15 +835,7 @@ void CDlgInfo::OnStc0016()
 	
 	CString sVal;
 	GetDlgItem(IDC_STC_0016)->GetWindowText(sVal);
-// 	pDoc->WorkingInfo.LastJob.sLotSepLen = sVal;
-// 	if(pDoc->m_pReelMap)
-// 		pDoc->m_pReelMap->m_dLotLen = _tstof(sVal);
-// 	::WritePrivateProfileString(_T("Last Job"), _T("Lot Seperate Length", sVal, PATH_WORKING_INFO);
-
 	pDoc->SetSeparateDist(_tstof(sVal));
-	//pView->IoWrite(_T("ML45002", long(_tstof(sVal)*1000.0));	// Lot 분리 길이 (단위 M * 1000)
-	//pView->MpeWrite(_T("ML45002", long(_tstof(sVal)*1000.0));
-
 	pView->SetLotLastShot();
 }
 
@@ -888,14 +880,6 @@ void CDlgInfo::OnStc0024()
 	CString sVal;
 	GetDlgItem(IDC_STC_0024)->GetWindowText(sVal);
  	pDoc->SetStopDist(_tstof(sVal));	
-// 
-// 	pDoc->WorkingInfo.LastJob.sTempPauseLen = sVal;
-// 	if(pDoc->m_pReelMap)
-// 		pDoc->m_pReelMap->m_dTempPauseLen = _tstof(sVal);
-// 	::WritePrivateProfileString(_T("Last Job"), _T("Temporary Pause Length", sVal, PATH_WORKING_INFO);	
-// 
-// 	//pView->IoWrite(_T("ML45006", long(_tstof(sVal)*1000.0));	// 일시정지 길이 (단위 M * 1000)
-// 	pView->MpeWrite(_T("ML45006", long(_tstof(sVal)*1000.0));
 
 #ifdef USE_ENGRAVE
 	if (pView && pView->m_pEngrave)
@@ -1228,7 +1212,7 @@ void CDlgInfo::OnChk008()
 	CString sData = pDoc->WorkingInfo.LastJob.bUse380mm ? _T("1") : _T("0");
 	::WritePrivateProfileString(_T("Last Job"), _T("Use 380mm Roll"), sData, PATH_WORKING_INFO);
 
-	pView->MpeWrite(pView->Plc.DlgInfo.Use380mm, pDoc->WorkingInfo.LastJob.bUse380mm ? 1 : 0);	// EPC실린더(제품소->OFF/제품대->ON)
+	pView->MpeWrite(pView->Plc.DlgInfo.Laser380mm, pDoc->WorkingInfo.LastJob.bUse380mm ? 1 : 0);	// EPC실린더(제품소->OFF/제품대->ON)
 
 #ifdef USE_ENGRAVE
 	if (pView && pView->m_pEngrave)
@@ -1968,44 +1952,12 @@ void CDlgInfo::OnStnClickedStc17()
 void CDlgInfo::OnStnClickedStc41()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	//myStcData[17].SetBkColor(RGB_RED);
-	//myStcData[17].RedrawWindow();
-
-	//CPoint pt;	CRect rt;
-	//GetDlgItem(IDC_STC_41)->GetWindowRect(&rt);
-	//pt.x = rt.right; pt.y = rt.bottom;
-	//ShowKeypad(IDC_STC_41, pt, TO_BOTTOM | TO_RIGHT);
-
-	//myStcData[17].SetBkColor(RGB_WHITE);
-	//myStcData[17].RedrawWindow();
-
-	//CString sData;
-	//GetDlgItem(IDC_STC_41)->GetWindowText(sData);
-	//pDoc->WorkingInfo.LastJob.sCurrentShotNum = sData;
-	//::WritePrivateProfileString(_T("Last Job"), _T("Current ShotNum"), sData, PATH_WORKING_INFO);
-	//pView->MpeWrite(_T("ML44098"), _ttoi(sData)); // Shot수 현재값
 }
 
 
 void CDlgInfo::OnStnClickedStc43()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	//myStcData[18].SetBkColor(RGB_RED);
-	//myStcData[18].RedrawWindow();
-
-	//CPoint pt;	CRect rt;
-	//GetDlgItem(IDC_STC_43)->GetWindowRect(&rt);
-	//pt.x = rt.right; pt.y = rt.bottom;
-	//ShowKeypad(IDC_STC_43, pt, TO_BOTTOM | TO_RIGHT);
-
-	//myStcData[18].SetBkColor(RGB_WHITE);
-	//myStcData[18].RedrawWindow();
-
-	//CString sData;
-	//GetDlgItem(IDC_STC_43)->GetWindowText(sData);
-	//pDoc->WorkingInfo.LastJob.sSettingShotNum = sData;
-	//::WritePrivateProfileString(_T("Last Job"), _T("Setting ShotNum"), sData, PATH_WORKING_INFO);
-	//pView->MpeWrite(_T("ML45108"), _ttoi(sData)); // Shot수 설정값
 }
 
 void CDlgInfo::OnStnClickedStc82()
