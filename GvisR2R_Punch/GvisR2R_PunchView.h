@@ -595,6 +595,7 @@ public:
 
 	void GetInput();
 	void GetEnc();
+	void SetEngFdPitch(double dPitch);
 	void SetAoiFdPitch(double dPitch);
 	void SetMkFdPitch(double dPitch);
 

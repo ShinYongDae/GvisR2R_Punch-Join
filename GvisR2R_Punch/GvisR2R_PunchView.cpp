@@ -7906,6 +7906,11 @@ void CGvisR2R_PunchView::DoRcSens3()
 	}
 }
 
+void CGvisR2R_PunchView::SetEngFdPitch(double dPitch)
+{
+	pDoc->SetEngFdPitch(dPitch);
+}
+
 void CGvisR2R_PunchView::SetAoiFdPitch(double dPitch)
 {
 	pDoc->SetAoiFdPitch(dPitch);

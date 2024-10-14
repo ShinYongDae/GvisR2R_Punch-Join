@@ -177,6 +177,8 @@ public:
 	double GetOnePnlVel();
 	void SetOnePnlAcc(double dAcc);
 	double GetOnePnlAcc();
+	void SetEngFdPitch(double dPitch);
+	double GetEngFdPitch();
 	void SetAoiFdPitch(double dPitch);
 	double GetAoiFdPitch();
 	void SetMkFdPitch(double dPitch);

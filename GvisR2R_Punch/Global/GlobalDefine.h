@@ -12,7 +12,7 @@
 #include "../Device/MotionParam.h"
 
 
-//#define TEST_MODE		1
+#define TEST_MODE		1
 
 #ifndef MAX_STRIP
 	#define MAX_STRIP				4

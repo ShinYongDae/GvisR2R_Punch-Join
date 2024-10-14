@@ -152,6 +152,7 @@ protected:
 	afx_msg void OnBtnResetMkR();
 	afx_msg void OnStc69();
 	afx_msg void OnStc124();
+	afx_msg void OnStc15();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:

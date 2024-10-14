@@ -131,6 +131,7 @@ BEGIN_MESSAGE_MAP(CDlgMenu04, CDialog)
 	ON_BN_CLICKED(IDC_BTN_RESET_MK_R, OnBtnResetMkR)
 	ON_BN_CLICKED(IDC_STC_69, OnStc69)
 	ON_BN_CLICKED(IDC_STC_124, OnStc124)
+	ON_BN_CLICKED(IDC_STC_15, OnStc15)
 	//}}AFX_MSG_MAP
 	ON_MESSAGE(WM_MYBTN_DOWN, OnMyBtnDown)
 	ON_MESSAGE(WM_MYBTN_UP, OnMyBtnUp)
@@ -697,6 +698,8 @@ void CDlgMenu04::Disp()
 	myStcData[1].SetText(str);
 	str.Format(_T("%.1f"), _tstof(pDoc->WorkingInfo.Motion.sMkFdAcc));
 	myStcData[2].SetText(str);
+	str.Format(_T("%.1f"), _tstof(pDoc->WorkingInfo.Motion.sEngraveFdLead));
+	myStcData[58].SetText(str);
 	str.Format(_T("%.1f"), _tstof(pDoc->WorkingInfo.Motion.sAoiFdLead));
 	myStcData[3].SetText(str);
 	str.Format(_T("%.1f"), _tstof(pDoc->WorkingInfo.Motion.sMkFdLead));
@@ -2555,6 +2558,25 @@ void CDlgMenu04::OnStc124()
 	GetDlgItem(IDC_STC_124)->SetWindowText(str);
 	
 	pView->m_pVoiceCoil[1]->SetMarkFinalData(1);
+}
+
+void CDlgMenu04::OnStc15() 
+{
+	// TODO: Add your control notification handler code here
+	myStcData[58].SetBkColor(RGB_RED);
+	myStcData[58].RedrawWindow();
+
+	CPoint pt;	CRect rt;
+	GetDlgItem(IDC_STC_15)->GetWindowRect(&rt);
+	pt.x = rt.right; pt.y = rt.bottom;
+	ShowKeypad(IDC_STC_15, pt, TO_BOTTOM|TO_RIGHT);
+
+	myStcData[58].SetBkColor(RGB_WHITE);
+	myStcData[58].RedrawWindow();
+
+	CString sData, str;
+	GetDlgItem(IDC_STC_15)->GetWindowText(sData);
+	pView->SetAoiFdPitch(_tstof(sData));
 }
 
 BOOL CDlgMenu04::OnEraseBkgnd(CDC* pDC)

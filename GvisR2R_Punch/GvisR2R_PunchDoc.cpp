@@ -7142,6 +7142,17 @@ double CGvisR2R_PunchDoc::GetOnePnlAcc()
 	return (_tstof(WorkingInfo.Motion.sMkFdAcc));
 }
 
+void CGvisR2R_PunchDoc::SetEngFdPitch(double dPitch)
+{
+	CString sPath = PATH_WORKING_INFO;
+	CString sVal;
+	sVal.Format(_T("%.3f"), dPitch);
+	WorkingInfo.Motion.sEngraveFdLead = sVal;
+	::WritePrivateProfileString(_T("Motion"), _T("ENGRAVE_FEEDING_DRUM_LEAD_PITCH"), sVal, sPath);
+	long lData = (long)(dPitch * 1000.0);
+	pView->MpeWrite(pView->Plc.DlgMenu04.FeedLeadPitchEngrave, lData);	// 검사부 Feeding 롤러 Lead Pitch (단위 mm * 1000)
+}
+
 void CGvisR2R_PunchDoc::SetAoiFdPitch(double dPitch)
 {
 	CString sPath = PATH_WORKING_INFO;
@@ -7151,7 +7162,7 @@ void CGvisR2R_PunchDoc::SetAoiFdPitch(double dPitch)
 	::WritePrivateProfileString(_T("Motion"), _T("AOI_FEEDING_DRUM_LEAD_PITCH"), sVal, sPath);
 	long lData = (long)(dPitch * 1000.0);
 	pView->MpeWrite(pView->Plc.DlgMenu04.FeedLeadPitchAoi, lData);	// 검사부 Feeding 롤러 Lead Pitch (단위 mm * 1000)
-	pView->MpeWrite(pView->Plc.DlgMenu04.FeedLeadPitchEngrave, lData);	// 검사부 Feeding 롤러 Lead Pitch (단위 mm * 1000)
+	//pView->MpeWrite(pView->Plc.DlgMenu04.FeedLeadPitchEngrave, lData);	// 검사부 Feeding 롤러 Lead Pitch (단위 mm * 1000)
 }
 
 double CGvisR2R_PunchDoc::GetAoiFdPitch()
