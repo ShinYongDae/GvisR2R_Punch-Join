@@ -651,7 +651,7 @@ void CMyGL::DrawRgn()
 				}
 				else
 				{
-					nDef = m_pReelMap->pPcsDef[k][i];//pDoc->
+					nDef = m_pReelMap->pPcsDef[k][i];
 					if(nDef)
 						int iii = i;
 
@@ -666,14 +666,11 @@ void CMyGL::DrawRgn()
 
 void CMyGL::DrawPnlNum()
 {
-	if (!m_pPnlNum || !m_pReelMap)
+	if (!m_pPnlNum || !m_pReelMap /*|| !m_pReelMap->m_hWnd*/)
 		return;
 
 	int k;
-	//char cPnlNum[MAX_PATH];
-	//TCHAR cPnlNum[MAX_PATH];
 	CString sPnlNum;
-// 	for(k=0; k<m_nTotPnl; k++)
 	for(k=m_nTotPnl-1; k>=0; k--)
 	{
 		if(pDoc->WorkingInfo.LastJob.bLotSep && m_pPnlNum[k] > pDoc->m_nLotLastShot && !pDoc->m_bDoneChgLot)
@@ -692,8 +689,6 @@ void CMyGL::DrawPnlNum()
 				SaveLog(strData);
 			}
 		}
-		//strcpy(cPnlNum, sPnlNum);
-		//_stprintf(cPnlNum, _T("%s"), sPnlNum);
 
 		double dScale = m_pReelMap->GetAdjRatio();//pDoc->
 		double fPosX = (m_pReelMap->pFrmRgn[k].left+m_pReelMap->pFrmRgn[k].right-sPnlNum.GetLength()*(MYGL_GAP_NUM + MYGL_SIZE_CHAR)*dScale)/2.0;	//pDoc->pDoc->
@@ -722,25 +717,20 @@ void CMyGL::DrawPnlNum()
 
 void CMyGL::DrawPnlDefNum()
 {
-	if(!m_pPnlDefNum || !m_pReelMap)
+	if(!m_pPnlDefNum || !m_pReelMap /*|| !m_pReelMap->m_hWnd*/)
 		return;
 
 	if (m_pPnlDefNum < 0 || m_pReelMap < 0)
 		return;
 
 	int k;
-	//char cPnlDefNum[MAX_PATH];
-	//TCHAR cPnlDefNum[MAX_PATH];
 	CString sPnlDefNum;
-// 	for(k=0; k<m_nTotPnl; k++)
 	for(k=m_nTotPnl-1; k>=0; k--)
 	{
-		if(m_pPnlDefNum[k] <= 0)
+		if (m_pPnlDefNum[k] < 0)
 			sPnlDefNum.Format(_T(""));
 		else
 			sPnlDefNum.Format(_T("Total: %d"), m_pPnlDefNum[k]);
-		//strcpy(cPnlDefNum, sPnlDefNum);
-		//_stprintf(cPnlDefNum, _T("%s"), sPnlDefNum);
 
 		double dScale = m_pReelMap->m_dAdjRatio;//m_pReelMap->GetAdjRatio();//pDoc->
 		double fPosX = (m_pReelMap->pFrmRgn[k].left+m_pReelMap->pFrmRgn[k].right-sPnlDefNum.GetLength()*(MYGL_GAP_NUM + MYGL_SIZE_CHAR)*dScale)/2.0;	//pDoc->pDoc->

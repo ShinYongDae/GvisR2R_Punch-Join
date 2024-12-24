@@ -98,7 +98,7 @@ class CDlgMenu01 : public CDialog
 	BOOL IsWinkMkR();
 	void WinkMkR(BOOL bOn);
 
-	void ResetLotChange();
+	void ResetJoinCont();
 
 // Construction
 public:
@@ -119,7 +119,7 @@ public:
 
 	void SetRgbStcDef();
 	void SetTitleStcDef();
-
+	void ChkAoiVsStatus();
 	void SelMap(int nSel);
 	//BOOL OpenReelmap(CString sPath); // for Test
 	void OpenReelmap(int nSelRmap);
@@ -245,7 +245,7 @@ protected:
 	afx_msg void OnChkReview();
 	afx_msg void OnStcReviewLen();
 	afx_msg void OnChkReviewMove();
-	afx_msg void OnChkLotEnd();
+	afx_msg void OnChkJoinProc();
 	afx_msg void OnChkDefUp();
 	afx_msg void OnChkDefDn();
 	afx_msg void OnChkDefAll();

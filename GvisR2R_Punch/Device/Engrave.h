@@ -7,7 +7,8 @@
 
 #define TIM_CONNECT			1
 #define TIM_CHECK_CONNECT	10
-#define TIM_MPE_OFFSET_INITPOS_MOVE	20
+//#define TIM_MPE_OFFSET_INITPOS_MOVE	20
+#define TIM_CHK_RCV_SIG	100
 
 #define DELAY_CHECK_CONNECT	5000
 #define DELAY_RESPONSE		10000
@@ -17,6 +18,8 @@ class CEngrave : public CWnd
 	HWND m_hParentWnd;
 	CTcpIpClient* m_pClient;
 
+	CString m_sSignalName[_EndIdx];
+	BOOL m_bTIM_CHK_RCV_SIG;
 	CString	m_strPortSvr, m_strAddrSvr;
 	CString	m_strAddrCli;
 	int m_nServerID;
@@ -29,7 +32,7 @@ class CEngrave : public CWnd
 	SOCKET_DATA m_SocketData;
 	BOOL m_bAutoConnect;
 	BOOL m_bTIM_CHECK_CONNECT;
-	BOOL m_bTIM_MPE_OFFSET_INITPOS_MOVE;
+	//BOOL m_bTIM_MPE_OFFSET_INITPOS_MOVE;
 	
 	void StartClient(CString sAddrCli, CString sAddrSvr, CString sPortSvr);
 	void StopClient();
@@ -40,6 +43,8 @@ public:
 	CEngrave(CString sAddrCli, CString sAddrSvr, CString sPortSvr, CWnd* pParent = NULL);
 	~CEngrave();
 
+	BOOL m_bSendSig[_SigInx::_EndIdx], m_bRcvSig[_SigInx::_EndIdx];
+	int m_nSendSigData[_SigInx::_EndIdx], m_nRcvSigData[_SigInx::_EndIdx];
 	BOOL m_bGetOpInfo, m_bGetInfo, m_bGetEngInfo;
 	BOOL m_bGetSignalMain, m_bGetSignalTorqueMotor, m_bGetSignalInductionMotor, m_bGetSignalCore150mm, m_bGetSignalEtc;
 	BOOL m_bGetSignalRecoiler, m_bGetSignalPunch, m_bGetSignalAOIDn, m_bGetSignalAOIUp, m_bGetSignalEngrave, m_bGetSignalUncoiler;
@@ -92,6 +97,7 @@ public:
 	void GetSignalEngraveAutoSequence(SOCKET_DATA SockData);
 	void GetSignalMyMsg(SOCKET_DATA SockData);
 	void GetSignal2dEng(SOCKET_DATA SockData);
+	void GetCurrentInfoSignal(SOCKET_DATA SockData);
 
 	// GetSysData
 	void GetSysData(SOCKET_DATA SockData);
@@ -562,7 +568,17 @@ public:
 	void IsSetMyMsgNo();
 	void IsSetMyMsgOk();
 
+	// CurrentInfoSigna
+	void SetCurrentInfoSignal(int nMsgID, int nData);
+	void IsSetCurrentInfoSignal();
+
+	// MonDispMain
+	void SetMonDispMainSignal();
+	void IsSetMonDispMainSignal();
+
 	// Engrave Auto Sequence
+	void EngDispAlarm(BOOL bOn = TRUE); // 각인부에 Alarm 표시
+	void IsEngDispAlarm(BOOL bOn = TRUE); // 각인부에 Alarm 표시 Return 확인
 	void SwEngAutoInit(BOOL bOn); // 각인부 초기화(Reset)
 	void SwEngAutoMkSt(BOOL bOn);
 	void SwEngAutoOnMking(BOOL bOn);
@@ -601,6 +617,11 @@ public:
 	// SetteingEng
 	void Set2DOffsetInitPosMove(BOOL bOn);
 
+	void SetSignal(int nMsgID, int nData);
+	CString GetSignalName(int nMsgID);
+	void SetSignalName();
+	void SetJobEndEngrave();
+
 protected:
 	afx_msg LRESULT wmClientReceived(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT wmClientClosed(WPARAM wParam, LPARAM lParam);
@@ -609,5 +630,6 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 };
 

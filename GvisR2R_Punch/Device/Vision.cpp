@@ -32,6 +32,9 @@ CVision::CVision(int nIdx, MIL_ID MilSysId, HWND *hCtrl, CWnd* pParent /*=NULL*/
 	m_nIdx = nIdx;
 	m_MilSysId = MilSysId;
 
+	m_MilGrabModelPunch = NULL;
+	m_dVerifyPunchScore = 80.0;
+
 	// init camera
 	m_hCtrl[0] = hCtrl[0];
 	m_hCtrl[1] = hCtrl[1];
@@ -186,6 +189,12 @@ CVision::~CVision()
 	{
 		delete m_pMilDispPin;
 		m_pMilDispPin = NULL;
+	}
+
+	if(m_MilGrabModelPunch)
+	{
+		delete m_MilGrabModelPunch;
+		m_MilGrabModelPunch = NULL;
 	}
 
 	// Temperary Buf for Align View
@@ -2657,15 +2666,12 @@ void CVision::LoadPinBuf(int nLayer)
 		MimResize(MilPinImgBuf, MilOriginDisp->m_MilImage, (double)PIN_IMG_DISP_SIZEX/1024.0, (double)PIN_IMG_DISP_SIZEY/1024.0, M_DEFAULT);
 		MbufChild2d(MilOriginDisp->m_MilImage, 0, 0, PIN_IMG_DISP_SIZEX, PIN_IMG_DISP_SIZEY, &MilBufPinCld);
 
-
-
 		MbufChild2d(MilBufPinTemp, 0, 0, PIN_IMG_DISP_SIZEX, PIN_IMG_DISP_SIZEY, &MilBufPinTempCld);
 
 // 		MimRotate(MilBufPinCld, MilPatRtImg->m_MilImage, 90.0, M_DEFAULT, M_DEFAULT, M_DEFAULT, M_DEFAULT, M_DEFAULT);
 		MimRotate(MilBufPinCld, MilPatRtImg->m_MilImage, 0.0, M_DEFAULT, M_DEFAULT, M_DEFAULT, M_DEFAULT, M_DEFAULT);
 		if(MilPatRtImg->m_MilImage != M_NULL && MilBufPinTempCld != M_NULL)
 			MbufCopy(MilPatRtImg->m_MilImage, MilBufPinTempCld);
-
 
 		if(MilPatRtImg != NULL)
 		{
@@ -2960,7 +2966,7 @@ void CVision::SetDispAxisPos()
 
 void CVision::DispAxisPos(BOOL bForceWrite)
 {
-	double dFdEnc;
+	double dFdEnc = 0.0;
 
 // 	if(!m_bDrawOverlayModeEnable)
 // 		return;
@@ -2998,7 +3004,8 @@ void CVision::DispAxisPos(BOOL bForceWrite)
 			//m_pMilDrawOverlay->DrawText(m_ptDisplayAxisPosOffset.x, m_ptDisplayAxisPosOffset.y+m_nDisplayAxisPosLineHeight*1, szText);
 			m_pMil->DrawText(szText, m_ptDisplayAxisPosOffset.x, m_ptDisplayAxisPosOffset.y+m_nDisplayAxisPosLineHeight*1, M_COLOR_GREEN);
 		}
-		dFdEnc = (double)pDoc->m_pMpeData[0][0];	// 마킹부 Feeding 엔코더 값(단위 mm )
+		if(pDoc->m_pMpeData)
+			dFdEnc = (double)pDoc->m_pMpeData[2][2];	// 마킹부 Feeding 엔코더 값(단위 mm )
 		if(fabs(m_dFdEnc-dFdEnc)>0.05 || bForceWrite)
 		{
 			m_dFdEnc = dFdEnc;
@@ -3007,7 +3014,8 @@ void CVision::DispAxisPos(BOOL bForceWrite)
 			//m_pMilDrawOverlay->DrawText(m_ptDisplayAxisPosOffset.x, m_ptDisplayAxisPosOffset.y+(m_nDisplayAxisPosLineHeight*2), szText);
 			m_pMil->DrawText(szText, m_ptDisplayAxisPosOffset.x, m_ptDisplayAxisPosOffset.y+m_nDisplayAxisPosLineHeight*2, M_COLOR_GREEN);
 		}
-		dFdEnc = (double)pDoc->m_pMpeData[1][0];	// 각인부 Feeding 엔코더 값(단위 mm)
+		if (pDoc->m_pMpeData)
+			dFdEnc = (double)pDoc->m_pMpeData[1][14];	// 각인부 Feeding 엔코더 값(단위 mm)
 		if (fabs(m_dFdEnc - dFdEnc) > 0.05 || bForceWrite)
 		{
 			m_dFdEnc = dFdEnc;
@@ -3037,7 +3045,7 @@ void CVision::DispAxisPos(BOOL bForceWrite)
 			m_pMil->DrawText(szText, m_ptDisplayAxisPosOffset.x, m_ptDisplayAxisPosOffset.y+m_nDisplayAxisPosLineHeight*1, M_COLOR_GREEN);
 		}
 #ifdef USE_MPE
-		double dBufEnc = (double)pDoc->m_pMpeData[0][1]	/ 1000.0;	// 마킹부 버퍼 엔코더 값(단위 mm * 1000)
+		double dBufEnc = (double)pDoc->m_pMpeData[2][1]	/ 1000.0;	// 마킹부 버퍼 엔코더 값(단위 mm * 1000)
 		if(fabs(m_dBufEnc-dBufEnc)>0.05 || bForceWrite)
 		{
 			m_dBufEnc = dBufEnc;
@@ -3046,7 +3054,7 @@ void CVision::DispAxisPos(BOOL bForceWrite)
 			//m_pMilDrawOverlay->DrawText(m_ptDisplayAxisPosOffset.x, m_ptDisplayAxisPosOffset.y+(m_nDisplayAxisPosLineHeight*2), szText);
 			m_pMil->DrawText(szText, m_ptDisplayAxisPosOffset.x, m_ptDisplayAxisPosOffset.y+m_nDisplayAxisPosLineHeight*2, M_COLOR_GREEN);
 		}
-		dFdEnc = (double)pDoc->m_pMpeData[1][1];	// 각인부 Feeding 엔코더 값(단위 mm)
+		dFdEnc = (double)pDoc->m_pMpeData[1][14];	// 각인부 Feeding 엔코더 값(단위 mm)
 		if (fabs(m_dFdEnc - dFdEnc) > 0.05 || bForceWrite)
 		{
 			m_dFdEnc = dFdEnc;
@@ -3115,6 +3123,7 @@ double CVision::CalcCameraPixelSize()
 			//if(!pView->m_pMotion->Move(MS_X0Y0, pTgtPos, 0.3, ABS, WAIT))
 			if (!pView->m_pMotion->Move(MS_X0Y0, pTgtPos, 0.3, ABS, WAIT))
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->ClrDispMsg();
 				AfxMessageBox(_T("Move XY Error..."));
 			}
@@ -3129,6 +3138,7 @@ double CVision::CalcCameraPixelSize()
 				//if(!pView->m_pMotion->Move(MS_X0Y0, pTgtPos, fVel, fAcc, fAcc))
 				if (!pView->m_pMotion->Move(MS_X0Y0, pTgtPos, fVel, fAcc, fAcc))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					pView->ClrDispMsg();
 					AfxMessageBox(_T("Move XY Error..."));
 				}
@@ -3144,6 +3154,7 @@ double CVision::CalcCameraPixelSize()
 			//if(!pView->m_pMotion->Move(MS_X1Y1, pTgtPos, 0.3, ABS, WAIT))
 			if (!pView->m_pMotion->Move(MS_X1Y1, pTgtPos, 0.3, ABS, WAIT))
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->ClrDispMsg();
 				AfxMessageBox(_T("Move XY Error..."));
 			}
@@ -3158,11 +3169,12 @@ double CVision::CalcCameraPixelSize()
 				//if(!pView->m_pMotion->Move(MS_X1Y1, pTgtPos, fVel, fAcc, fAcc))
 				if (!pView->m_pMotion->Move(MS_X1Y1, pTgtPos, fVel, fAcc, fAcc))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					pView->ClrDispMsg();
 					AfxMessageBox(_T("Move XY Error..."));
+				}
 			}
 		}
-	}
 	}
 
 	Sleep(500);
@@ -3349,6 +3361,7 @@ double CVision::CalcCameraPixelSize()
 			//if(!pView->m_pMotion->Move(MS_X0Y0, pTgtPos, 0.3, ABS, WAIT))
 			if (!pView->m_pMotion->Move(MS_X0Y0, pTgtPos, 0.3, ABS, WAIT))
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->ClrDispMsg();
 				AfxMessageBox(_T("Move XY Error..."));
 			}
@@ -3363,6 +3376,7 @@ double CVision::CalcCameraPixelSize()
 				//if(!pView->m_pMotion->Move(MS_X0Y0, pTgtPos, fVel/10.0, fAcc/10.0, fAcc/10.0))
 				if (!pView->m_pMotion->Move(MS_X0Y0, pTgtPos, fVel / 10.0, fAcc / 10.0, fAcc / 10.0))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					pView->ClrDispMsg();
 					AfxMessageBox(_T("Move XY Error..."));
 				}
@@ -3380,6 +3394,7 @@ double CVision::CalcCameraPixelSize()
 			//if(!pView->m_pMotion->Move(MS_X1Y1, pTgtPos, 0.3, ABS, WAIT))
 			if (!pView->m_pMotion->Move(MS_X1Y1, pTgtPos, 0.3, ABS, WAIT))
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->ClrDispMsg();
 				AfxMessageBox(_T("Move XY Error..."));
 			}
@@ -3394,6 +3409,7 @@ double CVision::CalcCameraPixelSize()
 				//if(!pView->m_pMotion->Move(MS_X1Y1, pTgtPos, fVel/10.0, fAcc/10.0, fAcc/10.0))
 				if (!pView->m_pMotion->Move(MS_X1Y1, pTgtPos, fVel / 10.0, fAcc / 10.0, fAcc / 10.0))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					pView->ClrDispMsg();
 					AfxMessageBox(_T("Move XY Error..."));
 				}
@@ -4331,6 +4347,7 @@ BOOL CVision::SaveMkImg(CString sPath)
 
 	if (m_pIRayple->OneshotGrab() == FALSE)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		//pView->MsgBox(_T("Image Grab Fail !!"));
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("m_pIRayple->OneshotGrab() Fail !!"));
@@ -4341,6 +4358,7 @@ BOOL CVision::SaveMkImg(CString sPath)
 	}
 	else if(m_pMil->OneshotGrab(MilGrabImg->m_MilImage, GRAB_COLOR_COLOR) == FALSE)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		//pView->MsgBox(_T("Image Grab Fail !!"));
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("m_pMil->OneshotGrab Fail !!"));
@@ -4372,6 +4390,7 @@ BOOL CVision::SaveMkImg(CString sPath)
 	}
 	else
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("MbufSave() Fail !!"));
 		//if (MilOriginDisp)
@@ -4394,7 +4413,6 @@ BOOL CVision::SaveMkImg(CString sPath)
 	return TRUE;
 }
 
-
 void CVision::SaveCadImg(int nIdxMkInfo, CString sPath)
 {
 	if (m_pMilBufCad[nIdxMkInfo])
@@ -4403,9 +4421,29 @@ void CVision::SaveCadImg(int nIdxMkInfo, CString sPath)
 	}
 	else
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("SaveCadImg() Fail !!"));
 	}
+}
+
+BOOL CVision::PrepareVerifyPunching() // Must call at Position of Model.
+{
+#ifdef USE_IRAYPLE
+	m_MilGrabModelPunch = m_pMil->AllocBuf((long)m_pIRayple->GetImgWidth(), (long)m_pIRayple->GetImgHeight(), 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
+#endif
+
+	return TRUE;
+}
+
+BOOL CVision::CheckVerifyPunching()
+{
+	return TRUE;
+}
+
+void CVision::SetVerifyPunchScore(double dScore)
+{
+	m_dVerifyPunchScore = dScore;
 }
 
 #endif

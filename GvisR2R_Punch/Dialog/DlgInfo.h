@@ -10,9 +10,11 @@
 #include "MyBtn.h"
 #include "MyStatic.h"
 
-#define MAX_INFO_STC				67
+#define MAX_INFO_STC				69
 #define MAX_INFO_STC_DATA			21
-#define MAX_INFO_BTN				26
+#define MAX_INFO_BTN				28
+
+#define TIM_DISP_STS				450
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgInfo dialog
@@ -24,6 +26,7 @@ class CDlgInfo : public CDialog
 	CMyStatic myStcData[MAX_INFO_STC_DATA];
 
 	BOOL m_bLoadImg;
+	BOOL m_bTIM_DISP_STS;
 
 	void LoadImg();
 	void DelImg();
@@ -36,9 +39,10 @@ class CDlgInfo : public CDialog
 	BOOL ShowKeypad(int nCtlID, CPoint ptSt=(0, 0), int nDir=TO_NONE);
 	void Disp();
 	void SetDualTest(BOOL bOn=TRUE);
-	void SetTwoMetal(BOOL bOn=TRUE);
+	void SetFeedDir(int nUnit);
 	void SetTestMode(int nMode);
 	int GetTestMode();
+	int GetTestModeFromPlc();
 
 // Construction
 public:
@@ -101,12 +105,14 @@ protected:
 	afx_msg void OnChkUseAoiDual();
 	afx_msg void OnChkUseAoiSingle();
 	afx_msg void OnChkSampleTest();
-	afx_msg void OnChkOneMetal();
-	afx_msg void OnChkTwoMetal();
+	afx_msg void OnChkRecoilerCcw();
+	afx_msg void OnChkUncoilerCcw();
 	afx_msg void OnChkUseAoiInner();
 	afx_msg void OnChkUseAoiOuter();
 	afx_msg void OnStc181();
 	afx_msg void OnStc183();
+	afx_msg void OnChk19();
+	afx_msg void OnChk23();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:
@@ -123,6 +129,7 @@ public:
 	afx_msg void OnStnClickedStc82();
 	afx_msg void OnStnClickedStc83();
 	afx_msg void OnBnClickedChkUseAoiMiddle();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 
 //{{AFX_INSERT_LOCATION}}

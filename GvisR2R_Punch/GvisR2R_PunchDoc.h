@@ -13,12 +13,14 @@
 #include "Global/Yield.h"
 #include "Process/CamMaster.h"
 
-#define PATH_LOG		_T("C:\Debuging\Log")
-#define PATH_LOG_AUTO	_T("C:\Debuging\Log\Auto")
-#define PATH_LOG_PLC	_T("C:\Debuging\Log\PLC")
+#define PATH_LOG		_T("C:\\Debuging\\Log")
+#define PATH_LOG_AUTO	_T("C:\\Debuging\\Log\\Auto")
+#define PATH_LOG_PLC	_T("C:\\Debuging\\Log\\PLC")
 
 class CGvisR2R_PunchDoc : public CDocument
 {
+	double m_dVerifyPunchScore;
+
 	int GetIdxPcrBuf(int nSerial);
 	int GetIdxPcrBufUp(int nSerial);
 	int GetIdxPcrBufDn(int nSerial);
@@ -33,6 +35,7 @@ protected: // serialization에서만 만들어집니다.
 
 // 특성입니다.
 public:
+	BOOL m_bVsStatusUp, m_bVsStatusDn;
 	BOOL m_bOffLogAuto, m_bOffLogPLC;
 	int m_nDelayShow;
 	BOOL m_bBufEmpty[2]; // [0]: Up, [1]: Dn
@@ -133,6 +136,9 @@ public:
 
 // 작업입니다.
 public:
+	BOOL MakeDirRmap(int nRmap);
+	double GetVerifyPunchScore();
+	void SetVerifyPunchScore(double dScore);
 	void LogAuto(CString strMsg, int nType = 0);
 	void LogPLC(CString strMsg, int nType = 0);
 	CString GetProcessNum();
@@ -337,6 +343,7 @@ public:
 	double GetFdJogAcc();
 	void SetModelInfoUp();
 	void SetModelInfoDn();
+	BOOL GetEngOffset(CfPoint &OfSt);
 	BOOL GetAoiUpOffset(CfPoint &OfSt);
 	BOOL GetAoiDnOffset(CfPoint &OfSt);
 	void ClrPcr();
@@ -422,22 +429,24 @@ public:
 	BOOL DirectoryExists(LPCTSTR szPath);
 	void UpdateYieldOnRmap();
 	void SetTestMode(int nMode);
+	void SetTestMode();
 	int GetTestMode();
-	BOOL GetEngOffset(CfPoint &OfSt);
+	//BOOL GetEngOffset(CfPoint &OfSt);
 
 	void SetEngItsCode(CString sItsCode);
 
-	void SetCurrentInfoSignal(int nIdxSig, BOOL bOn);
-	BOOL GetCurrentInfoSignal(int nIdxSig);
+	void SetCurrentInfoSignal(int nMsgID, BOOL bOn);
+	BOOL GetCurrentInfoSignal(int nMsgID);
 	void SetLastSerialEng(int nSerial);
 	BOOL GetCurrentInfoEng();
 	int GetCurrentInfoEngShotNum();
+	int GetCurrentInfoReadShotNum();
 	void SetCurrentInfoBufUpTot(int nTotal);
 	void SetCurrentInfoBufUp(int nIdx, int nData);
 	void SetCurrentInfoBufDnTot(int nTotal);
 	void SetCurrentInfoBufDn(int nIdx, int nData);
 
-	CString GetMonDispMain();
+	//CString GetMonDispMain();
 	void SetMonDispMain(CString sDisp);
 	//void GetMkMenu01();
 	void SetMkMenu01(CString sMenu, CString sItem, CString sData);
@@ -467,6 +476,9 @@ public:
 	CString m_sEngLayerDn;
 	int m_nWritedItsSerial;
 
+	//BOOL MakeLayerMappingHeader();
+	//BOOL MakeLayerMappingSerial(int nIdx, int nItsSerial);
+
 	int SearchFirstShotOnIts();
 	BOOL GetItsSerialInfo(int nItsSerial, BOOL &bDualTest, CString &sLot, CString &sLayerUp, CString &sLayerDn, int nOption=0);		// 내층에서의 ITS 시리얼의 정보
 	BOOL SetItsSerialInfo(int nItsSerial);																							// 내층에서의 ITS 시리얼의 정보
@@ -474,8 +486,10 @@ public:
 	int GetLastItsSerial();																											// 내외층 머징된 릴맵 데이타의 Last 시리얼
 	CString GetItsFolderPath();
 	CString GetItsTargetFolderPath();
-	CString GetItsReelmapPath();
+	//CString GetItsReelmapPath();
 	BOOL GetInnerFolderPath(int nItsSerial, CString  &sUp, CString &sDn);
+	BOOL GetInnerReelmapPath(int nItsSerial, CString  &sUp, CString &sDn, CString  &sAllUp, CString &sAllDn);
+	BOOL GetInnerYieldPath(int nItsSerial, CString  &sUp, CString &sDn, CString  &sAllUp, CString &sAllDn);
 
 	char* StrToChar(CString str);
 	void StrToChar(CString str, char* pCh);
@@ -521,6 +535,21 @@ public:
 	int LoadPcrAllDn (CString sPath);	// return : 2(Failed), 1(정상), -1(Align Error, 노광불량), -2(Lot End)
 
 	int IsOfflineFolder(); // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+	BOOL CheckPathCamMstSpec();
+
+	BOOL CopyReelmapInner(int nItsSerial);
+	CString GetYieldPath(int nRmap);
+	CString GetRmapPath(int nRmap);
+
+	void SetDualTest();
+	void SetAlignMethode();
+	void RecoilerCcw();
+	void UncoilerCcw();
+	void SetEngItsCode();
+	void SetDoorRecoiler();
+	void SetDoorAoiUp();
+
+	CString m_sEngAlarm;
 
 // 재정의입니다.
 public:

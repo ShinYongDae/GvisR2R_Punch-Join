@@ -17,9 +17,9 @@
 #define MAX_MENU03_LABEL			5
 
 #define TIM_MENU03_DISP				300
-#define TIM_CHK_DONE_MK				301
-#define TIM_CHK_DONE_AOI			302
-#define TIM_CHK_DONE_MKAOI			303
+//#define TIM_CHK_DONE_MK				301
+//#define TIM_CHK_DONE_AOI			302
+//#define TIM_CHK_DONE_MKAOI			303
 #define TIM_CHK_MREG				304
 #define TIM_SET_RC_RELATION			306
 #define TIM_SW_RC_RELATION			307
@@ -31,11 +31,10 @@
 #define TIM_CHK_DONE_BUF_INIT		313
 // #define TIM_CHK_SOL_MK			312
 // #define TIM_CHK_SOL_AOI			313
+//#define TIM_CHK_DONE_ENGRAVE		314
 
-#define TIM_CHK_DONE_ENGRAVE		314
-
-#define TIM_CHK_DONE_ENG_BUF_HOME	315
-#define TIM_CHK_DONE_ENG_BUF_INIT	316
+//#define TIM_CHK_DONE_ENG_BUF_HOME	315
+//#define TIM_CHK_DONE_ENG_BUF_INIT	316
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgMenu03 dialog
@@ -49,9 +48,9 @@ class CDlgMenu03 : public CDialog
 
 	BOOL m_bLoadImg;
 	BOOL m_bTIM_MENU03_DISP;
-	BOOL m_bTIM_CHK_DONE_MK;
-	BOOL m_bTIM_CHK_DONE_AOI;
-	BOOL m_bTIM_CHK_DONE_MKAOI;
+	//BOOL m_bTIM_CHK_DONE_MK;
+	//BOOL m_bTIM_CHK_DONE_AOI;
+	//BOOL m_bTIM_CHK_DONE_MKAOI;
 	BOOL m_bTIM_CHK_DONE_BUF_HOME;
 	BOOL m_bTIM_CHK_DONE_BUF_INIT;
 	BOOL m_bTIM_CHK_DONE_READY;
@@ -63,9 +62,9 @@ class CDlgMenu03 : public CDialog
 	int m_nDir[MAX_AXIS];
 	BOOL m_bBufInitPosMove;
 
-	BOOL m_bTIM_CHK_DONE_ENGRAVE;
-	BOOL m_bTIM_CHK_DONE_ENG_BUF_HOME;
-	BOOL m_bTIM_CHK_DONE_ENG_BUF_INIT;
+	//BOOL m_bTIM_CHK_DONE_ENGRAVE;
+	//BOOL m_bTIM_CHK_DONE_ENG_BUF_HOME;
+	//BOOL m_bTIM_CHK_DONE_ENG_BUF_INIT;
 
 
 	void AtDlgShow();
@@ -88,7 +87,7 @@ class CDlgMenu03 : public CDialog
 	void DispEngrave();
 	void DispUncoiler();
 
-	void ChkDoneMkAoi();
+	//void ChkDoneMkAoi();
 	void DoReady();
 	BOOL DoReset();
 
@@ -122,16 +121,16 @@ public:
 	BOOL GetAoiTq();
 	void SetMkTq(BOOL bOn);
 	void SetAoiTq(BOOL bOn);
-	void ChkDoneMk();
-	void ChkDoneAoi();
-	void ChkBufHomeDone();
+	//void ChkDoneMk();
+	//void ChkDoneAoi();
+	//void ChkBufHomeDone();
 	void ChkBufInitDone();
 	void ChkReadyDone();
 	void DoManual();
 	void DoAuto();
 
-	void ChkEngBufHomeDone();
-	void ChkEngBufInitDone();
+	//void ChkEngBufHomeDone();
+	//void ChkEngBufInitDone();
 
 	afx_msg LRESULT OnMyBtnDown(WPARAM wPara, LPARAM lPara);
 	afx_msg LRESULT OnMyBtnUp(WPARAM wPara, LPARAM lPara);
@@ -170,7 +169,7 @@ public:
 	void SetEngraveOnePnl(BOOL bOn);
 	void MoveEngrave(int nDir = M_CW);
 	void MoveEngrave(double dOffset);
-	void ChkDoneEngrave();
+	//void ChkDoneEngrave();
 
 	BOOL IsEngraveFdVac();
 	BOOL IsEngraveTqVac();

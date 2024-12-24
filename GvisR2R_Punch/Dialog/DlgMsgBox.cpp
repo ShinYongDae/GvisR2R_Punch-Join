@@ -333,6 +333,7 @@ void CDlgMsgBox::WaitUntilThreadEnd(HANDLE hThread) // Worker Thread 구동관련 St
 		// Time Out Check
 		if (GetTickCount() >= (dwStartTick + dwTimeOut)) 
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			//pView->MsgBox("WaitUntilThreadEnd() Time Out!!!");
 			pView->ClrDispMsg();
 			AfxMessageBox(_T("WaitUntilThreadEnd() Time Out!!!", NULL, MB_OK | MB_ICONSTOP));

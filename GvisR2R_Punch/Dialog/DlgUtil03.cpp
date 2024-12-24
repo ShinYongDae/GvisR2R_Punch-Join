@@ -203,7 +203,7 @@ void CDlgUtil03::OnShowWindow(BOOL bShow, UINT nStatus)
 void CDlgUtil03::AtDlgShow()
 {
 	if(pDoc->m_Master[0].m_pPcsRgn)
-		SetScrlBarMax(pDoc->m_Master[0].m_pPcsRgn->nCol, pDoc->m_Master[0].m_pPcsRgn->nRow); // ROT_NONE
+		SetScrlBarMax(pDoc->m_Master[0].m_pPcsRgn->m_nCol, pDoc->m_Master[0].m_pPcsRgn->m_nRow); // ROT_NONE
 // 	SetScrlBarMax(pDoc->m_pPcsRgn->nRow, pDoc->m_pPcsRgn->nCol); // ROT_CCW_90
 	SetScrlBar(0,0);
 	
@@ -252,7 +252,7 @@ BOOL CDlgUtil03::OnInitDialog()
 	InitBtn();
 
 	if(pDoc->m_Master[0].m_pPcsRgn)
-		SetScrlBarMax(pDoc->m_Master[0].m_pPcsRgn->nCol, pDoc->m_Master[0].m_pPcsRgn->nRow); // ROT_NONE
+		SetScrlBarMax(pDoc->m_Master[0].m_pPcsRgn->m_nCol, pDoc->m_Master[0].m_pPcsRgn->m_nRow); // ROT_NONE
 // 	SetScrlBarMax(pDoc->m_pPcsRgn->nRow, pDoc->m_pPcsRgn->nCol); // ROT_CCW_90
 	SetScrlBar(0,0);
 
@@ -496,6 +496,11 @@ void CDlgUtil03::OnBtnMk()
 
 void CDlgUtil03::MoveMkPos(int nStcId)
 {
+	if (pView->IsClampOff())
+	{
+		return;
+	}
+
 	CString str;
 	int nPos, nPcsId;
 	CfPoint ptPnt;
@@ -526,8 +531,12 @@ void CDlgUtil03::MoveMkPos(int nStcId)
 		if(fLen > 0.001)
 		{
 			pView->m_pMotion->GetSpeedProfile(TRAPEZOIDAL, AXIS_X0, fLen, fVel, fAcc, fJerk);
-			if(!pView->m_pMotion->Move(MS_X0Y0, pPos, fVel, fAcc, fAcc))
+			if (!pView->m_pMotion->Move(MS_X0Y0, pPos, fVel, fAcc, fAcc))
+			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
+				pView->ClrDispMsg();
 				AfxMessageBox(_T("Move X0Y0 Error..."));
+			}
 		}
 	}
 	else if(!bOn0 && bOn1)
@@ -548,8 +557,12 @@ void CDlgUtil03::MoveMkPos(int nStcId)
 		if(fLen > 0.001)
 		{
 			pView->m_pMotion->GetSpeedProfile(TRAPEZOIDAL, AXIS_X1, fLen, fVel, fAcc, fJerk);
-			if(!pView->m_pMotion->Move(MS_X1Y1, pPos, fVel, fAcc, fAcc))
+			if (!pView->m_pMotion->Move(MS_X1Y1, pPos, fVel, fAcc, fAcc))
+			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
+				pView->ClrDispMsg();
 				AfxMessageBox(_T("Move X1Y1 Error..."));
+			}
 		}
 	}
 	else if(bOn0 && bOn1)
@@ -570,8 +583,12 @@ void CDlgUtil03::MoveMkPos(int nStcId)
 		if(fLen > 0.001)
 		{
 			pView->m_pMotion->GetSpeedProfile(TRAPEZOIDAL, AXIS_X0, fLen, fVel, fAcc, fJerk);
-			if(!pView->m_pMotion->Move(MS_X0Y0, pPos, fVel, fAcc, fAcc))
+			if (!pView->m_pMotion->Move(MS_X0Y0, pPos, fVel, fAcc, fAcc))
+			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
+				pView->ClrDispMsg();
 				AfxMessageBox(_T("Move X0Y0 Error..."));
+			}
 		}
 
 		nPos = str.Find('(', 0);
@@ -589,8 +606,12 @@ void CDlgUtil03::MoveMkPos(int nStcId)
 		if(fLen > 0.001)
 		{
 			pView->m_pMotion->GetSpeedProfile(TRAPEZOIDAL, AXIS_X1, fLen, fVel, fAcc, fJerk);
-			if(!pView->m_pMotion->Move(MS_X1Y1, pPos, fVel, fAcc, fAcc))
+			if (!pView->m_pMotion->Move(MS_X1Y1, pPos, fVel, fAcc, fAcc))
+			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
+				pView->ClrDispMsg();
 				AfxMessageBox(_T("Move X1Y1 Error..."));
+			}
 		}
 	}
 
@@ -791,6 +812,11 @@ void CDlgUtil03::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 void CDlgUtil03::OnBtnAllMkTest() 
 {
 	// TODO: Add your control notification handler code here
+	if (pView->IsClampOff())
+	{
+		return;
+	}
+
 	BOOL bOn0 = myBtn[3].GetCheck();
 	BOOL bOn1 = myBtn[4].GetCheck();
 
@@ -1309,7 +1335,8 @@ BOOL CDlgUtil03::ShowKeypad(int nCtlID, CPoint ptSt, int nDir)
 			_tstof(strData) > _tstof(strMax))
 		{
 			SetDlgItemText(nCtlID, strPrev);
-			pView->DispMsg(_T("입력 범위를 벗어났습니다."), _T("주의"), RGB_YELLOW);
+			//pView->DispMsg(_T("입력 범위를 벗어났습니다."), _T("주의"), RGB_YELLOW);
+			pView->MsgBox(_T("입력 범위를 벗어났습니다."));
 		}
 		else
 			SetDlgItemText(nCtlID, strData);

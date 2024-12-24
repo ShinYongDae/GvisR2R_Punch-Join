@@ -82,7 +82,7 @@ BOOL CQuery::Execute(CString sQuery, CStringArray& sArrayData, int& nTotalRow, i
 	{
 		CString strMsg;
 		strMsg.Format(_T("Error occur at m_dataSource.ExecuteQuery() at GetCustomerNameList()\r\n%s"), m_dataSource.GetLastError());
-		Log(strMsg); pView->ClrDispMsg(); AfxMessageBox(strMsg, MB_ICONSTOP);
+		pView->SetAlarmToPlc(UNIT_PUNCH); Log(strMsg); pView->ClrDispMsg(); AfxMessageBox(strMsg, MB_ICONSTOP);
 		return FALSE;
 	}
 
@@ -148,7 +148,7 @@ int CQuery::GetCustomerNameList(CStringArray &strCustomerName)
 	{
 		CString strMsg;
 		strMsg.Format(_T("Error occur at m_dataSource.ExecuteQuery() at GetCustomerNameList()\r\n%s"), m_dataSource.GetLastError());
-		Log(strMsg); pView->ClrDispMsg(); AfxMessageBox(strMsg, MB_ICONSTOP);
+		pView->SetAlarmToPlc(UNIT_PUNCH); Log(strMsg); pView->ClrDispMsg(); AfxMessageBox(strMsg, MB_ICONSTOP);
 		return 0;
 	}
 
@@ -190,7 +190,7 @@ BOOL CQuery::FindCustomerCode(CString strCustomerName, CString &strCustomerCode)
 	{
 		CString strMsg;
 		strMsg.Format(_T("Error occur at m_dataSource.ExecuteQuery() at FindCustomerCode()\r\n%s"), m_dataSource.GetLastError());
-		Log(strMsg); pView->ClrDispMsg(); AfxMessageBox(strMsg, MB_ICONSTOP);
+		pView->SetAlarmToPlc(UNIT_PUNCH); Log(strMsg); pView->ClrDispMsg(); AfxMessageBox(strMsg, MB_ICONSTOP);
 		return FALSE;
 	}
 
@@ -240,7 +240,7 @@ int CQuery::GetUserInfo(CStringArray &sUserID, CStringArray &sPW, CStringArray &
 	{
 		CString strMsg;
 		strMsg.Format(_T("Error occur at m_dataSource.ExecuteQuery() at GetUserInfoFromDBForVrs()\r\n%s"), m_dataSource.GetLastError());
-		Log(strMsg); pView->ClrDispMsg(); AfxMessageBox(strMsg, MB_ICONSTOP);
+		pView->SetAlarmToPlc(UNIT_PUNCH); Log(strMsg); pView->ClrDispMsg(); AfxMessageBox(strMsg, MB_ICONSTOP);
 		return 0;
 	}
 
@@ -365,7 +365,7 @@ int CQuery::GetUserNameList(CStringArray &strUserName)
 	{
 		CString strMsg;
 		strMsg.Format(_T("Error occur at m_dataSource.ExecuteQuery() at GetUserNameList()\r\n%s"), m_dataSource.GetLastError());
-		Log(strMsg); pView->ClrDispMsg(); AfxMessageBox(strMsg, MB_ICONSTOP);
+		pView->SetAlarmToPlc(UNIT_PUNCH); Log(strMsg); pView->ClrDispMsg(); AfxMessageBox(strMsg, MB_ICONSTOP);
 		return FALSE;
 	}
 
@@ -409,7 +409,7 @@ int CQuery::GetUserList(CUser* pList, int& nUserCount)
 	{
 		CString strMsg;
 		strMsg.Format(_T("Error occur at m_dataSource.ExecuteQuery() at GetUserNameList()\r\n%s"), m_dataSource.GetLastError());
-		Log(strMsg); pView->ClrDispMsg(); AfxMessageBox(strMsg, MB_ICONSTOP);
+		pView->SetAlarmToPlc(UNIT_PUNCH); Log(strMsg); pView->ClrDispMsg(); AfxMessageBox(strMsg, MB_ICONSTOP);
 		return FALSE;
 	}
 
@@ -491,7 +491,7 @@ BOOL CQuery::GetUserName(int nIndex, CString &strUserName)
 	{
 		CString strMsg;
 		strMsg.Format(_T("Error occur at m_dataSource.ExecuteQuery() at GetUserName()\r\n%s"), m_dataSource.GetLastError());
-		Log(strMsg); pView->ClrDispMsg(); AfxMessageBox(strMsg, MB_ICONSTOP);
+		pView->SetAlarmToPlc(UNIT_PUNCH); Log(strMsg); pView->ClrDispMsg(); AfxMessageBox(strMsg, MB_ICONSTOP);
 		return FALSE;
 	}
 
@@ -2887,4 +2887,23 @@ BOOL CQuery::GetCurrentDBName(CString &sName)
 	}
 
 	return FALSE;
+}
+
+BOOL CQuery::InsertPunchingData(CString sLot, int nSerial, CString sProcess, double dPosX, double dPosY, int nPunchCode)
+{
+	CString sLCode3 = _T("L01"); // Layer-Top
+	CString sQuery;
+
+	//strQuery.Format(_T("UPDATE RSTD_PUNCH SET LOT_CODE='%s',SERIAL_CODE='%d',DATE=GETDATE() where EQUIP_CODE='%s'"), nAlarmID, nAlarmSet, strEquipcode);
+	sQuery.Format(_T("INSERT INTO RSTD_PUNCH (LOT_CODE,SERIAL_CODE,LAYER_CODE,PROC_CODE,X_POS,Y_POS,PUNCH_CODE,DATE)")
+		_T("VALUES('%s','%d','%s','%s','%.3f','%.3f','%d',GETDATE())"), sLot, nSerial, sLCode3, sProcess, dPosX, dPosY, nPunchCode);
+
+	if (!m_dataSource.ExecuteQuery((LPCTSTR)sQuery))
+	{
+		CString strMsg;
+		strMsg.Format(_T("Error occur at m_dataSource.ExecuteQuery() at InsertPunchingData()\r\n%s"), m_dataSource.GetLastError());
+		Log(strMsg); pView->ClrDispMsg(); AfxMessageBox(strMsg, MB_ICONSTOP);
+		return FALSE;
+	}
+	return TRUE;
 }

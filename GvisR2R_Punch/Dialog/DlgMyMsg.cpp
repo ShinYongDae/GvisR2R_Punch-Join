@@ -29,6 +29,7 @@ CDlgMyMsg::CDlgMyMsg(CWnd* pParent /*=NULL*/, int nIDD)
 	m_pParent = pParent;
 	if (pParent)
 		m_hParentWnd = pParent->GetSafeHwnd();
+	m_bTIM_DISP_STS = FALSE;
 
 	m_pRect = NULL;
 
@@ -58,6 +59,8 @@ CDlgMyMsg::CDlgMyMsg(CWnd* pParent /*=NULL*/, int nIDD)
 
 CDlgMyMsg::~CDlgMyMsg()
 {
+	m_bTIM_DISP_STS = FALSE;
+
 	StopTimer();
 
 	if(m_pDlgMyMsg) 
@@ -122,6 +125,9 @@ BOOL CDlgMyMsg::OnInitDialog()
 		m_bTimDlgMyMsg = TRUE;
 		SetTimer(0, 100, NULL);
 	}
+	
+	//m_bTIM_DISP_STS = TRUE;
+	//SetTimer(TIM_DISP_STS, 100, NULL);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
@@ -180,6 +186,21 @@ void CDlgMyMsg::OnTimer(UINT_PTR nIDEvent)//(UINT nIDEvent)
 			SetTimer(0, 100, NULL);
 	}
 	
+	if (nIDEvent == TIM_DISP_STS)
+	{
+		KillTimer(TIM_DISP_STS);
+		if (this->IsWindowVisible())
+		{
+			m_bTIM_DISP_STS = FALSE;
+		}
+		else
+		{
+			this->ShowWindow(SW_SHOW);
+		}
+		if (m_bTIM_DISP_STS)
+			SetTimer(TIM_DISP_STS, 100, NULL);
+	}
+
 	CDialog::OnTimer(nIDEvent);
 }
 

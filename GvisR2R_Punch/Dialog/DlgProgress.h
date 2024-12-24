@@ -7,12 +7,15 @@
 // DlgProgress.h : header file
 //
 #include "../resource.h"
+#define TIM_DISP_STS				450
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgProgress dialog
 
 class CDlgProgress : public CDialog
 {
+	BOOL m_bTIM_DISP_STS;
+
 // Construction
 public:
 	CDlgProgress(CWnd* pParent = NULL);   // standard constructor
@@ -71,6 +74,8 @@ protected:
 	afx_msg void OnDestroy();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 
 //{{AFX_INSERT_LOCATION}}

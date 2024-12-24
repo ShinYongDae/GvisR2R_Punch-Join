@@ -31,10 +31,12 @@ CDlgInfo::CDlgInfo(CWnd* pParent /*=NULL*/)
 	//}}AFX_DATA_INIT
 
 	m_bLoadImg = FALSE;
+	m_bTIM_DISP_STS = FALSE;
 }
 
 CDlgInfo::~CDlgInfo()
 {
+	m_bTIM_DISP_STS = FALSE;
 	if (pView->m_pDlgMenu01)
 		pView->m_pDlgMenu01->UpdateData();
 }
@@ -87,11 +89,13 @@ BEGIN_MESSAGE_MAP(CDlgInfo, CDialog)
 	ON_BN_CLICKED(IDC_CHK_USE_AOI_DUAL, OnChkUseAoiDual)
 	ON_BN_CLICKED(IDC_CHK_USE_AOI_SINGLE, OnChkUseAoiSingle)
 	ON_BN_CLICKED(IDC_CHK_SAMPLE_TEST, OnChkSampleTest)
-	ON_BN_CLICKED(IDC_CHK_ONE_METAL, OnChkOneMetal)
-	ON_BN_CLICKED(IDC_CHK_TWO_METAL, OnChkTwoMetal)
+	ON_BN_CLICKED(IDC_CHK_RECOILER_CCW, OnChkRecoilerCcw)
+	ON_BN_CLICKED(IDC_CHK_UNCOILER_CCW, OnChkUncoilerCcw)
 	ON_BN_CLICKED(IDC_CHK_USE_AOI_INNER, OnChkUseAoiInner)
 	ON_BN_CLICKED(IDC_CHK_USE_AOI_OUTER, OnChkUseAoiOuter)
 	ON_BN_CLICKED(IDC_STC_181, OnStc181)
+	ON_BN_CLICKED(IDC_CHK_19, OnChk19)
+	ON_BN_CLICKED(IDC_CHK_23, OnChk23)
 	//}}AFX_MSG_MAP
 	ON_BN_CLICKED(IDC_CHK_4_POINT_ALIGN, &CDlgInfo::OnBnClickedChk4PointAlign)
 	ON_BN_CLICKED(IDC_CHK_2_POINT_ALIGN, &CDlgInfo::OnBnClickedChk2PointAlign)
@@ -106,6 +110,7 @@ BEGIN_MESSAGE_MAP(CDlgInfo, CDialog)
 	ON_STN_CLICKED(IDC_STC_82, &CDlgInfo::OnStnClickedStc82)
 	ON_STN_CLICKED(IDC_STC_83, &CDlgInfo::OnStnClickedStc83)
 	ON_BN_CLICKED(IDC_CHK_USE_AOI_MIDDLE, &CDlgInfo::OnBnClickedChkUseAoiMiddle)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -130,6 +135,8 @@ void CDlgInfo::AtDlgShow()
 {
 	LoadImg();
 	Disp();
+	if (pView->m_pDlgMenu01)
+		pView->m_pDlgMenu01->ChkAoiVsStatus();
 }
 
 void CDlgInfo::AtDlgHide()
@@ -208,9 +215,15 @@ BOOL CDlgInfo::OnInitDialog()
 // 	GetDlgItem(IDC_STC_0046)->ShowWindow(SW_HIDE);
 // 	GetDlgItem(IDC_CHK_011)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_CHK_USE_AOI_MIDDLE)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_CHK_SAMPLE_TEST)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STC_64)->ShowWindow(SW_HIDE);
 
-	GetDlgItem(IDC_STC_181)->SetWindowText(_T("")); // 샘플검사 Shot수
+	GetDlgItem(IDC_STC_181)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_STC_181)->SetWindowText(_T("")); // 샘플검사 Shot수
 	
+	m_bTIM_DISP_STS = TRUE;
+	SetTimer(TIM_DISP_STS, 100, NULL);
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -277,12 +290,12 @@ void CDlgInfo::InitBtn()
 	myBtn[14].SetHwnd(this->GetSafeHwnd(), IDC_CHK_SAMPLE_TEST);
 	myBtn[14].SetBtnType(BTN_TYPE_CHECK);
 
-	myBtn[15].SubclassDlgItem(IDC_CHK_ONE_METAL, this);
-	myBtn[15].SetHwnd(this->GetSafeHwnd(), IDC_CHK_ONE_METAL);
+	myBtn[15].SubclassDlgItem(IDC_CHK_RECOILER_CCW, this);
+	myBtn[15].SetHwnd(this->GetSafeHwnd(), IDC_CHK_RECOILER_CCW);
 	myBtn[15].SetBtnType(BTN_TYPE_CHECK);
 
-	myBtn[16].SubclassDlgItem(IDC_CHK_TWO_METAL, this);
-	myBtn[16].SetHwnd(this->GetSafeHwnd(), IDC_CHK_TWO_METAL);
+	myBtn[16].SubclassDlgItem(IDC_CHK_UNCOILER_CCW, this);
+	myBtn[16].SetHwnd(this->GetSafeHwnd(), IDC_CHK_UNCOILER_CCW);
 	myBtn[16].SetBtnType(BTN_TYPE_CHECK);
 
 	myBtn[17].SubclassDlgItem(IDC_CHK_2_POINT_ALIGN, this);
@@ -321,6 +334,13 @@ void CDlgInfo::InitBtn()
 	myBtn[25].SetHwnd(this->GetSafeHwnd(), IDC_CHK_USE_AOI_MIDDLE);
 	myBtn[25].SetBtnType(BTN_TYPE_CHECK);
 
+	myBtn[26].SubclassDlgItem(IDC_CHK_19, this);
+	myBtn[26].SetHwnd(this->GetSafeHwnd(), IDC_CHK_19);
+	myBtn[26].SetBtnType(BTN_TYPE_CHECK);
+
+	myBtn[27].SubclassDlgItem(IDC_CHK_23, this);
+	myBtn[27].SetHwnd(this->GetSafeHwnd(), IDC_CHK_23);
+	myBtn[27].SetBtnType(BTN_TYPE_CHECK);
 
 	int i;
 	for(i=0; i<MAX_INFO_BTN; i++)
@@ -393,7 +413,7 @@ void CDlgInfo::InitStcTitle()
 	myStcTitle[31].SubclassDlgItem(IDC_STC_0040, this);
 	myStcTitle[32].SubclassDlgItem(IDC_STC_0041, this);
 	myStcTitle[33].SubclassDlgItem(IDC_STC_0042, this);
-	myStcTitle[34].SubclassDlgItem(IDC_STC_0043, this);
+	myStcTitle[34].SubclassDlgItem(IDC_STC_0043, this); // 380mm
 	myStcTitle[35].SubclassDlgItem(IDC_STC_0044, this);
 	myStcTitle[36].SubclassDlgItem(IDC_STC_0045, this);
 	myStcTitle[37].SubclassDlgItem(IDC_STC_0046, this);
@@ -431,6 +451,10 @@ void CDlgInfo::InitStcTitle()
 
 	myStcTitle[65].SubclassDlgItem(IDC_STC_185, this); //검사부 AOI 상하면 재작업 알람 시간
 	myStcTitle[66].SubclassDlgItem(IDC_STC_186, this); //마킹부 재작업 알람 시간
+
+	myStcTitle[67].SubclassDlgItem(IDC_STC_44, this); // 340mm
+	myStcTitle[68].SubclassDlgItem(IDC_STC_47, this); // 346mm
+
 
 	for(int i=0; i<MAX_INFO_STC; i++)
 	{
@@ -553,7 +577,8 @@ BOOL CDlgInfo::ShowKeypad(int nCtlID, CPoint ptSt, int nDir)
 			_tstof(strData) > _tstof(strMax))
 		{
 			SetDlgItemText(nCtlID, strPrev);
-			pView->DispMsg(_T("입력 범위를 벗어났습니다."), _T("주의"), RGB_YELLOW);
+			//pView->DispMsg(_T("입력 범위를 벗어났습니다."), _T("주의"), RGB_YELLOW);
+			pView->MsgBox(_T("입력 범위를 벗어났습니다."));
 		}
 		else
 			SetDlgItemText(nCtlID, strData);
@@ -610,31 +635,31 @@ void CDlgInfo::Disp()
 	else
 		myBtn[3].SetCheck(FALSE);
 
+	pDoc->WorkingInfo.LastJob.bRclDrSen = pView->MpeRead(pView->Plc.DlgInfo.LampDoorSensorRecoiler) ? TRUE : FALSE;
 	if(pDoc->WorkingInfo.LastJob.bRclDrSen)
 		myBtn[4].SetCheck(TRUE);
 	else
 		myBtn[4].SetCheck(FALSE);
 
+	pDoc->WorkingInfo.LastJob.bAoiUpDrSen = pView->MpeRead(pView->Plc.DlgInfo.LampDoorSensorAoiUp) ? TRUE : FALSE;
 	if(pDoc->WorkingInfo.LastJob.bAoiUpDrSen)
 		myBtn[5].SetCheck(TRUE);
 	else
 		myBtn[5].SetCheck(FALSE);
 
+	pDoc->WorkingInfo.LastJob.bMkDrSen = pView->MpeRead(pView->Plc.DlgInfo.LampDoorSensorPunch) ? TRUE : FALSE;
 	if(pDoc->WorkingInfo.LastJob.bMkDrSen)
 		myBtn[6].SetCheck(TRUE);
 	else
 		myBtn[6].SetCheck(FALSE);
 
+	pDoc->WorkingInfo.LastJob.bUclDrSen = pView->MpeRead(pView->Plc.DlgInfo.LampDoorSensorUncoiler) ? TRUE : FALSE;
 	if(pDoc->WorkingInfo.LastJob.bUclDrSen)
 		myBtn[7].SetCheck(TRUE);
 	else
 		myBtn[7].SetCheck(FALSE);
 
-	//if(pDoc->WorkingInfo.LastJob.bDispMkPcs)
-	//	myBtn[8].SetCheck(TRUE);
-	//else
-	//	myBtn[8].SetCheck(FALSE);
-
+	pDoc->WorkingInfo.LastJob.bUse380mm = pView->MpeRead(pView->Plc.DlgMenu03.LampLaser380mm) ? TRUE : FALSE;
 	if (pDoc->WorkingInfo.LastJob.bUse380mm)
 		myBtn[8].SetCheck(TRUE);
 	else
@@ -650,12 +675,13 @@ void CDlgInfo::Disp()
 	else
 		myBtn[10].SetCheck(FALSE);
 
-	//if(pDoc->WorkingInfo.LastJob.bAoiSftySen)
+	pDoc->WorkingInfo.LastJob.bAoiDnDrSen = pView->MpeRead(pView->Plc.DlgInfo.LampDoorSensorAoiDn) ? TRUE : FALSE;
 	if (pDoc->WorkingInfo.LastJob.bAoiDnDrSen)
 		myBtn[11].SetCheck(TRUE);
 	else
 		myBtn[11].SetCheck(FALSE);
-
+	
+	pDoc->WorkingInfo.LastJob.bTwoMetal = pView->MpeRead(pView->Plc.DlgInfo.LampTwoMetal) ? TRUE : FALSE;
 	if(pDoc->WorkingInfo.LastJob.bDualTest)
 	{
 		myBtn[12].SetCheck(TRUE);
@@ -667,12 +693,14 @@ void CDlgInfo::Disp()
 		myBtn[13].SetCheck(TRUE);
 	}
 
+	pDoc->WorkingInfo.LastJob.bSampleTest = pView->MpeRead(pView->Plc.DlgInfo.LampSampleTest) ? TRUE : FALSE;		// Sample 검사 On
 	if(pDoc->WorkingInfo.LastJob.bSampleTest)
 		myBtn[14].SetCheck(TRUE);
 	else
 		myBtn[14].SetCheck(FALSE);
 
-	if(pDoc->WorkingInfo.LastJob.bOneMetal)
+	pDoc->WorkingInfo.LastJob.bFeedCcwRecoiler = pView->MpeRead(pView->Plc.DlgInfo.LampFeedCcwRecoiler) ? TRUE : FALSE;
+	if(pDoc->WorkingInfo.LastJob.bFeedCcwRecoiler)
 	{
 		myBtn[15].SetCheck(TRUE);
 		myBtn[15].SetWindowText(_T("Recoiler\r역방향"));	
@@ -685,7 +713,8 @@ void CDlgInfo::Disp()
 		myBtn[15].SetTextColor(RGB_BLUE);
 	}
 
-	if(pDoc->WorkingInfo.LastJob.bTwoMetal)
+	pDoc->WorkingInfo.LastJob.bFeedCcwUncoiler = pView->MpeRead(pView->Plc.DlgInfo.LampFeedCcwUncoiler) ? TRUE : FALSE;
+	if(pDoc->WorkingInfo.LastJob.bFeedCcwUncoiler)
 	{
 		myBtn[16].SetCheck(TRUE);
 		myBtn[16].SetWindowText(_T("Uncoiler\r역방향"));
@@ -698,26 +727,31 @@ void CDlgInfo::Disp()
 		myBtn[16].SetTextColor(RGB_BLUE);
 	}
 
+	pDoc->WorkingInfo.LastJob.bUseAoiDnCleanRoler = pView->MpeRead(pView->Plc.DlgInfo.LampCleanRollerAoiDn) ? TRUE : FALSE;
 	if (pDoc->WorkingInfo.LastJob.bUseAoiDnCleanRoler)
 		myBtn[19].SetCheck(TRUE);
 	else
 		myBtn[19].SetCheck(FALSE);
 
+	pDoc->WorkingInfo.LastJob.bUseAoiUpCleanRoler = pView->MpeRead(pView->Plc.DlgInfo.LampCleanRollerAoiUp) ? TRUE : FALSE;
 	if (pDoc->WorkingInfo.LastJob.bUseAoiUpCleanRoler)
 		myBtn[20].SetCheck(TRUE);
 	else
 		myBtn[20].SetCheck(FALSE);
 
+	pDoc->WorkingInfo.LastJob.bUseAoiDnUltrasonic = pView->MpeRead(pView->Plc.DlgInfo.LampUltraSonicAoi) ? TRUE : FALSE;
 	if (pDoc->WorkingInfo.LastJob.bUseAoiDnUltrasonic) //AOI초음파세정기
 		myBtn[21].SetCheck(TRUE);
 	else
 		myBtn[21].SetCheck(FALSE);
 
+	pDoc->WorkingInfo.LastJob.bUseEngraveUltrasonic = pView->MpeRead(pView->Plc.DlgInfo.LampUltraSonicEngrave) ? TRUE : FALSE;
 	if (pDoc->WorkingInfo.LastJob.bUseEngraveUltrasonic) //각인부초음파세정기
 		myBtn[22].SetCheck(TRUE);
 	else
 		myBtn[22].SetCheck(FALSE);
 
+	pDoc->WorkingInfo.LastJob.nTestMode = GetTestModeFromPlc();
 	switch (pDoc->WorkingInfo.LastJob.nTestMode) // GetTestMode()
 	{
 	case MODE_NONE:		// 0 
@@ -749,33 +783,58 @@ void CDlgInfo::Disp()
 		break;
 	}
 
-	if (pDoc && pDoc->m_pMpeData)
-	{
-		str.Format(_T("%d"), pDoc->m_pMpeData[2][7]); // Shot수 현재값
-		myStcData[17].SetWindowText(str);
+	//if (pDoc && pDoc->m_pMpeData)
+	//{
+	//	str.Format(_T("%d"), pDoc->m_pMpeData[2][7]); // Shot수 현재값
+	//	myStcData[17].SetWindowText(str);
 
-		str.Format(_T("%d"), pDoc->m_pMpeData[7][6]); //Shot수 설정값
-		myStcData[18].SetWindowText(str);
+	//	str.Format(_T("%d"), pDoc->m_pMpeData[7][6]); //Shot수 설정값
+	//	myStcData[18].SetWindowText(str);
 
+	//	str.Format(_T("%d"), pDoc->m_pMpeData[0][10]); //검사부 AOI 상[10]하[11]면 재작업 알람 시간
+	//	myStcData[19].SetWindowText(str);
 
-		str.Format(_T("%d"), pDoc->m_pMpeData[0][10]); //검사부 AOI 상[10]하[11]면 재작업 알람 시간
-		myStcData[19].SetWindowText(str);
-
-		str.Format(_T("%d"), pDoc->m_pMpeData[0][12]); //마킹부[12] 재작업 알람 시간
-		myStcData[20].SetWindowText(str);
-	}
+	//	str.Format(_T("%d"), pDoc->m_pMpeData[0][12]); //마킹부[12] 재작업 알람 시간
+	//	myStcData[20].SetWindowText(str);
+	//}
 
 	if (pView->IsAuto())
 	{
-		GetDlgItem(IDC_CHK_ONE_METAL)->EnableWindow(FALSE); // myBtn[15] IDC_CHK_ONE_METAL - Recoiler\r정방향 CW : FALSE
-		GetDlgItem(IDC_CHK_TWO_METAL)->EnableWindow(FALSE); // myBtn[16] IDC_CHK_TWO_METAL - Uncoiler\r정방향 CW : FALSE
+		GetDlgItem(IDC_CHK_RECOILER_CCW)->EnableWindow(FALSE); // myBtn[15] IDC_CHK_RECOILER_CCW - Recoiler\r정방향 CW : FALSE
+		GetDlgItem(IDC_CHK_UNCOILER_CCW)->EnableWindow(FALSE); // myBtn[16] IDC_CHK_UNCOILER_CCW - Uncoiler\r정방향 CW : FALSE
 	}
 	else
 	{
-		GetDlgItem(IDC_CHK_ONE_METAL)->EnableWindow(TRUE); // myBtn[15] IDC_CHK_ONE_METAL - Recoiler\r정방향 CW : FALSE
-		GetDlgItem(IDC_CHK_TWO_METAL)->EnableWindow(TRUE); // myBtn[16] IDC_CHK_TWO_METAL - Uncoiler\r정방향 CW : FALSE
+		GetDlgItem(IDC_CHK_RECOILER_CCW)->EnableWindow(TRUE); // myBtn[15] IDC_CHK_RECOILER_CCW - Recoiler\r정방향 CW : FALSE
+		GetDlgItem(IDC_CHK_UNCOILER_CCW)->EnableWindow(TRUE); // myBtn[16] IDC_CHK_TWO_METAL - Uncoiler\r정방향 CW : FALSE
 	}
 
+	pDoc->WorkingInfo.LastJob.bUse340mm = pView->MpeRead(pView->Plc.DlgMenu03.LampLaser340mm) ? TRUE : FALSE;
+	if (pDoc->WorkingInfo.LastJob.bUse340mm)
+		myBtn[26].SetCheck(TRUE);
+	else
+		myBtn[26].SetCheck(FALSE);
+
+
+	pDoc->WorkingInfo.LastJob.bUse346mm = pView->MpeRead(pView->Plc.DlgMenu03.LampLaser346mm) ? TRUE : FALSE;
+	if (pDoc->WorkingInfo.LastJob.bUse346mm)
+		myBtn[27].SetCheck(TRUE);
+	else
+		myBtn[27].SetCheck(FALSE);
+
+}
+
+int CDlgInfo::GetTestModeFromPlc()
+{
+	// MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2 .
+	if (pView->MpeRead(pView->Plc.DlgInfo.LampModeInner))
+		pDoc->WorkingInfo.LastJob.nTestMode = MODE_INNER;	
+	else if (pView->MpeRead(pView->Plc.DlgInfo.LampModeOutter))
+		pDoc->WorkingInfo.LastJob.nTestMode = MODE_OUTER;
+	//else
+	//	pDoc->WorkingInfo.LastJob.nTestMode = MODE_NONE;
+
+	return pDoc->WorkingInfo.LastJob.nTestMode;
 }
 
 void CDlgInfo::OnStc0008()
@@ -1214,9 +1273,105 @@ void CDlgInfo::OnChk008()
 
 	pView->MpeWrite(pView->Plc.DlgInfo.Laser380mm, pDoc->WorkingInfo.LastJob.bUse380mm ? 1 : 0);	// EPC실린더(제품소->OFF/제품대->ON)
 
+	if (pDoc->WorkingInfo.LastJob.bUse380mm)
+	{
+		pDoc->WorkingInfo.LastJob.bUse340mm = FALSE;
+		pView->MpeWrite(pView->Plc.DlgInfo.Laser340mm, 0);
+		if (pDoc->WorkingInfo.LastJob.bUse340mm)
+			myBtn[26].SetCheck(TRUE);
+		else
+			myBtn[26].SetCheck(FALSE);
+
+		pDoc->WorkingInfo.LastJob.bUse346mm = FALSE;
+		pView->MpeWrite(pView->Plc.DlgInfo.Laser346mm, 0);
+		if (pDoc->WorkingInfo.LastJob.bUse346mm)
+			myBtn[27].SetCheck(TRUE);
+		else
+			myBtn[27].SetCheck(FALSE);
+	}
+
 #ifdef USE_ENGRAVE
 	if (pView && pView->m_pEngrave)
 		pView->m_pEngrave->SetUse380mm();	//_stSigInx::_Use380mm
+#endif
+
+}
+
+void CDlgInfo::OnChk19()
+{
+	if (myBtn[26].GetCheck())
+		pDoc->WorkingInfo.LastJob.bUse340mm = TRUE;
+	else
+		pDoc->WorkingInfo.LastJob.bUse340mm = FALSE;
+
+	CString sData = pDoc->WorkingInfo.LastJob.bUse340mm ? _T("1") : _T("0");
+	::WritePrivateProfileString(_T("Last Job"), _T("Use 340mm Roll"), sData, PATH_WORKING_INFO);
+
+	pView->MpeWrite(pView->Plc.DlgInfo.Laser340mm, pDoc->WorkingInfo.LastJob.bUse340mm ? 1 : 0);	// EPC실린더(제품소->OFF/제품대->ON)
+
+	if (pDoc->WorkingInfo.LastJob.bUse340mm)
+	{
+		pDoc->WorkingInfo.LastJob.bUse346mm = FALSE;
+		pView->MpeWrite(pView->Plc.DlgInfo.Laser346mm, 0);
+		if (pDoc->WorkingInfo.LastJob.bUse346mm)
+			myBtn[27].SetCheck(TRUE);
+		else
+			myBtn[27].SetCheck(FALSE);
+
+		pDoc->WorkingInfo.LastJob.bUse380mm = FALSE;
+		pView->MpeWrite(pView->Plc.DlgInfo.Laser380mm, 0);
+		if (pDoc->WorkingInfo.LastJob.bUse380mm)
+			myBtn[8].SetCheck(TRUE);
+		else
+			myBtn[8].SetCheck(FALSE);
+	}
+
+#ifdef USE_ENGRAVE
+	//if (pView && pView->m_pEngrave)
+	//	pView->m_pEngrave->SetUse340mm();	//_stSigInx::_Use340mm
+#endif
+
+}
+
+void CDlgInfo::OnChk23()
+{
+	if (myBtn[27].GetCheck())
+		pDoc->WorkingInfo.LastJob.bUse346mm = TRUE;
+	else
+		pDoc->WorkingInfo.LastJob.bUse346mm = FALSE;
+
+	CString sData = pDoc->WorkingInfo.LastJob.bUse346mm ? _T("1") : _T("0");
+	::WritePrivateProfileString(_T("Last Job"), _T("Use 346mm Roll"), sData, PATH_WORKING_INFO);
+
+	pView->MpeWrite(pView->Plc.DlgInfo.Laser346mm, pDoc->WorkingInfo.LastJob.bUse346mm ? 1 : 0);	// EPC실린더(제품소->OFF/제품대->ON)
+
+	if (pDoc->WorkingInfo.LastJob.bUse346mm)
+	{
+		pDoc->WorkingInfo.LastJob.bUse340mm = FALSE;
+		pView->MpeWrite(pView->Plc.DlgInfo.Laser340mm, 0);
+		if (pDoc->WorkingInfo.LastJob.bUse340mm)
+			myBtn[26].SetCheck(TRUE);
+		else
+			myBtn[26].SetCheck(FALSE);
+
+		pDoc->WorkingInfo.LastJob.bUse380mm = FALSE;
+		pView->MpeWrite(pView->Plc.DlgInfo.Laser380mm, 0);
+		if (pDoc->WorkingInfo.LastJob.bUse380mm)
+			myBtn[8].SetCheck(TRUE);
+		else
+			myBtn[8].SetCheck(FALSE);
+
+		//pDoc->WorkingInfo.LastJob.bUse346mm = FALSE;
+		//pView->MpeWrite(pView->Plc.DlgInfo.Laser346mm, 0);
+		//if (pDoc->WorkingInfo.LastJob.bUse346mm)
+		//	myBtn[27].SetCheck(TRUE);
+		//else
+		//	myBtn[27].SetCheck(FALSE);
+	}
+
+#ifdef USE_ENGRAVE
+	//if (pView && pView->m_pEngrave)
+	//	pView->m_pEngrave->SetUse347mm();	//_stSigInx::_Use346mm
 #endif
 
 }
@@ -1424,14 +1579,12 @@ int CDlgInfo::GetTestMode()
 
 void CDlgInfo::SetTestMode(int nMode)
 {
-	pDoc->WorkingInfo.LastJob.nTestMode = nMode; // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2 .
+	pDoc->SetTestMode(nMode);
 
 #ifdef USE_ENGRAVE
 	if (pView && pView->m_pEngrave)
 		pView->m_pEngrave->SetTestMode();	//_ItemInx::_TestMode
 #endif
-
-	pDoc->SetTestMode(nMode);
 
 	myBtn[23].RedrawWindow();
 	myBtn[24].RedrawWindow();
@@ -1456,12 +1609,14 @@ void CDlgInfo::SetDualTest(BOOL bOn)
 		sData = _T("6");
 		myBtn[12].SetCheck(TRUE); // 양면 검사
 		myBtn[13].SetCheck(FALSE); // 단면 검사
+		pView->SetTwoMetal(TRUE, TRUE); // (TwoMetal, On)
 	}
 	else
 	{
 		sData = _T("12");
 		myBtn[12].SetCheck(FALSE); // 양면 검사
 		myBtn[13].SetCheck(TRUE); // 단면 검사
+		pView->SetTwoMetal(FALSE, TRUE); // (OneMetal, On)
 	}
 	
 	myBtn[12].RedrawWindow();
@@ -1477,14 +1632,17 @@ void CDlgInfo::SetDualTest(BOOL bOn)
 #endif
 }
 
-void CDlgInfo::SetTwoMetal(BOOL bOn)
+void CDlgInfo::SetFeedDir(int nUnit)
 {
 	BOOL bChk[2];
-	bChk[0] = myBtn[15].GetCheck(); // IDC_CHK_ONE_METAL - Recoiler\r정방향 CW : FALSE
-	bChk[1] = myBtn[16].GetCheck(); // IDC_CHK_TWO_METAL - Uncoiler\r정방향 CW : FALSE
+	bChk[0] = myBtn[15].GetCheck(); // IDC_CHK_RECOILER_CCW - Recoiler\r정방향 CW : FALSE
+	bChk[1] = myBtn[16].GetCheck(); // IDC_CHK_UNCOILER_CCW - Uncoiler\r정방향 CW : FALSE
 
-	if(bOn)
+	if(nUnit == 1)
 	{
+		pView->SetFeedDir(nUnit, bChk[1]);
+		//pView->SetTwoMetal(bOn, bChk[1]); // (TwoMetal, On)
+
 		if(bChk[1])
 		{
 			myBtn[16].SetTextColor(RGB_DARKRED);
@@ -1497,7 +1655,6 @@ void CDlgInfo::SetTwoMetal(BOOL bOn)
 			myBtn[16].SetWindowText(_T("Uncoiler\r정방향"));
 			pDoc->SetMkInfo(_T("Signal"), _T("UncoilerCcw"), FALSE);
 		}
-		pView->SetTwoMetal(bOn, bChk[1]);
 #ifdef USE_ENGRAVE
 		if (pView && pView->m_pEngrave)
 			pView->m_pEngrave->SetUncoilerCcw();	//_stSigInx::_UncoilerCcw
@@ -1511,6 +1668,9 @@ void CDlgInfo::SetTwoMetal(BOOL bOn)
 	}
 	else
 	{
+		pView->SetFeedDir(nUnit, bChk[0]);
+		//pView->SetTwoMetal(bOn, bChk[0]); // (OneMetal, On)
+
 		if(bChk[0])
 		{
 			myBtn[15].SetTextColor(RGB_DARKRED);
@@ -1523,7 +1683,6 @@ void CDlgInfo::SetTwoMetal(BOOL bOn)
 			myBtn[15].SetWindowText(_T("Recoiler\r정방향"));
 			pDoc->SetMkInfo(_T("Signal"), _T("RecoilerCcw"), FALSE);
 		}
-		pView->SetTwoMetal(bOn, bChk[0]);
 #ifdef USE_ENGRAVE
 		if (pView && pView->m_pEngrave)
 			pView->m_pEngrave->SetRecoilerCcw();	//_stSigInx::_RecoilerCcw
@@ -1565,9 +1724,10 @@ void CDlgInfo::OnChkUseAoiInner()
 void CDlgInfo::OnChkUseAoiOuter() 
 {
 	// TODO: Add your control notification handler code here
-	BOOL bOn[2];
+	BOOL bOn[3] = { 0 };
 	bOn[0] = myBtn[23].GetCheck();
 	bOn[1] = myBtn[24].GetCheck();
+	bOn[2] = myBtn[25].GetCheck();
 	GetDlgItem(IDC_STC_181)->SetWindowText(_T(""));
 
 	if (bOn[0] && bOn[1])
@@ -1621,26 +1781,27 @@ void CDlgInfo::OnChkSampleTest()
 #endif
 }
 
-void CDlgInfo::OnChkOneMetal() 
+void CDlgInfo::OnChkRecoilerCcw()
 {
 	// TODO: Add your control notification handler code here
 	if (pView->IsAuto())
 		return;
 
-	SetTwoMetal(FALSE);
+	SetFeedDir(0); // SetFeedDir (0): Recoiler , (1): Uncoiler
+
 	BOOL bOn = myBtn[15].GetCheck();
 	//BOOL bOn = !pDoc->WorkingInfo.LastJob.bOneMetal;
 	if (bOn)
 	{
 		pDoc->WorkingInfo.LastJob.bOneMetal = TRUE;
 		pView->MpeWrite(pView->Plc.DlgInfo.OneMetal, 1);
-		::WritePrivateProfileString(_T("Last Job"), _T("One Metal On"), _T("1"), PATH_WORKING_INFO);// IDC_CHK_ONE_METAL - Recoiler\r정방향 CW : FALSE
+		::WritePrivateProfileString(_T("Last Job"), _T("One Metal On"), _T("1"), PATH_WORKING_INFO);// IDC_CHK_RECOILER_CCW - Recoiler\r정방향 CW : FALSE
 	}
 	else
 	{
 		pDoc->WorkingInfo.LastJob.bOneMetal = FALSE;
 		pView->MpeWrite(pView->Plc.DlgInfo.OneMetal, 0);
-		::WritePrivateProfileString(_T("Last Job"), _T("One Metal On"), _T("0"), PATH_WORKING_INFO);// IDC_CHK_ONE_METAL - Recoiler\r정방향 CW : FALSE
+		::WritePrivateProfileString(_T("Last Job"), _T("One Metal On"), _T("0"), PATH_WORKING_INFO);// IDC_CHK_RECOILER_CCW - Recoiler\r정방향 CW : FALSE
 	}
 	pDoc->SetMkInfo(_T("Signal"), _T("RecoilerCcw"), bOn);
 
@@ -1654,13 +1815,14 @@ void CDlgInfo::OnChkOneMetal()
 #endif
 }
 
-void CDlgInfo::OnChkTwoMetal() 
+void CDlgInfo::OnChkUncoilerCcw()
 {
 	// TODO: Add your control notification handler code here
 	if (pView->IsAuto())
 		return;
 
-	SetTwoMetal(TRUE);
+	SetFeedDir(1); // SetFeedDir (0): Recoiler , (1): Uncoiler
+
 	BOOL bOn = myBtn[16].GetCheck();
 	//BOOL bOn = !pDoc->WorkingInfo.LastJob.bTwoMetal;
 	if(bOn)
@@ -1994,4 +2156,26 @@ void CDlgInfo::OnBnClickedChkUseAoiMiddle()
 		SetTestMode(MODE_OUTER);
 	else
 		SetTestMode(MODE_NONE);
+}
+
+
+void CDlgInfo::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	if (nIDEvent == TIM_DISP_STS)
+	{
+		KillTimer(TIM_DISP_STS);
+		if (this->IsWindowVisible())
+		{
+			m_bTIM_DISP_STS = FALSE;
+		}
+		else
+		{
+			this->ShowWindow(SW_SHOW);
+		}
+		if (m_bTIM_DISP_STS)
+			SetTimer(TIM_DISP_STS, 100, NULL);
+	}
+
+	CDialog::OnTimer(nIDEvent);
 }

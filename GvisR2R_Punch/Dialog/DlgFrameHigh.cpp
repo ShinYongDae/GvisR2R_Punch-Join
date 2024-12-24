@@ -329,37 +329,37 @@ void CDlgFrameHigh::InitPic()
 
 void CDlgFrameHigh::InitBtn()
 {
-	myChkMenu01.SetFont(_T("±¼¸²Ã¼"),16,TRUE);
+	myChkMenu01.SetFont(_T("±¼¸²Ã¼"),14,TRUE);
 	myChkMenu01.SetTextColor(RGB_BLACK);
 	myChkMenu01.SubclassDlgItem(IDC_CHK_MENU_01, this);
 	myChkMenu01.SetHwnd(this->GetSafeHwnd(), IDC_CHK_MENU_01);
 	//myChkMenu01.SetBtnType(BTN_TYPE_CHECK);
 
-	myChkMenu02.SetFont(_T("±¼¸²Ã¼"),16,TRUE);
+	myChkMenu02.SetFont(_T("±¼¸²Ã¼"),14,TRUE);
 	myChkMenu02.SetTextColor(RGB_BLACK);
 	myChkMenu02.SubclassDlgItem(IDC_CHK_MENU_02, this);
 	myChkMenu02.SetHwnd(this->GetSafeHwnd(), IDC_CHK_MENU_02);
 	//myChkMenu02.SetBtnType(BTN_TYPE_CHECK);
 
-	myChkMenu03.SetFont(_T("±¼¸²Ã¼"),16,TRUE);
+	myChkMenu03.SetFont(_T("±¼¸²Ã¼"),14,TRUE);
 	myChkMenu03.SetTextColor(RGB_BLACK);
 	myChkMenu03.SubclassDlgItem(IDC_CHK_MENU_03, this);
 	myChkMenu03.SetHwnd(this->GetSafeHwnd(), IDC_CHK_MENU_03);
 	//myChkMenu03.SetBtnType(BTN_TYPE_CHECK);
 
-	myChkMenu04.SetFont(_T("±¼¸²Ã¼"),16,TRUE);
+	myChkMenu04.SetFont(_T("±¼¸²Ã¼"),14,TRUE);
 	myChkMenu04.SetTextColor(RGB_BLACK);
 	myChkMenu04.SubclassDlgItem(IDC_CHK_MENU_04, this);
 	myChkMenu04.SetHwnd(this->GetSafeHwnd(), IDC_CHK_MENU_04);
 	//myChkMenu04.SetBtnType(BTN_TYPE_CHECK);
 
-	myChkMenu05.SetFont(_T("±¼¸²Ã¼"),16,TRUE);
+	myChkMenu05.SetFont(_T("±¼¸²Ã¼"),14,TRUE);
 	myChkMenu05.SetTextColor(RGB_BLACK);
 	myChkMenu05.SubclassDlgItem(IDC_CHK_MENU_05, this);
 	myChkMenu05.SetHwnd(this->GetSafeHwnd(), IDC_CHK_MENU_05);
 	//myChkMenu05.SetBtnType(BTN_TYPE_CHECK);
 
-	myChkMenu06.SetFont(_T("±¼¸²Ã¼"), 16, TRUE);
+	myChkMenu06.SetFont(_T("±¼¸²Ã¼"), 14, TRUE);
 	myChkMenu06.SetTextColor(RGB_BLACK);
 	myChkMenu06.SubclassDlgItem(IDC_CHK_MENU_06, this);
 	myChkMenu06.SetHwnd(this->GetSafeHwnd(), IDC_CHK_MENU_06);
@@ -532,7 +532,7 @@ void CDlgFrameHigh::OnTimer(UINT_PTR nIDEvent)//(UINT nIDEvent)
 void CDlgFrameHigh::ChkFdEnc()
 {
 // 	double dLimit = (double)MAX_ENC_CNT / 2.0;
-// 	double dCurPosMkFd = (double)pDoc->m_pMpeData[0][0];	// ¸¶Å·ºÎ Feeding ¿£ÄÚ´õ °ª(´ÜÀ§ mm )
+// 	double dCurPosMkFd = (double)pDoc->m_pMpeData[2][2];	// ¸¶Å·ºÎ Feeding ¿£ÄÚ´õ °ª(´ÜÀ§ mm )
 // 	if(dCurPosMkFd > dLimit || dCurPosMkFd < - dLimit)
 // 	{
 // 		if(pView->m_pMotion)
@@ -552,9 +552,9 @@ void CDlgFrameHigh::DispFdCnt()
 		return;
 
 	CString str;
-	int nFeedCntEng = (int)pDoc->m_pMpeData[1][4];	// °¢ÀÎºÎ Feeding È½¼ö
-	int nFeedCntAoi = (int)pDoc->m_pMpeData[1][5];	// °Ë»çºÎ Feeding È½¼ö
-	int nFeedCntMk = (int)pDoc->m_pMpeData[1][6];	// ¸¶Å·ºÎ Feeding È½¼ö
+	int nFeedCntEng = (int)pDoc->m_pMpeData[2][3];	// °¢ÀÎºÎ Feeding È½¼ö
+	int nFeedCntAoi = (int)pDoc->m_pMpeData[2][4];	// °Ë»çºÎ Feeding È½¼ö
+	int nFeedCntMk = (int)pDoc->m_pMpeData[2][5];	// ¸¶Å·ºÎ Feeding È½¼ö
 
 	//str.Format(_T("%d,%d,%d"), nFeedCntMk, nFeedCntAoi, nFeedCntEng);
 	str.Format(_T("%d"), nFeedCntAoi);
@@ -612,7 +612,7 @@ void CDlgFrameHigh::DispSigAoi()
 		return;
 
 	BOOL bOn;
-	CString sName = pView->GetCurrentDBName();
+	//CString sName = pView->GetCurrentDBName();
 
 	// IDC_STC_SIG01
 	bOn = (pDoc->m_nAoiCamInfoStrPcs[0] == 1) ? TRUE : FALSE; // AOI»ó strpcs.bin ¿¬°á

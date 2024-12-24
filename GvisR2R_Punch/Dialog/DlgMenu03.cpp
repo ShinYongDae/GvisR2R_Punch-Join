@@ -33,11 +33,11 @@ CDlgMenu03::CDlgMenu03(CWnd* pParent /*=NULL*/)
 	m_pRect = NULL;
 	m_bLoadImg = FALSE;
 	m_bTIM_MENU03_DISP = FALSE;
-	m_bTIM_CHK_DONE_MK = FALSE;
-	m_bTIM_CHK_DONE_AOI = FALSE;
-	m_bTIM_CHK_DONE_MKAOI = FALSE;
-	m_bTIM_CHK_DONE_BUF_HOME = FALSE;
-	m_bTIM_CHK_DONE_BUF_INIT = FALSE;
+	//m_bTIM_CHK_DONE_MK = FALSE;
+	//m_bTIM_CHK_DONE_AOI = FALSE;
+	//m_bTIM_CHK_DONE_MKAOI = FALSE;
+	//m_bTIM_CHK_DONE_BUF_HOME = FALSE;
+	//m_bTIM_CHK_DONE_BUF_INIT = FALSE;
 	m_bTIM_CHK_DONE_READY = FALSE;
 	m_bTIM_SET_RC_RELATION = FALSE;
 	m_bTIM_SW_RC_RELATION = FALSE;
@@ -54,29 +54,29 @@ CDlgMenu03::CDlgMenu03(CWnd* pParent /*=NULL*/)
 	m_bVMoveMkFdVac = FALSE;
 	m_bVMoveAoiFdVac = FALSE;
 
-	m_bTIM_CHK_DONE_ENGRAVE = FALSE;
+	//m_bTIM_CHK_DONE_ENGRAVE = FALSE;
 
-	m_bTIM_CHK_DONE_ENG_BUF_HOME = FALSE;
-	m_bTIM_CHK_DONE_ENG_BUF_INIT = FALSE;
+	//m_bTIM_CHK_DONE_ENG_BUF_HOME = FALSE;
+	//m_bTIM_CHK_DONE_ENG_BUF_INIT = FALSE;
 }
 
 CDlgMenu03::~CDlgMenu03()
 {
 	m_bTIM_MENU03_DISP = FALSE;
-	m_bTIM_CHK_DONE_MK = FALSE;
-	m_bTIM_CHK_DONE_AOI = FALSE;
-	m_bTIM_CHK_DONE_MKAOI = FALSE;
-	m_bTIM_CHK_DONE_BUF_HOME = FALSE;
-	m_bTIM_CHK_DONE_BUF_INIT = FALSE;
+	//m_bTIM_CHK_DONE_MK = FALSE;
+	//m_bTIM_CHK_DONE_AOI = FALSE;
+	//m_bTIM_CHK_DONE_MKAOI = FALSE;
+	//m_bTIM_CHK_DONE_BUF_HOME = FALSE;
+	//m_bTIM_CHK_DONE_BUF_INIT = FALSE;
 	m_bTIM_CHK_DONE_READY = FALSE;
 	m_bTIM_SET_RC_RELATION = FALSE;
 	m_bTIM_SW_RC_RELATION = FALSE;
 	m_bTIM_SW_UC_RELATION = FALSE;
 
-	m_bTIM_CHK_DONE_ENGRAVE = FALSE;
+	//m_bTIM_CHK_DONE_ENGRAVE = FALSE;
 
-	m_bTIM_CHK_DONE_ENG_BUF_HOME = FALSE;
-	m_bTIM_CHK_DONE_ENG_BUF_INIT = FALSE;
+	//m_bTIM_CHK_DONE_ENG_BUF_HOME = FALSE;
+	//m_bTIM_CHK_DONE_ENG_BUF_INIT = FALSE;
 
 	DelImg();
 	if(m_pRect)
@@ -175,14 +175,16 @@ void CDlgMenu03::LoadImg()
 		switch (i)
 		{
 		case 0:		// Run-Main
-			myBtn[i].LoadBkImage(IMG_CIR_GRN_OFF_DlgMenu03, BTN_IMG_UP);
+			myBtn[i].LoadBkImage(IMG_CIR_GRY_OFF_DlgMenu03, BTN_IMG_UP);
+			//myBtn[i].LoadBkImage(IMG_CIR_GRN_OFF_DlgMenu03, BTN_IMG_UP);
 			myBtn[i].LoadBkImage(IMG_CIR_GRN_ON_DlgMenu03, BTN_IMG_DN);
 			break;
 		case 33:	// Stop-Main
 		case 2:		// 340mm-레이저
 		case 3:		// 346mm-레이저
 		case 83:	// 380mm-레이저
-			myBtn[i].LoadBkImage(IMG_CIR_RED_OFF_DlgMenu03, BTN_IMG_UP);
+			myBtn[i].LoadBkImage(IMG_CIR_GRY_OFF_DlgMenu03, BTN_IMG_UP);
+			//myBtn[i].LoadBkImage(IMG_CIR_RED_OFF_DlgMenu03, BTN_IMG_UP);
 			myBtn[i].LoadBkImage(IMG_CIR_RED_ON_DlgMenu03, BTN_IMG_DN);
 			break;
 
@@ -201,18 +203,19 @@ void CDlgMenu03::LoadImg()
 		case 81:	// 테이블 실린터-Engraving
 		case 79:	// 테이블 진공-Engraving
 		case 80:	// 테이블 블로어-Engraving
-			myBtn[i].LoadBkImage(IMG_CIR_BLUE_OFF_DlgMenu03, BTN_IMG_UP);
+			myBtn[i].LoadBkImage(IMG_CIR_GRY_OFF_DlgMenu03, BTN_IMG_UP);
+			//myBtn[i].LoadBkImage(IMG_CIR_BLUE_OFF_DlgMenu03, BTN_IMG_UP);
 			myBtn[i].LoadBkImage(IMG_CIR_BLUE_ON_DlgMenu03, BTN_IMG_DN);
 			break;
 
 		case 1:		// Reset-Main
-		case 12:	// 피딩 HOME-Punching
+		//case 12:	// 피딩 HOME-Punching
 		case 13:	// 피딩 진공-Punching
-		case 20:	// 피딩 HOME-AOI상
+		//case 20:	// 피딩 HOME-AOI상
 		case 21:	// 피딩 진공-AOI상
-		case 58:	// 피딩 HOME-AOI하
+		//case 58:	// 피딩 HOME-AOI하
 		case 59:	// 피딩 진공-AOI하
-		case 75:	// 피딩 HOME-Engraving
+		//case 75:	// 피딩 HOME-Engraving
 		case 76:	// 피딩 진공-Engraving
 		case 48:	// 마킹시작-Punching
 		case 98:	// 검사시작-AOI하
@@ -220,11 +223,13 @@ void CDlgMenu03::LoadImg()
 		case 111:	// 정렬시작-Engraving
 		case 112:	// 각인시작-Engraving
 		case 113:	// 리딩시작-Engraving
-			myBtn[i].LoadBkImage(IMG_CIR_YLO_OFF_DlgMenu03, BTN_IMG_UP);
+			myBtn[i].LoadBkImage(IMG_CIR_GRY_OFF_DlgMenu03, BTN_IMG_UP);
+			//myBtn[i].LoadBkImage(IMG_CIR_YLO_OFF_DlgMenu03, BTN_IMG_UP);
 			myBtn[i].LoadBkImage(IMG_CIR_YLO_ON_DlgMenu03, BTN_IMG_DN);
 			break;
 		case 47:	// 연동선택-운전모드
 			myBtn[i].LoadBkImage(IMG_CIR_GRY_OFF_DlgMenu03, BTN_IMG_UP);
+			//myBtn[i].LoadBkImage(IMG_CIR_GRY_OFF_DlgMenu03, BTN_IMG_UP);
 			myBtn[i].LoadBkImage(IMG_CIR_GRY_ON_DlgMenu03, BTN_IMG_DN);
 			break;
 
@@ -258,24 +263,25 @@ void CDlgMenu03::LoadImg()
 		case 70:	// 전체 상승/하강-댄서롤/버퍼롤
 		case 71:	// 전체 고정 On/Off-댄서롤/버퍼롤
 
-		case 39:	// 댄서롤 고정-Uncoiler
-		case 38:	// 댄서롤 상승-Uncoiler
-		case 66:	// 댄서롤 상승-Recoiler
-		case 67:	// 댄서롤 고정-Recoiler
+		//case 39:	// 댄서롤 고정-Uncoiler
+		//case 38:	// 댄서롤 상승-Uncoiler
+		//case 66:	// 댄서롤 상승-Recoiler
+		//case 67:	// 댄서롤 고정-Recoiler
 
 		case 99:	// 버퍼롤러 상승-AOI하
 		case 100:	// 버퍼롤러 고정-AOI하
-		case 109:	// 버퍼롤 상승-Engraving
-		case 110:	// 버퍼롤 고정-Engraving
+		//case 109:	// 버퍼롤 상승-Engraving
+		//case 110:	// 버퍼롤 고정-Engraving
 
 		case 65:	// 클린롤러 상부-AOI하
 		case 86:	// 클린롤러 하부-AOI하
 		case 97:	// 클린롤러 누름-AOI하
-		case 50:	// 클린롤러 상부-AOI상
+		//case 50:	// 클린롤러 상부-AOI상
 		case 102:	// 클린롤러 하부-AOI상
 		case 103:	// 클린롤러 누름-AOI상
 
-			myBtn[i].LoadBkImage(IMG_CIR_GRN_OFF_DlgMenu03, BTN_IMG_UP);
+			myBtn[i].LoadBkImage(IMG_CIR_GRY_OFF_DlgMenu03, BTN_IMG_UP);
+			//myBtn[i].LoadBkImage(IMG_CIR_GRN_OFF_DlgMenu03, BTN_IMG_UP);
 			myBtn[i].LoadBkImage(IMG_CIR_GRN_ON_DlgMenu03, BTN_IMG_DN);
 			break;
 
@@ -285,7 +291,7 @@ void CDlgMenu03::LoadImg()
 		case 5:		// 이음매 클램프-Recoiler
 		case 14:	// 피딩 클램프-Punching
 		case 15:	// 텐션 클램프-Punching
-		case 95:	// 테이블 클램프 전진-Punching
+		//case 95:	// 테이블 클램프 전진-Punching
 		case 49:	// 테이블 클램프 하강-Punching
 		case 60:	// 피딩 클램프-AOI하
 		case 61:	// 텐션 클램프-AOI하
@@ -295,7 +301,8 @@ void CDlgMenu03::LoadImg()
 		case 78:	// 텐션 클램프-Engraving
 		case 25:	// 제품척 클램프-Uncoiler
 		case 40:	// 간지척 클램프-Uncoiler
-			myBtn[i].LoadBkImage(IMG_CIR_DGN_OFF_DlgMenu03, BTN_IMG_UP);
+			myBtn[i].LoadBkImage(IMG_CIR_GRY_OFF_DlgMenu03, BTN_IMG_UP);
+			//myBtn[i].LoadBkImage(IMG_CIR_DGN_OFF_DlgMenu03, BTN_IMG_UP);
 			myBtn[i].LoadBkImage(IMG_CIR_DGN_ON_DlgMenu03, BTN_IMG_DN);
 			break;
 
@@ -324,26 +331,31 @@ void CDlgMenu03::LoadImg()
 		case 82:	// 초음파 세정기 하강-Engraving
 		case 85:	// 초음파 세정기 운전-Engrave
 		case 108:	// 초음파 세정기 속도-Engraving
-			myBtn[i].LoadBkImage(IMG_CIR_PNK_OFF_DlgMenu03, BTN_IMG_UP);
+			myBtn[i].LoadBkImage(IMG_CIR_GRY_OFF_DlgMenu03, BTN_IMG_UP);
+			//myBtn[i].LoadBkImage(IMG_CIR_PNK_OFF_DlgMenu03, BTN_IMG_UP);
 			myBtn[i].LoadBkImage(IMG_CIR_PNK_ON_DlgMenu03, BTN_IMG_DN);
 			break;
 
 		case 87:	// 한판넬이송-운전모드
-			myBtn[i].LoadBkImage(IMG_CIR_ORG_OFF_DlgMenu03, BTN_IMG_UP);
+			myBtn[i].LoadBkImage(IMG_CIR_GRY_OFF_DlgMenu03, BTN_IMG_UP);
+			//myBtn[i].LoadBkImage(IMG_CIR_ORG_OFF_DlgMenu03, BTN_IMG_UP);
 			myBtn[i].LoadBkImage(IMG_CIR_RED_ON_DlgMenu03, BTN_IMG_DN);
 			break;
 
 		case 68:	// Recoiler-정방향-회전방향
 		case 69:	// Uncoiler-정방향-회전방향	
-			myBtn[i].LoadBkImage(IMG_CIR_BLUE_OFF_DlgMenu03, BTN_IMG_UP);
+			myBtn[i].LoadBkImage(IMG_CIR_GRY_OFF_DlgMenu03, BTN_IMG_UP);
+			//myBtn[i].LoadBkImage(IMG_CIR_BLUE_OFF_DlgMenu03, BTN_IMG_UP);
 			myBtn[i].LoadBkImage(IMG_CIR_RED_ON_DlgMenu03, BTN_IMG_DN);
 			break;
 		}
 	}
 
-	myStcTitle[33].LoadBkImage(IMG_CIR_BLU_OFF_DlgMenu03, LBL_IMG_UP);
+	myStcTitle[33].LoadBkImage(IMG_CIR_GRY_OFF_DlgMenu03, LBL_IMG_UP);
+	//myStcTitle[33].LoadBkImage(IMG_CIR_BLU_OFF_DlgMenu03, LBL_IMG_UP);
 	myStcTitle[33].LoadBkImage(IMG_CIR_BLU_ON_DlgMenu03, LBL_IMG_DN);
-	myStcTitle[35].LoadBkImage(IMG_CIR_BLU_OFF_DlgMenu03, LBL_IMG_UP);
+	myStcTitle[35].LoadBkImage(IMG_CIR_GRY_OFF_DlgMenu03, LBL_IMG_UP);
+	//myStcTitle[35].LoadBkImage(IMG_CIR_BLU_OFF_DlgMenu03, LBL_IMG_UP);
 	myStcTitle[35].LoadBkImage(IMG_CIR_BLU_ON_DlgMenu03, LBL_IMG_DN);
 }
 
@@ -377,8 +389,57 @@ BOOL CDlgMenu03::OnInitDialog()
 	InitGroup();
 	InitLabel();
 
+	//GetDlgItem(IDC_STC_12_55)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_CHK_66)->ShowWindow(SW_HIDE);
+
+	//GetDlgItem(IDC_STC_12_56)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_CHK_67)->ShowWindow(SW_HIDE);
+
+	//GetDlgItem(IDC_STC_12_8)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_CHK_12)->ShowWindow(SW_HIDE);
+
+	//GetDlgItem(IDC_STC_000_15)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_CHK_118)->ShowWindow(SW_HIDE);
+
+	//GetDlgItem(IDC_STC_12_48)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_CHK_58)->ShowWindow(SW_HIDE);
+
+	//GetDlgItem(IDC_STC_12_52)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_CHK_63)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_CHK_50)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_CHK_20)->ShowWindow(SW_HIDE);
+
+	//GetDlgItem(IDC_STC_12_60)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_CHK_75)->ShowWindow(SW_HIDE);
+
+	//GetDlgItem(IDC_STC_12_74)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_CHK_98)->ShowWindow(SW_HIDE);
+
+	//GetDlgItem(IDC_STC_12_75)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_CHK_99)->ShowWindow(SW_HIDE);
+
+	//GetDlgItem(IDC_STC_12_21)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_CHK_29)->ShowWindow(SW_HIDE);
+
+	//GetDlgItem(IDC_STC_12_27)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_CHK_36)->ShowWindow(SW_HIDE);
+
+#ifndef TEST_MODE
+
+	if (pDoc->m_pMpeSignal)
+	{
+		if (pDoc->m_pMpeSignal[0] & (0x01 << 3))	// PLC 운전준비 완료(PC가 확인하고 Reset시킴.)
+		{
+			m_bTIM_CHK_DONE_READY = FALSE;
+			pView->m_bReadyDone = TRUE; pDoc->SetStatus(_T("General"), _T("bReadyDone"), pView->m_bReadyDone);
+			//pView->MpeWrite(pView->Plc.DlgMenu01.PlcReadyDone, 0);	// PLC 운전준비 완료(PC가 확인하고 Reset시킴.)MB440100
+		}
+	}
+
+#endif
+
 	m_bTIM_MENU03_DISP = TRUE;
-	SetTimer(TIM_MENU03_DISP, 300, NULL);	// Disp();
+	SetTimer(TIM_MENU03_DISP, 500, NULL);	// Disp();
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 }
@@ -562,15 +623,15 @@ void CDlgMenu03::InitBtn()
 	myBtn[46].SetBoarder(FALSE);
 	myBtn[46].SetBtnType(BTN_TYPE_DEFAULT);
 
-	myBtn[66].SubclassDlgItem(IDC_CHK_66, this);		// 댄서롤 상승
-	myBtn[66].SetHwnd(this->GetSafeHwnd(), IDC_CHK_66);
-	myBtn[66].SetBoarder(FALSE);
-	myBtn[66].SetBtnType(BTN_TYPE_CHECK);
+	//myBtn[66].SubclassDlgItem(IDC_CHK_66, this);		// 댄서롤 상승
+	//myBtn[66].SetHwnd(this->GetSafeHwnd(), IDC_CHK_66);
+	//myBtn[66].SetBoarder(FALSE);
+	//myBtn[66].SetBtnType(BTN_TYPE_CHECK);
 
-	myBtn[67].SubclassDlgItem(IDC_CHK_67, this);		// 댄서롤 고정
-	myBtn[67].SetHwnd(this->GetSafeHwnd(), IDC_CHK_67);
-	myBtn[67].SetBoarder(FALSE);
-	myBtn[67].SetBtnType(BTN_TYPE_CHECK);
+	//myBtn[67].SubclassDlgItem(IDC_CHK_67, this);		// 댄서롤 고정
+	//myBtn[67].SetHwnd(this->GetSafeHwnd(), IDC_CHK_67);
+	//myBtn[67].SetBoarder(FALSE);
+	//myBtn[67].SetBtnType(BTN_TYPE_CHECK);
 
 	myBtn[89].SubclassDlgItem(IDC_CHK_121, this);		// EPC 자동
 	myBtn[89].SetHwnd(this->GetSafeHwnd(), IDC_CHK_121);
@@ -619,10 +680,10 @@ void CDlgMenu03::InitBtn()
 	myBtn[11].SetBoarder(FALSE);
 	myBtn[11].SetBtnType(BTN_TYPE_CHECK);
 
-	myBtn[12].SubclassDlgItem(IDC_CHK_12, this);		// 피딩 HOME
-	myBtn[12].SetHwnd(this->GetSafeHwnd(), IDC_CHK_12);
-	myBtn[12].SetBoarder(FALSE);
-	myBtn[12].SetBtnType(BTN_TYPE_CHECK);
+	//myBtn[12].SubclassDlgItem(IDC_CHK_12, this);		// 피딩 HOME
+	//myBtn[12].SetHwnd(this->GetSafeHwnd(), IDC_CHK_12);
+	//myBtn[12].SetBoarder(FALSE);
+	//myBtn[12].SetBtnType(BTN_TYPE_CHECK);
 
 	myBtn[13].SubclassDlgItem(IDC_CHK_13, this);		// 피딩 진공
 	myBtn[13].SetHwnd(this->GetSafeHwnd(), IDC_CHK_13);
@@ -659,10 +720,10 @@ void CDlgMenu03::InitBtn()
 	myBtn[49].SetBoarder(FALSE);
 	myBtn[49].SetBtnType(BTN_TYPE_CHECK);
 
-	myBtn[95].SubclassDlgItem(IDC_CHK_118, this);		// 테이블 클램프 전진
-	myBtn[95].SetHwnd(this->GetSafeHwnd(), IDC_CHK_118);
-	myBtn[95].SetBoarder(FALSE);
-	myBtn[95].SetBtnType(BTN_TYPE_CHECK);
+	//myBtn[95].SubclassDlgItem(IDC_CHK_118, this);		// 테이블 클램프 전진
+	//myBtn[95].SetHwnd(this->GetSafeHwnd(), IDC_CHK_118);
+	//myBtn[95].SetBoarder(FALSE);
+	//myBtn[95].SetBtnType(BTN_TYPE_CHECK);
 
 	myBtn[48].SubclassDlgItem(IDC_CHK_48, this);		// 마킹 시작
 	myBtn[48].SetHwnd(this->GetSafeHwnd(), IDC_CHK_48);
@@ -690,10 +751,10 @@ void CDlgMenu03::InitBtn()
 	myBtn[57].SetBoarder(FALSE);
 	myBtn[57].SetBtnType(BTN_TYPE_CHECK);
 
-	myBtn[58].SubclassDlgItem(IDC_CHK_58, this);		// 피딩 HOME
-	myBtn[58].SetHwnd(this->GetSafeHwnd(), IDC_CHK_58);
-	myBtn[58].SetBoarder(FALSE);
-	myBtn[58].SetBtnType(BTN_TYPE_CHECK);
+	//myBtn[58].SubclassDlgItem(IDC_CHK_58, this);		// 피딩 HOME
+	//myBtn[58].SetHwnd(this->GetSafeHwnd(), IDC_CHK_58);
+	//myBtn[58].SetBoarder(FALSE);
+	//myBtn[58].SetBtnType(BTN_TYPE_CHECK);
 
 	myBtn[59].SubclassDlgItem(IDC_CHK_59, this);		// 피딩 진공
 	myBtn[59].SetHwnd(this->GetSafeHwnd(), IDC_CHK_59);
@@ -777,10 +838,10 @@ void CDlgMenu03::InitBtn()
 	myBtn[19].SetBoarder(FALSE);
 	myBtn[19].SetBtnType(BTN_TYPE_CHECK);
 
-	myBtn[20].SubclassDlgItem(IDC_CHK_20, this);		// 피딩 HOME
-	myBtn[20].SetHwnd(this->GetSafeHwnd(), IDC_CHK_20);
-	myBtn[20].SetBoarder(FALSE);
-	myBtn[20].SetBtnType(BTN_TYPE_CHECK);
+	//myBtn[20].SubclassDlgItem(IDC_CHK_20, this);		// 피딩 HOME
+	//myBtn[20].SetHwnd(this->GetSafeHwnd(), IDC_CHK_20);
+	//myBtn[20].SetBoarder(FALSE);
+	//myBtn[20].SetBtnType(BTN_TYPE_CHECK);
 
 	myBtn[21].SubclassDlgItem(IDC_CHK_21, this);		// 피딩 진공
 	myBtn[21].SetHwnd(this->GetSafeHwnd(), IDC_CHK_21);
@@ -812,10 +873,10 @@ void CDlgMenu03::InitBtn()
 	myBtn[24].SetBoarder(FALSE);
 	myBtn[24].SetBtnType(BTN_TYPE_CHECK);
 
-	myBtn[50].SubclassDlgItem(IDC_CHK_50, this);		// 클린롤러 상부
-	myBtn[50].SetHwnd(this->GetSafeHwnd(), IDC_CHK_50);
-	myBtn[50].SetBoarder(FALSE);
-	myBtn[50].SetBtnType(BTN_TYPE_CHECK);
+	//myBtn[50].SubclassDlgItem(IDC_CHK_50, this);		// 클린롤러 상부
+	//myBtn[50].SetHwnd(this->GetSafeHwnd(), IDC_CHK_50);
+	//myBtn[50].SetBoarder(FALSE);
+	//myBtn[50].SetBtnType(BTN_TYPE_CHECK);
 
 	myBtn[102].SubclassDlgItem(IDC_CHK_104, this);		// 클린롤러 하부
 	myBtn[102].SetHwnd(this->GetSafeHwnd(), IDC_CHK_104);
@@ -868,10 +929,10 @@ void CDlgMenu03::InitBtn()
 	myBtn[74].SetBoarder(FALSE);
 	myBtn[74].SetBtnType(BTN_TYPE_CHECK);
 
-	myBtn[75].SubclassDlgItem(IDC_CHK_75, this);		// 피딩 HOME
-	myBtn[75].SetHwnd(this->GetSafeHwnd(), IDC_CHK_75);
-	myBtn[75].SetBoarder(FALSE);
-	myBtn[75].SetBtnType(BTN_TYPE_CHECK);
+	//myBtn[75].SubclassDlgItem(IDC_CHK_75, this);		// 피딩 HOME
+	//myBtn[75].SetHwnd(this->GetSafeHwnd(), IDC_CHK_75);
+	//myBtn[75].SetBoarder(FALSE);
+	//myBtn[75].SetBtnType(BTN_TYPE_CHECK);
 
 	myBtn[76].SubclassDlgItem(IDC_CHK_76, this);		// 피딩 진공
 	myBtn[76].SetHwnd(this->GetSafeHwnd(), IDC_CHK_76);
@@ -918,15 +979,15 @@ void CDlgMenu03::InitBtn()
 	myBtn[108].SetBoarder(FALSE);
 	myBtn[108].SetBtnType(BTN_TYPE_CHECK);
 
-	myBtn[109].SubclassDlgItem(IDC_CHK_98, this);		// 버퍼롤러 상승 - 각인부
-	myBtn[109].SetHwnd(this->GetSafeHwnd(), IDC_CHK_98);
-	myBtn[109].SetBoarder(FALSE);
-	myBtn[109].SetBtnType(BTN_TYPE_CHECK);
+	//myBtn[109].SubclassDlgItem(IDC_CHK_98, this);		// 버퍼롤러 상승 - 각인부
+	//myBtn[109].SetHwnd(this->GetSafeHwnd(), IDC_CHK_98);
+	//myBtn[109].SetBoarder(FALSE);
+	//myBtn[109].SetBtnType(BTN_TYPE_CHECK);
 
-	myBtn[110].SubclassDlgItem(IDC_CHK_99, this);		// 버퍼롤러 고정 - 각인부
-	myBtn[110].SetHwnd(this->GetSafeHwnd(), IDC_CHK_99);
-	myBtn[110].SetBoarder(FALSE);
-	myBtn[110].SetBtnType(BTN_TYPE_CHECK);
+	//myBtn[110].SubclassDlgItem(IDC_CHK_99, this);		// 버퍼롤러 고정 - 각인부
+	//myBtn[110].SetHwnd(this->GetSafeHwnd(), IDC_CHK_99);
+	//myBtn[110].SetBoarder(FALSE);
+	//myBtn[110].SetBtnType(BTN_TYPE_CHECK);
 
 	myBtn[111].SubclassDlgItem(IDC_CHK_100, this);		// 정렬시작 - 각인부
 	myBtn[111].SetHwnd(this->GetSafeHwnd(), IDC_CHK_100);
@@ -1004,15 +1065,15 @@ void CDlgMenu03::InitBtn()
 	myBtn[36].SetBoarder(FALSE);
 	myBtn[36].SetBtnType(BTN_TYPE_CHECK);
 
-	myBtn[38].SubclassDlgItem(IDC_CHK_29, this);		// 댄서롤 상승
-	myBtn[38].SetHwnd(this->GetSafeHwnd(), IDC_CHK_29);
-	myBtn[38].SetBoarder(FALSE);
-	myBtn[38].SetBtnType(BTN_TYPE_CHECK);
+	//myBtn[38].SubclassDlgItem(IDC_CHK_29, this);		// 댄서롤 상승
+	//myBtn[38].SetHwnd(this->GetSafeHwnd(), IDC_CHK_29);
+	//myBtn[38].SetBoarder(FALSE);
+	//myBtn[38].SetBtnType(BTN_TYPE_CHECK);
 
-	myBtn[39].SubclassDlgItem(IDC_CHK_36, this);		// 댄서롤 고정
-	myBtn[39].SetHwnd(this->GetSafeHwnd(), IDC_CHK_36);
-	myBtn[39].SetBoarder(FALSE);
-	myBtn[39].SetBtnType(BTN_TYPE_CHECK);
+	//myBtn[39].SubclassDlgItem(IDC_CHK_36, this);		// 댄서롤 고정
+	//myBtn[39].SetHwnd(this->GetSafeHwnd(), IDC_CHK_36);
+	//myBtn[39].SetBoarder(FALSE);
+	//myBtn[39].SetBtnType(BTN_TYPE_CHECK);
 
 	myBtn[114].SubclassDlgItem(IDC_CHK_89, this);		// EPC 자동
 	myBtn[114].SetHwnd(this->GetSafeHwnd(), IDC_CHK_89);
@@ -1109,8 +1170,8 @@ void CDlgMenu03::InitStatic()
 	myStcTitle[50].SubclassDlgItem(IDC_STC_12_36, this);	// 제품인버터 역방향
 	myStcTitle[51].SubclassDlgItem(IDC_STC_12_35, this);	// 간지인버터 정방향
 	myStcTitle[52].SubclassDlgItem(IDC_STC_12_37, this);	// 간지인버터 역방향
-	myStcTitle[72].SubclassDlgItem(IDC_STC_12_55, this);	// 댄서롤 상승
-	myStcTitle[73].SubclassDlgItem(IDC_STC_12_56, this);	// 댄서롤 고정
+	//myStcTitle[72].SubclassDlgItem(IDC_STC_12_55, this);	// 댄서롤 상승
+	//myStcTitle[73].SubclassDlgItem(IDC_STC_12_56, this);	// 댄서롤 고정
 	myStcTitle[53].SubclassDlgItem(IDC_STC_12_93, this);	// EPC 자동
 	myStcTitle[93].SubclassDlgItem(IDC_STC_12_94, this);	// EPC 수동
 	myStcTitle[94].SubclassDlgItem(IDC_STC_12_95, this);	// EPC In
@@ -1122,7 +1183,7 @@ void CDlgMenu03::InitStatic()
 	myStcTitle[97].SubclassDlgItem(IDC_STC_12_89, this);	// 피딩 역회전
 	myStcTitle[10].SubclassDlgItem(IDC_STC_12_6, this);		// 텐션 정방향
 	myStcTitle[11].SubclassDlgItem(IDC_STC_12_5, this);		// 텐션 역방향
-	myStcTitle[12].SubclassDlgItem(IDC_STC_12_8, this);		// 피딩 HOME
+	//myStcTitle[12].SubclassDlgItem(IDC_STC_12_8, this);		// 피딩 HOME
 	myStcTitle[13].SubclassDlgItem(IDC_STC_12_7, this);		// 피딩 진공
 	myStcTitle[14].SubclassDlgItem(IDC_STC_12_10, this);	// 피딩 클램프
 	myStcTitle[15].SubclassDlgItem(IDC_STC_12_9, this);		// 텐션 클램프
@@ -1130,7 +1191,7 @@ void CDlgMenu03::InitStatic()
 	myStcTitle[58].SubclassDlgItem(IDC_STC_12_41, this);	// 테이블 블로어
 	myStcTitle[16].SubclassDlgItem(IDC_STC_12_12, this);	// 테이블 실린더
 	myStcTitle[55].SubclassDlgItem(IDC_STC_12_39, this);	// 테이블 클램프 하강
-	myStcTitle[98].SubclassDlgItem(IDC_STC_000_15, this);	// 테이블 클램프 전진
+	//myStcTitle[98].SubclassDlgItem(IDC_STC_000_15, this);	// 테이블 클램프 전진
 	myStcTitle[54].SubclassDlgItem(IDC_STC_000_5, this);	// 마킹 시작
 
 															// AOI하
@@ -1138,7 +1199,7 @@ void CDlgMenu03::InitStatic()
 	myStcTitle[99].SubclassDlgItem(IDC_STC_12_85, this);	// 피딩 역회전
 	myStcTitle[62].SubclassDlgItem(IDC_STC_12_46, this);	// 텐션 정방향
 	myStcTitle[63].SubclassDlgItem(IDC_STC_12_45, this);	// 텐션 역방향
-	myStcTitle[64].SubclassDlgItem(IDC_STC_12_48, this);	// 피딩 HOME
+	//myStcTitle[64].SubclassDlgItem(IDC_STC_12_48, this);	// 피딩 HOME
 	myStcTitle[65].SubclassDlgItem(IDC_STC_12_47, this);	// 피딩 진공
 	myStcTitle[66].SubclassDlgItem(IDC_STC_12_50, this);	// 피딩 클램프
 	myStcTitle[67].SubclassDlgItem(IDC_STC_12_49, this);	// 텐션 클램프
@@ -1157,14 +1218,14 @@ void CDlgMenu03::InitStatic()
 	myStcTitle[104].SubclassDlgItem(IDC_STC_12_79, this);	// 피딩 역회전
 	myStcTitle[18].SubclassDlgItem(IDC_STC_12_13, this);	// 텐션 정방향
 	myStcTitle[19].SubclassDlgItem(IDC_STC_12_11, this);	// 텐션 역방향
-	myStcTitle[20].SubclassDlgItem(IDC_STC_12_15, this);	// 피딩 HOME
+	//myStcTitle[20].SubclassDlgItem(IDC_STC_12_15, this);	// 피딩 HOME
 	myStcTitle[21].SubclassDlgItem(IDC_STC_12_14, this);	// 피딩 진공
 	myStcTitle[22].SubclassDlgItem(IDC_STC_12_17, this);	// 피딩 클램프
 	myStcTitle[23].SubclassDlgItem(IDC_STC_12_16, this);	// 텐션 클램프
 	myStcTitle[59].SubclassDlgItem(IDC_STC_12_44, this);	// 테이블 진공
 	myStcTitle[60].SubclassDlgItem(IDC_STC_12_43, this);	// 테이블 블로어
 	myStcTitle[24].SubclassDlgItem(IDC_STC_12_19, this);	// 테이블 실린더
-	myStcTitle[56].SubclassDlgItem(IDC_STC_12_40, this);	// 클린롤러 상부	
+	//myStcTitle[56].SubclassDlgItem(IDC_STC_12_40, this);	// 클린롤러 상부	
 	myStcTitle[105].SubclassDlgItem(IDC_STC_000_13, this);	// 클린롤러 하부
 	myStcTitle[106].SubclassDlgItem(IDC_STC_12_80, this);	// 클린롤러 누름
 	myStcTitle[107].SubclassDlgItem(IDC_STC_12_81, this);	// 검사시작
@@ -1177,7 +1238,7 @@ void CDlgMenu03::InitStatic()
 	myStcTitle[87].SubclassDlgItem(IDC_STC_000_8, this);	// 피딩 역회전
 	myStcTitle[80].SubclassDlgItem(IDC_STC_12_58, this);	// 텐션 정방향
 	myStcTitle[81].SubclassDlgItem(IDC_STC_12_57, this);	// 텐션 역방향
-	myStcTitle[82].SubclassDlgItem(IDC_STC_12_60, this);	// 피딩 HOME
+	//myStcTitle[82].SubclassDlgItem(IDC_STC_12_60, this);	// 피딩 HOME
 	myStcTitle[83].SubclassDlgItem(IDC_STC_12_59, this);	// 피딩 진공
 	myStcTitle[84].SubclassDlgItem(IDC_STC_12_62, this);	// 피딩 클램프
 	myStcTitle[85].SubclassDlgItem(IDC_STC_12_61, this);	// 텐션 클램프
@@ -1187,8 +1248,8 @@ void CDlgMenu03::InitStatic()
 	myStcTitle[88].SubclassDlgItem(IDC_STC_12_64, this);	// 초음파 세정기 하강
 	myStcTitle[91].SubclassDlgItem(IDC_STC_000_10, this);	// 초음파 세정기 운전
 	myStcTitle[111].SubclassDlgItem(IDC_STC_12_73, this);	// 초음파 세정기 속도
-	myStcTitle[112].SubclassDlgItem(IDC_STC_12_74, this);	// 버퍼롤 상승
-	myStcTitle[113].SubclassDlgItem(IDC_STC_12_75, this);	// 버퍼롤 고정
+	//myStcTitle[112].SubclassDlgItem(IDC_STC_12_74, this);	// 버퍼롤 상승
+	//myStcTitle[113].SubclassDlgItem(IDC_STC_12_75, this);	// 버퍼롤 고정
 	myStcTitle[114].SubclassDlgItem(IDC_STC_12_76, this);	// 정렬시작
 	myStcTitle[115].SubclassDlgItem(IDC_STC_12_77, this);	// 각인시작
 	myStcTitle[116].SubclassDlgItem(IDC_STC_12_78, this);	// 리딩시작
@@ -1206,8 +1267,8 @@ void CDlgMenu03::InitStatic()
 	myStcTitle[31].SubclassDlgItem(IDC_STC_12_25, this);	// 제품인버터 역방향
 	myStcTitle[32].SubclassDlgItem(IDC_STC_12_23, this);	// 간지인버터 정방향
 	myStcTitle[45].SubclassDlgItem(IDC_STC_12_30, this);	// 간지인버터 역방향
-	myStcTitle[29].SubclassDlgItem(IDC_STC_12_21, this);	// 댄서롤 상승
-	myStcTitle[42].SubclassDlgItem(IDC_STC_12_27, this);	// 댄서롤 고정
+	//myStcTitle[29].SubclassDlgItem(IDC_STC_12_21, this);	// 댄서롤 상승
+	//myStcTitle[42].SubclassDlgItem(IDC_STC_12_27, this);	// 댄서롤 고정
 	myStcTitle[118].SubclassDlgItem(IDC_STC_12_67, this);	// EPC 자동
 	myStcTitle[119].SubclassDlgItem(IDC_STC_12_68, this);	// EPC 수동
 	myStcTitle[120].SubclassDlgItem(IDC_STC_12_69, this);	// EPC In
@@ -1223,6 +1284,8 @@ void CDlgMenu03::InitStatic()
 
 	for (int i = 0; i < MAX_MENU03_STC; i++)
 	{
+		if(i == 12 || i == 20 || i == 29 || i == 42 || i == 56 || i == 64 || i == 72 || i == 73 || i == 82 || i == 98 || i == 112 || i == 113)
+			continue;
 		myStcTitle[i].SetFontName(_T("Arial"));
 		myStcTitle[i].SetFontSize(12);
 		myStcTitle[i].SetFontBold(TRUE);
@@ -1324,26 +1387,26 @@ void CDlgMenu03::DispMain()
 
 	// [InductionMotor]
 	CString sCap;
-	bOn = pDoc->WorkingInfo.LastJob.bOneMetal = pDoc->BtnStatus.Induct.Rc;	// [One Metal]
+	bOn = pDoc->BtnStatus.FeedDir.FeedCcwRecoiler; //pDoc->BtnStatus.Induct.Rc;	// [One Metal]
 	if (bOn)
 	{
 		sCap = myStcTitle[74].GetText();
-		if (sCap != _T("Recoiler\r정방향 CCW"))
+		if (sCap != _T("Recoiler\r정방향"))
 		{
 			myStcTitle[74].ShowWindow(SW_HIDE);
 			myStcTitle[74].SetTextColor(RGB_RED);
-			myStcTitle[74].SetText(_T("Recoiler\r정방향 CCW"));
+			myStcTitle[74].SetText(_T("Recoiler\r정방향"));
 			myStcTitle[74].ShowWindow(SW_SHOW);
 		}
 	}
 	else
 	{
 		sCap = myStcTitle[74].GetText();
-		if (sCap != _T("Recoiler\r정방향 CW"))
+		if (sCap != _T("Recoiler\r정방향"))
 		{
 			myStcTitle[74].ShowWindow(SW_HIDE);
 			myStcTitle[74].SetTextColor(RGB_NAVY);
-			myStcTitle[74].SetText(_T("Recoiler\r정방향 CW"));
+			myStcTitle[74].SetText(_T("Recoiler\r정방향"));
 			myStcTitle[74].ShowWindow(SW_SHOW);
 		}
 	}
@@ -1353,7 +1416,7 @@ void CDlgMenu03::DispMain()
 		myBtn[68].SetCheck(bOn);
 	}
 
-	bOn = pDoc->WorkingInfo.LastJob.bTwoMetal = pDoc->BtnStatus.Induct.Uc;	// [Two Metal]
+	bOn = pDoc->BtnStatus.FeedDir.FeedCcwUncoiler; //pDoc->BtnStatus.Induct.Uc;	// [Two Metal]
 	if (bOn)
 	{
 		sCap = myStcTitle[75].GetText();
@@ -1474,13 +1537,13 @@ void CDlgMenu03::DispRecoiler()
 	if (myBtn[46].GetImageBk() != bOn)
 		myBtn[46].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Rc.DancerUpper;		// 리코일러 댄서롤 상승 스위치 램프
-	if (myBtn[66].GetImageBk() != bOn)
-		myBtn[66].SetCheck(bOn);
+	//bOn = pDoc->BtnStatus.Rc.DancerUpper;		// 리코일러 댄서롤 상승 스위치 램프
+	//if (myBtn[66].GetImageBk() != bOn)
+	//	myBtn[66].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Rc.DancerFixer;		// 리코일러 댄서롤 고정 스위치 램프
-	if (myBtn[67].GetImageBk() != bOn)
-		myBtn[67].SetCheck(bOn);
+	//bOn = pDoc->BtnStatus.Rc.DancerFixer;		// 리코일러 댄서롤 고정 스위치 램프
+	//if (myBtn[67].GetImageBk() != bOn)
+	//	myBtn[67].SetCheck(bOn);
 }
 
 void CDlgMenu03::DispPunch()
@@ -1504,9 +1567,9 @@ void CDlgMenu03::DispPunch()
 	if (myBtn[11].GetImageBk() != bOn)
 		myBtn[11].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Mk.FeedHome;			// 마킹부 피딩 HOME 스위치 램프
-	if (myBtn[12].GetImageBk() != bOn)
-		myBtn[12].SetCheck(bOn);
+	//bOn = pDoc->BtnStatus.Mk.FeedHome;			// 마킹부 피딩 HOME 스위치 램프
+	//if (myBtn[12].GetImageBk() != bOn)
+	//	myBtn[12].SetCheck(bOn);
 
 	bOn = pDoc->BtnStatus.Mk.FeedVacuum;		//  마킹부 피딩 진공 스위치 램프
 	if (myBtn[13].GetImageBk() != bOn)
@@ -1536,9 +1599,9 @@ void CDlgMenu03::DispPunch()
 	if (myBtn[49].GetCheck() != bOn)
 		myBtn[49].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Mk.TableClampForward;	// 마킹부 테이블 클램프 전진 스위치 램프
-	if (myBtn[95].GetImageBk() != bOn)
-		myBtn[95].SetCheck(bOn);
+	//bOn = pDoc->BtnStatus.Mk.TableClampForward;	// 마킹부 테이블 클램프 전진 스위치 램프
+	//if (myBtn[95].GetImageBk() != bOn)
+	//	myBtn[95].SetCheck(bOn);
 
 	bOn = pDoc->BtnStatus.Mk.PunchStart;		// 마킹부 마킹 시작 스위치 램프
 	if (myBtn[48].GetImageBk() != bOn)
@@ -1566,9 +1629,9 @@ void CDlgMenu03::DispAoiDn()
 	if (myBtn[57].GetImageBk() != bOn)
 		myBtn[57].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiDn.FeedHome;			// 검사부 하 피딩 HOME 스위치 램프
-	if (myBtn[58].GetImageBk() != bOn)
-		myBtn[58].SetCheck(bOn);
+	//bOn = pDoc->BtnStatus.AoiDn.FeedHome;			// 검사부 하 피딩 HOME 스위치 램프
+	//if (myBtn[58].GetImageBk() != bOn)
+	//	myBtn[58].SetCheck(bOn);
 
 	bOn = pDoc->BtnStatus.AoiDn.FeedVacuum;			// 검사부 하 피딩 진공 스위치 램프
 	if (myBtn[59].GetImageBk() != bOn)
@@ -1640,9 +1703,9 @@ void CDlgMenu03::DispAoiUp()
 	if (myBtn[19].GetImageBk() != bOn)
 		myBtn[19].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiUp.FeedHome;	// 검사부 상 피딩 HOME 스위치 램프
-	if (myBtn[20].GetImageBk() != bOn)
-		myBtn[20].SetCheck(bOn);
+	//bOn = pDoc->BtnStatus.AoiUp.FeedHome;	// 검사부 상 피딩 HOME 스위치 램프
+	//if (myBtn[20].GetImageBk() != bOn)
+	//	myBtn[20].SetCheck(bOn);
 
 	bOn = pDoc->BtnStatus.AoiUp.FeedVacuum;	// 검사부 상 피딩 진공 스위치 램프
 	if (myBtn[21].GetImageBk() != bOn)
@@ -1668,9 +1731,9 @@ void CDlgMenu03::DispAoiUp()
 	if (myBtn[24].GetImageBk() != bOn)
 		myBtn[24].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.AoiUp.CleanRollerUp; // 검사부 상 클린롤러 상부 스위치 램프
-	if (myBtn[50].GetImageBk() != bOn)
-		myBtn[50].SetCheck(bOn);
+	//bOn = pDoc->BtnStatus.AoiUp.CleanRollerUp; // 검사부 상 클린롤러 상부 스위치 램프
+	//if (myBtn[50].GetImageBk() != bOn)
+	//	myBtn[50].SetCheck(bOn);
 
 	bOn = pDoc->BtnStatus.AoiUp.CleanRollerDn;	// 검사부 상 클린롤러 하부 스위치 램프
 	if (myBtn[102].GetImageBk() != bOn)
@@ -1717,9 +1780,9 @@ void CDlgMenu03::DispEngrave()
 	if (myBtn[74].GetImageBk() != bOn)
 		myBtn[74].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Eng.FeedHome;			// 각인부 피딩 HOME 스위치 램프
-	if (myBtn[75].GetImageBk() != bOn)
-		myBtn[75].SetCheck(bOn);
+	//bOn = pDoc->BtnStatus.Eng.FeedHome;			// 각인부 피딩 HOME 스위치 램프
+	//if (myBtn[75].GetImageBk() != bOn)
+	//	myBtn[75].SetCheck(bOn);
 
 	bOn = pDoc->BtnStatus.Eng.FeedVacuum;		// 각인부 피딩 진공 스위치 램프
 	if (myBtn[76].GetImageBk() != bOn)
@@ -1758,13 +1821,13 @@ void CDlgMenu03::DispEngrave()
 	if (myBtn[108].GetImageBk() != bOn)
 		myBtn[108].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Eng.DancerUpper;		// 각인부 버퍼롤 상승 스위치 램프
-	if (myBtn[109].GetImageBk() != bOn)
-		myBtn[109].SetCheck(bOn);
+	//bOn = pDoc->BtnStatus.Eng.DancerUpper;		// 각인부 버퍼롤 상승 스위치 램프
+	//if (myBtn[109].GetImageBk() != bOn)
+	//	myBtn[109].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Eng.DancerFixer;		// 각인부 버퍼롤 고정 스위치 램프
-	if (myBtn[110].GetImageBk() != bOn)
-		myBtn[110].SetCheck(bOn);
+	//bOn = pDoc->BtnStatus.Eng.DancerFixer;		// 각인부 버퍼롤 고정 스위치 램프
+	//if (myBtn[110].GetImageBk() != bOn)
+	//	myBtn[110].SetCheck(bOn);
 
 	bOn = pDoc->BtnStatus.Eng.AlignStart;		// 각인부 정렬 시작 스위치 램프
 	if (myBtn[111].GetImageBk() != bOn)
@@ -1852,13 +1915,13 @@ void CDlgMenu03::DispUncoiler()
 	if (myBtn[36].GetImageBk() != bOn)
 		myBtn[36].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Uc.DancerUpper;		// 언코일러 댄서롤 상승 스위치 램프
-	if (myBtn[38].GetImageBk() != bOn)
-		myBtn[38].SetCheck(bOn);
+	//bOn = pDoc->BtnStatus.Uc.DancerUpper;		// 언코일러 댄서롤 상승 스위치 램프
+	//if (myBtn[38].GetImageBk() != bOn)
+	//	myBtn[38].SetCheck(bOn);
 
-	bOn = pDoc->BtnStatus.Uc.DancerFixer;		// 언코일러 댄서롤 고정 스위치 램프 
-	if (myBtn[39].GetImageBk() != bOn)
-		myBtn[39].SetCheck(bOn);
+	//bOn = pDoc->BtnStatus.Uc.DancerFixer;		// 언코일러 댄서롤 고정 스위치 램프 
+	//if (myBtn[39].GetImageBk() != bOn)
+	//	myBtn[39].SetCheck(bOn);
 }
 
 void CDlgMenu03::OnTimer(UINT_PTR nIDEvent)//(UINT nIDEvent)
@@ -1873,35 +1936,34 @@ void CDlgMenu03::OnTimer(UINT_PTR nIDEvent)//(UINT nIDEvent)
 			SetTimer(TIM_MENU03_DISP, 300, NULL);
 	}
 
-	if(nIDEvent == TIM_CHK_DONE_MKAOI)
-	{
-		KillTimer(TIM_CHK_DONE_MKAOI);
-
-		if(!(pDoc->m_pMpeSignal[5] & (0x01<<1)) && !(pDoc->m_pMpeSignal[5] & (0x01<<0)))	// 마킹부 피딩 ON (PLC가 피딩완료 후 OFF) && 검사부 피딩 ON (PLC가 피딩완료 후 OFF)
-		{
-			m_bTIM_CHK_DONE_MKAOI = FALSE;
-		}
-		if(m_bTIM_CHK_DONE_MKAOI)
-			SetTimer(TIM_CHK_DONE_MKAOI, 100, NULL);
-	}
-	if(nIDEvent == TIM_CHK_DONE_MK)
-	{
-		KillTimer(TIM_CHK_DONE_MK);
-
-		if(!(pDoc->m_pMpeSignal[5] & (0x01<<1)))	// 마킹부 피딩 ON (PLC가 피딩완료 후 OFF)
-			m_bTIM_CHK_DONE_MK = FALSE;
-		if(m_bTIM_CHK_DONE_MK)
-			SetTimer(TIM_CHK_DONE_MK, 100, NULL);
-	}
-	if(nIDEvent == TIM_CHK_DONE_AOI)
-	{
-		KillTimer(TIM_CHK_DONE_AOI);
-
-		if(!(pDoc->m_pMpeSignal[5] & (0x01<<0)))	// 검사부 피딩 ON (PLC가 피딩완료 후 OFF)
-			m_bTIM_CHK_DONE_AOI = FALSE;
-		if(m_bTIM_CHK_DONE_AOI)
-			SetTimer(TIM_CHK_DONE_AOI, 100, NULL);
-	}
+	//if(nIDEvent == TIM_CHK_DONE_MKAOI)
+	//{
+	//	KillTimer(TIM_CHK_DONE_MKAOI);
+	//	if(!(pDoc->m_pMpeSignal[5] & (0x01<<1)) && !(pDoc->m_pMpeSignal[5] & (0x01<<0)))	// 마킹부 피딩 ON (PLC가 피딩완료 후 OFF) && 검사부 피딩 ON (PLC가 피딩완료 후 OFF)
+	//	{
+	//		m_bTIM_CHK_DONE_MKAOI = FALSE;
+	//	}
+	//	if(m_bTIM_CHK_DONE_MKAOI)
+	//		SetTimer(TIM_CHK_DONE_MKAOI, 100, NULL);
+	//}
+	
+	//if(nIDEvent == TIM_CHK_DONE_MK)
+	//{
+	//	KillTimer(TIM_CHK_DONE_MK);
+	//	if(!(pDoc->m_pMpeSignal[5] & (0x01<<1)))	// 마킹부 피딩 ON (PLC가 피딩완료 후 OFF)
+	//		m_bTIM_CHK_DONE_MK = FALSE;
+	//	if(m_bTIM_CHK_DONE_MK)
+	//		SetTimer(TIM_CHK_DONE_MK, 100, NULL);
+	//}
+	
+	//if(nIDEvent == TIM_CHK_DONE_AOI)
+	//{
+	//	KillTimer(TIM_CHK_DONE_AOI);
+	//	if(!(pDoc->m_pMpeSignal[5] & (0x01<<0)))	// 검사부 피딩 ON (PLC가 피딩완료 후 OFF)
+	//		m_bTIM_CHK_DONE_AOI = FALSE;
+	//	if(m_bTIM_CHK_DONE_AOI)
+	//		SetTimer(TIM_CHK_DONE_AOI, 100, NULL);
+	//}
 
 	if(nIDEvent == TIM_CHK_MREG)
 	{
@@ -1909,54 +1971,52 @@ void CDlgMenu03::OnTimer(UINT_PTR nIDEvent)//(UINT nIDEvent)
 		pView->ChkMRegOut();
 	}
 	
-	if(nIDEvent == TIM_CHK_DONE_BUF_HOME)
-	{
-		KillTimer(TIM_CHK_DONE_BUF_HOME);
-
-		if(pDoc->m_pMpeSignal[4] & (0x01<<2))	// 마킹부 버퍼롤러 홈동작 ON (PLC가 홈동작 완료 후 OFF)
-		{
-			pView->GetDispMsg(strMsg, strTitle);
-			if(strMsg != _T("Searching Buffer Home Position...") || strTitle != _T("Homming"))
-				pView->DispMsg(_T("Searching Buffer Home Position..."), _T("Homming"), RGB_GREEN, DELAY_TIME_MSG);
-		}
-		else
-		{
-			m_bTIM_CHK_DONE_BUF_HOME = FALSE;
-			pView->m_bBufHomeDone = TRUE;
-			pView->ClrDispMsg();
-		}
-		if(m_bTIM_CHK_DONE_BUF_HOME)
-			SetTimer(TIM_CHK_DONE_BUF_HOME, 100, NULL);
-	}
+	//if(nIDEvent == TIM_CHK_DONE_BUF_HOME)
+	//{
+	//	KillTimer(TIM_CHK_DONE_BUF_HOME);
+	//	if(pDoc->m_pMpeSignal[4] & (0x01<<2))	// 마킹부 버퍼롤러 홈동작 ON (PLC가 홈동작 완료 후 OFF)
+	//	{
+	//		pView->GetDispMsg(strMsg, strTitle);
+	//		if(strMsg != _T("Searching Buffer Home Position...") || strTitle != _T("Homming"))
+	//			pView->DispMsg(_T("Searching Buffer Home Position..."), _T("Homming"), RGB_GREEN, DELAY_TIME_MSG);
+	//	}
+	//	else
+	//	{
+	//		m_bTIM_CHK_DONE_BUF_HOME = FALSE;
+	//		pView->m_bBufHomeDone = TRUE;
+	//		pView->ClrDispMsg();
+	//	}
+	//	if(m_bTIM_CHK_DONE_BUF_HOME)
+	//		SetTimer(TIM_CHK_DONE_BUF_HOME, 100, NULL);
+	//}
 	
-	if(nIDEvent == TIM_CHK_DONE_BUF_INIT)
-	{
-		KillTimer(TIM_CHK_DONE_BUF_INIT);
-
-		if(pDoc->m_pMpeSignal[4] & (0x01<<10))	// 마킹부 버퍼 초기위치 이동(PC가 ON, PLC가 OFF)
-		{
-			pView->GetDispMsg(strMsg, strTitle);
-			if(strMsg != _T("Searching Buffer Initial Position...") || strTitle != _T("Moving"))
-				pView->DispMsg(_T("Searching Buffer Initial Position..."), _T("Moving"), RGB_GREEN, DELAY_TIME_MSG);
-		}
-		else
-		{
-			m_bTIM_CHK_DONE_BUF_INIT = FALSE;
-			pView->ClrDispMsg();
-		}
-		if(m_bTIM_CHK_DONE_BUF_INIT)
-			SetTimer(TIM_CHK_DONE_BUF_INIT, 100, NULL);
-	}
+	//if(nIDEvent == TIM_CHK_DONE_BUF_INIT)
+	//{
+	//	KillTimer(TIM_CHK_DONE_BUF_INIT);
+	//	if(pDoc->m_pMpeSignal[4] & (0x01<<10))	// 마킹부 버퍼 초기위치 이동(PC가 ON, PLC가 OFF)
+	//	{
+	//		pView->GetDispMsg(strMsg, strTitle);
+	//		if(strMsg != _T("Searching Buffer Initial Position...") || strTitle != _T("Moving"))
+	//			pView->DispMsg(_T("Searching Buffer Initial Position..."), _T("Moving"), RGB_GREEN, DELAY_TIME_MSG);
+	//	}
+	//	else
+	//	{
+	//		m_bTIM_CHK_DONE_BUF_INIT = FALSE;
+	//		pView->ClrDispMsg();
+	//	}
+	//	if(m_bTIM_CHK_DONE_BUF_INIT)
+	//		SetTimer(TIM_CHK_DONE_BUF_INIT, 100, NULL);
+	//}
 	
 	if(nIDEvent == TIM_CHK_DONE_READY)
 	{
 		KillTimer(TIM_CHK_DONE_READY);
 
-		if(pDoc->m_pMpeSignal[0] & (0x01<<0))	// PLC 운전준비 완료(PC가 확인하고 Reset시킴.)
+		if(pDoc->m_pMpeSignal[0] & (0x01<<3))	// PLC 운전준비 완료(PC가 확인하고 Reset시킴.)
 		{
 			m_bTIM_CHK_DONE_READY = FALSE;
 			pView->m_bReadyDone = TRUE; pDoc->SetStatus(_T("General"), _T("bReadyDone"), pView->m_bReadyDone);
-			pView->MpeWrite(pView->Plc.DlgMenu01.PlcReadyDone, 0);	// PLC 운전준비 완료(PC가 확인하고 Reset시킴.)MB440100
+			//pView->MpeWrite(pView->Plc.DlgMenu01.PlcReadyDone, 0);	// PLC 운전준비 완료(PC가 확인하고 Reset시킴.)MB440100
 		}
 		else
 		{
@@ -1981,82 +2041,78 @@ void CDlgMenu03::OnTimer(UINT_PTR nIDEvent)//(UINT nIDEvent)
 		KillTimer(TIM_AOI_LOTEND_OFF);
 	}
 
-	if (nIDEvent == TIM_CHK_DONE_ENGRAVE)
-	{
-		KillTimer(TIM_CHK_DONE_ENGRAVE);
+	//if (nIDEvent == TIM_CHK_DONE_ENGRAVE)
+	//{
+	//	KillTimer(TIM_CHK_DONE_ENGRAVE);
+	//	if (!(pDoc->m_pMpeSignal[6] & (0x01 << 12)))	// 각인부 피딩 CW ON (PLC가 피딩완료 후 OFF) - MB44017C
+	//		m_bTIM_CHK_DONE_ENGRAVE = FALSE;
+	//	if (m_bTIM_CHK_DONE_ENGRAVE)
+	//		SetTimer(TIM_CHK_DONE_ENGRAVE, 100, NULL);
+	//}
+	
+//	if (nIDEvent == TIM_CHK_DONE_ENG_BUF_HOME)
+//	{
+//		KillTimer(TIM_CHK_DONE_ENG_BUF_HOME);
+//
+//		if (pDoc->m_pMpeSignal && pDoc->m_pMpeSignal[6] & (0x01 << 2))	// 각인부 버퍼롤러 홈동작 ON (PLC가 홈동작 완료 후 OFF)
+//		{
+//			pView->GetDispMsg(strMsg, strTitle);
+//			if (strMsg != _T("Searching Engrave Buffer Home Position...") || strTitle != _T("Homming"))
+//				pView->DispMsg(_T("Searching Engrave Buffer Home Position..."), _T("Homming"), RGB_GREEN, DELAY_TIME_MSG);
+//		}
+//		else
+//		{
+//			m_bTIM_CHK_DONE_ENG_BUF_HOME = FALSE;
+//			pView->m_bEngBufHomeDone = TRUE;
+//			pView->ClrDispMsg();
+//
+//#ifdef USE_ENGRAVE
+//			if (pView && pView->m_pEngrave)
+//			{
+//				pDoc->WorkingInfo.Motion.bEngBuffHommingDone = TRUE;
+//				pView->m_pEngrave->SetEngBuffHomeDone();	//_SigInx::_EngBuffOrgMvDone // 각인부 버퍼롤러 홈동작 ON (PLC가 홈동작 완료 후 OFF)
+//			}
+//#endif
+//		}
+//		if (m_bTIM_CHK_DONE_ENG_BUF_HOME)
+//			SetTimer(TIM_CHK_DONE_ENG_BUF_HOME, 100, NULL);
+//	}
 
-		if (!(pDoc->m_pMpeSignal[6] & (0x01 << 12)))	// 각인부 피딩 CW ON (PLC가 피딩완료 후 OFF) - MB44017C
-			m_bTIM_CHK_DONE_ENGRAVE = FALSE;
-		if (m_bTIM_CHK_DONE_ENGRAVE)
-			SetTimer(TIM_CHK_DONE_ENGRAVE, 100, NULL);
-	}
+//	if (nIDEvent == TIM_CHK_DONE_ENG_BUF_INIT)
+//	{
+//		KillTimer(TIM_CHK_DONE_ENG_BUF_INIT);
+//
+//		if (pDoc->m_pMpeSignal && pDoc->m_pMpeSignal[6] & (0x01 << 10))	// 각인부 버퍼 초기위치 이동(PC가 ON, PLC가 OFF)
+//		{
+//			pView->GetDispMsg(strMsg, strTitle);
+//			if (strMsg != _T("Searching Engrave Buffer Initial Position...") || strTitle != _T("Moving"))
+//				pView->DispMsg(_T("Searching Engrave Buffer Initial Position..."), _T("Moving"), RGB_GREEN, DELAY_TIME_MSG);
+//		}
+//		else
+//		{
+//			m_bTIM_CHK_DONE_ENG_BUF_INIT = FALSE;
+//			pView->ClrDispMsg();
+//
+//#ifdef USE_ENGRAVE
+//			if (pView && pView->m_pEngrave)
+//			{
+//				pDoc->WorkingInfo.Motion.bEngBuffInitMvDone = TRUE;
+//				pView->m_pEngrave->SetEngBuffInitMoveDone();	//_SigInx::_EngBuffInitPosMvDone // 각인부 버퍼 초기위치 이동(PC가 ON, PLC가 OFF)
+//			}
+//#endif
+//		}
+//		if (m_bTIM_CHK_DONE_ENG_BUF_INIT)
+//			SetTimer(TIM_CHK_DONE_ENG_BUF_INIT, 100, NULL);
+//	}
 
-
-
-	if (nIDEvent == TIM_CHK_DONE_ENG_BUF_HOME)
-	{
-		KillTimer(TIM_CHK_DONE_ENG_BUF_HOME);
-
-		if (pDoc->m_pMpeSignal && pDoc->m_pMpeSignal[6] & (0x01 << 2))	// 각인부 버퍼롤러 홈동작 ON (PLC가 홈동작 완료 후 OFF)
-		{
-			pView->GetDispMsg(strMsg, strTitle);
-			if (strMsg != _T("Searching Engrave Buffer Home Position...") || strTitle != _T("Homming"))
-				pView->DispMsg(_T("Searching Engrave Buffer Home Position..."), _T("Homming"), RGB_GREEN, DELAY_TIME_MSG);
-		}
-		else
-		{
-			m_bTIM_CHK_DONE_ENG_BUF_HOME = FALSE;
-			pView->m_bEngBufHomeDone = TRUE;
-			pView->ClrDispMsg();
-
-#ifdef USE_ENGRAVE
-			if (pView && pView->m_pEngrave)
-			{
-				pDoc->WorkingInfo.Motion.bEngBuffHommingDone = TRUE;
-				pView->m_pEngrave->SetEngBuffHomeDone();	//_SigInx::_EngBuffOrgMvDone // 각인부 버퍼롤러 홈동작 ON (PLC가 홈동작 완료 후 OFF)
-			}
-#endif
-		}
-		if (m_bTIM_CHK_DONE_ENG_BUF_HOME)
-			SetTimer(TIM_CHK_DONE_ENG_BUF_HOME, 100, NULL);
-	}
-
-	if (nIDEvent == TIM_CHK_DONE_ENG_BUF_INIT)
-	{
-		KillTimer(TIM_CHK_DONE_ENG_BUF_INIT);
-
-		if (pDoc->m_pMpeSignal && pDoc->m_pMpeSignal[6] & (0x01 << 10))	// 각인부 버퍼 초기위치 이동(PC가 ON, PLC가 OFF)
-		{
-			pView->GetDispMsg(strMsg, strTitle);
-			if (strMsg != _T("Searching Engrave Buffer Initial Position...") || strTitle != _T("Moving"))
-				pView->DispMsg(_T("Searching Engrave Buffer Initial Position..."), _T("Moving"), RGB_GREEN, DELAY_TIME_MSG);
-		}
-		else
-		{
-			m_bTIM_CHK_DONE_ENG_BUF_INIT = FALSE;
-			pView->ClrDispMsg();
-
-#ifdef USE_ENGRAVE
-			if (pView && pView->m_pEngrave)
-			{
-				pDoc->WorkingInfo.Motion.bEngBuffInitMvDone = TRUE;
-				pView->m_pEngrave->SetEngBuffInitMoveDone();	//_SigInx::_EngBuffInitPosMvDone // 각인부 버퍼 초기위치 이동(PC가 ON, PLC가 OFF)
-			}
-#endif
-		}
-		if (m_bTIM_CHK_DONE_ENG_BUF_INIT)
-			SetTimer(TIM_CHK_DONE_ENG_BUF_INIT, 100, NULL);
-	}
-
-	if (nIDEvent == TIM_CHK_DONE_AOI)
-	{
-		KillTimer(TIM_CHK_DONE_AOI);
-
-		if (!(pDoc->m_pMpeSignal[5] & (0x01 << 0)))	// 검사부 피딩 ON (PLC가 피딩완료 후 OFF)
-			m_bTIM_CHK_DONE_AOI = FALSE;
-		if (m_bTIM_CHK_DONE_AOI)
-			SetTimer(TIM_CHK_DONE_AOI, 100, NULL);
-	}
+	//if (nIDEvent == TIM_CHK_DONE_AOI)
+	//{
+	//	KillTimer(TIM_CHK_DONE_AOI);
+	//	if (!(pDoc->m_pMpeSignal[5] & (0x01 << 0)))	// 검사부 피딩 ON (PLC가 피딩완료 후 OFF)
+	//		m_bTIM_CHK_DONE_AOI = FALSE;
+	//	if (m_bTIM_CHK_DONE_AOI)
+	//		SetTimer(TIM_CHK_DONE_AOI, 100, NULL);
+	//}
 
 	CDialog::OnTimer(nIDEvent);
 }
@@ -2104,16 +2160,17 @@ void CDlgMenu03::SwMyBtnDown(int nCtrlID)
 		return;
 
 	long lData = 1; BOOL bData = TRUE;
-
+#ifndef TEST_MODE
 	if (nCtrlID != IDC_CHK_33 && nCtrlID != IDC_CHK_0)		// 마킹부 정지 스위치 , 마킹부 운전 스위치
 	{
 		if (!pDoc->Status.bManual)
 		{
-			pView->DispMsg(_T("수동 모드가 아닙니다."), _T("주의"), RGB_YELLOW);
+			//pView->DispMsg(_T("수동 모드가 아닙니다."), _T("주의"), RGB_YELLOW);
+			pView->MsgBox(_T("수동 모드가 아닙니다."));
 			return;
 		}
 	}
-
+#endif
 #ifdef USE_ENGRAVE
 	if (!pView->m_pEngrave)
 		return;
@@ -2136,7 +2193,8 @@ void CDlgMenu03::SwMyBtnUp(int nCtrlID)
 	{
 		if (!pDoc->Status.bManual)
 		{
-			pView->DispMsg(_T("수동 모드가 아닙니다."), _T("주의"), RGB_YELLOW);
+			//pView->DispMsg(_T("수동 모드가 아닙니다."), _T("주의"), RGB_YELLOW);
+			pView->MsgBox(_T("수동 모드가 아닙니다."));
 			return;
 		}
 	}
@@ -2201,14 +2259,16 @@ void CDlgMenu03::SwMpeBtn(int nCtrlID, long lData)
 
 	// Feed Direction
 	case IDC_CHK_68:			// 리코일러 역방향 스위치
-		pView->MpeWrite(pView->Plc.DlgInfo.FeedCcwRecoiler, 1);
-		Sleep(300);
-		pView->MpeWrite(pView->Plc.DlgInfo.FeedCcwRecoiler, 0);
+		pView->MpeWrite(pView->Plc.DlgInfo.FeedCcwRecoiler, lData);
+		//pView->MpeWrite(pView->Plc.DlgInfo.FeedCcwRecoiler, 1);
+		//Sleep(300);
+		//pView->MpeWrite(pView->Plc.DlgInfo.FeedCcwRecoiler, 0);
 		break;
 	case IDC_CHK_69:			// 언코일러 역방향 스위치
-		pView->MpeWrite(pView->Plc.DlgInfo.FeedCcwUncoiler, 1);
-		Sleep(300);
-		pView->MpeWrite(pView->Plc.DlgInfo.FeedCcwUncoiler, 0);
+		pView->MpeWrite(pView->Plc.DlgInfo.FeedCcwUncoiler, lData);
+		//pView->MpeWrite(pView->Plc.DlgInfo.FeedCcwUncoiler, 1);
+		//Sleep(300);
+		//pView->MpeWrite(pView->Plc.DlgInfo.FeedCcwUncoiler, 0);
 		break;
 
 	// 댄서롤/버퍼롤
@@ -2285,16 +2345,16 @@ void CDlgMenu03::SwMpeBtn(int nCtrlID, long lData)
 		pView->MpeWrite(pView->Plc.DlgMenu03.PaperInverterCcwRecoiler, 0);
 		break;
 
-	case IDC_CHK_66:		// 리코일러 댄서롤 상승 스위치
-		pView->MpeWrite(pView->Plc.DlgMenu03.DancerUpperRecoiler, 1);
-		Sleep(300);
-		pView->MpeWrite(pView->Plc.DlgMenu03.DancerUpperRecoiler, 0);
-		break;
-	case IDC_CHK_67:		// 리코일러 댄서롤 고정 스위치
-		pView->MpeWrite(pView->Plc.DlgMenu03.DancerFixerRecoiler, 1);
-		Sleep(300);
-		pView->MpeWrite(pView->Plc.DlgMenu03.DancerFixerRecoiler, 0);
-		break;
+	//case IDC_CHK_66:		// 리코일러 댄서롤 상승 스위치
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.DancerUpperRecoiler, 1);
+	//	Sleep(300);
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.DancerUpperRecoiler, 0);
+	//	break;
+	//case IDC_CHK_67:		// 리코일러 댄서롤 고정 스위치
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.DancerFixerRecoiler, 1);
+	//	Sleep(300);
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.DancerFixerRecoiler, 0);
+	//	break;
 	case IDC_CHK_121:		// 리코일러 EPC 자동 스위치
 		pView->MpeWrite(pView->Plc.DlgMenu03.EpcAutoRecoiler, 1);
 		Sleep(300);
@@ -2342,11 +2402,11 @@ void CDlgMenu03::SwMpeBtn(int nCtrlID, long lData)
 		Sleep(300);
 		pView->MpeWrite(pView->Plc.DlgMenu03.TensionCcwPunch, 0);
 		break;
-	case IDC_CHK_12:		// 마킹부 피딩 HOME 스위치 
-		pView->MpeWrite(pView->Plc.DlgMenu03.FeedHomePunch, 1);
-		Sleep(300);
-		pView->MpeWrite(pView->Plc.DlgMenu03.FeedHomePunch, 0);
-		break;
+	//case IDC_CHK_12:		// 마킹부 피딩 HOME 스위치 
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.FeedHomePunch, 1);
+	//	Sleep(300);
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.FeedHomePunch, 0);
+	//	break;
 	case IDC_CHK_13:		// 마킹부 피딩 진공 스위치
 		pView->MpeWrite(pView->Plc.DlgMenu03.FeedVacuumPunch, 1);
 		Sleep(300);
@@ -2382,11 +2442,11 @@ void CDlgMenu03::SwMpeBtn(int nCtrlID, long lData)
 		Sleep(300);
 		pView->MpeWrite(pView->Plc.DlgMenu03.TableClampDnPunch, 0);
 		break;
-	case IDC_CHK_118:		// 마킹부 테이블 클램프전진 스위치
-		pView->MpeWrite(pView->Plc.DlgMenu03.TableClampForwardPunch, 1);
-		Sleep(300);
-		pView->MpeWrite(pView->Plc.DlgMenu03.TableClampForwardPunch, 0);
-		break;
+	//case IDC_CHK_118:		// 마킹부 테이블 클램프전진 스위치
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.TableClampForwardPunch, 1);
+	//	Sleep(300);
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.TableClampForwardPunch, 0);
+	//	break;
 	case IDC_CHK_48:		// 마킹부 마킹 시작 스위치
 		pView->MpeWrite(pView->Plc.DlgMenu03.PunchStartPunch, 1);
 		Sleep(300);
@@ -2414,11 +2474,11 @@ void CDlgMenu03::SwMpeBtn(int nCtrlID, long lData)
 		Sleep(300);
 		pView->MpeWrite(pView->Plc.DlgMenu03.TensionCcwAoiDn, 0);
 		break;
-	case IDC_CHK_58:		// 검사부 하 피딩 HOME 스위치
-		pView->MpeWrite(pView->Plc.DlgMenu03.FeedHomeAoiDn, 1);
-		Sleep(300);
-		pView->MpeWrite(pView->Plc.DlgMenu03.FeedHomeAoiDn, 0);
-		break;
+	//case IDC_CHK_58:		// 검사부 하 피딩 HOME 스위치
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.FeedHomeAoiDn, 1);
+	//	Sleep(300);
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.FeedHomeAoiDn, 0);
+	//	break;
 	case IDC_CHK_59:		// 검사부 하 피딩 진공 스위치
 		pView->MpeWrite(pView->Plc.DlgMenu03.FeedVacuumAoiDn, 1);
 		Sleep(300);
@@ -2501,11 +2561,11 @@ void CDlgMenu03::SwMpeBtn(int nCtrlID, long lData)
 		Sleep(300);
 		pView->MpeWrite(pView->Plc.DlgMenu03.TensionCcwAoiUp, 0);
 		break;
-	case IDC_CHK_20:		// 검사부 상 피딩 HOME 스위치
-		pView->MpeWrite(pView->Plc.DlgMenu03.FeedHomeAoiUp, 1);
-		Sleep(300);
-		pView->MpeWrite(pView->Plc.DlgMenu03.FeedHomeAoiUp, 0);
-		break;
+	//case IDC_CHK_20:		// 검사부 상 피딩 HOME 스위치
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.FeedHomeAoiUp, 1);
+	//	Sleep(300);
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.FeedHomeAoiUp, 0);
+	//	break;
 	case IDC_CHK_21:		// 검사부 상 피딩 진공 스위치
 		pView->MpeWrite(pView->Plc.DlgMenu03.FeedVacuumAoiUp, 1);
 		Sleep(300);
@@ -2536,11 +2596,11 @@ void CDlgMenu03::SwMpeBtn(int nCtrlID, long lData)
 		Sleep(300);
 		pView->MpeWrite(pView->Plc.DlgMenu03.TableCylinderAoiUp, 0);
 		break;
-	case IDC_CHK_50:		// 검사부 상 클린롤러 상부 스위치
-		pView->MpeWrite(pView->Plc.DlgMenu03.CleanRollerUpAoiUp, 1);
-		Sleep(300);
-		pView->MpeWrite(pView->Plc.DlgMenu03.CleanRollerUpAoiUp, 0);
-		break;
+	//case IDC_CHK_50:		// 검사부 상 클린롤러 상부 스위치
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.CleanRollerUpAoiUp, 1);
+	//	Sleep(300);
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.CleanRollerUpAoiUp, 0);
+	//	break;
 	case IDC_CHK_104:		// 검사부 상 클린롤러 하부 스위치
 		pView->MpeWrite(pView->Plc.DlgMenu03.CleanRollerDnAoiUp, 1);
 		Sleep(300);
@@ -2593,11 +2653,11 @@ void CDlgMenu03::SwMpeBtn(int nCtrlID, long lData)
 		Sleep(300);
 		pView->MpeWrite(pView->Plc.DlgMenu03.TensionCcwEngrave, 0);
 		break;
-	case IDC_CHK_75:		// 각인기 피딩 HOME 스위치
-		pView->MpeWrite(pView->Plc.DlgMenu03.FeedHomeEngrave, 1);
-		Sleep(300);
-		pView->MpeWrite(pView->Plc.DlgMenu03.FeedHomeEngrave, 0);
-		break;
+	//case IDC_CHK_75:		// 각인기 피딩 HOME 스위치
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.FeedHomeEngrave, 1);
+	//	Sleep(300);
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.FeedHomeEngrave, 0);
+	//	break;
 	case IDC_CHK_76:		// 각인기 피딩 진공 스위치
 		pView->MpeWrite(pView->Plc.DlgMenu03.FeedVacuumEngrave, 1);
 		Sleep(300);
@@ -2643,16 +2703,16 @@ void CDlgMenu03::SwMpeBtn(int nCtrlID, long lData)
 		Sleep(300);
 		pView->MpeWrite(pView->Plc.DlgMenu03.UltrasonicSpeedEngrave, 0);
 		break;
-	case IDC_CHK_98:		// 각인기 버퍼롤 상승 스위치
-		pView->MpeWrite(pView->Plc.DlgMenu03.DancerUpperEngrave, 1);
-		Sleep(300);
-		pView->MpeWrite(pView->Plc.DlgMenu03.DancerUpperEngrave, 0);
-		break;
-	case IDC_CHK_99:		// 각인기 버퍼롤 고정 스위치
-		pView->MpeWrite(pView->Plc.DlgMenu03.DancerFixerEngrave, 1);
-		Sleep(300);
-		pView->MpeWrite(pView->Plc.DlgMenu03.DancerFixerEngrave, 0);
-		break;
+	//case IDC_CHK_98:		// 각인기 버퍼롤 상승 스위치
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.DancerUpperEngrave, 1);
+	//	Sleep(300);
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.DancerUpperEngrave, 0);
+	//	break;
+	//case IDC_CHK_99:		// 각인기 버퍼롤 고정 스위치
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.DancerFixerEngrave, 1);
+	//	Sleep(300);
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.DancerFixerEngrave, 0);
+	//	break;
 	case IDC_CHK_100:		// 각인기 정렬시작 스위치
 		pView->MpeWrite(pView->Plc.DlgMenu03.AlignStartEngrave, 1);
 		Sleep(300);
@@ -2730,16 +2790,16 @@ void CDlgMenu03::SwMpeBtn(int nCtrlID, long lData)
 		Sleep(300);
 		pView->MpeWrite(pView->Plc.DlgMenu03.PaperInverterCcwUncoiler, 0);
 		break;
-	case IDC_CHK_29:		// 언코일러 댄서롤 상승 스위치
-		pView->MpeWrite(pView->Plc.DlgMenu03.DancerUpperUncoiler, 1);
-		Sleep(300);
-		pView->MpeWrite(pView->Plc.DlgMenu03.DancerUpperUncoiler, 0);
-		break;
-	case IDC_CHK_36:		// 언코일러 댄서롤 고정 스위치
-		pView->MpeWrite(pView->Plc.DlgMenu03.DancerFixerUncoiler, 1);
-		Sleep(300);
-		pView->MpeWrite(pView->Plc.DlgMenu03.DancerFixerUncoiler, 0);
-		break;
+	//case IDC_CHK_29:		// 언코일러 댄서롤 상승 스위치
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.DancerUpperUncoiler, 1);
+	//	Sleep(300);
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.DancerUpperUncoiler, 0);
+	//	break;
+	//case IDC_CHK_36:		// 언코일러 댄서롤 고정 스위치
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.DancerFixerUncoiler, 1);
+	//	Sleep(300);
+	//	pView->MpeWrite(pView->Plc.DlgMenu03.DancerFixerUncoiler, 0);
+	//	break;
 	case IDC_CHK_89:		// 언코일러 EPC 자동 스위치
 		pView->MpeWrite(pView->Plc.DlgMenu03.EpcAutoUncoiler, 1);
 		Sleep(300);
@@ -2864,41 +2924,41 @@ void CDlgMenu03::MoveAoi(int nDir)
 	}
 }
 
-void CDlgMenu03::ChkDoneMk() 
-{
-	if(pDoc->WorkingInfo.LastJob.bMkOnePnl)
-	{
-		if(!m_bTIM_CHK_DONE_MK)
-		{
-			m_bTIM_CHK_DONE_MK = TRUE;
-			SetTimer(TIM_CHK_DONE_MK, 100, NULL);
-		}
-	}
-}
+//void CDlgMenu03::ChkDoneMk() 
+//{
+//	if(pDoc->WorkingInfo.LastJob.bMkOnePnl)
+//	{
+//		if(!m_bTIM_CHK_DONE_MK)
+//		{
+//			m_bTIM_CHK_DONE_MK = TRUE;
+//			SetTimer(TIM_CHK_DONE_MK, 100, NULL);
+//		}
+//	}
+//}
 
-void CDlgMenu03::ChkDoneAoi() 
-{
-	if(pDoc->WorkingInfo.LastJob.bAoiOnePnl)
-	{
-		if(!m_bTIM_CHK_DONE_AOI)
-		{
-			m_bTIM_CHK_DONE_AOI = TRUE;
-			SetTimer(TIM_CHK_DONE_AOI, 100, NULL);
-		}
-	}
-}
+//void CDlgMenu03::ChkDoneAoi() 
+//{
+//	if(pDoc->WorkingInfo.LastJob.bAoiOnePnl)
+//	{
+//		if(!m_bTIM_CHK_DONE_AOI)
+//		{
+//			m_bTIM_CHK_DONE_AOI = TRUE;
+//			SetTimer(TIM_CHK_DONE_AOI, 100, NULL);
+//		}
+//	}
+//}
 
-void CDlgMenu03::ChkDoneMkAoi() 
-{
-	if(pDoc->WorkingInfo.LastJob.bMkOnePnl && pDoc->WorkingInfo.LastJob.bAoiOnePnl)
-	{
-		if(!m_bTIM_CHK_DONE_MKAOI)
-		{
-			m_bTIM_CHK_DONE_MKAOI = TRUE;
-			SetTimer(TIM_CHK_DONE_MKAOI, 100, NULL);
-		}
-	}
-}
+//void CDlgMenu03::ChkDoneMkAoi() 
+//{
+//	if(pDoc->WorkingInfo.LastJob.bMkOnePnl && pDoc->WorkingInfo.LastJob.bAoiOnePnl)
+//	{
+//		if(!m_bTIM_CHK_DONE_MKAOI)
+//		{
+//			m_bTIM_CHK_DONE_MKAOI = TRUE;
+//			SetTimer(TIM_CHK_DONE_MKAOI, 100, NULL);
+//		}
+//	}
+//}
 
 BOOL CDlgMenu03::GetRelation() 
 {
@@ -3039,6 +3099,12 @@ BOOL CDlgMenu03::DoReset()
 
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
 
+	// 자신의 로컬파일에 설정
+	pDoc->SetCurrentInfoSignal(_SigInx::_MyMsgYes, FALSE);
+	pDoc->SetCurrentInfoSignal(_SigInx::_MyMsgNo, FALSE);
+	pDoc->SetCurrentInfoSignal(_SigInx::_MyMsgOk, FALSE);
+
+
 	if(pDoc->Status.bManual)
 	{
 		BOOL bInit=TRUE;
@@ -3058,7 +3124,7 @@ BOOL CDlgMenu03::DoReset()
 			pView->m_pEngrave->SwEngAutoInit(TRUE);
 		}
 		
-		if(IDNO == pView->MsgBox(_T("초기화를 하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, FALSE))
+		if(IDNO == pView->MsgBox(_T("초기화를 하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, TRUE))
 			bInit = FALSE;
 		else
 		{
@@ -3067,11 +3133,13 @@ BOOL CDlgMenu03::DoReset()
 
 			if (pView->m_pDlgMenu01)
 				pView->m_pDlgMenu01->ClrInfo();
+
+			pView->ResetYield();
 		}
 
 		if(!bInit)
 		{
-			if(IDNO == pView->MsgBox(_T("이어가기를 하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, FALSE))
+			if(IDNO == pView->MsgBox(_T("이어가기를 하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, TRUE))
 			{
 				pView->m_bCont = FALSE; pDoc->SetStatus(_T("General"), _T("bCont"), pView->m_bCont);
 				return FALSE;
@@ -3091,50 +3159,55 @@ BOOL CDlgMenu03::DoReset()
 
 		pView->m_bInit = bInit;
 
-		CFileFind cFile;
-		BOOL bExistSup, bExistBup, bExistSdn, bExistBdn;
-		BOOL bExistSVsup, bExistBVsup, bExistSVsdn, bExistBVsdn;
-
-		bExistSup = cFile.FindFile(pDoc->WorkingInfo.System.sPathVrsShareUp + _T("*.pcr"));
-		bExistBup = cFile.FindFile(pDoc->WorkingInfo.System.sPathVrsBufUp + _T("*.pcr"));
-		bExistSVsup = cFile.FindFile(pDoc->WorkingInfo.System.sPathVsShareUp + _T("*.pcr"));
-		bExistBVsup = cFile.FindFile(pDoc->WorkingInfo.System.sPathVsDummyBufUp + _T("*.pcr"));
-		if(bDualTest)
-		{
-			bExistSdn = cFile.FindFile(pDoc->WorkingInfo.System.sPathVrsShareDn + _T("*.pcr"));
-			bExistBdn = cFile.FindFile(pDoc->WorkingInfo.System.sPathVrsBufDn + _T("*.pcr"));
-			bExistSVsdn = cFile.FindFile(pDoc->WorkingInfo.System.sPathVsShareDn + _T("*.pcr"));
-			bExistBVsdn = cFile.FindFile(pDoc->WorkingInfo.System.sPathVsDummyBufDn + _T("*.pcr"));
-			if(bExistSup || bExistSdn ||
-				bExistBup || bExistBdn ||
-				bExistSVsup || bExistSVsdn ||
-				bExistBVsup || bExistBVsdn)
-			{
-				pDoc->DelPcrAll();
-			}
-			else
-			{
-				pView->m_bIsBuf[0] = FALSE;
-				pView->m_bIsBuf[1] = FALSE;
-			}
-		}
-		else
-		{
-			if(bExistSup || bExistBup || bExistSVsup || bExistBVsup)
-			{
-				pDoc->DelPcrAll();
-			}
-			else
-			{
-				pView->m_bIsBuf[0] = FALSE;
-				pView->m_bIsBuf[1] = FALSE;
-			}
-		}
+		pView->ClearBuffer();
+		//CFileFind cFile;
+		//BOOL bExistSup, bExistBup, bExistSdn, bExistBdn;
+		//BOOL bExistSVsup, bExistBVsup, bExistSVsdn, bExistBVsdn;
+		//
+		//bExistSup = cFile.FindFile(pDoc->WorkingInfo.System.sPathVrsShareUp + _T("*.pcr"));
+		//bExistBup = cFile.FindFile(pDoc->WorkingInfo.System.sPathVrsBufUp + _T("*.pcr"));
+		//bExistSVsup = cFile.FindFile(pDoc->WorkingInfo.System.sPathVsShareUp + _T("*.pcr"));
+		//bExistBVsup = cFile.FindFile(pDoc->WorkingInfo.System.sPathVsDummyBufUp + _T("*.pcr"));
+		//if(bDualTest)
+		//{
+		//	bExistSdn = cFile.FindFile(pDoc->WorkingInfo.System.sPathVrsShareDn + _T("*.pcr"));
+		//	bExistBdn = cFile.FindFile(pDoc->WorkingInfo.System.sPathVrsBufDn + _T("*.pcr"));
+		//	bExistSVsdn = cFile.FindFile(pDoc->WorkingInfo.System.sPathVsShareDn + _T("*.pcr"));
+		//	bExistBVsdn = cFile.FindFile(pDoc->WorkingInfo.System.sPathVsDummyBufDn + _T("*.pcr"));
+		//	if(bExistSup || bExistSdn ||
+		//		bExistBup || bExistBdn ||
+		//		bExistSVsup || bExistSVsdn ||
+		//		bExistBVsup || bExistBVsdn)
+		//	{
+		//		pDoc->DelPcrAll();
+		//	}
+		//	else
+		//	{
+		//		pView->m_bIsBuf[0] = FALSE;
+		//		pView->m_bIsBuf[1] = FALSE;
+		//	}
+		//}
+		//else
+		//{
+		//	if(bExistSup || bExistBup || bExistSVsup || bExistBVsup)
+		//	{
+		//		pDoc->DelPcrAll();
+		//	}
+		//	else
+		//	{
+		//		pView->m_bIsBuf[0] = FALSE;
+		//		pView->m_bIsBuf[1] = FALSE;
+		//	}
+		//}
 
 		pView->TowerLamp(RGB_RED, TRUE, FALSE);
 		pView->DispMain(_T("정 지"), RGB_RED);	
 		SwAoiReset(TRUE);
 		pView->OpenReelmap();
+		if (pDoc->GetTestMode() == MODE_OUTER)
+		{
+			pView->OpenReelmapInner();
+		}
 
 		if(bInit)
 		{
@@ -3165,14 +3238,14 @@ void CDlgMenu03::DoReady()
 	pDoc->DelPcrAll();
 }
 
-void CDlgMenu03::ChkBufHomeDone()
-{
-	if(!m_bTIM_CHK_DONE_BUF_HOME)
-	{
-		m_bTIM_CHK_DONE_BUF_HOME = TRUE;
-		SetTimer(TIM_CHK_DONE_BUF_HOME, 100, NULL);
-	}
-}
+//void CDlgMenu03::ChkBufHomeDone()
+//{
+//	if(!m_bTIM_CHK_DONE_BUF_HOME)
+//	{
+//		m_bTIM_CHK_DONE_BUF_HOME = TRUE;
+//		SetTimer(TIM_CHK_DONE_BUF_HOME, 100, NULL);
+//	}
+//}
 
 void CDlgMenu03::ChkBufInitDone()
 {
@@ -3465,120 +3538,120 @@ void CDlgMenu03::SetCore150mmUncoiler(BOOL bOn)
 
 void CDlgMenu03::SetDualTest(BOOL bOn)
 {
-	if(bOn)
-	{
-		if(!myStcTitle[61].IsWindowVisible())
-			myStcTitle[61].ShowWindow(SW_SHOW);
-		if(!myBtn[55].IsWindowVisible())
-			myBtn[55].ShowWindow(SW_SHOW);
-		
-		if(!myStcTitle[62].IsWindowVisible())
-			myStcTitle[62].ShowWindow(SW_SHOW);
-		if(!myBtn[56].IsWindowVisible())
-			myBtn[56].ShowWindow(SW_SHOW);
-		
-		if(!myStcTitle[63].IsWindowVisible())
-			myStcTitle[63].ShowWindow(SW_SHOW);
-		if(!myBtn[57].IsWindowVisible())
-			myBtn[57].ShowWindow(SW_SHOW);
-		
-		if(!myStcTitle[64].IsWindowVisible())
-			myStcTitle[64].ShowWindow(SW_SHOW);
-		if(!myBtn[58].IsWindowVisible())
-			myBtn[58].ShowWindow(SW_SHOW);
-		
-		if(!myStcTitle[65].IsWindowVisible())
-			myStcTitle[65].ShowWindow(SW_SHOW);
-		if(!myBtn[59].IsWindowVisible())
-			myBtn[59].ShowWindow(SW_SHOW);
-		
-		if(!myStcTitle[66].IsWindowVisible())
-			myStcTitle[66].ShowWindow(SW_SHOW);
-		if(!myBtn[60].IsWindowVisible())
-			myBtn[60].ShowWindow(SW_SHOW);
-		
-		if(!myStcTitle[67].IsWindowVisible())
-			myStcTitle[67].ShowWindow(SW_SHOW);
-		if(!myBtn[61].IsWindowVisible())
-			myBtn[61].ShowWindow(SW_SHOW);
-		
-		if(!myStcTitle[68].IsWindowVisible())
-			myStcTitle[68].ShowWindow(SW_SHOW);
-		if(!myBtn[62].IsWindowVisible())
-			myBtn[62].ShowWindow(SW_SHOW);
-		
-		if(!myStcTitle[69].IsWindowVisible())
-			myStcTitle[69].ShowWindow(SW_SHOW);
-		if(!myBtn[63].IsWindowVisible())
-			myBtn[63].ShowWindow(SW_SHOW);
-		
-		if(!myStcTitle[70].IsWindowVisible())
-			myStcTitle[70].ShowWindow(SW_SHOW);
-		if(!myBtn[64].IsWindowVisible())
-			myBtn[64].ShowWindow(SW_SHOW);
-		
-		if(!myStcTitle[71].IsWindowVisible())
-			myStcTitle[71].ShowWindow(SW_SHOW);
-		if(!myBtn[65].IsWindowVisible())
-			myBtn[65].ShowWindow(SW_SHOW);
-	}
-	else
-	{
-		if(myStcTitle[61].IsWindowVisible())
-			myStcTitle[61].ShowWindow(SW_HIDE);
-		if(myBtn[55].IsWindowVisible())
-			myBtn[55].ShowWindow(SW_HIDE);
-		
-		if(myStcTitle[62].IsWindowVisible())
-			myStcTitle[62].ShowWindow(SW_HIDE);
-		if(myBtn[56].IsWindowVisible())
-			myBtn[56].ShowWindow(SW_HIDE);
-		
-		if(myStcTitle[63].IsWindowVisible())
-			myStcTitle[63].ShowWindow(SW_HIDE);
-		if(myBtn[57].IsWindowVisible())
-			myBtn[57].ShowWindow(SW_HIDE);
-		
-		if(myStcTitle[64].IsWindowVisible())
-			myStcTitle[64].ShowWindow(SW_HIDE);
-		if(myBtn[58].IsWindowVisible())
-			myBtn[58].ShowWindow(SW_HIDE);
-		
-		if(myStcTitle[65].IsWindowVisible())
-			myStcTitle[65].ShowWindow(SW_HIDE);
-		if(myBtn[59].IsWindowVisible())
-			myBtn[59].ShowWindow(SW_HIDE);
-		
-		if(myStcTitle[66].IsWindowVisible())
-			myStcTitle[66].ShowWindow(SW_HIDE);
-		if(myBtn[60].IsWindowVisible())
-			myBtn[60].ShowWindow(SW_HIDE);
-		
-		if(myStcTitle[67].IsWindowVisible())
-			myStcTitle[67].ShowWindow(SW_HIDE);
-		if(myBtn[61].IsWindowVisible())
-			myBtn[61].ShowWindow(SW_HIDE);
-		
-		if(myStcTitle[68].IsWindowVisible())
-			myStcTitle[68].ShowWindow(SW_HIDE);
-		if(myBtn[62].IsWindowVisible())
-			myBtn[62].ShowWindow(SW_HIDE);
-		
-		if(myStcTitle[69].IsWindowVisible())
-			myStcTitle[69].ShowWindow(SW_HIDE);
-		if(myBtn[63].IsWindowVisible())
-			myBtn[63].ShowWindow(SW_HIDE);
-		
-		if(myStcTitle[70].IsWindowVisible())
-			myStcTitle[70].ShowWindow(SW_HIDE);
-		if(myBtn[64].IsWindowVisible())
-			myBtn[64].ShowWindow(SW_HIDE);
-		
-		if(myStcTitle[71].IsWindowVisible())
-			myStcTitle[71].ShowWindow(SW_HIDE);
-		if(myBtn[65].IsWindowVisible())
-			myBtn[65].ShowWindow(SW_HIDE);
-	}
+	//if(bOn)
+	//{
+	//	if(!myStcTitle[61].IsWindowVisible())
+	//		myStcTitle[61].ShowWindow(SW_SHOW);
+	//	if(!myBtn[55].IsWindowVisible())
+	//		myBtn[55].ShowWindow(SW_SHOW);
+	//	
+	//	if(!myStcTitle[62].IsWindowVisible())
+	//		myStcTitle[62].ShowWindow(SW_SHOW);
+	//	if(!myBtn[56].IsWindowVisible())
+	//		myBtn[56].ShowWindow(SW_SHOW);
+	//	
+	//	if(!myStcTitle[63].IsWindowVisible())
+	//		myStcTitle[63].ShowWindow(SW_SHOW);
+	//	if(!myBtn[57].IsWindowVisible())
+	//		myBtn[57].ShowWindow(SW_SHOW);
+	//	
+	//	if(!myStcTitle[64].IsWindowVisible())
+	//		myStcTitle[64].ShowWindow(SW_SHOW);
+	//	if(!myBtn[58].IsWindowVisible())
+	//		myBtn[58].ShowWindow(SW_SHOW);
+	//	
+	//	if(!myStcTitle[65].IsWindowVisible())
+	//		myStcTitle[65].ShowWindow(SW_SHOW);
+	//	if(!myBtn[59].IsWindowVisible())
+	//		myBtn[59].ShowWindow(SW_SHOW);
+	//	
+	//	if(!myStcTitle[66].IsWindowVisible())
+	//		myStcTitle[66].ShowWindow(SW_SHOW);
+	//	if(!myBtn[60].IsWindowVisible())
+	//		myBtn[60].ShowWindow(SW_SHOW);
+	//	
+	//	if(!myStcTitle[67].IsWindowVisible())
+	//		myStcTitle[67].ShowWindow(SW_SHOW);
+	//	if(!myBtn[61].IsWindowVisible())
+	//		myBtn[61].ShowWindow(SW_SHOW);
+	//	
+	//	if(!myStcTitle[68].IsWindowVisible())
+	//		myStcTitle[68].ShowWindow(SW_SHOW);
+	//	if(!myBtn[62].IsWindowVisible())
+	//		myBtn[62].ShowWindow(SW_SHOW);
+	//	
+	//	if(!myStcTitle[69].IsWindowVisible())
+	//		myStcTitle[69].ShowWindow(SW_SHOW);
+	//	if(!myBtn[63].IsWindowVisible())
+	//		myBtn[63].ShowWindow(SW_SHOW);
+	//	
+	//	if(!myStcTitle[70].IsWindowVisible())
+	//		myStcTitle[70].ShowWindow(SW_SHOW);
+	//	if(!myBtn[64].IsWindowVisible())
+	//		myBtn[64].ShowWindow(SW_SHOW);
+	//	
+	//	if(!myStcTitle[71].IsWindowVisible())
+	//		myStcTitle[71].ShowWindow(SW_SHOW);
+	//	if(!myBtn[65].IsWindowVisible())
+	//		myBtn[65].ShowWindow(SW_SHOW);
+	//}
+	//else
+	//{
+	//	if(myStcTitle[61].IsWindowVisible())
+	//		myStcTitle[61].ShowWindow(SW_HIDE);
+	//	if(myBtn[55].IsWindowVisible())
+	//		myBtn[55].ShowWindow(SW_HIDE);
+	//	
+	//	if(myStcTitle[62].IsWindowVisible())
+	//		myStcTitle[62].ShowWindow(SW_HIDE);
+	//	if(myBtn[56].IsWindowVisible())
+	//		myBtn[56].ShowWindow(SW_HIDE);
+	//	
+	//	if(myStcTitle[63].IsWindowVisible())
+	//		myStcTitle[63].ShowWindow(SW_HIDE);
+	//	if(myBtn[57].IsWindowVisible())
+	//		myBtn[57].ShowWindow(SW_HIDE);
+	//	
+	//	if(myStcTitle[64].IsWindowVisible())
+	//		myStcTitle[64].ShowWindow(SW_HIDE);
+	//	if(myBtn[58].IsWindowVisible())
+	//		myBtn[58].ShowWindow(SW_HIDE);
+	//	
+	//	if(myStcTitle[65].IsWindowVisible())
+	//		myStcTitle[65].ShowWindow(SW_HIDE);
+	//	if(myBtn[59].IsWindowVisible())
+	//		myBtn[59].ShowWindow(SW_HIDE);
+	//	
+	//	if(myStcTitle[66].IsWindowVisible())
+	//		myStcTitle[66].ShowWindow(SW_HIDE);
+	//	if(myBtn[60].IsWindowVisible())
+	//		myBtn[60].ShowWindow(SW_HIDE);
+	//	
+	//	if(myStcTitle[67].IsWindowVisible())
+	//		myStcTitle[67].ShowWindow(SW_HIDE);
+	//	if(myBtn[61].IsWindowVisible())
+	//		myBtn[61].ShowWindow(SW_HIDE);
+	//	
+	//	if(myStcTitle[68].IsWindowVisible())
+	//		myStcTitle[68].ShowWindow(SW_HIDE);
+	//	if(myBtn[62].IsWindowVisible())
+	//		myBtn[62].ShowWindow(SW_HIDE);
+	//	
+	//	if(myStcTitle[69].IsWindowVisible())
+	//		myStcTitle[69].ShowWindow(SW_HIDE);
+	//	if(myBtn[63].IsWindowVisible())
+	//		myBtn[63].ShowWindow(SW_HIDE);
+	//	
+	//	if(myStcTitle[70].IsWindowVisible())
+	//		myStcTitle[70].ShowWindow(SW_HIDE);
+	//	if(myBtn[64].IsWindowVisible())
+	//		myBtn[64].ShowWindow(SW_HIDE);
+	//	
+	//	if(myStcTitle[71].IsWindowVisible())
+	//		myStcTitle[71].ShowWindow(SW_HIDE);
+	//	if(myBtn[65].IsWindowVisible())
+	//		myBtn[65].ShowWindow(SW_HIDE);
+	//}
 }
 
 BOOL CDlgMenu03::OnEraseBkgnd(CDC* pDC)
@@ -3632,17 +3705,17 @@ void CDlgMenu03::MoveEngrave(int nDir)
 	}
 }
 
-void CDlgMenu03::ChkDoneEngrave()
-{
-	if (pDoc->WorkingInfo.LastJob.bEngraveOnePnl)
-	{
-		if (!m_bTIM_CHK_DONE_ENGRAVE)
-		{
-			m_bTIM_CHK_DONE_ENGRAVE = TRUE;
-			SetTimer(TIM_CHK_DONE_ENGRAVE, 100, NULL);
-		}
-	}
-}
+//void CDlgMenu03::ChkDoneEngrave()
+//{
+//	if (pDoc->WorkingInfo.LastJob.bEngraveOnePnl)
+//	{
+//		if (!m_bTIM_CHK_DONE_ENGRAVE)
+//		{
+//			m_bTIM_CHK_DONE_ENGRAVE = TRUE;
+//			SetTimer(TIM_CHK_DONE_ENGRAVE, 100, NULL);
+//		}
+//	}
+//}
 
 BOOL CDlgMenu03::IsEngraveFdVac()
 {
@@ -3706,23 +3779,23 @@ void CDlgMenu03::UpdateSignal()
 }
 
 
-void CDlgMenu03::ChkEngBufHomeDone()
-{
-	if (!m_bTIM_CHK_DONE_ENG_BUF_HOME)
-	{
-		m_bTIM_CHK_DONE_ENG_BUF_HOME = TRUE;
-		SetTimer(TIM_CHK_DONE_ENG_BUF_HOME, 100, NULL);
-	}
-}
+//void CDlgMenu03::ChkEngBufHomeDone()
+//{
+//	if (!m_bTIM_CHK_DONE_ENG_BUF_HOME)
+//	{
+//		m_bTIM_CHK_DONE_ENG_BUF_HOME = TRUE;
+//		SetTimer(TIM_CHK_DONE_ENG_BUF_HOME, 100, NULL);
+//	}
+//}
 
-void CDlgMenu03::ChkEngBufInitDone()
-{
-	if (!m_bTIM_CHK_DONE_ENG_BUF_INIT)
-	{
-		m_bTIM_CHK_DONE_ENG_BUF_INIT = TRUE;
-		SetTimer(TIM_CHK_DONE_ENG_BUF_INIT, 100, NULL);
-	}
-}
+//void CDlgMenu03::ChkEngBufInitDone()
+//{
+//	if (!m_bTIM_CHK_DONE_ENG_BUF_INIT)
+//	{
+//		m_bTIM_CHK_DONE_ENG_BUF_INIT = TRUE;
+//		SetTimer(TIM_CHK_DONE_ENG_BUF_INIT, 100, NULL);
+//	}
+//}
 
 void CDlgMenu03::SetLed(int nIdx, BOOL bOn)
 {

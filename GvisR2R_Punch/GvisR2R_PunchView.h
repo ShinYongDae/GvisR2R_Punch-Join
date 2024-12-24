@@ -70,22 +70,24 @@
 #define ENG_ST					100	// m_nEngStAuto
 #define ENG_2D_ST				150	// m_nEngStAuto
 
-#define TIM_INIT_VIEW			0
-#define TIM_TOWER_WINKER		10
-#define TIM_BTN_WINKER			11
-#define TIM_BUZZER_WARN			12
-#define TIM_MB_TIME_OUT			13
-#define TIM_DISP_STATUS			14
-#define TIM_MPE_IO				15
-// #define TIM_MK_START			16
-#define TIM_SHOW_MENU01			18
-#define TIM_SHOW_MENU02			19
-#define TIM_CHK_TEMP_STOP		20
-#define TIM_SAFTY_STOP			21
-#define TIM_CAMMASTER_UPDATE	22
-#define TIM_START_UPDATE		100
+#define TIM_INIT_VIEW				0
+#define TIM_TOWER_WINKER			10
+#define TIM_BTN_WINKER				11
+#define TIM_BUZZER_WARN				12
+#define TIM_MB_TIME_OUT				13
+#define TIM_DISP_STATUS				14
+#define TIM_MPE_IO					15
+// #define TIM_MK_START				16
+#define TIM_SHOW_MENU01				18
+#define TIM_SHOW_MENU02				19
+#define TIM_CHK_TEMP_STOP			20
+#define TIM_SAFTY_STOP				21
+#define TIM_CAMMASTER_UPDATE		22
+#define TIM_START_UPDATE			100
+#define TIM_CHK_RCV_CURR_INFO_SIG	200
+#define TIM_CHK_RCV_MON_DISP_MAIN_SIG	201
 
-#define MAX_THREAD				39
+#define MAX_THREAD				49
 
 namespace Read2dIdx
 {
@@ -217,6 +219,7 @@ class CGvisR2R_PunchView : public CFormView
 
 	double m_dElecChkVal;
 	BOOL m_bContEngraveF;
+	CString m_sMsg;
 
 
 	void InitMyMsg();
@@ -332,7 +335,7 @@ class CGvisR2R_PunchView : public CFormView
 	BOOL SortingOutDn(int* pSerial, int nTot);
 	void SwapDn(__int64 *num1, __int64 *num2);
 
-	BOOL LoadMstInfo();
+	BOOL LoadMstInfo();			// Reelmap 초기화
 
 	void DoAutoEng();
 	void DoAtuoGetEngStSignal();
@@ -397,6 +400,9 @@ public:
 	BOOL m_bTIM_INIT_VIEW;
 	BOOL m_bCam, m_bReview;
 
+	BOOL m_bTIM_CHK_RCV_CURR_INFO_SIG;
+	BOOL m_bTIM_CHK_RCV_MON_DISP_MAIN_SIG;
+
 	DWORD m_dwThreadTick[MAX_THREAD];
 	BOOL m_bThread[MAX_THREAD];
 	CThreadTask m_Thread[MAX_THREAD];
@@ -439,7 +445,7 @@ public:
 	BOOL m_bTHREAD_UPDATE_YIELD_ITS;
 	BOOL m_bTHREAD_UPDATE_YIELD_INNER_UP, m_bTHREAD_UPDATE_YIELD_INNER_ALLUP;
 	BOOL m_bTHREAD_UPDATE_YIELD_INNER_DN, m_bTHREAD_UPDATE_YIELD_INNER_ALLDN;
-	int	m_nSnTHREAD_UPDATAE_YIELD;
+	int	m_nSnTHREAD_UPDATAE_YIELD, m_nSnTHREAD_UPDATAE_YIELD_ITS;
 
 	void UpdateReelmapYieldUp();
 	void UpdateReelmapYieldAllUp();
@@ -505,7 +511,7 @@ public:
 
 	int m_nMonAlmF, m_nClrAlmF;
 	BOOL m_bLotEnd, m_bLotEndF, m_bLastProc, m_bLastProcFromUp, m_bLastProcFromEng;
-	BOOL m_bMkSt, m_bMkStSw;
+	BOOL m_bMkSt[2], m_bMkStSw[2]; // 0 : Left , 1 : Right
 	BOOL m_bEngSt, m_bEngStSw;
 	BOOL m_bEng2dSt, m_bEng2dStSw;
 	int m_nMkStAuto, m_nEngStAuto, m_nEng2dStAuto;
@@ -515,10 +521,13 @@ public:
 
 	BOOL m_bAoiFdWrite[2], m_bAoiFdWriteF[2]; // [Up/Dn]
 	BOOL m_bAoiTest[2], m_bAoiTestF[2];
+	//BOOL m_bEngFdWrite, m_bEngFdWriteF; // [Up/Dn]
+	//BOOL m_bEngTest, m_bEngTestF;
 	BOOL m_bWaitPcr[2]; // [Up/Dn] : FALSE -> 잔량처리시 Share 폴더에 시리얼을 기다리지 않음.
 
 	BOOL m_bEngFdWrite, m_bEngFdWriteF;
 	BOOL m_bEngTest, m_bEngTestF;
+	BOOL m_bMkFdWrite, m_bMkFdWriteF;
 
 	BOOL m_bCycleStop, m_bContDiffLot;
 	CString m_sDispMain;
@@ -560,13 +569,14 @@ public:
 	int m_nSaveMk0Img, m_nSaveMk1Img;
 	BOOL m_bShift2Mk, m_bUpdateYield, m_bUpdateYieldOnRmap;
 
+	void ReloadYield();
 	void SetLastSerialEng(int nSerial);
 	int MsgBox(CString sMsg, int nThreadIdx = 0, int nType = MB_OK, int nTimOut = DEFAULT_TIME_OUT, BOOL bEngave = TRUE);		// SyncMsgBox
 	int AsyncMsgBox(CString sMsg, int nThreadIdx = 1, int nType = MB_OK, int nTimOut = DEFAULT_TIME_OUT);						// AsyncMsgBox
 	int WaitRtnVal(int nThreadIdx = 1);
 	afx_msg LRESULT OnMyMsgExit(WPARAM wPara, LPARAM lPara);
 
-
+	int GetLastBufferSerial(int nAoi); // 0: Up, 1: Dn
 	void GetPlcParam();
 	BOOL WatiDispMain(int nDelay);
 
@@ -609,6 +619,7 @@ public:
 	BOOL SaveMk0Img(int nMkPcsIdx);
 	BOOL SaveMk1Img(int nMkPcsIdx);
 
+	void InsertPunchingData(int nCam);
 
 	void ChkShareVs();
 	void ChkShareVsUp();
@@ -693,6 +704,66 @@ public:
 	static UINT ThreadProc37(LPVOID lpContext); // UpdateYieldInnerAllDn()
 	static UINT ThreadProc38(LPVOID lpContext); // UpdateYieldIts()
 
+	static UINT ThreadProc39(LPVOID lpContext); // MakeItsFileUp()
+	static UINT ThreadProc40(LPVOID lpContext); // MakeItsFileDn()
+
+	// RemakeReelmapFromPcr - Start
+	static UINT ThreadProc41(LPVOID lpContext); // LoadPcrUpOnOffline()
+	static UINT ThreadProc42(LPVOID lpContext); // LoadPcrUpAllOnOffline()
+	static UINT ThreadProc43(LPVOID lpContext); // LoadPcrDnOnOffline()
+	static UINT ThreadProc44(LPVOID lpContext); // LoadPcrDnAllOnOffline()
+
+	static UINT ThreadProc45(LPVOID lpContext); // m_pReelMapUp->WriteOnOffline()
+	static UINT ThreadProc46(LPVOID lpContext); // m_pReelMapDn->WriteOnOffline()
+	static UINT ThreadProc47(LPVOID lpContext); // m_pReelMapAllUp->WriteOnOffline()
+	static UINT ThreadProc48(LPVOID lpContext); // m_pReelMapAllDn->WriteOnOffline()
+
+	int m_nSerialRmapUpdateOnOffline;
+	BOOL m_bTHREAD_LOAD_PCR_UP_OFFLINE, m_bTHREAD_LOAD_PCR_ALLUP_OFFLINE;
+	BOOL m_bTHREAD_LOAD_PCR_DN_OFFLINE, m_bTHREAD_LOAD_PCR_ALLDN_OFFLINE;
+
+	BOOL m_bTHREAD_UPDATE_REELMAP_UP_OFFLINE, m_bTHREAD_UPDATE_REELMAP_ALLUP_OFFLINE;
+	BOOL m_bTHREAD_UPDATE_REELMAP_DN_OFFLINE, m_bTHREAD_UPDATE_REELMAP_ALLDN_OFFLINE;
+
+	int m_nLastShotOnOffline;
+	BOOL m_bTHREAD_WRITE_LAST_INFO_REELMAP_UP_OFFLINE, m_bTHREAD_WRITE_LAST_INFO_REELMAP_ALLUP_OFFLINE;
+	BOOL m_bTHREAD_WRITE_LAST_INFO_REELMAP_DN_OFFLINE, m_bTHREAD_WRITE_LAST_INFO_REELMAP_ALLDN_OFFLINE;
+
+	void LoadPcrUpOnOffline();
+	void LoadPcrDnOnOffline();
+	void LoadPcrUpAllOnOffline();
+	void LoadPcrDnAllOnOffline();
+
+	BOOL LoadPcrOnOffline(int nSerial, int nOffline);
+	BOOL LoadPcrAllOnOffline(int nSerial, int nOffline);
+
+	BOOL UpdateRMapOnOffline(int nSerial, int nOffline);
+	BOOL UpdateRMapAllOnOffline(int nSerial, int nOffline);
+	void UpdateRMapUpOnOffline();
+	void UpdateRMapDnOnOffline();
+	void UpdateRMapUpAllOnOffline();
+	void UpdateRMapDnAllOnOffline();
+
+	BOOL RemakeReelmapFromPcr(CString sModel, CString sLot, CString sLayerUp, CString sLayerDn);
+	int IsOfflineFolder(); // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+	void StartThreadRemakeRmapFromPcr();
+	void StartThread();
+	void SetLastSerialOnOffline(int nSerial, int nOffline);
+	void StopThreadRemakeRmapFromPcr();
+	void WriteLastRMapUpInfoOnOffline();
+	void WriteLastRMapDnInfoOnOffline();
+	void WriteLastRMapUpAllInfoOnOffline();
+	void WriteLastRMapDnAllInfoOnOffline();
+	void DeleteReelmapOnOffline();
+	BOOL WriteLastRmapInfo(int nLastShot, int nOffline);
+	int GetLastShotFromPcr(int nOffline);
+	BOOL RemakeRmapFromPcr(int nLastShot, int nOffline);
+	void ResetYield(int nOffline=3); // [nOffline] 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+
+	void DeleteYieldOnOffline();
+	// RemakeReelmapFromPcr - End
+
+
 	void UpdateRMapUp();
 	void UpdateRMapAllUp();
 	void UpdateRMapDn();
@@ -723,8 +794,8 @@ public:
 	BOOL GetDelay(int &mSec, int nId = 0);	// F:Done, T:On Waiting....
 	BOOL GetDelay0(int &mSec, int nId = 0);	// F:Done, T:On Waiting....
 	BOOL GetDelay1(int &mSec, int nId = 0);	// F:Done, T:On Waiting....
-	BOOL IsMkFdDone();
-	BOOL IsAoiFdDone();
+	//BOOL IsMkFdDone();
+	//BOOL IsAoiFdDone();
 	double GetAoi2InitDist();
 	double GetMkInitDist();
 	void UpdateWorking();
@@ -762,6 +833,8 @@ public:
 	double GetPartVel();
 	void SetCycTime();
 	int GetCycTime(); // [mSec]
+	void CheckCurrentInfoSignal(int nMsgID, int nData);
+	void CheckMonDispMainSignal();
 
 	BOOL IsShare();
 	BOOL IsShareUp();
@@ -803,7 +876,6 @@ public:
 	int GetBufferUp1(int *pPrevSerial = NULL);
 	int GetBufferDn1(int *pPrevSerial = NULL);
 
-	//	BOOL ChkLotEnd(CString sPath);
 	BOOL IsMkTmpStop();
 	BOOL IsAuto();
 	void Marking();
@@ -835,7 +907,6 @@ public:
 	int GetTotDefPcsUp1(int nSerial);
 	int GetTotDefPcsDn1(int nSerial);
 
-	// 	CfPoint GetMkPnt(int nSerial, int nMkPcs);
 	CfPoint GetMkPnt(int nIdx);						// CamMaster의 피스순서 인덱스
 	CfPoint GetMkPnt0(int nIdx);					// CamMaster의 피스순서 인덱스
 	CfPoint GetMkPnt1(int nIdx);					// CamMaster의 피스순서 인덱스
@@ -883,6 +954,7 @@ public:
 	BOOL ChkLotEndDn(int nSerial);
 	BOOL LoadMySpec();
 	BOOL MemChk();
+	BOOL GetEngOffset(CfPoint &OfSt);
 	BOOL GetAoiUpOffset(CfPoint &OfSt);
 	BOOL GetAoiDnOffset(CfPoint &OfSt);
 	BOOL GetMkOffset(CfPoint &OfSt);
@@ -940,8 +1012,6 @@ public:
 	BOOL IsVs();
 	BOOL IsVsUp();
 	BOOL IsVsDn();
-	//BOOL MakeDummyUp(int nErr);
-	//BOOL MakeDummyDn(int nErr);
 	int GetAoiUpSerial();
 	int GetAoiDnSerial();
 	BOOL GetAoiUpVsStatus();
@@ -1033,7 +1103,6 @@ public:
 	void SetFixPcs(int nSerial);
 
 	BOOL RemakeReelmap();	// MDS(해성DS) Style의 릴맵으로 재생성
-	BOOL RemakeReelmapFromPcr(CString sModel, CString sLot, CString sLayerUp, CString sLayerDn);
 	BOOL IsDoneRemakeReelmap();
 	BOOL RemakeReelmapInner();
 	BOOL IsDoneRemakeReelmapInner();
@@ -1052,6 +1121,7 @@ public:
 
 	void SetDualTest(BOOL bOn = TRUE);
 	void SetTwoMetal(BOOL bSel, BOOL bOn = TRUE);
+	void SetFeedDir(int nUnit, BOOL bCcw);
 
 	void DispStsBar(CString sMsg, int nIdx = 0);
 
@@ -1085,9 +1155,9 @@ public:
 	void UpdateYieldInnerAllDn(int nSerial);
 	void UpdateYieldIts(int nSerial);
 
-	void SetEngFd();
+	//void SetEngFd();
 	void MoveEng(double dOffset);
-	BOOL GetEngOffset(CfPoint &OfSt);
+	//BOOL GetEngOffset(CfPoint &OfSt);
 
 	void SetMyMsgYes();
 	void SetMyMsgNo();
@@ -1214,10 +1284,22 @@ public:
 	void DuplicateRmap(int nRmap);
 	int GetMkStAuto();
 	void SetMkStAuto();
-	BOOL GetMkStSignal();
+	//BOOL GetMkStSignal();
 	void LoadSerial();
 	BOOL MpeWrite(CString strRegAddr, long lData, BOOL bCheck = FALSE);
 	long MpeRead(CString strRegAddr);
+	void SetAlarmToPlc(int nFromUnit);
+
+	BOOL IsClampOff();
+	void ClampOn();
+	void SetMkReStart();
+	void ErrorRead2dCode(int nMcId);
+	void SetJobEndEngrave();
+
+	BOOL CheckCamMstInfo(int nLayer, int nSerial); // AOI에서 들어오는 PCR정보의 피스 인덱스가 캠정보를 overflow하는 지를 확인 ( FALSE : 비정상, TRUE : 정상 )
+	void ClearBuffer();
+	BOOL IsDoneReloadReelmap();
+	BOOL IsDoneReloadYield();
 
 // 재정의입니다.
 public:

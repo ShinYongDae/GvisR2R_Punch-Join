@@ -70,6 +70,7 @@ struct stResult
 class CReelMap : public CWnd
 {
 	BOOL m_FixPcs[FIX_PCS_SHOT_MAX][FIX_PCS_COL_MAX][FIX_PCS_ROW_MAX]; // [Col][Row]
+	int m_FixPcsTotal[FIX_PCS_COL_MAX][FIX_PCS_ROW_MAX]; // [Col][Row]
 	int m_FixPcsPrev[FIX_PCS_COL_MAX][FIX_PCS_ROW_MAX]; // [Col][Row]
 	int m_FixPcsPrevStSerial[FIX_PCS_COL_MAX][FIX_PCS_ROW_MAX]; // [Col][Row]
 	int m_FixPcsRpt[FIX_PCS_COL_MAX][FIX_PCS_ROW_MAX]; // [Col][Row]
@@ -80,17 +81,19 @@ class CReelMap : public CWnd
 	int m_nDefStrip[MAX_STRIP_NUM], m_nDefPerStrip[MAX_STRIP_NUM][MAX_DEF];
 	int m_nStripOut[MAX_STRIP_NUM], m_nTotStOut;
 	CString m_sPathShare, m_sPathBuf, m_sIpPath;
-	CString m_sPathYield;
+	CString m_sPathYield, m_sPathYieldOffline;
 	int m_nIdxDefInfo;	// MAX_DEFINFO에 들어가는 정보의 Index.
 	int m_nWritedSerial; // In Share folder Serial.
 	BOOL m_bContFixDef;
 	int m_nBeforeSerial;
 
+	int m_nBeforeSerialOffline;
+
 	void LoadConfig();
 	BOOL MakeDirRmap();
 	CString MakeDirRmapRestore();
 	CString MakeDirRmapRestore(CString sModel, CString sLayer, CString sLot);
-	int GetLastRmapRestoreDir(CString strPath);
+	int GetLastFileNameInDir(CString strPath);
 
 	char* StrToChar(CString str);
 	void StrToChar(CString str, char* pCh);
@@ -125,7 +128,8 @@ public:
 	CRect *pFrmRgn;
 	CRect **pPcsRgn;
 
-	int **pPcsDef; // [DispPnlIdx][PcsID] : 불량코드.
+	int **pPcsDef;		// [DispPnlIdx][PcsID] : 불량코드.
+	int **pMkedPcsDef;	// [DispPnlIdx][PcsID] : 불량코드.
 	CString m_sKorDef[MAX_DEF], m_sEngDef[MAX_DEF];
 	char m_cBigDef[MAX_DEF], m_cSmallDef[MAX_DEF];
 	COLORREF m_rgbDef[MAX_DEF];
@@ -138,7 +142,7 @@ public:
 	int m_nLastShot, m_nCompletedShot;
 	double m_dProgressRatio;
 
-	stYield m_stYield;
+	stYield m_stYield, m_stYieldOffline;
 	int m_nStartSerial;
 
 // Operations
@@ -160,6 +164,7 @@ public:
 	BOOL OpenUser(CString sPath, CString sModel, CString sLayer, CString sLot);
 	//int Read(CString &sRead);
 	BOOL Write(int nSerial);
+	BOOL Read(int nSerial);
 	BOOL Disp(int nMkPnl, BOOL bDumy=FALSE);
 	void SetLastSerial(int nSerial);
 	void SetCompletedSerial(int nSerial);
@@ -174,6 +179,13 @@ public:
 	int GetDefStrip(int nStrip);
 	int GetDefStrip(int nStrip, int nDefCode);
 	void GetPcsNum(int &nGood, int &nBad);
+
+	int GetDefNumOffline(int nDefCode);
+	int GetDefStripOffline(int nStrip);
+	int GetDefStripOffline(int nStrip, int nDefCode);
+	void GetPcsNumOffline(int &nGood, int &nBad);
+	int GetStripOutOffline(int nStrip);
+
 	void ClrPnlNum();
 	void Clear();
 	int GetLastSerial();
@@ -186,11 +198,13 @@ public:
 	BOOL IsFixPcs(int nSerial, int &Col, int &Row);
 	BOOL IsFixPcs(int nSerial, int* pCol, int* pRow, int &nTot, BOOL &bCont);
 	int GetRptFixPcs(int nCol, int nRow);
+	int GetTotalFixPcs(int nCol, int nRow);
 
 	//BOOL Write(int nSerial, int nLayer, CString sPath);
 	void SetPathAtBuf();
 	CString GetRmapPath(int nRmap);
 	CString GetYieldPath(int nRmap);
+	CString GetRmapTablePath(int nRmap);
 
 	void SetPnlDefNum(int *pPnlDefNum);
 	void ClrPnlDefNum();
@@ -213,6 +227,7 @@ public:
 	BOOL m_bThreadAliveReloadReelmap, m_bRtnThreadReloadReelmap, m_bDoneReloadReelmap;
 	int m_nLastOnThread, m_nProgressReloadReelmap, m_nTotalProgressReloadReelmap;
 	CThreadTask m_ThreadTaskReloadReelmap; // CThreadTask class, handles the threading code
+	BOOL ReloadReelmapFromThread(int nTo);
 	BOOL ReloadReelmap();
 	BOOL ReloadReelmap(int nTo);
 	BOOL IsDoneReloadReelmap();
@@ -222,6 +237,7 @@ public:
 	void StopThreadReloadReelmap();
 
 	BOOL UpdateYield(int nSerial);
+	BOOL UpdateYieldOffline(int nSerial);
 	BOOL UpdateReelmapYield();
 	BOOL MakeHeader(CString sPath);
 
@@ -236,12 +252,12 @@ public:
 	BOOL CopyItsFile(CString sPathSrc, CString sPathDest);
 
 	// ITS
-	CString GetPathReelmapIts();
+	CString GetPathReelmapIts();	// ITS 내층 정보파일 위치
 	BOOL MakeItsReelmapHeader();	// 내외층 머징된 릴맵 헤드
 	BOOL WriteIts(int nItsSerial);
 	BOOL MakeItsFile(int nSerial, int nLayer);		// RMAP_UP, RMAP_DN, RMAP_INNER_UP, RMAP_INNER_DN
 	CString GetItsFileData(int nSerial, int nLayer);	// RMAP_UP, RMAP_DN, RMAP_INNER_UP, RMAP_INNER_DN
-	BOOL MakeDirIts();
+	BOOL MakeDirIts(); // ITS, ITS1, ItsFile 폴더를 생성함.
 
 	stResult m_stResult;
 	void ResetReelmapPath();
@@ -249,10 +265,11 @@ public:
 	CString GetResultTxt();
 	CString GetSapp3Txt();
 	CString GetSapp3TxtReverse();
-	CString GetPath();
+	CString GetPath(); // m_sPathBuf = GetRmapPath(m_nLayer);
 	CString GetIpPath();
 
 	void ResetYield();
+	void ResetYieldOffline();
 
 	void SetLastSerialOnOffline(int nSerial);
 	CString GetRmapPathOnOffline(int nRmap);
@@ -260,6 +277,28 @@ public:
 	BOOL WriteLastRmapInfoOnOffline();
 	int GetFirstShotFromPcr();
 	int GetLastShotFromPcr();
+	BOOL ReadYieldOffline(int nSerial, CString sPath);
+	BOOL WriteYieldOffline(int nSerial, CString sPath);
+
+	CString GetYieldPathOnOffline(int nRmap);
+	BOOL WriteYieldOnOffline(int nSerial);
+
+	BOOL GetInnerReelmapPath(int nItsSerial, CString  &sUp, CString &sDn, CString  &sAllUp, CString &sAllDn);
+	BOOL GetItsSerialInfo(int nItsSerial, BOOL &bDualTest, CString &sLot, CString &sLayerUp, CString &sLayerDn, int nOption = 0);		// 내층에서의 ITS 시리얼의 정보
+	int SearchFirstShotOnIts();
+	int IsOfflineFolder(); // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+	int GetPcrIdx(int nSerial);
+	BOOL SetItsSerialInfo(int nItsSerial);
+	BOOL DirectoryExists(LPCTSTR szPath);
+	CString GetItsPath(int nSerial, int nLayer);	// 임시 작업중인 내층, 외층의 ITS파일이 저장되는 파일 위치 ( RMAP_UP, RMAP_DN, RMAP_INNER_UP, RMAP_INNER_DN )
+	CString GetItsFolderPath();						// 임시 작업중인 내층, 외층의 ITS파일이 저장되는 폴더 위치 ( RMAP_UP, RMAP_DN, RMAP_INNER_UP, RMAP_INNER_DN ) 
+
+	// PCS 인덱스를 예전방식의 인덱스로 변환함.
+	int MirrorLR(int nPcsId); // 좌우 미러링
+	int Rotate180(int nPcsId);// 180도 회전 = 좌우 미러링 & 상하 미러링
+	int MirrorUD(int nPcsId); // 상하 미러링
+
+	BOOL SetPcsMkOut(int nSerial, int nPcsIdx);
 
 // Overrides
 	// ClassWizard generated virtual function overrides

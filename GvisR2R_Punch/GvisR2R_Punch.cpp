@@ -19,6 +19,7 @@
 #define new DEBUG_NEW
 #endif
 
+#define TIM_DISP_STS				450
 
 // CGvisR2R_PunchApp
 
@@ -253,8 +254,11 @@ int CGvisR2R_PunchApp::ExitInstance()
 
 class CAboutDlg : public CDialogEx
 {
+	BOOL m_bTIM_DISP_STS;
+
 public:
 	CAboutDlg();
+	~CAboutDlg();
 
 // 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
@@ -267,10 +271,19 @@ protected:
 // 구현입니다.
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 };
 
 CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
 {
+	m_bTIM_DISP_STS = FALSE;
+}
+
+CAboutDlg::~CAboutDlg()
+{
+	m_bTIM_DISP_STS = FALSE;
 }
 
 void CAboutDlg::DoDataExchange(CDataExchange* pDX)
@@ -279,6 +292,9 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
+	ON_WM_CREATE()
+	ON_WM_TIMER()
+	ON_WM_CREATE()
 END_MESSAGE_MAP()
 
 // 대화 상자를 실행하기 위한 응용 프로그램 명령입니다.
@@ -339,3 +355,40 @@ void CGvisR2R_PunchApp::SetHostPort(CString sPort)
 	m_strHostPort = sPort;
 }
 
+
+
+void CAboutDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	if (nIDEvent == TIM_DISP_STS)
+	{
+		KillTimer(TIM_DISP_STS);
+		if (this->IsWindowVisible())
+		{
+			m_bTIM_DISP_STS = FALSE;
+		}
+		else
+		{
+			this->ShowWindow(SW_SHOW);
+		}
+		if (m_bTIM_DISP_STS)
+			SetTimer(TIM_DISP_STS, 100, NULL);
+	}
+
+
+	CDialogEx::OnTimer(nIDEvent);
+}
+
+
+int CAboutDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	if (CDialogEx::OnCreate(lpCreateStruct) == -1)
+		return -1;
+
+	// TODO:  여기에 특수화된 작성 코드를 추가합니다.
+
+	m_bTIM_DISP_STS = TRUE;
+	SetTimer(TIM_DISP_STS, 100, NULL);
+
+	return 0;
+}

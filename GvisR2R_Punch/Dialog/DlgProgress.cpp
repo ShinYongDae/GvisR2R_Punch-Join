@@ -83,6 +83,7 @@ BEGIN_MESSAGE_MAP(CDlgProgress, CDialog)
 	ON_WM_CTLCOLOR()
 	ON_WM_DESTROY()
 	//}}AFX_MSG_MAP
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -95,6 +96,10 @@ BOOL CDlgProgress::OnInitDialog()
     m_ctrlProgress.SetStep(m_nStep);
     m_ctrlProgress.SetPos(m_nLower);
     SetCaption(m_strCaption);
+
+	m_bTIM_DISP_STS = TRUE;
+	SetTimer(TIM_DISP_STS, 100, NULL);
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -190,7 +195,7 @@ void CDlgProgress::Quit()
 
 int CDlgProgress::SetPos(int nPos)
 {
-    PumpMessages();
+    //PumpMessages();
     int iResult = m_ctrlProgress.SetPos(nPos);
     UpdatePercent(nPos);
 	return iResult;
@@ -246,4 +251,23 @@ BOOL CDlgProgress::CheckCancelButton()
     m_bCancel = FALSE;
 
     return bResult;
+}
+
+
+void CDlgProgress::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	KillTimer(TIM_DISP_STS);
+	if (this->IsWindowVisible())
+	{
+		m_bTIM_DISP_STS = FALSE;
+	}
+	else
+	{
+		this->ShowWindow(SW_SHOW);
+	}
+	if (m_bTIM_DISP_STS)
+		SetTimer(TIM_DISP_STS, 100, NULL);
+
+	CDialog::OnTimer(nIDEvent);
 }

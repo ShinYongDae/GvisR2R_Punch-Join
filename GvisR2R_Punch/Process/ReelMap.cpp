@@ -34,6 +34,7 @@ CReelMap::CReelMap(int nLayer, int nPnl, int nPcs, int nDir)
 	nTotPcs = nPcs;
 	nDir = ROT_NONE;
 	m_nBeforeSerial = 0;
+	m_nBeforeSerialOffline = 0;
 
 	m_dTotLen = 0.0;
 	m_bUseLotSep = FALSE;
@@ -72,6 +73,7 @@ CReelMap::CReelMap(int nLayer, int nPnl, int nPcs, int nDir)
 	m_rgbDef[DEF_VH_OPEN]=(RGB_RED);
 	m_rgbDef[DEF_VH_DEF]=(RGB_BROWN);
 	m_rgbDef[DEF_LIGHT]=(RGB_YELLOW);
+	m_rgbDef[DEF_INNER] = (RGB_PCS_OUT);
 
 	m_cBigDef[0] = '*';		//	NONE
 	m_cBigDef[1] = 'N';		//	NICK
@@ -116,6 +118,7 @@ CReelMap::CReelMap(int nLayer, int nPnl, int nPcs, int nDir)
 	m_pPnlNum = NULL;
 	m_pPnlDefNum = NULL;
 	pPcsDef = NULL;
+	pMkedPcsDef = NULL;
 	pFrmRgn = NULL;
 	pPcsRgn = NULL;
 
@@ -163,8 +166,13 @@ CReelMap::CReelMap(int nLayer, int nPnl, int nPcs, int nDir)
 	m_bThreadAliveFinalCopyItsFiles = FALSE;
 
 	for (nC = 0; nC < FIX_PCS_COL_MAX; nC++)
+	{
 		for (nR = 0; nR < FIX_PCS_ROW_MAX; nR++)
+		{
 			m_FixPcsRpt[nC][nR] = 0;
+			m_FixPcsTotal[nC][nR] = 0;
+		}
+	}
 }
 
 CReelMap::~CReelMap()
@@ -217,6 +225,18 @@ CReelMap::~CReelMap()
 
 		delete[] pPcsDef;
 		pPcsDef = NULL;
+	}
+
+	if (pMkedPcsDef)
+	{
+		for (k = 0; k < nTotPnl; k++)
+		{
+			delete[] pMkedPcsDef[k];
+			pMkedPcsDef[k] = NULL;
+		}
+
+		delete[] pMkedPcsDef;
+		pMkedPcsDef = NULL;
 	}
 }
 
@@ -290,6 +310,7 @@ BOOL CReelMap::LoadDefectTableIni()
 		}
 		else
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			pView->ClrDispMsg();
 			AfxMessageBox(_T("Error - LoadDefectTableIni()"));
 			return FALSE;
@@ -408,8 +429,6 @@ BOOL CReelMap::Open(CString sPath)
 {
 	if (pDoc->GetTestMode() == MODE_OUTER)
 		MakeItsReelmapHeader();
-		//pDoc->MakeLayerMappingHeader();
-
 	return MakeHeader(sPath);
 }
 
@@ -417,7 +436,6 @@ BOOL CReelMap::OpenUser(CString sPath)
 {
 	if (pDoc->GetTestMode() == MODE_OUTER)
 		MakeItsReelmapHeader();
-
 	return MakeHeader(sPath);
 }
 
@@ -438,12 +456,124 @@ BOOL CReelMap::OpenUser(CString sPath, CString sModel, CString sLayer, CString s
 	return MakeHeader(sPath);
 }
 
+BOOL CReelMap::Read(int nSerial)
+{
+
+	TCHAR sep[] = { _T(",/;\r\n\t") };
+	TCHAR szData[MAX_PATH];
+
+	//CString sMsg, sPnl, sRow, sVal, sPath;
+	//int nLayer = RMAP_NONE;
+	//int nIdx = GetPcrIdx(nSerial);
+
+	//CFileFind cFile;
+	//if (m_nLayer == RMAP_INNER_UP || m_nLayer == RMAP_INNER_DN || m_nLayer == RMAP_INNER_ALLUP || m_nLayer == RMAP_INNER_ALLDN)
+	//{
+	//	CString sUpPath, sDnPath, sAllUpPath, sAllDnPath;
+	//	//if (!pDoc->GetInnerReelmapPath(nSerial, sUpPath, sDnPath, sAllUpPath, sAllDnPath))
+	//	if (!GetInnerReelmapPath(nSerial, sUpPath, sDnPath, sAllUpPath, sAllDnPath))
+	//	{
+	//		sMsg.Format(_T("GetInnerReelmapPath가 설정되지 않았습니다."));
+	//		pView->MsgBox(sMsg);
+	//		return FALSE;
+	//	}
+	//	switch (m_nLayer)
+	//	{
+	//	case RMAP_INNER_UP:
+	//		sPath = sUpPath;
+	//		break;
+	//	case RMAP_INNER_DN:
+	//		sPath = sDnPath;
+	//		break;
+	//	case RMAP_INNER_ALLUP:
+	//		sPath = sAllUpPath;
+	//		break;
+	//	case RMAP_INNER_ALLDN:
+	//		sPath = sAllDnPath;
+	//		break;
+	//	default:
+	//		;
+	//		break;
+	//	}
+	//}
+	//else
+	//{
+	//	sPath = GetRmapPath(m_nLayer);
+	//}
+	//if (!cFile.FindFile(sPath))
+	//{
+	//	sMsg.Format(_T("It is trouble to Read Reelmap.\r\n%s"), sPath);
+	//	pView->MsgBox(sMsg);
+	//	return FALSE;
+	//}
+
+	//if (m_nLayer == RMAP_UP || m_nLayer == RMAP_DN || m_nLayer == RMAP_ALLUP || m_nLayer == RMAP_ALLDN)
+	//{
+	//	nLayer = m_nLayer - RMAP_UP;
+	//}
+	//else if (m_nLayer == RMAP_INNER_UP || m_nLayer == RMAP_INNER_DN || m_nLayer == RMAP_INNER_ALLUP || m_nLayer == RMAP_INNER_ALLDN)
+	//{
+	//	nLayer = m_nLayer - RMAP_INNER_UP;
+	//}
+	//else if (m_nLayer == RMAP_ITS)
+	//{
+	//	;
+	//}
+	//else
+	//{
+	//	sMsg.Format(_T("It is trouble not to set layer of Reelmap."));
+	//	pView->MsgBox(sMsg);
+	//	return FALSE;
+	//}
+
+	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
+	int nStripY = pDoc->m_Master[0].m_pPcsRgn->m_nRow / MAX_STRIP; // Strip(1~4);
+
+	int nRow, nCol, nDefCode, nR, nC, nStrip;
+	CString sPnl, sRow, sVal, sMsg;
+
+	for (nRow = 0; nRow < nNodeX; nRow++)
+	{
+		sPnl.Format(_T("%d"), nSerial);
+		sRow.Format(_T("%02d"), nRow);
+		if (0 < ::GetPrivateProfileString(sPnl, sRow, NULL, szData, sizeof(szData), m_sPathBuf))
+		{
+			for (nCol = 0; nCol < nNodeY; nCol++)
+			{
+				if (nCol == 0)
+					sVal = _tcstok(szData, sep);
+				else
+					sVal = _tcstok(NULL, sep);//strtok
+
+				nDefCode = _tstoi(sVal);
+
+				nR = (nNodeY - 1) - nCol;
+				nC = nRow;
+
+				if (m_pPnlBuf)
+					m_pPnlBuf[nSerial-1][nR][nC] = (short)nDefCode;
+				else
+				{
+					sMsg.Format(_T("It is trouble not to create m_pPnlBuf[][][]."));
+					pView->MsgBox(sMsg);
+					return FALSE;
+				}
+			}
+		}
+	}
+
+	return TRUE;
+}
+
 BOOL CReelMap::Write(int nSerial)
 {
 	int nLayer = RMAP_NONE;
+	CString sMsg;
 
 	if(nSerial <= 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("Serial Error.62"));
 		return 0;
@@ -456,12 +586,18 @@ BOOL CReelMap::Write(int nSerial)
 	MakeHeader(sPath);
 
 	if (pDoc->GetTestMode() == MODE_INNER)
-		pDoc->SetItsSerialInfo(nSerial);
+	{
+		if (m_nLayer == RMAP_UP)
+			SetItsSerialInfo(nSerial);
+		//pDoc->SetItsSerialInfo(nSerial);
+	}
 
-	int nIdx = pDoc->GetPcrIdx1(nSerial, pDoc->m_bNewLotShare[1]);
-	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->nCol;
-	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->nRow;
-	int nStripY = pDoc->m_Master[0].m_pPcsRgn->nRow / 4; // Strip(1~4);
+	int nActionCode = pDoc->m_Master[0].MasterInfo.nActionCode;
+	int nIdx = GetPcrIdx(nSerial);
+	//int nIdx = GetPcrIdx(nSerial, pDoc->m_bNewLotShare[1]);
+	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
+	int nStripY = pDoc->m_Master[0].m_pPcsRgn->m_nRow / MAX_STRIP; // Strip(1~4);
 	int nTotDefPcs = 0;
 
 	if (m_nLayer == RMAP_UP || m_nLayer == RMAP_DN || m_nLayer == RMAP_ALLUP || m_nLayer == RMAP_ALLDN)
@@ -495,6 +631,15 @@ BOOL CReelMap::Write(int nSerial)
 	else
 		return 0;
 
+	if (m_nLayer != RMAP_ITS)
+	{
+		if (nLayer == RMAP_DN)
+		{
+			nActionCode = pDoc->m_Master[1].MasterInfo.nActionCode; // 하면인 경우
+		}
+	}
+
+
 	short **pPnlBuf;
 	int i, nC, nR, nPcsId, nDefCode;//, nTot, nDef, nGood;
 	pPnlBuf = new short*[nNodeY];
@@ -518,19 +663,19 @@ BOOL CReelMap::Write(int nSerial)
 			{
 				if (pDoc->WorkingInfo.System.bStripPcsRgnBin)	// DTS용
 				{
-					switch (pDoc->m_Master[0].MasterInfo.nActionCode)	// 0 : Rotation / Mirror 적용 없음(CAM Data 원본), 1 : 좌우 미러, 2 : 상하 미러, 3 : 180 회전, 4 : 270 회전(CCW), 5 : 90 회전(CW)
+					switch (nActionCode)	// 0 : Rotation / Mirror 적용 없음(CAM Data 원본), 1 : 좌우 미러, 2 : 상하 미러, 3 : 180 회전, 4 : 270 회전(CCW), 5 : 90 회전(CW)
 					{
 					case 0:
 						nPcsId = pDoc->m_pPcr[nLayer][nIdx]->m_pDefPcs[i];
 						break;
 					case 1:
-						nPcsId = pDoc->MirrorLR(pDoc->m_pPcr[nLayer][nIdx]->m_pDefPcs[i]);
+						nPcsId = MirrorLR(pDoc->m_pPcr[nLayer][nIdx]->m_pDefPcs[i]);
 						break;
 					case 2:
-						nPcsId = pDoc->MirrorUD(pDoc->m_pPcr[nLayer][nIdx]->m_pDefPcs[i]);
+						nPcsId = MirrorUD(pDoc->m_pPcr[nLayer][nIdx]->m_pDefPcs[i]);
 						break;
 					case 3:
-						nPcsId = pDoc->Rotate180(pDoc->m_pPcr[nLayer][nIdx]->m_pDefPcs[i]);
+						nPcsId = Rotate180(pDoc->m_pPcr[nLayer][nIdx]->m_pDefPcs[i]);
 						break;
 					default:
 						nPcsId = pDoc->m_pPcr[nLayer][nIdx]->m_pDefPcs[i];
@@ -539,6 +684,13 @@ BOOL CReelMap::Write(int nSerial)
 				}
 				else
 					nPcsId = pDoc->m_pPcr[nLayer][nIdx]->m_pDefPcs[i];
+
+				if (nPcsId < 0)
+				{
+					sMsg.Format(_T("Error - Defect Pcs Index(%d) is not exist on PCR."), nPcsId);
+					pView->MsgBox(sMsg);
+					return 0;
+				}
 
 				nDefCode = pDoc->m_pPcr[nLayer][nIdx]->m_pDefType[i];
 
@@ -564,19 +716,19 @@ BOOL CReelMap::Write(int nSerial)
 			{
 				if (pDoc->WorkingInfo.System.bStripPcsRgnBin)	// DTS용
 				{
-					switch (pDoc->m_MasterInner[0].MasterInfo.nActionCode)	// 0 : Rotation / Mirror 적용 없음(CAM Data 원본), 1 : 좌우 미러, 2 : 상하 미러, 3 : 180 회전, 4 : 270 회전(CCW), 5 : 90 회전(CW)
+					switch (nActionCode)	// 0 : Rotation / Mirror 적용 없음(CAM Data 원본), 1 : 좌우 미러, 2 : 상하 미러, 3 : 180 회전, 4 : 270 회전(CCW), 5 : 90 회전(CW)
 					{
 					case 0:
 						nPcsId = pDoc->m_pPcrInner[nLayer][nIdx]->m_pDefPcs[i];
 						break;
 					case 1:
-						nPcsId = pDoc->MirrorLR(pDoc->m_pPcrInner[nLayer][nIdx]->m_pDefPcs[i]);
+						nPcsId = MirrorLR(pDoc->m_pPcrInner[nLayer][nIdx]->m_pDefPcs[i]);
 						break;
 					case 2:
-						nPcsId = pDoc->MirrorUD(pDoc->m_pPcrInner[nLayer][nIdx]->m_pDefPcs[i]);
+						nPcsId = MirrorUD(pDoc->m_pPcrInner[nLayer][nIdx]->m_pDefPcs[i]);
 						break;
 					case 3:
-						nPcsId = pDoc->Rotate180(pDoc->m_pPcrInner[nLayer][nIdx]->m_pDefPcs[i]);
+						nPcsId = Rotate180(pDoc->m_pPcrInner[nLayer][nIdx]->m_pDefPcs[i]);
 						break;
 					default:
 						nPcsId = pDoc->m_pPcrInner[nLayer][nIdx]->m_pDefPcs[i];
@@ -608,19 +760,19 @@ BOOL CReelMap::Write(int nSerial)
 			{
 				if (pDoc->WorkingInfo.System.bStripPcsRgnBin)	// DTS용
 				{
-					switch (pDoc->m_Master[0].MasterInfo.nActionCode)	// 0 : Rotation / Mirror 적용 없음(CAM Data 원본), 1 : 좌우 미러, 2 : 상하 미러, 3 : 180 회전, 4 : 270 회전(CCW), 5 : 90 회전(CW)
+					switch (nActionCode)	// 0 : Rotation / Mirror 적용 없음(CAM Data 원본), 1 : 좌우 미러, 2 : 상하 미러, 3 : 180 회전, 4 : 270 회전(CCW), 5 : 90 회전(CW)
 					{
 					case 0:
 						nPcsId = pDoc->m_pPcrIts[nIdx]->m_pDefPcs[i];
 						break;
 					case 1:
-						nPcsId = pDoc->MirrorLR(pDoc->m_pPcrIts[nIdx]->m_pDefPcs[i]);
+						nPcsId = MirrorLR(pDoc->m_pPcrIts[nIdx]->m_pDefPcs[i]);
 						break;
 					case 2:
-						nPcsId = pDoc->MirrorUD(pDoc->m_pPcrIts[nIdx]->m_pDefPcs[i]);
+						nPcsId = MirrorUD(pDoc->m_pPcrIts[nIdx]->m_pDefPcs[i]);
 						break;
 					case 3:
-						nPcsId = pDoc->Rotate180(pDoc->m_pPcrIts[nIdx]->m_pDefPcs[i]);
+						nPcsId = Rotate180(pDoc->m_pPcrIts[nIdx]->m_pDefPcs[i]);
 						break;
 					default:
 						nPcsId = pDoc->m_pPcrIts[nIdx]->m_pDefPcs[i];
@@ -650,11 +802,14 @@ BOOL CReelMap::Write(int nSerial)
 			return 0;
 	}
 
-	CString sPnl, sRow;
+	CString sPnl, sRow, sReelmapTable, sReelmapVal;
 	i = 0;
 	sPnl.Format(_T("%d"), nSerial);
 	strData.Format(_T("%d"), nTotDefPcs - nTotVerifyed);
 	::WritePrivateProfileString(sPnl, _T("Total Defects"), strData, sPath);
+
+	sReelmapTable = _T("");
+	sReelmapVal = _T("");
 
 	for(int nRow=0; nRow<nNodeX; nRow++)			// 릴맵 Text(90도 시계방향으로 회전한 모습) 상의 Row : Shot의 첫번째 Col부터 시작해서 밑으로 내려감.
 	{
@@ -718,6 +873,31 @@ BOOL CReelMap::Write(int nSerial)
 				}
 				strData.Insert(nLen, strTemp);
 			}
+
+			if (pDoc->WorkingInfo.System.bSaveReelmapTable)
+			{
+				if (nDefCode > 0)
+				{
+					if (nR < nStripY)
+					{
+						sReelmapVal.Format(_T("%d_A_%d_%d_%c\n"), nSerial, nC, nR, pDoc->m_cBigDefCode[nDefCode]);
+					}
+					else if (nR < nStripY * 2)
+					{
+						sReelmapVal.Format(_T("%d_B_%d_%d_%c\n"), nSerial, nC, nR, pDoc->m_cBigDefCode[nDefCode]);
+					}
+					else if (nR < nStripY * 3)
+					{
+						sReelmapVal.Format(_T("%d_C_%d_%d_%c\n"), nSerial, nC, nR, pDoc->m_cBigDefCode[nDefCode]);
+					}
+					else if (nR < nStripY * 4)
+					{
+						sReelmapVal.Format(_T("%d_D_%d_%d_%c\n"), nSerial, nC, nR, pDoc->m_cBigDefCode[nDefCode]);
+					}
+
+					sReelmapTable += sReelmapVal;
+				}
+			}
 		}
 
 		int nPos = strData.ReverseFind(',');		// 릴맵 Text 맨 우측의 ','를 삭제
@@ -730,6 +910,74 @@ BOOL CReelMap::Write(int nSerial)
 	delete[] pPnlBuf;
 
 	m_nWritedSerial = nSerial;
+
+	if (pDoc->WorkingInfo.System.bSaveReelmapTable)
+	{
+		CString sMsg, strFileData;
+		CString sRmapTablePath = GetRmapTablePath(m_nLayer);
+		CFileFind cFile;
+		char FileName[MAX_PATH];
+		StringToChar(sRmapTablePath, FileName);
+
+		char* pRtn = NULL;
+		FILE *fp = NULL;
+		size_t nFileSize, nRSize;
+		char *FileData;
+
+		sReelmapTable += _T("\r\n");
+
+		if (cFile.FindFile(sRmapTablePath))
+		{
+			if ((fp = fopen(FileName, "w+")) != NULL)
+			{
+				fseek(fp, 0, SEEK_END);
+				nFileSize = ftell(fp);
+				fseek(fp, 0, SEEK_SET);
+
+				/* Allocate space for a path name */
+				FileData = (char*)calloc(nFileSize + 1, sizeof(char));
+
+				nRSize = fread(FileData, sizeof(char), nFileSize, fp);
+				strFileData = CharToString(FileData);
+				strFileData += sReelmapTable;
+
+				fprintf(fp, "%s", pRtn = StringToChar(sReelmapTable));
+				if (pRtn)
+				{
+					delete pRtn;
+					pRtn = NULL;
+				}
+
+				fclose(fp);
+				free(FileData);
+			}
+			else
+			{
+				sMsg.Format(_T("It is trouble to Add ReelmapTableFile.\r\n%s"), sRmapTablePath);
+				pView->MsgBox(strFileData);
+			}
+		}
+		else
+		{
+			fp = fopen(FileName, "w+");
+			if (fp != NULL)
+			{
+				fprintf(fp, "%s", pRtn = StringToChar(sReelmapTable));
+				if (pRtn)
+				{
+					delete pRtn;
+					pRtn = NULL;
+				}
+			}
+			else
+			{
+				sMsg.Format(_T("It is trouble to Make ReelmapTableFile.\r\n%s"), sRmapTablePath);
+				pView->MsgBox(sMsg);
+			}
+		}
+
+		fclose(fp);
+	}
 
 	return TRUE;
 }
@@ -748,24 +996,43 @@ void CReelMap::InitPcs()
 			}
 		}
 
-		if(!pPcsDef)
+		if (!pPcsDef)
 		{
 			pPcsDef = new int*[nTotPnl];
-			for(k=0; k<nTotPnl; k++)
+			for (k = 0; k < nTotPnl; k++)
 			{
 				if (nTotPcs > MAX_PCS)
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					pView->ClrDispMsg();
 					AfxMessageBox(_T("MAX_PCS 초과 Error."));
 				}
 				pPcsDef[k] = new int[MAX_PCS];
-				for(i=0; i<MAX_PCS; i++)
+				for (i = 0; i < MAX_PCS; i++)
 					pPcsDef[k][i] = DEF_NONE;
+			}
+		}
+
+		if (!pMkedPcsDef)
+		{
+			pMkedPcsDef = new int*[nTotPnl];
+			for (k = 0; k < nTotPnl; k++)
+			{
+				if (nTotPcs > MAX_PCS)
+				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
+					pView->ClrDispMsg();
+					AfxMessageBox(_T("MAX_PCS 초과 Error."));
+				}
+				pMkedPcsDef[k] = new int[MAX_PCS];
+				for (i = 0; i < MAX_PCS; i++)
+					pMkedPcsDef[k][i] = DEF_NONE;
 			}
 		}
 	}
 	else
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("Error-InitPcs."));
 	}
@@ -786,7 +1053,7 @@ BOOL CReelMap::Disp(int nMkPnl, BOOL bDumy)
 {
 	if(!bDumy)
 	{
-		if(!pPcsDef || !m_pPnlNum || !m_pPnlDefNum)
+		if(!pPcsDef || !pMkedPcsDef || !m_pPnlNum || !m_pPnlDefNum)
 		{
 			pView->MsgBox(_T("Reelmap Memory Error."));
 			return FALSE;
@@ -840,26 +1107,26 @@ BOOL CReelMap::Disp(int nMkPnl, BOOL bDumy)
 			break;
 	}
 	
-	m_nSerial = nMkPnl; // 8
+	m_nSerial = nMkPnl; // 6
 
-	int nMkedPnl = nTotPnl-m_nSelMarkingPnl-1; // 8-2-1 = 5
+	int nMkedPnl = nTotPnl-m_nSelMarkingPnl-1; // 6-2-1 = 3
 	int nPrevPnl = m_nSelMarkingPnl; // 2
 
-	int nFromPnl = nMkPnl-nMkedPnl-1; // 8-5-1 = 2
+	int nFromPnl = nMkPnl-nMkedPnl-1; // 6-3-1 = 2
 
 	CString sPnl, sRow, sVal;
 	TCHAR sep[] = { _T(",/;\r\n\t") };
 	TCHAR szData[MAX_PATH];
 	int k, i, nR, nC, nP, nInc=0;
 	int nLoadPnl, nDefCode;
-	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->nCol; // 10
-	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->nRow; // 5
+	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol; // 10
+	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow; // 5
 	int nActionCode;
 
-	for(k=nTotPnl-1; k>=0; k--) // k = 7 ~ 0
+	for(k=nTotPnl-1; k>=0; k--) // k = 5 ~ 0
 	{
 		nInc++;
-		nLoadPnl = nInc+nFromPnl; // 1 + 2 = 3 ~ 8 + 2 = 10
+		nLoadPnl = nInc+nFromPnl; // 1 + 2 = 3 ~ 6 + 2 = 8
 
 		if(pDoc->WorkingInfo.LastJob.bLotSep)
 		{
@@ -936,8 +1203,10 @@ BOOL CReelMap::Disp(int nMkPnl, BOOL bDumy)
 		{
 			m_pPnlNum[k] = -1;
 			m_pPnlDefNum[k] = -1;
-			for(i=0; i<nTotPcs; i++)
+			for (i = 0; i < nTotPcs; i++)
+			{
 				pPcsDef[k][i] = DEF_NONE;
+			}
 		}
 		else
 		{
@@ -961,14 +1230,14 @@ BOOL CReelMap::Disp(int nMkPnl, BOOL bDumy)
 				{
 					if (m_nLayer == RMAP_UP || m_nLayer == RMAP_DN || m_nLayer == RMAP_ALLUP || m_nLayer == RMAP_ALLDN)
 					{
-						m_pPnlDefNum[k] = pDoc->m_pPcr[m_nLayer][pDoc->GetPcrIdx1(nLoadPnl)]->m_nTotDef;
+						m_pPnlDefNum[k] = pDoc->m_pPcr[m_nLayer][GetPcrIdx(nLoadPnl)]->m_nTotDef;
 					}
 					else if (m_nLayer == RMAP_INNER_UP || m_nLayer == RMAP_INNER_DN || m_nLayer == RMAP_INNER_ALLUP || m_nLayer == RMAP_INNER_ALLDN)
 					{
-						m_pPnlDefNum[k] = pDoc->m_pPcrInner[m_nLayer - RMAP_INNER_UP][pDoc->GetPcrIdx1(nLoadPnl)]->m_nTotDef;
+						m_pPnlDefNum[k] = pDoc->m_pPcrInner[m_nLayer - RMAP_INNER_UP][GetPcrIdx(nLoadPnl)]->m_nTotDef;
 					}
 					else if (m_nLayer == RMAP_ITS)
-						m_pPnlDefNum[k] = pDoc->m_pPcrIts[pDoc->GetPcrIdx1(nLoadPnl)]->m_nTotDef;
+						m_pPnlDefNum[k] = pDoc->m_pPcrIts[GetPcrIdx(nLoadPnl)]->m_nTotDef;
 					else
 						return 0;
 				}
@@ -988,20 +1257,20 @@ BOOL CReelMap::Disp(int nMkPnl, BOOL bDumy)
 					break;
 				}
 
-				m_pPnlNum[k] = nLoadPnl; // 3 ~ 10
+				m_pPnlNum[k] = nLoadPnl; // k (5~0) : nLoadPnl (3~8)
 				if (nLoadPnl <= pView->m_nLotEndSerial || pView->m_nLotEndSerial == 0)
 				{
 					if (m_nLayer == RMAP_UP || m_nLayer == RMAP_DN || m_nLayer == RMAP_ALLUP || m_nLayer == RMAP_ALLDN)
 					{
-						m_pPnlDefNum[k] = pDoc->m_pPcr[m_nLayer][pDoc->GetPcrIdx1(nLoadPnl)]->m_nTotDef;
+						m_pPnlDefNum[k] = pDoc->m_pPcr[m_nLayer][GetPcrIdx(nLoadPnl)]->m_nTotDef;
 					}
 					else if (m_nLayer == RMAP_INNER_UP || m_nLayer == RMAP_INNER_DN || m_nLayer == RMAP_INNER_ALLUP || m_nLayer == RMAP_INNER_ALLDN)
 					{
 						if(pDoc->m_pPcrInner)
-							m_pPnlDefNum[k] = pDoc->m_pPcrInner[m_nLayer - RMAP_INNER_UP][pDoc->GetPcrIdx1(nLoadPnl)]->m_nTotDef;
+							m_pPnlDefNum[k] = pDoc->m_pPcrInner[m_nLayer - RMAP_INNER_UP][GetPcrIdx(nLoadPnl)]->m_nTotDef;
 					}
 					else if (m_nLayer == RMAP_ITS)
-						m_pPnlDefNum[k] = pDoc->m_pPcrIts[pDoc->GetPcrIdx1(nLoadPnl)]->m_nTotDef;
+						m_pPnlDefNum[k] = pDoc->m_pPcrIts[GetPcrIdx(nLoadPnl)]->m_nTotDef;
 					else
 						return 0;
 				}
@@ -1046,13 +1315,13 @@ BOOL CReelMap::Disp(int nMkPnl, BOOL bDumy)
 							case 0:
 								break;
 							case 1:
-								nP = pDoc->MirrorLR(nP);
+								nP = MirrorLR(nP);
 								break;
 							case 2:
-								nP = pDoc->MirrorUD(nP);
+								nP = MirrorUD(nP);
 								break;
 							case 3:
-								nP = pDoc->Rotate180(nP);
+								nP = Rotate180(nP);
 								break;
 							default:
 								break;
@@ -1102,13 +1371,13 @@ BOOL CReelMap::Disp(int nMkPnl, BOOL bDumy)
 								case 0:
 									break;
 								case 1:
-									nP = pDoc->MirrorLR(nP);
+									nP = MirrorLR(nP);
 									break;
 								case 2:
-									nP = pDoc->MirrorUD(nP);
+									nP = MirrorUD(nP);
 									break;
 								case 3:
-									nP = pDoc->Rotate180(nP);
+									nP = Rotate180(nP);
 									break;
 								default:
 									break;
@@ -1164,13 +1433,13 @@ BOOL CReelMap::Disp(int nMkPnl, BOOL bDumy)
 										case 0:
 											break;
 										case 1:
-											nP = pDoc->MirrorLR(nP);
+											nP = MirrorLR(nP);
 											break;
 										case 2:
-											nP = pDoc->MirrorUD(nP);
+											nP = MirrorUD(nP);
 											break;
 										case 3:
-											nP = pDoc->Rotate180(nP);
+											nP = Rotate180(nP);
 											break;
 										default:
 											break;
@@ -1227,13 +1496,13 @@ BOOL CReelMap::Disp(int nMkPnl, BOOL bDumy)
 									case 0:
 										break;
 									case 1:
-										nP = pDoc->MirrorLR(nP);
+										nP = MirrorLR(nP);
 										break;
 									case 2:
-										nP = pDoc->MirrorUD(nP);
+										nP = MirrorUD(nP);
 										break;
 									case 3:
-										nP = pDoc->Rotate180(nP);
+										nP = Rotate180(nP);
 										break;
 									default:
 										break;
@@ -1328,6 +1597,7 @@ void CReelMap::SetLastSerial(int nSerial) 	// 릴맵 텍스트 파일의 수율정보를 업데
 {
 	if(nSerial <= 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("Serial Error.64"));
 		return;
@@ -1361,6 +1631,7 @@ void CReelMap::SetCompletedSerial(int nSerial)
 {
 	if (nSerial <= 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("Serial Error.67"));
 		return;
@@ -1604,7 +1875,7 @@ BOOL CReelMap::UpdateYield(int nSerial)
 {
 	if (nSerial <= 0)
 	{
-		pView->ClrDispMsg(); AfxMessageBox(_T("Serial Error.68"));
+		//pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Serial Error.68"));
 		return 0;
 	}
 
@@ -1623,8 +1894,6 @@ BOOL CReelMap::UpdateYield(int nSerial)
 			m_nBeforeSerial = _tstoi(szData);
 	}
 
-	int nPnl = m_nBeforeSerial;
-
 	if (pView->m_bSerialDecrese)
 	{
 		if (nSerial >= m_nBeforeSerial)
@@ -1639,6 +1908,8 @@ BOOL CReelMap::UpdateYield(int nSerial)
 			m_nBeforeSerial = nSerial - 1;
 		}
 	}
+
+	int nPnl = m_nBeforeSerial;
 
 	if (bExist && nPnl > 0)
 		ReadYield(nPnl, sPath);
@@ -1747,8 +2018,8 @@ int CReelMap::GetLastSerial()
 
 void CReelMap::SetFixPcs(int nSerial)
 {
-	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->nCol;
-	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->nRow;
+	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
 	int nR, nC, nDefCode;
 
 	for(nR=0; nR<nNodeY; nR++)
@@ -1770,6 +2041,7 @@ void CReelMap::SetFixPcs(int nSerial, int nCol, int nRow) // nShot : 0 ~
 	int nRange = _tstoi(pDoc->WorkingInfo.LastJob.sNumRangeFixDef);
 	int nS = (nSerial-1) % nRange;
 	m_FixPcs[nS][nCol][nRow] = TRUE;
+	m_FixPcsTotal[nCol][nRow]++;
 }
 
 void CReelMap::ClrFixPcs()
@@ -1792,6 +2064,7 @@ void CReelMap::ClrFixPcs()
 				m_FixPcs[nS][nC][nR] = FALSE;
 				if(!nS)
 				{
+					//m_FixPcsTotal[nC][nR] = 0;
 					m_FixPcsPrev[nC][nR] = 0;
 					m_FixPcsPrevStSerial[nC][nR] = 0;
 				}		
@@ -1806,6 +2079,7 @@ void CReelMap::ClrFixPcs(int nCol, int nRow)
 	{
 		m_FixPcs[nS][nCol][nRow] = FALSE;
 	}
+	//m_FixPcsTotal[nCol][nRow] = 0;
 	m_FixPcsPrev[nCol][nRow] = 0;
 	m_FixPcsPrevStSerial[nCol][nRow] = 0;
 }
@@ -1813,8 +2087,8 @@ void CReelMap::ClrFixPcs(int nCol, int nRow)
 BOOL CReelMap::IsFixPcs(int nSerial, int &Col, int &Row)
 {
 	BOOL bRtn = FALSE;
-	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->nCol;
-	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->nRow;
+	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
 
 	BOOL bOn = pDoc->WorkingInfo.LastJob.bContFixDef;
 	int nRange = _tstoi(pDoc->WorkingInfo.LastJob.sNumRangeFixDef);
@@ -1872,8 +2146,8 @@ BOOL CReelMap::IsFixPcs(int nSerial, int &Col, int &Row)
 BOOL CReelMap::IsFixPcs(int nSerial, int* pCol, int* pRow, int &nTot, BOOL &bCont) // nTot : total of PCS Over nJudge
 {
 	BOOL bRtn = FALSE;
-	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->nCol;
-	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->nRow;
+	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
 
 	BOOL bOn = pDoc->WorkingInfo.LastJob.bContFixDef;
 	int nRange = _tstoi(pDoc->WorkingInfo.LastJob.sNumRangeFixDef);
@@ -2021,25 +2295,25 @@ BOOL CReelMap::MakeDirRmap()
 	if (!Path[0].IsEmpty() && !Path[1].IsEmpty())
 	{
 		sPath.Format(_T("%s%s"), Path[0], Path[1]);
-		if (!pDoc->DirectoryExists(sPath))
+		if (!DirectoryExists(sPath))
 			CreateDirectory(sPath, NULL);
 
 		if (!Path[2].IsEmpty())
 		{
 			sPath.Format(_T("%s%s\\%s"), Path[0], Path[1], Path[2]);
-			if (!pDoc->DirectoryExists(sPath))
+			if (!DirectoryExists(sPath))
 				CreateDirectory(sPath, NULL);
 
 			if (!Path[3].IsEmpty())
 			{
 				sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], Path[3]);
-				if (!pDoc->DirectoryExists(sPath))
+				if (!DirectoryExists(sPath))
 					CreateDirectory(sPath, NULL);
 
 				if (!Path[4].IsEmpty())
 				{
 					sPath.Format(_T("%s%s\\%s\\%s\\%s"), Path[0], Path[1], Path[2], Path[3], Path[4]);
-					if (!pDoc->DirectoryExists(sPath))
+					if (!DirectoryExists(sPath))
 						CreateDirectory(sPath, NULL);
 				}
 			}
@@ -2136,49 +2410,49 @@ CString CReelMap::MakeDirRmapRestore()
 	if (!Path[0].IsEmpty() && !Path[1].IsEmpty())
 	{
 		sPath.Format(_T("%s%s"), Path[0], Path[1]);
-		if (!pDoc->DirectoryExists(sPath))
+		if (!DirectoryExists(sPath))
 			CreateDirectory(sPath, NULL);
 
 		if (!Path[2].IsEmpty())
 		{
 			sPath.Format(_T("%s%s\\%s"), Path[0], Path[1], Path[2]);
-			if (!pDoc->DirectoryExists(sPath))
+			if (!DirectoryExists(sPath))
 				CreateDirectory(sPath, NULL);
 
 			if (!Path[3].IsEmpty())
 			{
 				sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], Path[3]);
-				if (!pDoc->DirectoryExists(sPath))
+				if (!DirectoryExists(sPath))
 					CreateDirectory(sPath, NULL);
 
 				if (!Path[4].IsEmpty())
 				{
 					sPath.Format(_T("%s%s\\%s\\%s\\%s"), Path[0], Path[1], Path[2], Path[3], Path[4]);
-					if (!pDoc->DirectoryExists(sPath))
+					if (!DirectoryExists(sPath))
 						CreateDirectory(sPath, NULL);
 
 					sPath.Format(_T("%s%s\\%s\\%s\\%s\\Restore"), Path[0], Path[1], Path[2], Path[3], Path[4]);
-					if (!pDoc->DirectoryExists(sPath))
+					if (!DirectoryExists(sPath))
 						CreateDirectory(sPath, NULL);
 				}
 				else
 				{
 					sPath.Format(_T("%s%s\\%s\\%s\\Restore"), Path[0], Path[1], Path[2], Path[3]);
-					if (!pDoc->DirectoryExists(sPath))
+					if (!DirectoryExists(sPath))
 						CreateDirectory(sPath, NULL);
 				}
 			}
 			else
 			{
 				sPath.Format(_T("%s%s\\%s\\Restore"), Path[0], Path[1], Path[2]);
-				if (!pDoc->DirectoryExists(sPath))
+				if (!DirectoryExists(sPath))
 					CreateDirectory(sPath, NULL);
 			}
 		}
 		else
 		{
 			sPath.Format(_T("%s%s\\Restore"), Path[0], Path[1]);
-			if (!pDoc->DirectoryExists(sPath))
+			if (!DirectoryExists(sPath))
 				CreateDirectory(sPath, NULL);
 		}
 	}
@@ -2278,25 +2552,25 @@ CString CReelMap::MakeDirRmapRestore(CString sModel, CString sLayer, CString sLo
 	if (!Path[0].IsEmpty() && !Path[1].IsEmpty())
 	{
 		sPath.Format(_T("%s%s"), Path[0], Path[1]);
-		if (!pDoc->DirectoryExists(sPath))
+		if (!DirectoryExists(sPath))
 			CreateDirectory(sPath, NULL);
 
 		if (!Path[2].IsEmpty())
 		{
 			sPath.Format(_T("%s%s\\%s"), Path[0], Path[1], Path[2]);
-			if (!pDoc->DirectoryExists(sPath))
+			if (!DirectoryExists(sPath))
 				CreateDirectory(sPath, NULL);
 
 			if (!Path[3].IsEmpty())
 			{
 				sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], Path[3]);
-				if (!pDoc->DirectoryExists(sPath))
+				if (!DirectoryExists(sPath))
 					CreateDirectory(sPath, NULL);
 
 				if (!Path[4].IsEmpty())
 				{
 					sPath.Format(_T("%s%s\\%s\\%s\\%s"), Path[0], Path[1], Path[2], Path[3], Path[4]);
-					if (!pDoc->DirectoryExists(sPath))
+					if (!DirectoryExists(sPath))
 						CreateDirectory(sPath, NULL);
 				}
 			}
@@ -2457,6 +2731,152 @@ CString CReelMap::GetRmapPath(int nRmap)
 	return sPath;
 }
 
+CString CReelMap::GetRmapTablePath(int nRmap)
+{
+	CString sPath = _T("");
+	CString Path[5], str;
+
+	switch (nRmap)
+	{
+	case RMAP_UP:
+		str = _T("ReelMapTableUp.txt");
+		if (pDoc->m_bDoneChgLot || !pDoc->m_bNewLotShare[0])
+		{
+			sPath.Format(_T("%s%s\\%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathOldFile,
+				pDoc->WorkingInfo.LastJob.sModel,
+				pDoc->WorkingInfo.LastJob.sLot,
+				pDoc->WorkingInfo.LastJob.sLayerUp,
+				str);
+		}
+		else if (!pDoc->m_bDoneChgLot && pDoc->m_bNewLotShare[0])
+		{
+			sPath.Format(_T("%s%s\\%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathOldFile,
+				pDoc->WorkingInfo.LastJob.sModel,
+				pDoc->Status.PcrShare[0].sLot,
+				pDoc->WorkingInfo.LastJob.sLayerUp,
+				str);
+		}
+		break;
+	case RMAP_ALLUP:
+		str = _T("ReelMapTableAll.txt");
+		if (pDoc->m_bDoneChgLot || !pDoc->m_bNewLotShare[0])
+		{
+			sPath.Format(_T("%s%s\\%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathOldFile,
+				pDoc->WorkingInfo.LastJob.sModel,
+				pDoc->WorkingInfo.LastJob.sLot,
+				pDoc->WorkingInfo.LastJob.sLayerUp,
+				str);
+		}
+		else if (!pDoc->m_bDoneChgLot && pDoc->m_bNewLotShare[0])
+		{
+			sPath.Format(_T("%s%s\\%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathOldFile,
+				pDoc->WorkingInfo.LastJob.sModel,
+				pDoc->Status.PcrShare[0].sLot,
+				pDoc->WorkingInfo.LastJob.sLayerUp,
+				str);
+		}
+		break;
+	case RMAP_DN:
+		str = _T("ReelMapTableDn.txt");
+		if (pDoc->m_bDoneChgLot || !pDoc->m_bNewLotShare[1])
+		{
+			sPath.Format(_T("%s%s\\%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathOldFile,
+				pDoc->WorkingInfo.LastJob.sModel,
+				pDoc->WorkingInfo.LastJob.sLot,
+				pDoc->WorkingInfo.LastJob.sLayerDn,
+				str);
+		}
+		else if (!pDoc->m_bDoneChgLot && pDoc->m_bNewLotShare[1])
+		{
+			sPath.Format(_T("%s%s\\%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathOldFile,
+				pDoc->WorkingInfo.LastJob.sModel,
+				pDoc->Status.PcrShare[0].sLot,
+				pDoc->WorkingInfo.LastJob.sLayerDn,
+				str);
+		}
+		break;
+	case RMAP_ALLDN:
+		str = _T("ReelMapTableAll.txt");
+		if (pDoc->m_bDoneChgLot || !pDoc->m_bNewLotShare[1])
+		{
+			sPath.Format(_T("%s%s\\%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathOldFile,
+				pDoc->WorkingInfo.LastJob.sModel,
+				pDoc->WorkingInfo.LastJob.sLot,
+				pDoc->WorkingInfo.LastJob.sLayerDn,
+				str);
+		}
+		else if (!pDoc->m_bDoneChgLot && pDoc->m_bNewLotShare[1])
+		{
+			sPath.Format(_T("%s%s\\%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathOldFile,
+				pDoc->WorkingInfo.LastJob.sModel,
+				pDoc->Status.PcrShare[0].sLot,
+				pDoc->WorkingInfo.LastJob.sLayerDn,
+				str);
+		}
+		break;
+	case RMAP_INNER_UP:
+		str = _T("ReelMapTableUp.txt");
+		Path[0] = pDoc->WorkingInfo.System.sPathItsFile;
+		Path[1] = pDoc->WorkingInfo.LastJob.sModel;
+		Path[2] = pDoc->WorkingInfo.LastJob.sEngItsCode;
+		Path[3] = pDoc->WorkingInfo.LastJob.sInnerLot;
+		Path[4] = pDoc->WorkingInfo.LastJob.sInnerLayerUp;
+		sPath.Format(_T("%s%s\\%s\\%s\\%s\\%s"), Path[0], Path[1], Path[2], Path[3], Path[4], str);
+		break;
+	case RMAP_INNER_DN:
+		str = _T("ReelMapTableDn.txt");
+		Path[0] = pDoc->WorkingInfo.System.sPathItsFile;
+		Path[1] = pDoc->WorkingInfo.LastJob.sModel;
+		Path[2] = pDoc->WorkingInfo.LastJob.sEngItsCode;
+		Path[3] = pDoc->WorkingInfo.LastJob.sInnerLot;
+		Path[4] = pDoc->WorkingInfo.LastJob.sInnerLayerDn;
+		sPath.Format(_T("%s%s\\%s\\%s\\%s\\%s"), Path[0], Path[1], Path[2], Path[3], Path[4], str);
+		break;
+	case RMAP_INNER_ALLUP:
+		str = _T("ReelMapTableAll.txt");
+		Path[0] = pDoc->WorkingInfo.System.sPathItsFile;
+		Path[1] = pDoc->WorkingInfo.LastJob.sModel;
+		Path[2] = pDoc->WorkingInfo.LastJob.sEngItsCode;
+		Path[3] = pDoc->WorkingInfo.LastJob.sInnerLot;
+		Path[4] = pDoc->WorkingInfo.LastJob.sInnerLayerUp;
+		sPath.Format(_T("%s%s\\%s\\%s\\%s\\%s"), Path[0], Path[1], Path[2], Path[3], Path[4], str);
+		break;
+	case RMAP_INNER_ALLDN:
+		str = _T("ReelMapTableAll.txt");
+		Path[0] = pDoc->WorkingInfo.System.sPathItsFile;
+		Path[1] = pDoc->WorkingInfo.LastJob.sModel;
+		Path[2] = pDoc->WorkingInfo.LastJob.sEngItsCode;
+		Path[3] = pDoc->WorkingInfo.LastJob.sInnerLot;
+		Path[4] = pDoc->WorkingInfo.LastJob.sInnerLayerDn;
+		sPath.Format(_T("%s%s\\%s\\%s\\%s\\%s"), Path[0], Path[1], Path[2], Path[3], Path[4], str);
+		break;
+	case RMAP_INOUTER_UP:
+		str = _T("ReelMapTableIO.txt");
+		sPath.Format(_T("%s%s\\%s\\%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathItsFile,
+			pDoc->WorkingInfo.LastJob.sModel, pDoc->WorkingInfo.LastJob.sEngItsCode,
+			pDoc->WorkingInfo.LastJob.sLot, pDoc->WorkingInfo.LastJob.sLayerUp,
+			str);
+		break;
+	case RMAP_INOUTER_DN:
+		str = _T("ReelMapTableIO.txt");
+		sPath.Format(_T("%s%s\\%s\\%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathItsFile,
+			pDoc->WorkingInfo.LastJob.sModel, pDoc->WorkingInfo.LastJob.sEngItsCode,
+			pDoc->WorkingInfo.LastJob.sLot, pDoc->WorkingInfo.LastJob.sLayerDn,
+			str);
+		break;
+	case RMAP_ITS:
+		pDoc->GetCurrentInfoEng();
+		str = _T("ReelMapTableIts.txt");
+		sPath.Format(_T("%s%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathItsFile,
+			pDoc->WorkingInfo.LastJob.sModel,
+			pDoc->WorkingInfo.LastJob.sEngItsCode,	//pDoc->m_sItsCode,
+			str);
+		break;
+	}
+
+	return sPath;
+}
+
 void CReelMap::UpdateProcessNum(CString sProcessNum, int nLayer)
 {
 	::WritePrivateProfileString(_T("Info"), _T("Process Code"), sProcessNum, GetRmapPath(nLayer));
@@ -2531,8 +2951,8 @@ BOOL CReelMap::GetNodeXYonRmap(int &nNodeX, int &nNodeY, CString sPath)
 
 	if (!nNodeX || !nNodeY)
 	{
-		nNodeX = pDoc->m_Master[0].m_pPcsRgn->nCol; // on Cam
-		nNodeY = pDoc->m_Master[0].m_pPcsRgn->nRow; // on Cam
+		nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol; // on Cam
+		nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow; // on Cam
 	}
 
 	return TRUE;
@@ -2541,13 +2961,13 @@ BOOL CReelMap::GetNodeXYonRmap(int &nNodeX, int &nNodeY, CString sPath)
 void CReelMap::RestoreReelmap()
 {
 	CString sPath = MakeDirRmapRestore();
-	int nLastDir = GetLastRmapRestoreDir(sPath);
+	int nLastInDir = GetLastFileNameInDir(sPath);
 
 	CString sUserRestoreDir;
-	sUserRestoreDir.Format(_T("%s\\%d"), sPath, nLastDir+1);
+	sUserRestoreDir.Format(_T("%s\\%d"), sPath, nLastInDir +1);
 	
 	CFileFind finder;
-	if (!pDoc->DirectoryExists(sUserRestoreDir))
+	if (!DirectoryExists(sUserRestoreDir))
 		CreateDirectory(sUserRestoreDir, NULL);
 
 	CString Path[5], str, sSrc, sDest;
@@ -2700,7 +3120,7 @@ void CReelMap::RestoreReelmap()
 	delete pFile;
 }
 
-int CReelMap::GetLastRmapRestoreDir(CString strPath)
+int CReelMap::GetLastFileNameInDir(CString strPath)
 {
 	CString strFileName;
 
@@ -2761,7 +3181,7 @@ BOOL CReelMap::ThreadProcReloadReelmap( LPVOID lpContext )
 	pThread->m_bRtnThreadReloadReelmap = FALSE;
 	pThread->m_bThreadAliveReloadReelmap = TRUE;	
 	
-	int nSerial = pDoc->GetLastShotMk();	// m_pDlgFrameHigh에서 얻거나 없으면, sPathOldFile폴더의 ReelMapDataDn.txt에서 _T("Info"), _T("Marked Shot") 찾음.
+	//int nSerial = pDoc->GetLastShotMk();	// m_pDlgFrameHigh에서 얻거나 없으면, sPathOldFile폴더의 ReelMapDataDn.txt에서 _T("Info"), _T("Marked Shot") 찾음.
 	pThread->m_bRtnThreadReloadReelmap = pThread->ReloadReelmap(pThread->m_nLastOnThread);
 	pThread->m_bThreadAliveReloadReelmap = FALSE;
 
@@ -2792,7 +3212,7 @@ BOOL CReelMap::ReloadReelmap()
 	//int nSerial;
 	BOOL bRtn;
 	
-	int nLastOnThread = pDoc->GetLastShotMk();	// m_pDlgFrameHigh에서 얻거나 없으면, sPathOldFile폴더의 ReelMapDataDn.txt에서 _T("Info"), _T("Marked Shot") 찾음.
+	int nLastOnThread = pDoc->GetLastSerial();	// m_pDlgFrameHigh에서 얻거나 없으면, sPathOldFile폴더의 ReelMapDataDn.txt에서 _T("Info"), _T("Marked Shot") 찾음.
 	m_nLastOnThread = nLastOnThread;	// m_pDlgFrameHigh에서 얻거나 없으면, sPathOldFile폴더의 ReelMapDataDn.txt에서 _T("Info"), _T("Marked Shot") 찾음.
 
 	if(m_nLastOnThread > 0)
@@ -2809,11 +3229,37 @@ BOOL CReelMap::ReloadReelmap()
 	return bRtn;
 }
 
+BOOL CReelMap::ReloadReelmapFromThread(int nTo)
+{
+	//int nSerial;
+	BOOL bRtn;
+
+	//int nLastOnThread = pView->GetLastBufferSerial(0);	// m_pDlgFrameHigh에서 얻거나 없으면, sPathOldFile폴더의 ReelMapDataDn.txt에서 _T("Info"), _T("Marked Shot") 찾음.
+	m_nLastOnThread = nTo;	// m_pDlgFrameHigh에서 얻거나 없으면, sPathOldFile폴더의 ReelMapDataDn.txt에서 _T("Info"), _T("Marked Shot") 찾음.
+
+	if (m_nLastOnThread > 0)
+	{
+		m_bDoneReloadReelmap = FALSE;
+		m_nProgressReloadReelmap = 0;
+		m_nTotalProgressReloadReelmap = 0;
+		StartThreadReloadReelmap();
+		bRtn = TRUE;
+	}
+	else
+		bRtn = FALSE;
+
+	return bRtn;
+}
+
+
 BOOL CReelMap::ReloadReelmap(int nTo)
 {
+	if (nTo <= 0)
+		return TRUE;
+
 	if(!m_pPnlBuf)
 	{
-		pView->ClrDispMsg(); AfxMessageBox(_T("Memory is not allocated.- PnlBuf"));
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Memory is not allocated.- PnlBuf"));
 		m_bDoneReloadReelmap = TRUE;
 		return FALSE;
 	}
@@ -2823,10 +3269,10 @@ BOOL CReelMap::ReloadReelmap(int nTo)
 	TCHAR sep[] = { _T(",/;\r\n\t") };
 	TCHAR szData[MAX_PATH];
 
-	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->nCol;
-	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->nRow;
+	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
 	int nTotPcs = nNodeX * nNodeY;
-	int nStripPcs = nTotPcs / 4;
+	int nStripPcs = nTotPcs / MAX_STRIP;
 
 	int nDefStrip[4];
 	ClrRst();
@@ -2841,7 +3287,7 @@ BOOL CReelMap::ReloadReelmap(int nTo)
 	{
 		if (!m_bThreadAliveReloadReelmap)
 		{
-			pView->ClrDispMsg(); AfxMessageBox(_T("Thread is stopped on reloading reelmap.- PnlBuf"));
+			pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Thread is stopped on reloading reelmap.- PnlBuf"));
 			m_bDoneReloadReelmap = TRUE;
 			return FALSE;
 		}
@@ -3079,25 +3525,25 @@ BOOL CReelMap::MakeDirYield(CString sPath)
 	if (!Path[0].IsEmpty() && !Path[1].IsEmpty())
 	{
 		sPath.Format(_T("%s%s"), Path[0], Path[1]);
-		if (!pDoc->DirectoryExists(sPath))
+		if (!DirectoryExists(sPath))
 			CreateDirectory(sPath, NULL);
 
 		if (!Path[2].IsEmpty())
 		{
 			sPath.Format(_T("%s%s\\%s"), Path[0], Path[1], Path[2]);
-			if (!pDoc->DirectoryExists(sPath))
+			if (!DirectoryExists(sPath))
 				CreateDirectory(sPath, NULL);
 
 			if (!Path[3].IsEmpty())
 			{
 				sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], Path[3]);
-				if (!pDoc->DirectoryExists(sPath))
+				if (!DirectoryExists(sPath))
 					CreateDirectory(sPath, NULL);
 
 				if (!Path[4].IsEmpty())
 				{
 					sPath.Format(_T("%s%s\\%s\\%s\\%s"), Path[0], Path[1], Path[2], Path[3], Path[4]);
-					if (!pDoc->DirectoryExists(sPath))
+					if (!DirectoryExists(sPath))
 						CreateDirectory(sPath, NULL);
 				}
 			}
@@ -3215,13 +3661,13 @@ BOOL CReelMap::WriteYield(int nSerial, CString sPath)
 	int dwStart = GetTickCount();
 	int nNodeX = 0, nNodeY = 0;
 #ifdef USE_CAM_MASTER
-	nNodeX = pDoc->m_Master[0].m_pPcsRgn->nCol;
-	nNodeY = pDoc->m_Master[0].m_pPcsRgn->nRow;
+	nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+	nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
 #endif
 	CString sDefNum, strData;
 	int nPnl, nRow, nCol, nDefCode, nStrip;
 	int nTotPcs = nNodeX * nNodeY;
-	int nStripPcs = nTotPcs / 4;
+	int nStripPcs = nTotPcs / MAX_STRIP;
 	double dStOutRto = _tstof(pDoc->WorkingInfo.LastJob.sStripOutRatio) / 100.0;
 	nPnl = nSerial - 1;
 
@@ -3313,7 +3759,7 @@ BOOL CReelMap::WriteYield(int nSerial, CString sPath)
 	fp = fopen(FileName, "a+");
 	if (fp == NULL)
 	{
-		pView->MsgBox(_T("It is trouble to open ReelMap.txt"));
+		pView->MsgBox(_T("It is trouble to open Yield.txt"));
 		return FALSE;
 	}
 
@@ -3438,6 +3884,7 @@ BOOL CReelMap::MakeHeader(CString sPath)
 	FILE *fp = NULL;
 	char FileName[MAX_PATH];
 	BOOL bExist = FALSE;
+	CString sMsg;
 
 	CFileFind findfile;
 	if (findfile.FindFile(sPath))
@@ -3452,7 +3899,8 @@ BOOL CReelMap::MakeHeader(CString sPath)
 	fp = fopen(FileName, "w+");
 	if (fp == NULL)
 	{
-		pView->MsgBox(_T("It is trouble to open ReelMap.txt"));
+		sMsg.Format(_T("It is trouble to open \r\n%s"), sPath);
+		pView->MsgBox(sMsg);
 		return FALSE;
 	}
 
@@ -3460,8 +3908,8 @@ BOOL CReelMap::MakeHeader(CString sPath)
 	char* pRtn = NULL;
 	int nNodeX = 0, nNodeY = 0, i = 0, k = 0;
 #ifdef USE_CAM_MASTER
-	nNodeX = pDoc->m_Master[0].m_pPcsRgn->nCol;
-	nNodeY = pDoc->m_Master[0].m_pPcsRgn->nRow;
+	nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+	nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
 #endif
 
 	fprintf(fp, "[Info]\n");
@@ -3580,11 +4028,11 @@ BOOL CReelMap::MakeItsReelmapHeader()
 	}
 
 	sPath.Format(_T("%s%s"), Path[0], Path[1]);					// 모델 폴더
-	if (!pDoc->DirectoryExists(sPath))
+	if (!DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
 
 	sPath.Format(_T("%s%s\\%s"), Path[0], Path[1], Path[2]);	// ITS 코드 폴더
-	if (!pDoc->DirectoryExists(sPath))
+	if (!DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
 
 	sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], sName); // ReelmapIts.txt
@@ -3603,8 +4051,8 @@ BOOL CReelMap::MakeItsReelmapHeader()
 	char* pRtn = NULL;
 	int nNodeX = 0, nNodeY = 0, i = 0, k = 0;
 #ifdef USE_CAM_MASTER
-	nNodeX = pDoc->m_Master[0].m_pPcsRgn->nCol;
-	nNodeY = pDoc->m_Master[0].m_pPcsRgn->nRow;
+	nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+	nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
 #endif
 
 	fprintf(fp, "[Info]\n");
@@ -3676,6 +4124,7 @@ BOOL CReelMap::WriteIts(int nItsSerial)
 {
 	if (nItsSerial <= 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("Serial Error.163"));
 		return FALSE;
@@ -3700,10 +4149,10 @@ BOOL CReelMap::WriteIts(int nItsSerial)
 		return FALSE;
 	}
 
-	int nIdx = pDoc->GetPcrIdx0(nItsSerial);
-	int nNodeX = pDoc->m_MasterInner[0].m_pPcsRgn->nCol;
-	int nNodeY = pDoc->m_MasterInner[0].m_pPcsRgn->nRow;
-	int nStripY = pDoc->m_MasterInner[0].m_pPcsRgn->nRow / MAX_STRIP_NUM; // Strip(1~4);
+	int nIdx = GetPcrIdx(nItsSerial);
+	int nNodeX = pDoc->m_MasterInner[0].m_pPcsRgn->m_nCol;
+	int nNodeY = pDoc->m_MasterInner[0].m_pPcsRgn->m_nRow;
+	int nStripY = pDoc->m_MasterInner[0].m_pPcsRgn->m_nRow / MAX_STRIP_NUM; // Strip(1~4);
 	int nTotDefPcs = 0;
 	if (pDoc->m_pPcrIts)
 	{
@@ -3736,13 +4185,13 @@ BOOL CReelMap::WriteIts(int nItsSerial)
 					nPcsId = pDoc->m_pPcrIts[nIdx]->m_pDefPcs[i];
 					break;
 				case 1:
-					nPcsId = pDoc->MirrorLR(pDoc->m_pPcrIts[nIdx]->m_pDefPcs[i]);
+					nPcsId = MirrorLR(pDoc->m_pPcrIts[nIdx]->m_pDefPcs[i]);
 					break;
 				case 2:
-					nPcsId = pDoc->MirrorUD(pDoc->m_pPcrIts[nIdx]->m_pDefPcs[i]);
+					nPcsId = MirrorUD(pDoc->m_pPcrIts[nIdx]->m_pDefPcs[i]);
 					break;
 				case 3:
-					nPcsId = pDoc->Rotate180(pDoc->m_pPcrIts[nIdx]->m_pDefPcs[i]);
+					nPcsId = Rotate180(pDoc->m_pPcrIts[nIdx]->m_pDefPcs[i]);
 					break;
 				default:
 					nPcsId = pDoc->m_pPcrIts[nIdx]->m_pDefPcs[i];
@@ -3869,7 +4318,7 @@ BOOL CReelMap::MakeItsFile(int nSerial, int nLayer) // RMAP_UP, RMAP_DN, RMAP_IN
 		}
 		else
 		{
-			sMsg.Format(_T("It is trouble to MakeItsFile.\r\n%s"), FileName);
+			sMsg.Format(_T("It is trouble to MakeItsFile.\r\n%s"), sPath);
 			pView->MsgBox(sMsg);
 			return FALSE;
 		}
@@ -3886,10 +4335,10 @@ CString CReelMap::GetItsFileData(int nSerial, int nLayer) // RMAP_UP, RMAP_DN, R
 	CString str = _T(""), sSide = _T(""), sTemp = _T(""), sItsData = _T("");
 	CString sItsCode = pDoc->WorkingInfo.LastJob.sEngItsCode;
 
-	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->nCol;
-	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->nRow;
-	int nStripY = pDoc->m_Master[0].m_pPcsRgn->nRow / 4; // Strip(1~4);
-	int nIdx = pDoc->GetPcrIdx0(nSerial);
+	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
+	int nStripY = pDoc->m_Master[0].m_pPcsRgn->m_nRow / MAX_STRIP; // Strip(1~4);
+	int nIdx = GetPcrIdx(nSerial);
 
 	int nTotDefPcs = 0;
 
@@ -3947,12 +4396,14 @@ CString CReelMap::GetItsFileData(int nSerial, int nLayer) // RMAP_UP, RMAP_DN, R
 		nR = nRow;
 		for (nCol = 0; nCol < nNodeX; nCol++)
 		{
-			nPcrLineNum = pDoc->m_pPcr[nLayer][nIdx]->m_arPcrLineNum[nR][nCol];
+			nPcrLineNum = pDoc->m_pPcr[nLayer][nIdx]->m_arPcrLineNumForIts[nR][nCol];
 			if (nPcrLineNum > -1)
 			{
 				if (pDoc->m_pPcr[nLayer][nIdx]->m_pMk[nPcrLineNum] != -2) // -2 (NoMarking)
 				{
-					nDefCode = m_pPnlBuf[nSerial - 1][nR][nCol]; // DefCode 3D Array : [nSerial][nRow][nCol] - 릴맵파일 정보용.
+					//nDefCode = m_pPnlBuf[nSerial - 1][nR][nCol]; // DefCode 3D Array : [nSerial][nRow][nCol] - 릴맵파일 정보용.
+					//nDefCode = pDoc->m_pPcr[nLayer][nIdx]->m_arDefType[nR][nCol];
+					nDefCode = pDoc->m_pPcr[nLayer][nIdx]->m_arDefTypeForIts[nR][nCol];
 					if (nDefCode > 0)
 					{
 						nTotStrip[0]++;
@@ -3974,12 +4425,14 @@ CString CReelMap::GetItsFileData(int nSerial, int nLayer) // RMAP_UP, RMAP_DN, R
 		nR = nRow + nStripY;
 		for (nCol = 0; nCol < nNodeX; nCol++)
 		{
-			nPcrLineNum = pDoc->m_pPcr[nLayer][nIdx]->m_arPcrLineNum[nR][nCol];
+			nPcrLineNum = pDoc->m_pPcr[nLayer][nIdx]->m_arPcrLineNumForIts[nR][nCol];
 			if (nPcrLineNum > -1)
 			{
 				if (pDoc->m_pPcr[nLayer][nIdx]->m_pMk[nPcrLineNum] != -2) // -2 (NoMarking)
 				{
-					nDefCode = m_pPnlBuf[nSerial - 1][nR][nCol]; // DefCode 3D Array : [nSerial][nRow][nCol] - 릴맵파일 정보용.
+					//nDefCode = m_pPnlBuf[nSerial - 1][nR][nCol]; // DefCode 3D Array : [nSerial][nRow][nCol] - 릴맵파일 정보용.
+					//nDefCode = pDoc->m_pPcr[nLayer][nIdx]->m_arDefType[nR][nCol];
+					nDefCode = pDoc->m_pPcr[nLayer][nIdx]->m_arDefTypeForIts[nR][nCol];
 					if (nDefCode > 0)
 					{
 						nTotStrip[1]++;
@@ -4001,12 +4454,14 @@ CString CReelMap::GetItsFileData(int nSerial, int nLayer) // RMAP_UP, RMAP_DN, R
 		nR = nRow + nStripY * 2;
 		for (nCol = 0; nCol < nNodeX; nCol++)
 		{
-			nPcrLineNum = pDoc->m_pPcr[nLayer][nIdx]->m_arPcrLineNum[nR][nCol];
+			nPcrLineNum = pDoc->m_pPcr[nLayer][nIdx]->m_arPcrLineNumForIts[nR][nCol];
 			if (nPcrLineNum > -1)
 			{
 				if (pDoc->m_pPcr[nLayer][nIdx]->m_pMk[nPcrLineNum] != -2) // -2 (NoMarking)
 				{
-					nDefCode = m_pPnlBuf[nSerial - 1][nR][nCol]; // DefCode 3D Array : [nSerial][nRow][nCol] - 릴맵파일 정보용.
+					//nDefCode = m_pPnlBuf[nSerial - 1][nR][nCol]; // DefCode 3D Array : [nSerial][nRow][nCol] - 릴맵파일 정보용.
+					//nDefCode = pDoc->m_pPcr[nLayer][nIdx]->m_arDefType[nR][nCol];
+					nDefCode = pDoc->m_pPcr[nLayer][nIdx]->m_arDefTypeForIts[nR][nCol];
 					if (nDefCode > 0)
 					{
 						nTotStrip[2]++;
@@ -4028,12 +4483,14 @@ CString CReelMap::GetItsFileData(int nSerial, int nLayer) // RMAP_UP, RMAP_DN, R
 		nR = nRow + nStripY * 3;
 		for (nCol = 0; nCol < nNodeX; nCol++)
 		{
-			nPcrLineNum = pDoc->m_pPcr[nLayer][nIdx]->m_arPcrLineNum[nR][nCol];
+			nPcrLineNum = pDoc->m_pPcr[nLayer][nIdx]->m_arPcrLineNumForIts[nR][nCol];
 			if (nPcrLineNum > -1)
 			{
 				if (pDoc->m_pPcr[nLayer][nIdx]->m_pMk[nPcrLineNum] != -2) // -2 (NoMarking)
 				{
-					nDefCode = m_pPnlBuf[nSerial - 1][nR][nCol]; // DefCode 3D Array : [nSerial][nRow][nCol] - 릴맵파일 정보용.
+					//nDefCode = m_pPnlBuf[nSerial - 1][nR][nCol]; // DefCode 3D Array : [nSerial][nRow][nCol] - 릴맵파일 정보용.
+					//nDefCode = pDoc->m_pPcr[nLayer][nIdx]->m_arDefType[nR][nCol];
+					nDefCode = pDoc->m_pPcr[nLayer][nIdx]->m_arDefTypeForIts[nR][nCol];
 					if (nDefCode > 0)
 					{
 						nTotStrip[3]++;
@@ -4048,7 +4505,6 @@ CString CReelMap::GetItsFileData(int nSerial, int nLayer) // RMAP_UP, RMAP_DN, R
 			}
 		}
 	}
-
 
 	// Header
 	str.Format(_T("%d,%s,%04d\n"), nTotDefPcs - nTotVerifyed, sItsCode, nSerial);
@@ -4091,9 +4547,13 @@ BOOL CReelMap::MakeDirIts()
 {
 	CFileFind finder;
 	CString  Path[3], sItsPath;
+	CString sItsInnerPath, sItsOuterPath;
 	CString sPath = _T("");
 
-	sItsPath = pDoc->WorkingInfo.System.sPathIts;
+	//sItsPath = pDoc->WorkingInfo.System.sPathIts;
+	sItsInnerPath = pDoc->WorkingInfo.System.sPathItsInner;
+	sItsOuterPath = pDoc->WorkingInfo.System.sPathItsOuter;
+
 	Path[0] = pDoc->WorkingInfo.System.sPathItsFile;
 	Path[1] = pDoc->WorkingInfo.LastJob.sModel;
 	Path[2] = pDoc->WorkingInfo.LastJob.sEngItsCode;
@@ -4102,31 +4562,50 @@ BOOL CReelMap::MakeDirIts()
 		return FALSE;
 
 	sPath.Format(_T("%s%s"), Path[0], Path[1]);
-	if (!pDoc->DirectoryExists(sPath))
+	if (!DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
 
 	sPath.Format(_T("%s%s\\%s"), Path[0], Path[1], Path[2]);
-	if (!pDoc->DirectoryExists(sPath))
+	if (!DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
 
 	sPath.Format(_T("%s%s\\%s\\Inner"), Path[0], Path[1], Path[2]);
-	if (!pDoc->DirectoryExists(sPath))
+	if (!DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
 
 	sPath.Format(_T("%s%s\\%s\\Outer"), Path[0], Path[1], Path[2]);
-	if (!pDoc->DirectoryExists(sPath))
+	if (!DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
 
 
-	if (sItsPath.IsEmpty())
+	//if (sItsPath.IsEmpty())
+
+	//int pos = sItsPath.ReverseFind('\\');
+	//if (pos != -1)
+	//	sItsPath.Delete(pos, sItsPath.GetLength() - pos);
+
+	//if (!DirectoryExists(sItsPath))
+	//	CreateDirectory(sItsPath, NULL);
+
+	if (sItsInnerPath.IsEmpty() || sItsOuterPath.IsEmpty())
+	{
+		pView->MsgBox(_T("ITS의 내층/외층 저장경로가 없습니다."));
 		return FALSE;
+	}
 
-	int pos = sItsPath.ReverseFind('\\');
-	if (pos != -1)
-		sItsPath.Delete(pos, sItsPath.GetLength() - pos);
+	int pos1 = sItsInnerPath.ReverseFind('\\');
+	if (pos1 != -1)
+		sItsInnerPath.Delete(pos1, sItsInnerPath.GetLength() - pos1);
 
-	if (!pDoc->DirectoryExists(sItsPath))
-		CreateDirectory(sItsPath, NULL);
+	if (!DirectoryExists(sItsInnerPath))
+		CreateDirectory(sItsInnerPath, NULL);
+	
+	int pos2 = sItsOuterPath.ReverseFind('\\');
+	if (pos2 != -1)
+		sItsOuterPath.Delete(pos2, sItsOuterPath.GetLength() - pos2);
+
+	if (!DirectoryExists(sItsOuterPath))
+		CreateDirectory(sItsOuterPath, NULL);
 
 	return TRUE;
 }
@@ -4190,7 +4669,7 @@ BOOL CReelMap::RemakeReelmap()
 
 	CString sPathRmapF = sRmapPath + _T("\\Reelmap");
 
-	if (!pDoc->DirectoryExists(sPathRmapF))
+	if (!DirectoryExists(sPathRmapF))
 		CreateDirectory(sPathRmapF, NULL);
 
 
@@ -4212,12 +4691,12 @@ BOOL CReelMap::RemakeReelmap()
 		DeleteFile(strPathName);
 	else
 	{
-		if (!pDoc->DirectoryExists(sPathRmapF))
+		if (!DirectoryExists(sPathRmapF))
 			CreateDirectory(sPath, NULL);
 	}
 
-	int nNodeX = 0;// = pDoc->m_pPcsRgn->nCol; // on Cam
-	int nNodeY = 0;// = pDoc->m_pPcsRgn->nRow; // on Cam
+	int nNodeX = 0;// = pDoc->m_pPcsRgn->m_nCol; // on Cam
+	int nNodeY = 0;// = pDoc->m_pPcsRgn->m_nRow; // on Cam
 
 	if (0 < ::GetPrivateProfileString(_T("Info"), _T("CamPcsX"), NULL, szData, sizeof(szData), sPath))
 		nNodeX = _tstoi(szData);
@@ -4318,6 +4797,7 @@ BOOL CReelMap::GetResult() // TRUE: Make Result, FALSE: Load Result or Failed.
 
 	if (!findfile.FindFile(strAddedDefectFP)) // Can not find file.
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strMsg.Format(_T("%s file open is failed"), strAddedDefectFP);
 		pView->ClrDispMsg();
 		AfxMessageBox(strMsg);
@@ -5410,18 +5890,21 @@ BOOL CReelMap::CopyItsFile(CString sPathSrc, CString sPathDest)
 	return bRtn;
 }
 
+int CReelMap::GetTotalFixPcs(int nCol, int nRow)
+{
+	return m_FixPcsTotal[nCol][nRow];
+}
 
 int CReelMap::GetRptFixPcs(int nCol, int nRow)
 {
-	return m_FixPcsRpt[nCol][nRow];;
+	return m_FixPcsRpt[nCol][nRow];
 }
-
-
 
 void CReelMap::SetLastSerialOnOffline(int nSerial) 
 {
 	if (nSerial <= 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("Serial Error.64"));
 		return;
@@ -5502,8 +5985,11 @@ CString CReelMap::GetRmapPathOnOffline(int nRmap)
 
 BOOL CReelMap::WriteOnOffline(int nSerial)
 {
+	CString sMsg;
+
 	if (nSerial <= 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("Serial Error.162"));
 		return FALSE;
@@ -5535,10 +6021,10 @@ BOOL CReelMap::WriteOnOffline(int nSerial)
 	CString sPath = GetRmapPathOnOffline(m_nLayer);
 	MakeHeader(sPath);
 
-	int nIdx = pDoc->GetPcrIdx1(nSerial, pDoc->m_bNewLotShare[1]);
-	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->nCol;
-	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->nRow;
-	int nStripY = pDoc->m_Master[0].m_pPcsRgn->nRow / MAX_STRIP; // Strip(1~4);
+	int nIdx = GetPcrIdx(nSerial);
+	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
+	int nStripY = pDoc->m_Master[0].m_pPcsRgn->m_nRow / MAX_STRIP; // Strip(1~4);
 	int nTotDefPcs = 0;
 
 	if (m_nLayer == RMAP_UP || m_nLayer == RMAP_DN || m_nLayer == RMAP_ALLUP || m_nLayer == RMAP_ALLDN)
@@ -5589,13 +6075,13 @@ BOOL CReelMap::WriteOnOffline(int nSerial)
 					nPcsId = pDoc->m_pPcr[nLayer][nIdx]->m_pDefPcs[i];
 					break;
 				case 1:
-					nPcsId = pDoc->MirrorLR(pDoc->m_pPcr[nLayer][nIdx]->m_pDefPcs[i]);
+					nPcsId = MirrorLR(pDoc->m_pPcr[nLayer][nIdx]->m_pDefPcs[i]);
 					break;
 				case 2:
-					nPcsId = pDoc->MirrorUD(pDoc->m_pPcr[nLayer][nIdx]->m_pDefPcs[i]);
+					nPcsId = MirrorUD(pDoc->m_pPcr[nLayer][nIdx]->m_pDefPcs[i]);
 					break;
 				case 3:
-					nPcsId = pDoc->Rotate180(pDoc->m_pPcr[nLayer][nIdx]->m_pDefPcs[i]);
+					nPcsId = Rotate180(pDoc->m_pPcr[nLayer][nIdx]->m_pDefPcs[i]);
 					break;
 				default:
 					nPcsId = pDoc->m_pPcr[nLayer][nIdx]->m_pDefPcs[i];
@@ -5604,6 +6090,13 @@ BOOL CReelMap::WriteOnOffline(int nSerial)
 			}
 			else
 				nPcsId = pDoc->m_pPcr[nLayer][nIdx]->m_pDefPcs[i];
+
+			if (nPcsId < 0)
+			{
+				sMsg.Format(_T("Error - Defect Pcs Index(%d) is not exist on PCR."), nPcsId);
+				pView->MsgBox(sMsg);
+				return 0;
+			}
 
 			nDefCode = pDoc->m_pPcr[nLayer][nIdx]->m_pDefType[i];
 
@@ -5843,7 +6336,6 @@ BOOL CReelMap::WriteLastRmapInfoOnOffline()
 	return TRUE;
 }
 
-
 int CReelMap::GetFirstShotFromPcr()
 {
 	CString sPath;
@@ -5954,4 +6446,1192 @@ int CReelMap::GetLastShotFromPcr()
 	}
 
 	return nLastShot;
+}
+
+int CReelMap::IsOfflineFolder() // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+{
+	int nRtn = 0;
+	CString sPath, str;
+	BOOL bWorking;
+
+	//검색 클래스
+	CFileFind finder;
+
+	str = _T("OFFLINE");
+	sPath.Format(_T("%s%s\\%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathOldFile,
+		pDoc->WorkingInfo.LastJob.sModel,
+		pDoc->WorkingInfo.LastJob.sLot,
+		pDoc->WorkingInfo.LastJob.sLayerUp,
+		str);
+
+	//CFileFind는 파일, 디렉터리가 존재하면 TRUE 를 반환함 
+	bWorking = finder.FindFile(sPath);
+
+	if (bWorking)
+		nRtn |= 0x01;
+
+	str = _T("OFFLINE");
+	sPath.Format(_T("%s%s\\%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathOldFile,
+		pDoc->WorkingInfo.LastJob.sModel,
+		pDoc->WorkingInfo.LastJob.sLot,
+		pDoc->WorkingInfo.LastJob.sLayerDn,
+		str);
+
+	//CFileFind는 파일, 디렉터리가 존재하면 TRUE 를 반환함 
+	bWorking = finder.FindFile(sPath);
+
+	if (bWorking)
+		nRtn |= 0x02;
+
+	return nRtn;
+}
+
+BOOL CReelMap::GetInnerReelmapPath(int nItsSerial, CString  &sUp, CString &sDn, CString  &sAllUp, CString &sAllDn)
+{
+	BOOL bDualTest;
+	CString sLot, sLayerUp, sLayerDn;
+	if (!GetItsSerialInfo(nItsSerial, bDualTest, sLot, sLayerUp, sLayerDn, 0))
+	{
+		CString str;
+		str.Format(_T("It is trouble to read GetItsSerialInfo()."));
+		pView->MsgBox(str);
+		return FALSE;
+	}
+
+	CString  Path[5];
+	CString sPath = _T("");
+
+	Path[0] = pDoc->WorkingInfo.System.sPathOldFile;
+	Path[1] = pDoc->WorkingInfo.LastJob.sModel;
+	Path[2] = sLot;
+	Path[3] = sLayerUp;
+	Path[4] = sLayerDn;
+
+	if (Path[0].IsEmpty() || Path[1].IsEmpty() || Path[2].IsEmpty() || Path[3].IsEmpty())
+		return FALSE;
+
+	int nOffline = IsOfflineFolder(); // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+
+	if (nOffline & 0x01)
+	{
+		sUp.Format(_T("%s%s\\%s\\%s\\OFFLINE\\ReelMapDataUp.txt"), Path[0], Path[1], Path[2], Path[3]); // ITS Inner Up Folder Path
+		if (bDualTest)
+			sAllUp.Format(_T("%s%s\\%s\\%s\\OFFLINE\\ReelMapDataAll.txt"), Path[0], Path[1], Path[2], Path[3]); // ITS Inner Up Folder Path
+	}
+	else
+	{
+		sUp.Format(_T("%s%s\\%s\\%s\\ReelMapDataUp.txt"), Path[0], Path[1], Path[2], Path[3]); // ITS Inner Up Folder Path
+		if (bDualTest)
+			sAllUp.Format(_T("%s%s\\%s\\%s\\ReelMapDataAll.txt"), Path[0], Path[1], Path[2], Path[3]); // ITS Inner Up Folder Path
+	}
+
+	if (bDualTest)
+	{
+		if (Path[4].IsEmpty())
+			return FALSE;
+		if (nOffline & 0x02)
+		{
+			sDn.Format(_T("%s%s\\%s\\%s\\OFFLINE\\ReelMapDataDn.txt"), Path[0], Path[1], Path[2], Path[4]); // ITS Inner Dn Folder Path
+			sAllDn.Format(_T("%s%s\\%s\\%s\\OFFLINE\\ReelMapDataAll.txt"), Path[0], Path[1], Path[2], Path[4]); // ITS Inner Dn Folder Path
+		}
+		else
+		{
+			sDn.Format(_T("%s%s\\%s\\%s\\ReelMapDataDn.txt"), Path[0], Path[1], Path[2], Path[4]); // ITS Inner Dn Folder Path
+			sAllDn.Format(_T("%s%s\\%s\\%s\\ReelMapDataAll.txt"), Path[0], Path[1], Path[2], Path[4]); // ITS Inner Dn Folder Path
+		}
+	}
+	else
+	{
+		sDn = _T("");
+		sAllUp = _T("");
+		sAllDn = _T("");
+	}
+
+	return TRUE;
+}
+
+BOOL CReelMap::GetItsSerialInfo(int nItsSerial, BOOL &bDualTest, CString &sLot, CString &sLayerUp, CString &sLayerDn, int nOption)		// 내층에서의 ITS 시리얼의 정보
+{
+	TCHAR szData[512];
+	CString str, sName, sPath, Path[3];
+
+	Path[0] = pDoc->WorkingInfo.System.sPathItsFile;
+	Path[1] = pDoc->WorkingInfo.LastJob.sModel;
+	Path[2] = pDoc->m_sItsCode;
+
+	sName.Format(_T("%s.txt"), pDoc->m_sItsCode);
+	sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], sName); // ITS_Code.txt
+
+	if (sPath.IsEmpty())
+		return FALSE;
+
+	CString strTemp;
+	CFileFind finder;
+	if (finder.FindFile(sPath) == FALSE)
+	{
+		Path[1] = pDoc->m_sEngModel;
+		sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], sName); // ITS_Code.txt
+		if (finder.FindFile(sPath) == FALSE)
+		{
+			strTemp.Format(_T("GetItsSerialInfo - Didn't find file.\r\n%s"), sPath);
+			pView->MsgBox(strTemp);
+			return FALSE;
+		}
+	}
+
+	if (nItsSerial == 0)
+		nItsSerial = SearchFirstShotOnIts();
+
+	CString sItsSerail;
+	sItsSerail.Format(_T("%d"), nItsSerial);
+
+
+	// Option 1
+	if (nOption == 0 || nOption == 1)
+	{
+		if (0 < ::GetPrivateProfileString(sItsSerail, _T("Dual Test"), NULL, szData, sizeof(szData), sPath))
+			bDualTest = (_ttoi(szData) > 0) ? TRUE : FALSE;
+		else
+			bDualTest = FALSE;
+
+		pDoc->WorkingInfo.LastJob.bDualTestInner = bDualTest;
+	}
+
+	// Option 2
+	if (nOption == 0 || nOption == 2)
+	{
+		if (0 < ::GetPrivateProfileString(sItsSerail, _T("Current Lot"), NULL, szData, sizeof(szData), sPath))
+			sLot = CString(szData);
+		else
+			sLot = _T("");
+
+		pDoc->WorkingInfo.LastJob.sInnerLot = sLot;
+	}
+
+	// Option 3
+	if (nOption == 0 || nOption == 3)
+	{
+		if (0 < ::GetPrivateProfileString(sItsSerail, _T("Current Layer Up"), NULL, szData, sizeof(szData), sPath))
+			sLayerUp = CString(szData);
+		else
+			sLayerUp = _T("");
+
+		pDoc->WorkingInfo.LastJob.sInnerLayerUp = sLayerUp;
+	}
+
+	// Option 4
+	if (nOption == 0 || nOption == 4)
+	{
+		if (bDualTest)
+		{
+			if (0 < ::GetPrivateProfileString(sItsSerail, _T("Current Layer Dn"), NULL, szData, sizeof(szData), sPath))
+				sLayerDn = CString(szData);
+			else
+				sLayerDn = _T("");
+		}
+		else
+			sLayerDn = _T("");
+
+		pDoc->WorkingInfo.LastJob.sInnerLayerDn = sLayerDn;
+	}
+
+	return TRUE;
+}
+
+int CReelMap::SearchFirstShotOnIts()
+{
+	CString sName, sPath, Path[3], sMsg;
+
+	Path[0] = pDoc->WorkingInfo.System.sPathItsFile;
+	Path[1] = pDoc->WorkingInfo.LastJob.sModel;
+	Path[2] = pDoc->m_sItsCode;
+
+	sName.Format(_T("%s.txt"), pDoc->m_sItsCode);
+	sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], sName); // ITS_Code.txt
+
+	CDataFile *pDataFile = new CDataFile;
+
+	if (!pDataFile->Open(sPath))
+	{
+		Path[1] = pDoc->m_sEngModel;
+		sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], sName); // ITS_Code.txt
+
+		if (!pDataFile->Open(sPath))
+		{
+			sMsg.Format(_T("%s File not found."), sPath);
+			pView->MsgBox(sMsg);
+			delete pDataFile;
+			return 0;
+		}
+	}
+
+	int i = 0, nLastShot = 0;
+	CString sLine;
+	int nTotLine = pDataFile->GetTotalLines();
+	for (i = 1; i <= nTotLine; i++)
+	{
+		sLine = pDataFile->GetLineString(i);
+		int nPos = sLine.Find(_T('['), 0);
+		if (nPos >= 0)
+		{
+			sLine.Delete(0, nPos + 1);
+			nPos = sLine.ReverseFind(_T(']'));
+			sLine = sLine.Left(nPos);
+			nLastShot = _ttoi(sLine);
+			break;
+		}
+	}
+
+	delete pDataFile;
+
+	return nLastShot;
+}
+
+int CReelMap::GetPcrIdx(int nSerial)
+{
+	if (nSerial <= 0)
+	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
+		pView->ClrDispMsg();
+		AfxMessageBox(_T("Serial Error.9"));
+		return 0;
+	}
+
+	int nIdx;
+	nIdx = (nSerial - 1) % MAX_PCR_PNL;
+	return nIdx;
+}
+
+BOOL CReelMap::SetItsSerialInfo(int nItsSerial)
+{
+	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
+
+	CString sName = _T("");
+	CString str, sPath, Path[6];
+
+	Path[0] = pDoc->WorkingInfo.System.sPathItsFile;
+	Path[1] = pDoc->m_sEngModel;
+	Path[2] = pDoc->m_sItsCode;
+	Path[3] = pDoc->m_sEngLotNum;
+	Path[4] = pDoc->m_sEngLayerUp;
+	Path[5] = pDoc->m_sEngLayerDn;
+
+	if (Path[0].IsEmpty() || Path[1].IsEmpty() || Path[2].IsEmpty() || Path[3].IsEmpty() || Path[4].IsEmpty())
+	{
+		sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], sName); // ITS_Code.txt
+		str.Format(_T("It is trouble to write SetItsSerialInfo.txt\r\n%s"), sPath);
+		pView->MsgBox(str);
+		return FALSE;
+	}
+
+	if (bDualTest)
+	{
+		if (Path[5].IsEmpty())
+			return FALSE;
+	}
+
+	sPath.Format(_T("%s%s"), Path[0], Path[1]);					// 모델 폴더
+	if (!DirectoryExists(sPath))
+		CreateDirectory(sPath, NULL);
+
+	sPath.Format(_T("%s%s\\%s"), Path[0], Path[1], Path[2]);	// ITS 코드 폴더
+	if (!DirectoryExists(sPath))
+		CreateDirectory(sPath, NULL);
+
+	sName.Format(_T("%s.txt"), pDoc->m_sItsCode);
+	sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], sName); // ITS_Code.txt
+
+	CString sItsSerail;
+	sItsSerail.Format(_T("%d"), nItsSerial);
+
+	// ITS_Code.txt 파일의 정보
+	str.Format(_T("%d"), pDoc->GetTestMode());
+	::WritePrivateProfileString(sItsSerail, _T("Test Mode"), str, sPath);
+	str.Format(_T("%d"), (bDualTest ? 1 : 0));
+	::WritePrivateProfileString(sItsSerail, _T("Dual Test"), str, sPath);
+	::WritePrivateProfileString(sItsSerail, _T("Process Unit Code"), pDoc->m_sEngProcessNum, sPath);
+	::WritePrivateProfileString(sItsSerail, _T("Current Model"), pDoc->m_sEngModel, sPath);
+	::WritePrivateProfileString(sItsSerail, _T("Its Code"), pDoc->m_sItsCode, sPath);
+	::WritePrivateProfileString(sItsSerail, _T("Current Lot"), pDoc->m_sEngLotNum, sPath);
+	::WritePrivateProfileString(sItsSerail, _T("Current Layer Up"), pDoc->m_sEngLayerUp, sPath);
+
+	if (bDualTest)
+		::WritePrivateProfileString(sItsSerail, _T("Current Layer Dn"), pDoc->m_sEngLayerDn, sPath);
+	else
+		::WritePrivateProfileString(sItsSerail, _T("Current Layer Dn"), _T(""), sPath);
+
+	return TRUE;
+}
+
+BOOL CReelMap::DirectoryExists(LPCTSTR szPath)
+{
+	DWORD dwAttrib = GetFileAttributes(szPath);
+
+	return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
+		(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+}
+
+CString CReelMap::GetItsPath(int nSerial, int nLayer)	// RMAP_UP, RMAP_DN, RMAP_INNER_UP, RMAP_INNER_DN
+{
+	CString sPath, str;
+	CString sItsFolderPath = GetItsFolderPath();
+	CString sTime = pView->GetTimeIts();
+
+	int nPos = pDoc->WorkingInfo.LastJob.sSelUserName.Find(_T('\r'));
+	if (nPos > 0)
+		pDoc->WorkingInfo.LastJob.sSelUserName = pDoc->WorkingInfo.LastJob.sSelUserName.Left(nPos);
+
+	switch (nLayer)
+	{
+	case RMAP_UP: // 외층 Top
+		str.Format(_T("%s_L2_%04d_T_%s_%s_AVR01_%s.dat"), pDoc->m_sItsCode, nSerial, pDoc->WorkingInfo.LastJob.sSelUserName, pDoc->WorkingInfo.System.sMcName, sTime);
+		sPath.Format(_T("%s\\Outer\\%s"), sItsFolderPath, str);
+		break;
+	case RMAP_DN: // 외층 Bottom
+		str.Format(_T("%s_L2_%04d_B_%s_%s_AVR01_%s.dat"), pDoc->m_sItsCode, nSerial, pDoc->WorkingInfo.LastJob.sSelUserName, pDoc->WorkingInfo.System.sMcName, sTime);
+		sPath.Format(_T("%s\\Outer\\%s"), sItsFolderPath, str);
+		break;
+	case RMAP_INNER_UP: // 내층 Top
+		str.Format(_T("%s_L1_%04d_T_%s_%s_AVR01_%s.dat"), pDoc->m_sItsCode, nSerial, pDoc->WorkingInfo.LastJob.sSelUserName, pDoc->WorkingInfo.System.sMcName, sTime);
+		sPath.Format(_T("%s\\Inner\\%s"), sItsFolderPath, str);
+		break;
+	case RMAP_INNER_DN: // 내층 Bottom
+		str.Format(_T("%s_L1_%04d_B_%s_%s_AVR01_%s.dat"), pDoc->m_sItsCode, nSerial, pDoc->WorkingInfo.LastJob.sSelUserName, pDoc->WorkingInfo.System.sMcName, sTime);
+		sPath.Format(_T("%s\\Inner\\%s"), sItsFolderPath, str);
+		break;
+	}
+
+	return sPath;
+}
+
+CString CReelMap::GetItsFolderPath()
+{
+	CString  Path[3];
+	CString sPath = _T("");
+
+	Path[0] = pDoc->WorkingInfo.System.sPathItsFile;
+	Path[1] = pDoc->WorkingInfo.LastJob.sModel;
+	Path[2] = pDoc->WorkingInfo.LastJob.sEngItsCode;
+
+	if (Path[0].IsEmpty() || Path[1].IsEmpty() || Path[2].IsEmpty())
+	{
+		if (Path[2].IsEmpty())
+		{
+			if (pDoc->GetCurrentInfoEng())
+			{
+				pDoc->WorkingInfo.LastJob.sEngItsCode = pDoc->m_sItsCode;
+				Path[2] = pDoc->WorkingInfo.LastJob.sEngItsCode;
+			}
+		}
+
+		if (Path[0].IsEmpty() || Path[1].IsEmpty() || Path[2].IsEmpty())
+			return sPath;
+	}
+
+	sPath.Format(_T("%s%s\\%s"), Path[0], Path[1], Path[2]); // ITS Folder Path
+
+	return sPath;
+}
+
+int CReelMap::MirrorLR(int nPcsId) // 좌우 미러링
+{
+#ifndef USE_CAM_MASTER
+	return 0;
+#endif
+
+	int nId, nCol, nRow, nC, nR;
+	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol; // 1 ~
+	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow; // 1 ~
+
+	nCol = int(nPcsId / nNodeY); // 0 ~
+	if (nCol % 2)
+		nRow = nNodeY*(nCol + 1) - nPcsId - 1;
+	else
+		nRow = nPcsId - nNodeY*nCol; // 0 ~
+
+	nR = nRow; // 0 ~
+	nC = (nNodeX - 1) - nCol; // 0 ~
+	if (nC % 2) // 홀수 : 시작 감소
+		nId = nNodeY*(nC + 1) - nR - 1;
+	else		// 짝수 : 시작 증가
+		nId = nR + nNodeY*nC;
+
+	return nId;
+}
+
+int CReelMap::MirrorUD(int nPcsId) // 상하 미러링
+{
+#ifndef USE_CAM_MASTER
+	return 0;
+#endif
+
+	int nId, nCol, nRow, nC, nR;
+	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol; // 1 ~
+	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow; // 1 ~
+
+	nCol = int(nPcsId / nNodeY); // 0 ~
+	if (nCol % 2)
+		nRow = nPcsId - nNodeY*nCol; // 0 ~
+	else
+		nRow = nNodeY*(nCol + 1) - nPcsId - 1;
+
+	nR = nRow; // 0 ~
+	nC = nCol; // 0 ~
+	if (nC % 2) // 홀수 : 시작 감소
+		nId = nNodeY*(nC + 1) - nR - 1;
+	else		// 짝수 : 시작 증가
+		nId = nR + nNodeY*nC;
+
+	return nId;
+}
+
+int CReelMap::Rotate180(int nPcsId) // 180도 회전
+{
+#ifndef USE_CAM_MASTER
+	return 0;
+#endif
+
+	int nId, nCol, nRow, nC, nR;
+	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol; // 1 ~
+	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow; // 1 ~
+
+	if (nNodeX % 2)		// 홀수 : 시작 감소
+	{
+		nCol = (nNodeX - 1) - int(nPcsId / nNodeY); // 0 ~
+		if (nCol % 2)
+			nRow = nPcsId - nNodeY * (nNodeX - nCol - 1); // 0 ~
+		else
+			nRow = nNodeY * (nNodeX - nCol) - nPcsId - 1; // 0 ~
+
+														  //nR = (nNodeY - 1) - nRow; // 0 ~
+														  //nC = (nNodeX - 1) - nCol; // 0 ~
+		nR = nRow;
+		nC = nCol;
+
+		if (nC % 2)
+			nId = nNodeY*(nC + 1) - nR - 1; // 0 ~
+		else
+			nId = nR + nNodeY*nC;
+	}
+	else				// 짝수 : 시작 증가
+	{
+		nCol = (nNodeX - 1) - int(nPcsId / nNodeY); // 0 ~
+		if (nCol % 2)
+			nRow = nNodeY * (nNodeX - nCol) - nPcsId - 1; // 0 ~
+		else
+			nRow = nPcsId - nNodeY * (nNodeX - nCol - 1); // 0 ~
+
+														  //nR = (nNodeY - 1) - nRow; // 0 ~
+														  //nC = (nNodeX - 1) - nCol; // 0 ~
+		nR = nRow;
+		nC = nCol;
+
+		if (nC % 2)
+			nId = nNodeY*(nC + 1) - nR - 1; // 0 ~
+		else
+			nId = nR + nNodeY*nC;
+	}
+	return nId;
+}
+
+BOOL CReelMap::SetPcsMkOut(int nSerial, int nPcsIdx)
+{
+	return TRUE;
+}
+
+
+CString CReelMap::GetYieldPathOnOffline(int nRmap)
+{
+	CString sPath = _T("");
+	CString Path[5], str;
+
+	switch (nRmap)
+	{
+	case RMAP_UP:
+		str = _T("YieldUp.txt");
+		sPath.Format(_T("%s%s\\%s\\%s\\OFFLINE\\%s"),
+			pDoc->WorkingInfo.System.sPathOldFile,
+			pDoc->WorkingInfo.LastJob.sModel,
+			pDoc->WorkingInfo.LastJob.sLot,
+			pDoc->WorkingInfo.LastJob.sLayerUp,
+			str);
+		break;
+	case RMAP_DN:
+		str = _T("YieldDn.txt");
+		sPath.Format(_T("%s%s\\%s\\%s\\OFFLINE\\%s"),
+			pDoc->WorkingInfo.System.sPathOldFile,
+			pDoc->WorkingInfo.LastJob.sModel,
+			pDoc->WorkingInfo.LastJob.sLot,
+			pDoc->WorkingInfo.LastJob.sLayerDn,
+			str);
+		break;
+	case RMAP_ALLUP:
+		str = _T("YieldAll.txt");
+		sPath.Format(_T("%s%s\\%s\\%s\\OFFLINE\\%s"),
+			pDoc->WorkingInfo.System.sPathOldFile,
+			pDoc->WorkingInfo.LastJob.sModel,
+			pDoc->WorkingInfo.LastJob.sLot,
+			pDoc->WorkingInfo.LastJob.sLayerUp,
+			str);
+		break;
+	case RMAP_ALLDN:
+		str = _T("YieldAll.txt");
+		sPath.Format(_T("%s%s\\%s\\%s\\OFFLINE\\%s"),
+			pDoc->WorkingInfo.System.sPathOldFile,
+			pDoc->WorkingInfo.LastJob.sModel,
+			pDoc->WorkingInfo.LastJob.sLot,
+			pDoc->WorkingInfo.LastJob.sLayerDn,
+			str);
+		break;
+	}
+
+	return sPath;
+}
+
+BOOL CReelMap::WriteYieldOnOffline(int nSerial)
+{
+	CString sPath = GetYieldPathOnOffline(m_nLayer);
+
+	m_nBeforeSerialOffline = nSerial;
+
+	int dwStart = GetTickCount();
+	int nNodeX = 0, nNodeY = 0;
+#ifdef USE_CAM_MASTER
+	nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+	nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
+#endif
+	CString sDefNum, strData;
+	int nPnl, nRow, nCol, nDefCode, nStrip;
+	int nTotPcs = nNodeX * nNodeY;
+	int nStripPcs = nTotPcs / MAX_STRIP;
+	double dStOutRto = _tstof(pDoc->WorkingInfo.LastJob.sStripOutRatio) / 100.0;
+	nPnl = nSerial - 1;
+
+	int i, k;
+	TCHAR szData[200];
+
+	CString sCode, strMenu, strItem, sMsg;
+	int nTot = 0, nGood = 0, nDef = 0;
+	int nTotSriptOut = 0;
+
+	int nDefStrip[MAX_STRIP], nDefA[MAX_DEF], nDefPerStrip[MAX_STRIP][MAX_DEF], nStripOut[MAX_STRIP];
+	nDefStrip[0] = 0; nDefStrip[1] = 0; nDefStrip[2] = 0; nDefStrip[3] = 0;
+	nStripOut[0] = 0; nStripOut[1] = 0; nStripOut[2] = 0; nStripOut[3] = 0;
+
+	nTot = nNodeX * nNodeY;
+
+	for (k = 0; k < MAX_DEF; k++)
+	{
+		nDefA[k] = 0;
+
+		for (i = 0; i < MAX_STRIP; i++)
+		{
+			nDefPerStrip[i][k] = 0;
+		}
+	}
+
+	for (nRow = 0; nRow < nNodeY; nRow++)
+	{
+		for (nCol = 0; nCol < nNodeX; nCol++)
+		{
+			if (m_pPnlBuf)
+			{
+				nDefCode = (int)m_pPnlBuf[nPnl][nRow][nCol] < 0 ? 0 : (int)m_pPnlBuf[nPnl][nRow][nCol];
+				nDefA[nDefCode]++;
+
+				nStrip = int(nRow / (nNodeY / MAX_STRIP));
+				if (nStrip > -1 && nStrip < MAX_STRIP)
+				{
+					if (nDefCode > 0)
+					{
+						nDefStrip[nStrip]++;
+						nDefPerStrip[nStrip][nDefCode]++;
+					}
+				}
+			}
+		}
+	}
+
+	for (nStrip = 0; nStrip < MAX_STRIP; nStrip++)
+	{
+		if (nDefStrip[nStrip] >= nStripPcs * dStOutRto)
+			nStripOut[nStrip]++;
+	}
+
+	for (i = 1; i < MAX_DEF; i++)
+	{
+		m_stYield.nDefA[i] = m_stYield.nDefA[i] + nDefA[i];
+		nDef += nDefA[i];
+	}
+	nGood = nTot - nDef;
+
+	m_stYield.nTot = m_stYield.nTot + nTot;
+	m_stYield.nGood = m_stYield.nGood + nGood;
+	m_stYield.nDef = m_stYield.nDef + nDef;
+
+	for (k = 0; k < MAX_STRIP; k++)
+	{
+		m_stYield.nDefStrip[k] = m_stYield.nDefStrip[k] + nDefStrip[k];
+		m_stYield.nStripOut[k] = m_stYield.nStripOut[k] + nStripOut[k];
+		nTotSriptOut += nStripOut[k];
+		for (i = 1; i < MAX_DEF; i++)
+			m_stYield.nDefPerStrip[k][i] = m_stYield.nDefPerStrip[k][i] + nDefPerStrip[k][i];
+	}
+	m_stYield.nTotSriptOut = m_stYield.nTotSriptOut + nTotSriptOut;
+
+
+	FILE *fp = NULL;
+	char FileName[MAX_PATH];
+
+	BOOL bExist = FALSE;
+	CFileFind findfile;
+	if (findfile.FindFile(sPath))
+		bExist = TRUE;
+	else
+		MakeDirYield(sPath);
+
+	StrToChar(sPath, FileName);
+
+	fp = fopen(FileName, "a+");
+	if (fp == NULL)
+	{
+		pView->MsgBox(_T("It is trouble to open Yield.txt"));
+		return FALSE;
+	}
+
+	if (!bExist)
+	{
+		m_nStartSerial = nSerial;
+
+		fprintf(fp, "[Info]\n");
+		fprintf(fp, "Total Shot = \n\n");
+		fprintf(fp, "Total Pcs = \n");
+		fprintf(fp, "Good Pcs = \n");
+		fprintf(fp, "Bad Pcs = \n\n");
+		fprintf(fp, "Start Shot=%d\n", m_nStartSerial);
+		fprintf(fp, "End Shot = \n\n");
+
+		for (i = 1; i <= MAX_DEF; i++)
+			fprintf(fp, "%d=\n", i);
+		fprintf(fp, "\n");
+
+		for (k = 0; k < MAX_STRIP; k++)
+			fprintf(fp, "Strip%d = \n", k);
+		fprintf(fp, "\n");
+
+		for (k = 0; k < MAX_STRIP; k++)
+		{
+			for (i = 1; i <= MAX_DEF; i++)
+				fprintf(fp, "Strip%d_%d = \n", k, i);
+			fprintf(fp, "\n");
+		}
+
+		fprintf(fp, "StripOut_Total = \n");
+		fprintf(fp, "StripOut_0 = \n");
+		fprintf(fp, "StripOut_1 = \n");
+		fprintf(fp, "StripOut_2 = \n");
+		fprintf(fp, "StripOut_3 = \n");
+		fprintf(fp, "\n");
+	}
+
+	fclose(fp);
+
+	strMenu.Format(_T("%d"), nSerial);
+
+	for (i = 1; i < MAX_DEF; i++)
+	{
+		sCode.Format(_T("%d"), i);
+		sDefNum.Format(_T("%d"), m_stYield.nDefA[i]);
+
+		// [Info]
+		::WritePrivateProfileString(_T("Info"), sCode, sDefNum, sPath);
+
+		// [Serial]
+		::WritePrivateProfileString(strMenu, sCode, sDefNum, sPath);
+	}
+
+	// [Info]
+	strData.Format(_T("%d"), nSerial);
+	::WritePrivateProfileString(_T("Info"), _T("End Shot"), strData, sPath);
+
+	strData.Format(_T("%d"), nSerial - m_nStartSerial + 1);
+	::WritePrivateProfileString(_T("Info"), _T("Total Shot"), strData, sPath);
+
+	strData.Format(_T("%d"), m_stYield.nTot);
+	::WritePrivateProfileString(_T("Info"), _T("Total Pcs"), strData, sPath);
+
+	strData.Format(_T("%d"), m_stYield.nGood);
+	::WritePrivateProfileString(_T("Info"), _T("Good Pcs"), strData, sPath);
+
+	strData.Format(_T("%d"), m_stYield.nDef);
+	::WritePrivateProfileString(_T("Info"), _T("Bad Pcs"), strData, sPath);
+
+	// [Serial]
+	strData.Format(_T("%d"), m_stYield.nTot);
+	::WritePrivateProfileString(strMenu, _T("Total Pcs"), strData, sPath);
+
+	strData.Format(_T("%d"), m_stYield.nGood);
+	::WritePrivateProfileString(strMenu, _T("Good Pcs"), strData, sPath);
+
+	strData.Format(_T("%d"), m_stYield.nDef);
+	::WritePrivateProfileString(strMenu, _T("Bad Pcs"), strData, sPath);
+
+	for (k = 0; k < MAX_STRIP; k++)
+	{
+		strItem.Format(_T("Strip%d"), k);
+		strData.Format(_T("%d"), m_stYield.nDefStrip[k]);
+		// [Info]
+		::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
+		// [Serial]
+		::WritePrivateProfileString(strMenu, strItem, strData, sPath);
+
+		strItem.Format(_T("StripOut_%d"), k);
+		strData.Format(_T("%d"), m_stYield.nStripOut[k]);
+		// [Info]
+		::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
+		// [Serial]
+		::WritePrivateProfileString(strMenu, strItem, strData, sPath);
+
+		for (i = 1; i < MAX_DEF; i++)
+		{
+			strItem.Format(_T("Strip%d_%d"), k, i);
+			strData.Format(_T("%d"), m_stYield.nDefPerStrip[k][i]);
+			// [Info]
+			::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
+			// [Serial]
+			::WritePrivateProfileString(strMenu, strItem, strData, sPath);
+		}
+	}
+
+	strData.Format(_T("%d"), m_stYield.nTotSriptOut);
+	// [Info]
+	::WritePrivateProfileString(_T("Info"), _T("StripOut_Total"), strData, sPath);
+	// [Serial]
+	::WritePrivateProfileString(strMenu, _T("StripOut_Total"), strData, sPath);
+
+	int dwEnd = GetTickCount();
+	int dwElapsed = dwEnd - dwStart;
+
+	return TRUE;
+}
+
+void CReelMap::ResetYieldOffline()
+{
+	m_nBeforeSerialOffline = 0;
+
+	m_stYieldOffline.nTot = 0; m_stYieldOffline.nGood = 0; m_stYieldOffline.nDef = 0;
+	m_stYieldOffline.nTotSriptOut = 0;
+	m_stYieldOffline.nDefStrip[0] = 0; m_stYieldOffline.nDefStrip[1] = 0; m_stYieldOffline.nDefStrip[2] = 0; m_stYieldOffline.nDefStrip[3] = 0;
+	m_stYieldOffline.nStripOut[0] = 0; m_stYieldOffline.nStripOut[1] = 0; m_stYieldOffline.nStripOut[2] = 0; m_stYieldOffline.nStripOut[3] = 0;
+
+	for (int k = 0; k < MAX_DEF; k++)
+	{
+		m_stYieldOffline.nDefA[k] = 0;
+
+		for (int i = 0; i < MAX_STRIP_NUM; i++)
+		{
+			m_stYieldOffline.nDefPerStrip[i][k] = 0;
+		}
+	}
+}
+
+BOOL CReelMap::UpdateYieldOffline(int nSerial)
+{
+	if (nSerial <= 0)
+	{
+		//pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Serial Error.68"));
+		return 0;
+	}
+
+	m_sPathYieldOffline = GetYieldPathOnOffline(m_nLayer);
+	CString sPath = m_sPathYieldOffline;
+
+	BOOL bExist = FALSE;
+	CFileFind findfile;
+	if (findfile.FindFile(sPath))
+		bExist = TRUE;
+
+	if (bExist)
+	{
+		TCHAR szData[MAX_PATH];
+		if (0 < ::GetPrivateProfileString(_T("Info"), _T("End Shot"), NULL, szData, sizeof(szData), sPath))
+			m_nBeforeSerialOffline = _tstoi(szData);
+	}
+
+	int nPnl = m_nBeforeSerialOffline;
+
+	if (pView->m_bSerialDecrese)
+	{
+		if (nSerial >= m_nBeforeSerialOffline)
+		{
+			m_nBeforeSerialOffline = nSerial + 1;
+		}
+	}
+	else
+	{
+		if (m_nBeforeSerialOffline >= nSerial)
+		{
+			m_nBeforeSerialOffline = nSerial - 1;
+		}
+	}
+
+	if (bExist && nPnl > 0)
+		ReadYieldOffline(nPnl, sPath);
+
+	WriteYieldOffline(nSerial, sPath);
+	Sleep(10);
+
+	return TRUE;
+}
+
+int CReelMap::GetDefNumOffline(int nDefCode)
+{
+	return m_stYield.nDefA[nDefCode];
+}
+
+int CReelMap::GetDefStripOffline(int nStrip)
+{
+	return m_stYield.nDefStrip[nStrip];
+}
+
+int CReelMap::GetDefStripOffline(int nStrip, int nDefCode)
+{
+	return m_stYield.nDefPerStrip[nStrip][nDefCode];
+}
+
+int CReelMap::GetStripOutOffline(int nStrip)
+{
+	return m_stYield.nStripOut[nStrip];
+}
+
+void CReelMap::GetPcsNumOffline(int &nGood, int &nBad)
+{
+	nGood = m_stYield.nGood;
+	nBad = m_stYield.nDef;
+}
+
+BOOL CReelMap::ReadYieldOffline(int nSerial, CString sPath)
+{
+	int dwStart = GetTickCount();
+
+	int i, k;
+	TCHAR szData[200];
+
+	CString sCode, strMenu, strItem, sMsg;
+
+	strMenu.Format(_T("%d"), nSerial);
+	for (i = 1; i < MAX_DEF; i++)
+	{
+		sCode.Format(_T("%d"), i);
+		if (0 < ::GetPrivateProfileString(strMenu, sCode, NULL, szData, sizeof(szData), sPath))
+		{
+			m_stYield.nDefA[i] = _ttoi(szData);
+		}
+		else
+		{
+			m_stYield.nDefA[i] = 0;
+		}
+	}
+
+	if (0 < ::GetPrivateProfileString(strMenu, _T("Total Pcs"), NULL, szData, sizeof(szData), sPath))
+	{
+		m_stYield.nTot = _ttoi(szData);
+	}
+	else
+	{
+		m_stYield.nTot = 0;
+	}
+
+	if (0 < ::GetPrivateProfileString(strMenu, _T("Good Pcs"), NULL, szData, sizeof(szData), sPath))
+	{
+		m_stYield.nGood = _ttoi(szData);
+	}
+	else
+	{
+		m_stYield.nGood = 0;
+	}
+
+	if (0 < ::GetPrivateProfileString(strMenu, _T("Bad Pcs"), NULL, szData, sizeof(szData), sPath))
+	{
+		m_stYield.nDef = _ttoi(szData);
+	}
+	else
+	{
+		m_stYield.nDef = 0;
+	}
+
+	for (k = 0; k < MAX_STRIP; k++)
+	{
+		strItem.Format(_T("Strip%d"), k);
+		if (0 < ::GetPrivateProfileString(strMenu, strItem, NULL, szData, sizeof(szData), sPath))
+		{
+			m_stYield.nDefStrip[k] = _ttoi(szData);
+		}
+		else
+		{
+			m_stYield.nDefStrip[k] = 0;
+		}
+
+		strItem.Format(_T("StripOut_%d"), k);
+		if (0 < ::GetPrivateProfileString(strMenu, strItem, NULL, szData, sizeof(szData), sPath))
+		{
+			m_stYield.nStripOut[k] = _ttoi(szData);
+		}
+		else
+		{
+			m_stYield.nStripOut[k] = 0;
+		}
+
+		for (i = 1; i < MAX_DEF; i++)
+		{
+			strItem.Format(_T("Strip%d_%d"), k, i);
+			if (0 < ::GetPrivateProfileString(strMenu, strItem, NULL, szData, sizeof(szData), sPath))
+			{
+				m_stYield.nDefPerStrip[k][i] = _ttoi(szData);
+			}
+			else
+			{
+				m_stYield.nDefPerStrip[k][i] = 0;
+			}
+		}
+	}
+
+	if (0 < ::GetPrivateProfileString(strMenu, _T("StripOut_Total"), NULL, szData, sizeof(szData), sPath))
+	{
+		m_stYield.nTotSriptOut = _ttoi(szData);
+	}
+	else
+	{
+		m_stYield.nTotSriptOut = 0;
+	}
+
+	int dwEnd = GetTickCount();
+	int dwElapsed = dwEnd - dwStart;
+
+	return TRUE;
+}
+
+BOOL CReelMap::WriteYieldOffline(int nSerial, CString sPath)
+{
+	m_nBeforeSerial = nSerial;
+
+	int dwStart = GetTickCount();
+	int nNodeX = 0, nNodeY = 0;
+#ifdef USE_CAM_MASTER
+	nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+	nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
+#endif
+	CString sDefNum, strData;
+	int nPnl, nRow, nCol, nDefCode, nStrip;
+	int nTotPcs = nNodeX * nNodeY;
+	int nStripPcs = nTotPcs / MAX_STRIP;
+	double dStOutRto = _tstof(pDoc->WorkingInfo.LastJob.sStripOutRatio) / 100.0;
+	nPnl = nSerial - 1;
+
+	int i, k;
+	TCHAR szData[200];
+
+	CString sCode, strMenu, strItem, sMsg;
+	int nTot = 0, nGood = 0, nDef = 0;
+	int nTotSriptOut = 0;
+
+	int nDefStrip[MAX_STRIP], nDefA[MAX_DEF], nDefPerStrip[MAX_STRIP][MAX_DEF], nStripOut[MAX_STRIP];
+	nDefStrip[0] = 0; nDefStrip[1] = 0; nDefStrip[2] = 0; nDefStrip[3] = 0;
+	nStripOut[0] = 0; nStripOut[1] = 0; nStripOut[2] = 0; nStripOut[3] = 0;
+
+	nTot = nNodeX * nNodeY;
+
+	for (k = 0; k < MAX_DEF; k++)
+	{
+		nDefA[k] = 0;
+
+		for (i = 0; i < MAX_STRIP; i++)
+		{
+			nDefPerStrip[i][k] = 0;
+		}
+	}
+
+	for (nRow = 0; nRow < nNodeY; nRow++)
+	{
+		for (nCol = 0; nCol < nNodeX; nCol++)
+		{
+			if (m_pPnlBuf)
+			{
+				nDefCode = (int)m_pPnlBuf[nPnl][nRow][nCol] < 0 ? 0 : (int)m_pPnlBuf[nPnl][nRow][nCol];
+				nDefA[nDefCode]++;
+
+				nStrip = int(nRow / (nNodeY / MAX_STRIP));
+				if (nStrip > -1 && nStrip < MAX_STRIP)
+				{
+					if (nDefCode > 0)
+					{
+						nDefStrip[nStrip]++;
+						nDefPerStrip[nStrip][nDefCode]++;
+					}
+				}
+			}
+		}
+	}
+
+	for (nStrip = 0; nStrip < MAX_STRIP; nStrip++)
+	{
+		if (nDefStrip[nStrip] >= nStripPcs * dStOutRto)
+			nStripOut[nStrip]++;
+	}
+
+	for (i = 1; i < MAX_DEF; i++)
+	{
+		m_stYield.nDefA[i] = m_stYield.nDefA[i] + nDefA[i];
+		nDef += nDefA[i];
+	}
+	nGood = nTot - nDef;
+
+	m_stYield.nTot = m_stYield.nTot + nTot;
+	m_stYield.nGood = m_stYield.nGood + nGood;
+	m_stYield.nDef = m_stYield.nDef + nDef;
+
+	for (k = 0; k < MAX_STRIP; k++)
+	{
+		m_stYield.nDefStrip[k] = m_stYield.nDefStrip[k] + nDefStrip[k];
+		m_stYield.nStripOut[k] = m_stYield.nStripOut[k] + nStripOut[k];
+		nTotSriptOut += nStripOut[k];
+		for (i = 1; i < MAX_DEF; i++)
+			m_stYield.nDefPerStrip[k][i] = m_stYield.nDefPerStrip[k][i] + nDefPerStrip[k][i];
+	}
+	m_stYield.nTotSriptOut = m_stYield.nTotSriptOut + nTotSriptOut;
+
+
+	FILE *fp = NULL;
+	char FileName[MAX_PATH];
+
+	BOOL bExist = FALSE;
+	CFileFind findfile;
+	if (findfile.FindFile(sPath))
+		bExist = TRUE;
+	else
+		MakeDirYield(sPath);
+
+	StrToChar(sPath, FileName);
+
+	fp = fopen(FileName, "a+");
+	if (fp == NULL)
+	{
+		pView->MsgBox(_T("It is trouble to open Yield.txt"));
+		return FALSE;
+	}
+
+	if (!bExist)
+	{
+		m_nStartSerial = nSerial;
+
+		fprintf(fp, "[Info]\n");
+		fprintf(fp, "Total Shot = \n\n");
+		fprintf(fp, "Total Pcs = \n");
+		fprintf(fp, "Good Pcs = \n");
+		fprintf(fp, "Bad Pcs = \n\n");
+		fprintf(fp, "Start Shot=%d\n", m_nStartSerial);
+		fprintf(fp, "End Shot = \n\n");
+
+		for (i = 1; i <= MAX_DEF; i++)
+			fprintf(fp, "%d=\n", i);
+		fprintf(fp, "\n");
+
+		for (k = 0; k < MAX_STRIP; k++)
+			fprintf(fp, "Strip%d = \n", k);
+		fprintf(fp, "\n");
+
+		for (k = 0; k < MAX_STRIP; k++)
+		{
+			for (i = 1; i <= MAX_DEF; i++)
+				fprintf(fp, "Strip%d_%d = \n", k, i);
+			fprintf(fp, "\n");
+		}
+
+		fprintf(fp, "StripOut_Total = \n");
+		fprintf(fp, "StripOut_0 = \n");
+		fprintf(fp, "StripOut_1 = \n");
+		fprintf(fp, "StripOut_2 = \n");
+		fprintf(fp, "StripOut_3 = \n");
+		fprintf(fp, "\n");
+	}
+
+	fclose(fp);
+
+	strMenu.Format(_T("%d"), nSerial);
+
+	for (i = 1; i < MAX_DEF; i++)
+	{
+		sCode.Format(_T("%d"), i);
+		sDefNum.Format(_T("%d"), m_stYield.nDefA[i]);
+
+		// [Info]
+		::WritePrivateProfileString(_T("Info"), sCode, sDefNum, sPath);
+
+		// [Serial]
+		::WritePrivateProfileString(strMenu, sCode, sDefNum, sPath);
+	}
+
+	// [Info]
+	strData.Format(_T("%d"), nSerial);
+	::WritePrivateProfileString(_T("Info"), _T("End Shot"), strData, sPath);
+
+	strData.Format(_T("%d"), nSerial - m_nStartSerial + 1);
+	::WritePrivateProfileString(_T("Info"), _T("Total Shot"), strData, sPath);
+
+	strData.Format(_T("%d"), m_stYield.nTot);
+	::WritePrivateProfileString(_T("Info"), _T("Total Pcs"), strData, sPath);
+
+	strData.Format(_T("%d"), m_stYield.nGood);
+	::WritePrivateProfileString(_T("Info"), _T("Good Pcs"), strData, sPath);
+
+	strData.Format(_T("%d"), m_stYield.nDef);
+	::WritePrivateProfileString(_T("Info"), _T("Bad Pcs"), strData, sPath);
+
+	// [Serial]
+	strData.Format(_T("%d"), m_stYield.nTot);
+	::WritePrivateProfileString(strMenu, _T("Total Pcs"), strData, sPath);
+
+	strData.Format(_T("%d"), m_stYield.nGood);
+	::WritePrivateProfileString(strMenu, _T("Good Pcs"), strData, sPath);
+
+	strData.Format(_T("%d"), m_stYield.nDef);
+	::WritePrivateProfileString(strMenu, _T("Bad Pcs"), strData, sPath);
+
+	for (k = 0; k < MAX_STRIP; k++)
+	{
+		strItem.Format(_T("Strip%d"), k);
+		strData.Format(_T("%d"), m_stYield.nDefStrip[k]);
+		// [Info]
+		::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
+		// [Serial]
+		::WritePrivateProfileString(strMenu, strItem, strData, sPath);
+
+		strItem.Format(_T("StripOut_%d"), k);
+		strData.Format(_T("%d"), m_stYield.nStripOut[k]);
+		// [Info]
+		::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
+		// [Serial]
+		::WritePrivateProfileString(strMenu, strItem, strData, sPath);
+
+		for (i = 1; i < MAX_DEF; i++)
+		{
+			strItem.Format(_T("Strip%d_%d"), k, i);
+			strData.Format(_T("%d"), m_stYield.nDefPerStrip[k][i]);
+			// [Info]
+			::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
+			// [Serial]
+			::WritePrivateProfileString(strMenu, strItem, strData, sPath);
+		}
+	}
+
+	strData.Format(_T("%d"), m_stYield.nTotSriptOut);
+	// [Info]
+	::WritePrivateProfileString(_T("Info"), _T("StripOut_Total"), strData, sPath);
+	// [Serial]
+	::WritePrivateProfileString(strMenu, _T("StripOut_Total"), strData, sPath);
+
+	int dwEnd = GetTickCount();
+	int dwElapsed = dwEnd - dwStart;
+
+	return TRUE;
 }

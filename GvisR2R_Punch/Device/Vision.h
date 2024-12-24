@@ -104,6 +104,9 @@ class CVision : public CWnd
 	CLibMilDraw *m_pMilPinOverlay;
 	CLibMilDraw *m_pMilPinOverlayDelete;
 
+	CLibMilBuf *m_MilGrabModelPunch;
+	double m_dVerifyPunchScore;
+
 	MIL_ID MilCADImgBuf, MilBufCADTemp;
 	MIL_ID MilBufPinTemp, MilPinImgBuf;
 	//MIL_ID MilBufAlignTemp[2], MilAlignImgBuf[2];	// 2 points
@@ -212,6 +215,9 @@ public:
 	BOOL SaveMkImg(CString sPath);
 	void SaveCadImg(int nIdxMkInfo, CString sPath); // (화면의 IDC 인덱스, 저장할 파일 Path)
 
+	BOOL PrepareVerifyPunching();
+	BOOL CheckVerifyPunching(); // TRUE : Miss punching, FALSE : Punched
+	void SetVerifyPunchScore(double dScore);
 	// ITS
 	//CLibMilBuf *m_pMilBufCad[DEF_VIEW_IMG_NUMBER], *m_pMilBufDef[DEF_VIEW_IMG_NUMBER];
 	//CLibMilDisp *m_pMilDispCad[DEF_VIEW_IMG_NUMBER], *m_pMilDispDef[DEF_VIEW_IMG_NUMBER];

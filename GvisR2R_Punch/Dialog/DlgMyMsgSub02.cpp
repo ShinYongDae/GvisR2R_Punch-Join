@@ -32,6 +32,7 @@ CDlgMyMsgSub02::CDlgMyMsgSub02(CWnd* pParent, int nIDD)
 		// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
 
+	m_bTIM_DISP_STS = FALSE;
 	m_hParentWnd = NULL;
 	m_pParent = pParent;
 	m_pRect = NULL;
@@ -42,6 +43,7 @@ CDlgMyMsgSub02::CDlgMyMsgSub02(CWnd* pParent, int nIDD)
 
 CDlgMyMsgSub02::~CDlgMyMsgSub02()
 {
+	m_bTIM_DISP_STS = FALSE;
 	StopThread();
 
 	while(m_bThreadAlive)
@@ -148,7 +150,10 @@ LRESULT CDlgMyMsgSub02::OnMyBtnDown(WPARAM wPara, LPARAM lPara)
 	case IDC_BTN_00: // Ok...
 #ifdef USE_ENGRAVE
 		if (pView && pView->m_pEngrave)
-			pView->m_pEngrave->SetMyMsgOk();	//_SigInx::_MyMsgYes
+		{
+			pDoc->SetCurrentInfoSignal(_SigInx::_MyMsgOk, TRUE);
+			//pView->m_pEngrave->SetMyMsgOk();	//_SigInx::_MyMsgOk
+		}
 #endif
 		break;
 	}
@@ -202,6 +207,7 @@ void CDlgMyMsgSub02::OnShowWindow(BOOL bShow, UINT nStatus)
 		m_pRect->bottom = m_pRect->top + nHeight + m_nPosY;
 		m_pRect->left = (1280 - nWidth) / 2 + m_nPosX;
 		m_pRect->right = m_pRect->left + nWidth + m_nPosX;
+		this->SetForegroundWindow();
 		this->MoveWindow(m_pRect, TRUE);
 	}
 
@@ -253,6 +259,9 @@ BOOL CDlgMyMsgSub02::OnInitDialog()
 	InitPic();
 	InitEdit();
 	InitBtn();
+
+	m_bTIM_DISP_STS = TRUE;
+	SetTimer(TIM_DISP_STS, 100, NULL);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
@@ -318,6 +327,20 @@ void CDlgMyMsgSub02::KillFocus(int nID)
 void CDlgMyMsgSub02::OnTimer(UINT_PTR nIDEvent)//(UINT nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
+	if (nIDEvent == TIM_DISP_STS)
+	{
+		KillTimer(TIM_DISP_STS);
+		if (this->IsWindowVisible())
+		{
+			m_bTIM_DISP_STS = FALSE;
+		}
+		else
+		{
+			this->ShowWindow(SW_SHOW);
+		}
+		if (m_bTIM_DISP_STS)
+			SetTimer(TIM_DISP_STS, 100, NULL);
+	}
 
 	CDialog::OnTimer(nIDEvent);
 }

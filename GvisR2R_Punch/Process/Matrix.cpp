@@ -414,7 +414,7 @@ double CMatrix::matrix_det(matrix* m)
 	}
 	else
 	{
-		pView->ClrDispMsg(); AfxMessageBox(_T("Matrix must be square"));
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Matrix must be square"));
 	}
 	return dDet;
 
@@ -441,7 +441,7 @@ matrix* CMatrix::matrix_minor(matrix* m,int row, int col)
 	}
 	else
 	{
-		pView->ClrDispMsg(); AfxMessageBox(_T("Index for minor out of range"));
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Index for minor out of range"));
 	}
 
 	return minor;
@@ -1044,7 +1044,7 @@ matrix* CMatrix::affine_matrix( double* x, double* y, double* _x, double* _y)
 		{
 			matrix_free(b);
 			matrix_free(a);
-			pView->ClrDispMsg(); AfxMessageBox(_T("Not found inverse matrix"));
+			pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Not found inverse matrix"));
 			return NULL;
 		}
 	}
@@ -1151,7 +1151,7 @@ matrix* CMatrix::projection_matrix( double* x, double* y, double* _x, double* _y
 		{
 			matrix_free(b);
 			matrix_free(a);
-			pView->ClrDispMsg(); AfxMessageBox(_T("Not found inverse matrix"));
+			pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Not found inverse matrix"));
 			return NULL;
 		}
 	}

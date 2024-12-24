@@ -168,8 +168,8 @@ BEGIN_MESSAGE_MAP(CDlgMenu02, CDialog)
 	ON_BN_CLICKED(IDC_BTN_ALIGN_MOVE, OnBtnAlignMove)
 	ON_BN_CLICKED(IDC_BTN_ALIGN, OnBtnAlign)
 	ON_BN_CLICKED(IDC_BTN_GRAB, OnBtnGrab)
-	ON_BN_CLICKED(IDC_BTN_BUFF_HOME, OnBtnBuffHome)
-	ON_BN_CLICKED(IDC_BTN_BUFF_INIT_MOVE, OnBtnBuffInitMove)
+	//ON_BN_CLICKED(IDC_BTN_BUFF_HOME, OnBtnBuffHome)
+	//ON_BN_CLICKED(IDC_BTN_BUFF_INIT_MOVE, OnBtnBuffInitMove)
 	ON_BN_CLICKED(IDC_BTN_BUFF_INIT_SAVE, OnBtnBuffInitSave)
 	ON_BN_CLICKED(IDC_BTN_START_SAVE, OnBtnHomeSave)
 	ON_BN_CLICKED(IDC_STC_ALIGN_STD_SCR, OnStcAlignStdScr)
@@ -203,7 +203,7 @@ BEGIN_MESSAGE_MAP(CDlgMenu02, CDialog)
 	ON_BN_CLICKED(IDC_BTN_ALIGN_MOVE2, OnBtnAlignMove2)
 	ON_BN_CLICKED(IDC_BTN_GRAB2, OnBtnGrab2)
 	ON_BN_CLICKED(IDC_STC_ALIGN_STD_SCR2, OnStcAlignStdScr2)
-	ON_BN_CLICKED(IDC_CHK_ELEC_TEST, OnChkElecTest)
+	ON_BN_CLICKED(IDC_CHK_LOAD_CAMMST, OnChkElecTest)
 	//}}AFX_MSG_MAP
 	ON_MESSAGE(WM_DRAW_PCSIMG, OnDrawPcsImg)
 	ON_MESSAGE(WM_DRAW_PINIMG, OnDrawPinImg)
@@ -353,6 +353,11 @@ void CDlgMenu02::LoadImg()
 			myBtn[i].LoadBkImage(IMG_JOG_RT_DlgMenu02, BTN_IMG_UP);
 			myBtn[i].LoadBkImage(IMG_JOG_RT_DlgMenu02, BTN_IMG_DN);
 		}
+		else if (i == 16)
+		{
+			myBtn[i].LoadBkImage(NI_BTN_UP_DlgMenu02, BTN_IMG_UP);
+			myBtn[i].LoadBkImage(NI_BTN_DN_DlgMenu02, BTN_IMG_DN);
+		}
 // 		else if(i==24)
 // 		{
 // 			myBtn[i].LoadBkImage(IMG_JOG_UP_DlgMenu02, BTN_IMG_UP);
@@ -472,15 +477,16 @@ BOOL CDlgMenu02::OnInitDialog()
 
 	HWND hCtrlV0[4] = {0};
 	hCtrlV0[0] = GetDlgItem(IDC_STC_VISION)->GetSafeHwnd();
-	//MIL_ID MilSys = M_NULL;
+#ifdef USE_MIL
 	pView->m_pVision[0] = new CVision(0, m_MilSys, hCtrlV0, this);
 	m_MilSys = pView->m_pVision[0]->GetSystemID();
+	pView->m_pVision[0]->SetVerifyPunchScore(pDoc->GetVerifyPunchScore());
 
-//#ifndef TEST_MODE
 	HWND hCtrlV1[4] = { 0 };
 	hCtrlV1[0] = GetDlgItem(IDC_STC_VISION_2)->GetSafeHwnd();
 	pView->m_pVision[1] = new CVision(1, m_MilSys, hCtrlV1, this);
-//#endif
+	pView->m_pVision[1]->SetVerifyPunchScore(pDoc->GetVerifyPunchScore());
+#endif
 
 
 	if(pView->m_pVision[0])
@@ -689,9 +695,11 @@ void CDlgMenu02::InitBtn()
 	myBtn[15].SubclassDlgItem(IDC_BTN_ALIGN, this);
 	myBtn[15].SetHwnd(this->GetSafeHwnd(), IDC_BTN_ALIGN);
 
-	myBtn[16].SubclassDlgItem(IDC_CHK_ELEC_TEST, this);
-	myBtn[16].SetHwnd(this->GetSafeHwnd(), IDC_CHK_ELEC_TEST);
+	myBtn[16].SubclassDlgItem(IDC_CHK_LOAD_CAMMST, this);
+	myBtn[16].SetHwnd(this->GetSafeHwnd(), IDC_CHK_LOAD_CAMMST);
 	myBtn[16].SetBtnType(BTN_TYPE_CHECK);
+	myBtn[16].SetFont(_T("굴림체"), 16, TRUE);
+	myBtn[16].SetTextColor(RGB_RED);
 
 	myBtn[17].SubclassDlgItem(IDC_CHK_RES_POS_ST, this);
 	myBtn[17].SetHwnd(this->GetSafeHwnd(), IDC_CHK_RES_POS_ST);
@@ -1859,6 +1867,11 @@ void CDlgMenu02::OnBtnPinMove2()
 
 BOOL CDlgMenu02::MovePos(int nPos) 
 {
+	if (pView->IsClampOff())
+	{
+		return FALSE;
+	}
+
 	if(!pView->m_pMotion)
 		return FALSE;
 
@@ -1888,10 +1901,11 @@ BOOL CDlgMenu02::MovePos(int nPos)
 			{
 				if (!pView->m_pMotion->Move(MS_X0Y0, pPos, fVel, fAcc, fAcc))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					pView->ClrDispMsg();
 					AfxMessageBox(_T("Move XY Error..."));
+				}
 			}
-		}
 		}
 
 		return TRUE;
@@ -1902,6 +1916,11 @@ BOOL CDlgMenu02::MovePos(int nPos)
 
 BOOL CDlgMenu02::MovePos2(int nPos) 
 {
+	if (pView->IsClampOff())
+	{
+		return FALSE;
+	}
+
 	if(!pView->m_pMotion)
 		return FALSE;
 
@@ -1931,10 +1950,11 @@ BOOL CDlgMenu02::MovePos2(int nPos)
 			{
 				if (!pView->m_pMotion->Move(MS_X1Y1, pPos, fVel, fAcc, fAcc))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					pView->ClrDispMsg();
 					AfxMessageBox(_T("Move XY Error..."));
+				}
 			}
-		}
 		}
 
 		return TRUE;
@@ -1946,6 +1966,11 @@ BOOL CDlgMenu02::MovePos2(int nPos)
 
 BOOL CDlgMenu02::MovePinPos() 
 {
+	if (pView->IsClampOff())
+	{
+		return FALSE;
+	}
+
 	if(!pView->m_pMotion)
 		return FALSE;
 
@@ -1977,6 +2002,7 @@ BOOL CDlgMenu02::MovePinPos()
 			{
 				if (!pView->m_pMotion->Move(MS_X0Y0, pPos, fVel, fAcc, fAcc))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					pView->ClrDispMsg();
 					AfxMessageBox(_T("Move XY Error..."));
 				}
@@ -1991,6 +2017,11 @@ BOOL CDlgMenu02::MovePinPos()
 
 BOOL CDlgMenu02::MovePinPos2() 
 {
+	if (pView->IsClampOff())
+	{
+		return FALSE;
+	}
+
 	if(!pView->m_pMotion)
 		return FALSE;
 
@@ -2022,10 +2053,11 @@ BOOL CDlgMenu02::MovePinPos2()
 			{
 				if (!pView->m_pMotion->Move(MS_X0Y0, pPos, fVel, fAcc, fAcc))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					pView->ClrDispMsg();
 					AfxMessageBox(_T("Move XY Error..."));
+				}
 			}
-		}
 		}
 
 		return TRUE;
@@ -2036,6 +2068,11 @@ BOOL CDlgMenu02::MovePinPos2()
 
 BOOL CDlgMenu02::MoveAlign0(int nPos) 
 {
+	if (pView->IsClampOff())
+	{
+		return FALSE;
+	}
+
 	if(!pView->m_pMotion)
 		return FALSE;
 
@@ -2049,6 +2086,11 @@ BOOL CDlgMenu02::MoveAlign0(int nPos)
 
 BOOL CDlgMenu02::Move2PntAlign0(int nPos)
 {
+	if (pView->IsClampOff())
+	{
+		return FALSE;
+	}
+
 	if (pView->m_pMotion->m_dPinPosY[0] > 0.0 && pView->m_pMotion->m_dPinPosX[0] > 0.0)
 	{
 		double dCurrX = pView->m_dEnc[AXIS_X0];
@@ -2083,10 +2125,11 @@ BOOL CDlgMenu02::Move2PntAlign0(int nPos)
 			{
 				if (!pView->m_pMotion->Move(MS_X0Y0, pPos, fVel, fAcc, fAcc))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					pView->ClrDispMsg();
 					AfxMessageBox(_T("Move XY Error..."));
+				}
 			}
-		}
 		}
 
 		return TRUE;
@@ -2097,6 +2140,11 @@ BOOL CDlgMenu02::Move2PntAlign0(int nPos)
 
 BOOL CDlgMenu02::Move4PntAlign0(int nPos)
 {
+	if (pView->IsClampOff())
+	{
+		return FALSE;
+	}
+
 	if (pView->m_pMotion->m_dPinPosY[0] > 0.0 && pView->m_pMotion->m_dPinPosX[0] > 0.0)
 	{
 		double dCurrX = pView->m_dEnc[AXIS_X0];
@@ -2141,10 +2189,11 @@ BOOL CDlgMenu02::Move4PntAlign0(int nPos)
 			{
 				if (!pView->m_pMotion->Move(MS_X0Y0, pPos, fVel, fAcc, fAcc))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					pView->ClrDispMsg();
 					AfxMessageBox(_T("Move XY Error..."));
+				}
 			}
-		}
 		}
 
 		return TRUE;
@@ -2155,6 +2204,11 @@ BOOL CDlgMenu02::Move4PntAlign0(int nPos)
 
 BOOL CDlgMenu02::MoveAlign1(int nPos) 
 {
+	if (pView->IsClampOff())
+	{
+		return FALSE;
+	}
+
 	if(!pView->m_pMotion)
 		return FALSE;
 
@@ -2168,6 +2222,11 @@ BOOL CDlgMenu02::MoveAlign1(int nPos)
 
 BOOL CDlgMenu02::Move2PntAlign1(int nPos)
 {
+	if (pView->IsClampOff())
+	{
+		return FALSE;
+	}
+
 	if (pView->m_pMotion->m_dPinPosY[1] > 0.0 && pView->m_pMotion->m_dPinPosX[1] > 0.0)
 	{
 		double dCurrX = pView->m_dEnc[AXIS_X1];
@@ -2203,10 +2262,11 @@ BOOL CDlgMenu02::Move2PntAlign1(int nPos)
 			{
 				if (!pView->m_pMotion->Move(MS_X1Y1, pPos, fVel, fAcc, fAcc))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					pView->ClrDispMsg();
 					AfxMessageBox(_T("Move XY Error..."));
+				}
 			}
-		}
 		}
 
 		return TRUE;
@@ -2217,6 +2277,11 @@ BOOL CDlgMenu02::Move2PntAlign1(int nPos)
 
 BOOL CDlgMenu02::Move4PntAlign1(int nPos)
 {
+	if (pView->IsClampOff())
+	{
+		return FALSE;
+	}
+
 	if (pView->m_pMotion->m_dPinPosY[1] > 0.0 && pView->m_pMotion->m_dPinPosX[1] > 0.0)
 	{
 		double dCurrX = pView->m_dEnc[AXIS_X1];
@@ -2262,10 +2327,11 @@ BOOL CDlgMenu02::Move4PntAlign1(int nPos)
 			{
 				if (!pView->m_pMotion->Move(MS_X1Y1, pPos, fVel, fAcc, fAcc))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					pView->ClrDispMsg();
 					AfxMessageBox(_T("Move XY Error..."));
+				}
 			}
-		}
 		}
 
 		return TRUE;
@@ -2325,8 +2391,17 @@ void CDlgMenu02::OnBtnPinSave()
 
  	if(pDoc->m_pSpecLocal)
  	{
- 		pDoc->SetMkPnt(CAM_LF);
+ 		pDoc->SetMkPnt(CAM_BOTH);
  	}
+
+	if (pDoc->GetTestMode() != MODE_INNER)
+	{
+		if (!pView->CheckMkPnt())
+		{
+			pView->MsgBox(_T("캠마스터의 마킹위치좌표가 설정되어 있지않습니다.\r\n확인하시고 다시 핀위치를 설정하세요."));
+			return;
+		}
+	}
 }
 
 void CDlgMenu02::OnBtnPinSave2() 
@@ -2346,13 +2421,22 @@ void CDlgMenu02::OnBtnPinSave2()
 
 	if(pDoc->m_pSpecLocal)
 	{
-		pDoc->SetMkPnt(CAM_RT);
+		pDoc->SetMkPnt(CAM_BOTH);
 		if(myBtn2[16].GetCheck())
 		{
 			if(m_pDlgUtil03)
 				m_pDlgUtil03->Disp(ROT_NONE);
 		}
 	}	
+
+	if (pDoc->GetTestMode() != MODE_INNER)
+	{
+		if (!pView->CheckMkPnt())
+		{
+			pView->MsgBox(_T("캠마스터의 마킹위치좌표가 설정되어 있지않습니다.\r\n확인하시고 다시 핀위치를 설정하세요."));
+			return;
+		}
+	}
 
 	if (pView->m_nMkStAuto > MK_ST + 11 && pView->m_nMkStAuto < MK_ST + 29)
 	{
@@ -2363,6 +2447,11 @@ void CDlgMenu02::OnBtnPinSave2()
 void CDlgMenu02::OnBtnHomeMove() 
 {
 	// TODO: Add your control notification handler code here
+	if (pView->IsClampOff())
+	{
+		return;
+	}
+
 	ResetLight();
 
 	double pTgtPos[2];
@@ -2390,17 +2479,23 @@ void CDlgMenu02::OnBtnHomeMove()
 			{
 				if(!pView->m_pMotion->Move(MS_X0Y0, pTgtPos, fVel, fAcc, fAcc))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					pView->ClrDispMsg();
 					AfxMessageBox(_T("Move XY Error..."));
+				}
 			}
 		}
-	}
 	}
 }
 
 void CDlgMenu02::OnBtnHomeMove2() 
 {
 	// TODO: Add your control notification handler code here
+	if (pView->IsClampOff())
+	{
+		return;
+	}
+
 	ResetLight2();
 
 	double pTgtPos[2];
@@ -2428,10 +2523,11 @@ void CDlgMenu02::OnBtnHomeMove2()
 			{
 				if(!pView->m_pMotion->Move(MS_X1Y1, pTgtPos, fVel, fAcc, fAcc))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					pView->ClrDispMsg();
 					AfxMessageBox(_T("Move XY Error..."));
+				}
 			}
-		}
 		}
 	}	
 }
@@ -2454,7 +2550,8 @@ void CDlgMenu02::OnBtnHomeSave()
 
 	if(dX > 50.0)
 	{
-		pView->DispMsg(_T("설정범위 초과"),_T("저장 실패 : X축 50.0 이하만 설장됨 ..."),RGB_GREEN,2000,TRUE);
+		//pView->DispMsg(_T("설정범위 초과"),_T("저장 실패 : X축 50.0 이하만 설장됨 ..."),RGB_GREEN,2000,TRUE);
+		pView->MsgBox(_T("저장 실패 : X축 50.0 이하만 설장됨 ..."));
 		return;
 	}
 
@@ -2487,7 +2584,8 @@ void CDlgMenu02::OnBtnStartSave2()
 
 	if(dX < 250.0)
 	{
-		pView->DispMsg(_T("설정범위 초과"),_T("저장 실패 : X축 250.0 이상만 설장됨 ..."),RGB_GREEN,2000,TRUE);
+		//pView->DispMsg(_T("설정범위 초과"),_T("저장 실패 : X축 250.0 이상만 설장됨 ..."),RGB_GREEN,2000,TRUE);
+		pView->MsgBox(_T("저장 실패 : X축 250.0 이상만 설장됨 ..."));
 		return;
 	}
 
@@ -2507,6 +2605,12 @@ void CDlgMenu02::OnChkResPosSt()
 #ifdef USE_VISION
 	if(!pView->m_pVision[0])
 		return;
+
+	if (pView->IsClampOff())
+	{
+		return;
+	}
+
 	myBtn[17].SetCheck(TRUE);	//	IDC_CHK_RES_POS_ST
 	myBtn[17].EnableWindow(FALSE);
 
@@ -2526,6 +2630,11 @@ void CDlgMenu02::OnChkResPosSt2()
 {
 	// TODO: Add your control notification handler code here
 #ifdef USE_VISION
+	if (pView->IsClampOff())
+	{
+		return;
+	}
+
 	if(!pView->m_pVision[1])
 		return;
 
@@ -2760,6 +2869,7 @@ void CDlgMenu02::Grab2PntAlign()
 
 	if (nPos == -1)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("Error - Grab2PntAlign() failed!"));
 		return;
@@ -2826,6 +2936,7 @@ void CDlgMenu02::Grab4PntAlign()
 
 	if (nPos == -1)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("Error - Grab4PntAlign() failed!"));
 		return;
@@ -3045,6 +3156,11 @@ void CDlgMenu02::OnBtnAlign2()
 
 void CDlgMenu02::SwMarking()
 {
+	if (pView->IsClampOff())
+	{
+		return;
+	}
+
 	if(!pView->m_pMotion)
 		return;
 
@@ -3090,10 +3206,11 @@ void CDlgMenu02::SwMarking()
 		{
 			if(!pView->m_pMotion->Move(MS_X0Y0, pPos, fVel, fAcc, fAcc))
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->ClrDispMsg();
 				AfxMessageBox(_T("Move XY Error..."));
+			}
 		}
-	}
 	}
 
 
@@ -3105,6 +3222,11 @@ void CDlgMenu02::SwMarking()
 
 void CDlgMenu02::SwMarking2()
 {
+	if (pView->IsClampOff())
+	{
+		return;
+	}
+
 	if(!pView->m_pMotion)
 		return;
 
@@ -3150,10 +3272,11 @@ void CDlgMenu02::SwMarking2()
 		{
 			if(!pView->m_pMotion->Move(MS_X1Y1, pPos, fVel, fAcc, fAcc))
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->ClrDispMsg();
 				AfxMessageBox(_T("Move XY Error..."));
+			}
 		}
-	}
 	}
 
 
@@ -3177,7 +3300,6 @@ void CDlgMenu02::SetMkCurPos(int nCam)
 	}
 	
 }
-
 
 void CDlgMenu02::SetMkDlyOff(int nCam, int mSec)
 {
@@ -3228,15 +3350,21 @@ void CDlgMenu02::MarkingOff()
 		{
 			if(!pView->m_pMotion->Move(MS_X0Y0, pPos, fVel, fAcc, fAcc))
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->ClrDispMsg();
 				AfxMessageBox(_T("Move XY Error..."));
+			}
 		}
-	}
 	}
 }
 
 void CDlgMenu02::MarkingOff2()
 {
+	if (pView->IsClampOff())
+	{
+		return;
+	}
+
 	if(!pView->m_pMotion)
 		return;
 	
@@ -3276,34 +3404,35 @@ void CDlgMenu02::MarkingOff2()
 		{
 			if(!pView->m_pMotion->Move(MS_X1Y1, pPos, fVel, fAcc, fAcc))
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->ClrDispMsg();
 				AfxMessageBox(_T("Move XY Error..."));
+			}
 		}
 	}
-	}
 }
 
-void CDlgMenu02::OnBtnBuffHome() 
-{
-	// TODO: Add your control notification handler code here
-	if(pDoc->WorkingInfo.Motion.bBufHomming)
-	{
-		pView->DispMsg(_T("Homming"),_T("Searching Buffer Home Position..."),RGB_GREEN,2000,TRUE);
-		//pView->MpeWrite(pView->Plc.DlgMenu04.BufferHomming, 1);	// 마킹부 버퍼롤러 홈동작 ON
-		pView->m_bBufHomeDone = FALSE;
-		if(pView->m_pDlgMenu03)
-			pView->m_pDlgMenu03->ChkBufHomeDone();
-	}	
-}
+//void CDlgMenu02::OnBtnBuffHome() 
+//{
+//	// TODO: Add your control notification handler code here
+//	if(pDoc->WorkingInfo.Motion.bBufHomming)
+//	{
+//		pView->DispMsg(_T("Homming"),_T("Searching Buffer Home Position..."),RGB_GREEN,2000,TRUE);
+//		//pView->MpeWrite(pView->Plc.DlgMenu04.BufferHomming, 1);	// 마킹부 버퍼롤러 홈동작 ON
+//		pView->m_bBufHomeDone = FALSE;
+//		if(pView->m_pDlgMenu03)
+//			pView->m_pDlgMenu03->ChkBufHomeDone();
+//	}	
+//}
 
-void CDlgMenu02::OnBtnBuffInitMove() 
-{
-	// TODO: Add your control notification handler code here
-	pView->DispMsg(_T("Moving"),_T("Searching Buffer Initial Position..."),RGB_GREEN,2000,TRUE);
-	pView->MpeWrite(pView->Plc.DlgMenu04.BufferInitPosMove, 1);	// 마킹부 버퍼 초기위치 이동(PC가 ON, PLC가 OFF)
-	if(pView->m_pDlgMenu03)
-		pView->m_pDlgMenu03->ChkBufInitDone();
-}
+//void CDlgMenu02::OnBtnBuffInitMove() 
+//{
+//	// TODO: Add your control notification handler code here
+//	pView->DispMsg(_T("Moving"),_T("Searching Buffer Initial Position..."),RGB_GREEN,2000,TRUE);
+//	pView->MpeWrite(pView->Plc.DlgMenu04.BufferInitPosMove, 1);	// 마킹부 버퍼 초기위치 이동(PC가 ON, PLC가 OFF)
+//	if(pView->m_pDlgMenu03)
+//		pView->m_pDlgMenu03->ChkBufInitDone();
+//}
 
 void CDlgMenu02::OnBtnBuffInitSave() 
 {
@@ -3320,7 +3449,7 @@ void CDlgMenu02::OnBtnBuffInitSave()
 	if(IDNO == pView->MsgBox(_T("Do you want to save Buffer Position?"), 0, MB_YESNO))
 		return;
 
-	double dBufEnc = (double)pDoc->m_pMpeData[0][1]	/ 1000.0;	// 마킹부 버퍼 엔코더 값(단위 mm * 1000)
+	double dBufEnc = (double)pDoc->m_pMpeData[2][1]	/ 1000.0;	// 마킹부 버퍼 엔코더 값(단위 mm * 1000)
 	pView->SetBufInitPos(dBufEnc);
 }
 
@@ -3426,6 +3555,11 @@ BOOL CDlgMenu02::PreTranslateMessage(MSG* pMsg)
 
 		if(pMsg->message == WM_LBUTTONDBLCLK && GetDlgItem(IDC_STC_VISION)->GetSafeHwnd() == pMsg->hwnd)
 		{
+			if (pView->IsClampOff())
+			{
+				return TRUE;
+			}
+
 			dResX = _tstof(pDoc->WorkingInfo.Vision[0].sResX);
 			dResY = _tstof(pDoc->WorkingInfo.Vision[0].sResY);
 			sMsg.Format(_T("%d,%d"), pMsg->pt.x, pMsg->pt.y);
@@ -3443,14 +3577,20 @@ BOOL CDlgMenu02::PreTranslateMessage(MSG* pMsg)
 				{
 					if (!pView->m_pMotion->Move(MS_X0Y0, pPos, fVel, fAcc, fAcc))
 					{
+						pView->SetAlarmToPlc(UNIT_PUNCH);
 						pView->ClrDispMsg();
 						AfxMessageBox(_T("Move X0Y0 Error..."));
+					}
 				}
 			}
 		}
-		}
 		else if(pMsg->message == WM_LBUTTONDBLCLK && GetDlgItem(IDC_STC_VISION_2)->GetSafeHwnd() == pMsg->hwnd)
 		{
+			if (pView->IsClampOff())
+			{
+				return TRUE;
+			}
+
 			dResX = _tstof(pDoc->WorkingInfo.Vision[1].sResX);
 			dResY = _tstof(pDoc->WorkingInfo.Vision[1].sResY);
 			sMsg.Format(_T("%d,%d"), pMsg->pt.x, pMsg->pt.y);
@@ -3468,12 +3608,13 @@ BOOL CDlgMenu02::PreTranslateMessage(MSG* pMsg)
 				{
 					if (!pView->m_pMotion->Move(MS_X1Y1, pPos, fVel, fAcc, fAcc))
 					{
+						pView->SetAlarmToPlc(UNIT_PUNCH);
 						pView->ClrDispMsg();
 						AfxMessageBox(_T("Move X1Y1 Error..."));
+					}
 				}
 			}
 		}
-	}
 	}
 #endif
 	if (pMsg->message != WM_KEYDOWN)
@@ -3525,7 +3666,8 @@ BOOL CDlgMenu02::ShowKeypad(int nCtlID, CPoint ptSt, int nDir)
 			_tstof(strData) > _tstof(strMax))
 		{
 			SetDlgItemText(nCtlID, strPrev);
-			pView->DispMsg(_T("입력 범위를 벗어났습니다."), _T("주의"), RGB_YELLOW);
+			//pView->DispMsg(_T("입력 범위를 벗어났습니다."), _T("주의"), RGB_YELLOW);
+			pView->MsgBox(_T("입력 범위를 벗어났습니다."));
 		}
 		else
 			SetDlgItemText(nCtlID, strData);
@@ -3914,6 +4056,7 @@ void CDlgMenu02::Grab2PntAlign2()
 
 	if (nPos == -1)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("Error - Grab2PntAlign2() failed!"));
 		return;
@@ -3981,6 +4124,7 @@ void CDlgMenu02::Grab4PntAlign2()
 
 	if (nPos == -1)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("Error - Grab4PntAlign2() failed!"));
 		return;
@@ -4377,8 +4521,8 @@ BOOL CDlgMenu02::Do2PtAlign0(int nPos, BOOL bDraw)
 		int nNodeX = 0, nNodeY = 0;
 		if (pDoc->m_Master[0].m_pPcsRgn)
 		{
-			nNodeX = pDoc->m_Master[0].m_pPcsRgn->nCol;
-			nNodeY = pDoc->m_Master[0].m_pPcsRgn->nRow;
+			nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+			nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
 		}
 
 		pView->m_Align[0].SetAlignData(dRefAlignX0, dRefAlignY0, dRefAlignX1, dRefAlignY1, dTgtAlignX0, dTgtAlignY0, dTgtAlignX1, dTgtAlignY1);
@@ -4526,8 +4670,8 @@ BOOL CDlgMenu02::Do2PtAlign1(int nPos, BOOL bDraw)
 		int nNodeX = 0, nNodeY = 0;
 		if (pDoc->m_Master[0].m_pPcsRgn)
 		{
-			nNodeX = pDoc->m_Master[0].m_pPcsRgn->nCol;
-			nNodeY = pDoc->m_Master[0].m_pPcsRgn->nRow;
+			nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+			nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
 		}
 
 		pView->m_Align[1].SetAlignData(dRefAlignX0, dRefAlignY0, dRefAlignX1, dRefAlignY1, dTgtAlignX0, dTgtAlignY0, dTgtAlignX1, dTgtAlignY1);
@@ -4560,6 +4704,69 @@ BOOL CDlgMenu02::Do2PtAlign1(int nPos, BOOL bDraw)
 	}
 #endif
 	return TRUE;
+}
+
+void CDlgMenu02::ShowDebugEngSig()
+{
+	if (pDoc->WorkingInfo.System.bDebugEngSig)
+	{
+		GetDlgItem(IDC_STATIC_1001)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_ENG_RD_ST)->ShowWindow(SW_SHOW);
+
+		GetDlgItem(IDC_STATIC_1002)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_ENG_RD)->ShowWindow(SW_SHOW);
+
+		GetDlgItem(IDC_STATIC_1003)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_ENG_RD_DONE)->ShowWindow(SW_SHOW);
+
+		GetDlgItem(IDC_STATIC_1004)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_ENG_MK_ST)->ShowWindow(SW_SHOW);
+
+		GetDlgItem(IDC_STATIC_1005)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_ENG_MK)->ShowWindow(SW_SHOW);
+
+		GetDlgItem(IDC_STATIC_1006)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_ENG_MK_DONE)->ShowWindow(SW_SHOW);
+
+		GetDlgItem(IDC_STATIC_1007)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_ENG_SN)->ShowWindow(SW_SHOW);
+
+		GetDlgItem(IDC_STATIC_1008)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_ENG_FD)->ShowWindow(SW_SHOW);
+
+		GetDlgItem(IDC_STATIC_1009)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_ENG_FD_DONE)->ShowWindow(SW_SHOW);
+	}
+	else
+	{
+		GetDlgItem(IDC_STATIC_1001)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_ENG_RD_ST)->ShowWindow(SW_HIDE);
+
+		GetDlgItem(IDC_STATIC_1002)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_ENG_RD)->ShowWindow(SW_HIDE);
+
+		GetDlgItem(IDC_STATIC_1003)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_ENG_RD_DONE)->ShowWindow(SW_HIDE);
+
+		GetDlgItem(IDC_STATIC_1004)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_ENG_MK_ST)->ShowWindow(SW_HIDE);
+
+		GetDlgItem(IDC_STATIC_1005)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_ENG_MK)->ShowWindow(SW_HIDE);
+
+		GetDlgItem(IDC_STATIC_1006)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_ENG_MK_DONE)->ShowWindow(SW_HIDE);
+
+		GetDlgItem(IDC_STATIC_1007)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_ENG_SN)->ShowWindow(SW_HIDE);
+
+		GetDlgItem(IDC_STATIC_1008)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_ENG_FD)->ShowWindow(SW_HIDE);
+
+		GetDlgItem(IDC_STATIC_1009)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_ENG_FD_DONE)->ShowWindow(SW_HIDE);
+	}
+
 }
 
 // FourPointAlign==================================================================
@@ -4707,8 +4914,8 @@ BOOL CDlgMenu02::Do4PtAlign0(int nPos, BOOL bDraw)
 		int nNodeX = 0, nNodeY = 0;
 		if (pDoc->m_Master[0].m_pPcsRgn)
 		{
-			nNodeX = pDoc->m_Master[0].m_pPcsRgn->nCol;
-			nNodeY = pDoc->m_Master[0].m_pPcsRgn->nRow;
+			nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+			nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
 		}
 
 
@@ -4873,8 +5080,8 @@ BOOL CDlgMenu02::Do4PtAlign1(int nPos, BOOL bDraw)
 		int nNodeX = 0, nNodeY = 0;
 		if (pDoc->m_Master[0].m_pPcsRgn)
 		{
-			nNodeX = pDoc->m_Master[0].m_pPcsRgn->nCol;
-			nNodeY = pDoc->m_Master[0].m_pPcsRgn->nRow;
+			nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+			nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
 		}
 
 

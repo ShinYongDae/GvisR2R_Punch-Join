@@ -45,7 +45,8 @@ void CYield::SetDef(int nSerial, int *pDef)	// int pDef[4];
 {
 	if(nSerial <= 0)
 	{
-		pView->ClrDispMsg(); AfxMessageBox(_T("Serial Error.66"));
+			
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Serial Error.66"));
 		return;
 	}
 

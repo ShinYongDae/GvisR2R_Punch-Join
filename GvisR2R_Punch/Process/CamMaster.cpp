@@ -94,7 +94,10 @@ void CCamMaster::Init(CString sPathSpec, CString sModel, CString sLayer, CString
 	m_sPathCamSpecDir = sPathSpec;
 	m_sModel = sModel;
 	m_sLayer = sLayer;
-	m_sLayerUp = sLayerUp; // 하면 CamMaster정보에는 상면의 Align 이미지를 담아야 함.
+	//if(sLayerUp.IsEmpty())
+	//	m_sLayerUp = sLayer; // 하면 CamMaster정보에는 상면의 Align 이미지를 담아야 함.
+	//else
+		m_sLayerUp = sLayerUp; // 하면 CamMaster정보에는 상면의 Align 이미지를 담아야 함.
 }
 
 //BOOL CCamMaster::LoadMstInfo()
@@ -337,7 +340,10 @@ void CCamMaster::LoadPinImg()
 // 		pView->DispStsBar("Pin 이미지 다운로드를 완료하였습니다.", 0);
 	}
 	else
+	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->DispMsg(_T("Pin 이미지 다운로드를 실패하였습니다."), _T("경고"), RGB_GREEN, DELAY_TIME_MSG);
+	}
 #else
 	PinImgBufAlloc(PATH_PIN_IMG_, FALSE);
 #endif
@@ -549,6 +555,7 @@ BOOL CCamMaster::LoadStripRgnFromCam() // sprintf(FileNCam,"%s%s\\%s.mst",strSpe
 	{
 		if(!file.Open(FileNCam, CFile::modeRead))
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			sMsg.Format(_T("캠마스터에서 해당모델의 작업정보가 없습니다.\r\n%s"), sPath);
 			pView->ClrDispMsg();
 			AfxMessageBox(sMsg);
@@ -715,8 +722,8 @@ BOOL CCamMaster::LoadPcsRgnFromCam() // 기존 RTR
 		}
 		nCol++;
 
-		m_pPcsRgn->nCol = nCol;
-		m_pPcsRgn->nRow = nPieceRgnNum/nCol;
+		m_pPcsRgn->m_nCol = nCol;
+		m_pPcsRgn->m_nRow = nPieceRgnNum/nCol;
 
 		double dWidth = rtFrm.right - rtFrm.left;
 		double dHeight =  rtFrm.bottom - rtFrm.top;
@@ -940,8 +947,8 @@ BOOL CCamMaster::LoadStripPieceRegion_Binary()	//20121120-ndy for PairPanel
 
 	nCol++;
 
-	m_pPcsRgn->nCol = nCol;
-	m_pPcsRgn->nRow = nPieceRgnNum / nCol;
+	m_pPcsRgn->m_nCol = nCol;
+	m_pPcsRgn->m_nRow = nPieceRgnNum / nCol;
 
 	double dWidth = rtFrm.right - rtFrm.left;
 	double dHeight = rtFrm.bottom - rtFrm.top;
@@ -983,6 +990,7 @@ BOOL CCamMaster::WriteStripPieceRegion_Text(CString sBasePath, CString sLot)
 
 	if (sModel.IsEmpty() || sLot.IsEmpty() || sLayer.IsEmpty())
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		sMsg.Format(_T("모델이나 로뜨 또는 레이어명이 없습니다."));
 		pView->ClrDispMsg();
 		AfxMessageBox(sMsg);
@@ -1135,7 +1143,7 @@ void CCamMaster::LoadPcsImg()
 	//if(!PcsFindFile.FindFile(FileD))
 	if (!pDoc->DirectoryExists(FileD))
 	{
-		if(!CreateDirectory(FileD, NULL))
+		if (!CreateDirectory(FileD, NULL))
 		{
 			pView->MsgBox(_T("Can not Create PCS Directory"));
 		}
@@ -1146,7 +1154,7 @@ void CCamMaster::LoadPcsImg()
 		DeleteFileInFolder(FileD);
 	}
 	PcsImgFree();
-		
+
 #ifdef USE_CAM_MASTER
 	TCHAR FileS[MAX_PATH];
 	//sprintf(FileS,"%s%s\\%s\\Piece.tif", MasterInfo.strMasterLocation, m_sModel, m_sLayer);
@@ -1157,11 +1165,11 @@ void CCamMaster::LoadPcsImg()
 		_stprintf(FileS, _T("%s%s\\%s\\Piece.tif"), MasterInfo.strMasterLocation, m_sModel, m_sLayer);
 	_stprintf(FileD, PATH_PCS_IMG);
 
-	if(!CopyFile((LPCTSTR)FileS, (LPCTSTR)FileD, FALSE))
+	if (!CopyFile((LPCTSTR)FileS, (LPCTSTR)FileD, FALSE))
 	{
-		if(!CopyFile((LPCTSTR)FileS, (LPCTSTR)FileD, FALSE))
+		if (!CopyFile((LPCTSTR)FileS, (LPCTSTR)FileD, FALSE))
 		{
-			if(!CopyFile((LPCTSTR)FileS, (LPCTSTR)FileD, FALSE))
+			if (!CopyFile((LPCTSTR)FileS, (LPCTSTR)FileD, FALSE))
 				prcStopF = TRUE;
 		}
 	}
@@ -1169,10 +1177,13 @@ void CCamMaster::LoadPcsImg()
 	if (!prcStopF)
 	{
 		PcsImgBufAlloc(FileD, FALSE);
-// 		pView->DispStsBar("PCS 이미지 다운로드를 완료하였습니다.", 0);
+		// 		pView->DispStsBar("PCS 이미지 다운로드를 완료하였습니다.", 0);
 	}
 	else
+	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->DispMsg(_T("PCS 이미지 다운로드를 실패하였습니다."), _T("경고"), RGB_GREEN, DELAY_TIME_MSG);
+	}
 #else
 	PcsImgBufAlloc(PATH_PCS_IMG_, FALSE);
 #endif
@@ -1264,7 +1275,10 @@ void CCamMaster::LoadCadImg()
 	if (!prcStopF)
 		pView->DispMsg(_T("CAD 이미지 다운로드를 완료하였습니다."), _T("CAD 이미지"), RGB_GREEN, DELAY_TIME_MSG);
 	else
+	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->DispMsg(_T("CAD 이미지 다운로드를 실패하였습니다."), _T("CAD 이미지"), RGB_GREEN, DELAY_TIME_MSG);
+	}
 #else
 	CADImgBufAlloc(PATH_CAD_IMG, 0, FALSE);
 #endif
@@ -1526,7 +1540,10 @@ void CCamMaster::LoadAlignImg()
 // 		pView->DispStsBar("Align0 이미지 다운로드를 완료하였습니다.", 0);
 	}
 	else
+	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->DispMsg(_T("Align0 이미지 다운로드를 실패하였습니다."), _T("경고"), RGB_GREEN, DELAY_TIME_MSG);
+	}
 
 	// CAM-Master File Copy and Local File Load
 	//strcpy(FileNLoc, PATH_ALIGN1_IMG);
@@ -1565,7 +1582,10 @@ void CCamMaster::LoadAlignImg()
 // 		pView->DispStsBar("Align1 이미지 다운로드를 완료하였습니다.", 0);
 	}
 	else
+	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->DispMsg(_T("Align1 이미지 다운로드를 실패하였습니다."), _T("경고"), RGB_GREEN, DELAY_TIME_MSG);
+	}
 
 		if (MasterInfo.nNumOfAlignPoint >= 3)
 		{
@@ -1606,7 +1626,10 @@ void CCamMaster::LoadAlignImg()
 				//pView->DispStsBar("Align2 이미지 다운로드를 완료하였습니다.", 0);
 			}
 			else
+			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->DispMsg(_T("Align2 이미지 다운로드를 실패하였습니다."), _T("경고"), RGB_GREEN, DELAY_TIME_MSG);
+			}
 		}
 
 		if (MasterInfo.nNumOfAlignPoint >= 4)
@@ -1648,12 +1671,16 @@ void CCamMaster::LoadAlignImg()
 				//pView->DispStsBar("Align3 이미지 다운로드를 완료하였습니다.", 0);
 			}
 			else
+			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->DispMsg(_T("Align3 이미지 다운로드를 실패하였습니다."), _T("경고"), RGB_GREEN, DELAY_TIME_MSG);
+			}
 		}
 
 	}
 	else
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->DispMsg(_T("Align 이미지가 생성되지 않았습니다."), _T("경고"), RGB_GREEN, DELAY_TIME_MSG);
 	}
 #else

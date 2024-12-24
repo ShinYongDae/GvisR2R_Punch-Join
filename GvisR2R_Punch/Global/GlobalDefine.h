@@ -12,7 +12,7 @@
 #include "../Device/MotionParam.h"
 
 
-#define TEST_MODE		1
+//#define TEST_MODE		1
 
 #ifndef MAX_STRIP
 	#define MAX_STRIP				4
@@ -54,6 +54,7 @@
 
 	#define	USE_MIL
 	#define	USE_VISION
+
 	//#define USE_TCPIP
 	//#define USE_ENGRAVE
 	//#define USE_DTS
@@ -62,26 +63,28 @@
 	//#define	USE_NMC
 	//#define	USE_MPE
 	//#define	USE_IRAYPLE
-	//#define	USE_SR1000W
 	//#define	USE_LIGHT
 	//#define	USE_SMAC
 
+	//#define	USE_SR1000W
+
 #else
-	#define USE_CAM_MASTER
+	#define	USE_CAM_MASTER
 	#define	USE_MIL
-	#define USE_VISION
+	#define	USE_VISION
 
 	#define	USE_NMC
-	#define	USE_LIGHT
 	#define	USE_MPE
-	#define	USE_SMAC
 	#define	USE_IRAYPLE
 	#define	USE_TCPIP
 	#define USE_ENGRAVE
+
+	#define	USE_LIGHT
+	#define	USE_SMAC
 	#define USE_DTS
 
-// 	#define	USE_SR1000W
 
+// 	#define	USE_SR1000W
 
 //	#define	USE_SONY
 //	#define	USE_IDS
@@ -96,6 +99,14 @@
 	#define PATH_ALIGN2_IMG			_T("C:\\R2RSet\\Align\\Align2.TIF")
 	#define PATH_ALIGN3_IMG			_T("C:\\R2RSet\\Align\\Align3.TIF")
 	#define PATH_PCS_IMG			_T("C:\\R2RSet\\Pcs\\Piece.tif")
+
+	#define PATH_PIN_IMG_			_T("C:\\R2RSet\\Test\\Pin-330.tif")
+	#define PATH_CELL_RGN			_T("C:\\R2RSet\\Test\\Cell.rgn")			// CAM PCS Region
+	#define PATH_CELL_MST			_T("C:\\R2RSet\\Test\\1STRIP-2-050.mst")	// CAM Cell Img Region Data
+	#define PATH_PCS_IMG_			_T("C:\\R2RSet\\Test\\Piece.tif")
+	#define PATH_CAD_IMG			_T("C:\\R2RSet\\Test\\CORGO1.tif")
+	#define PATH_PCR				_T("C:\\R2RSet\\Test\\0004.pcr")
+
 #endif
 
 
@@ -149,6 +160,7 @@ typedef enum {KOREAN=0, ENGLISH=1, JAPANESE=2} LANG;
 #define PATH_WORKING_INFO		_T("C:\\R2RSet\\WorkingInfo.ini")
 #define PATH_SMAC				_T("C:\\R2RSet\\SMAC.ini")
 #define PATH_ALARM				_T("C:\\R2RSet\\Alarm.ini")
+#define PATH_GUI_REGISTER		_T("C:\\R2RSet\\GuiRegister.ini")
 
 #define RGB_BLACK       RGB(0,0,0)
 #define RGB_WHITE       RGB(255,255,255)
@@ -214,7 +226,7 @@ typedef enum {KOREAN=0, ENGLISH=1, JAPANESE=2} LANG;
 
 #define RGB_BLACK       RGB(0,0,0)
 #define RGB_WHITE       RGB(255,255,255)
-#define RGB_GRAY        RGB(0x80, 0x80, 0x80)
+#define RGB_GRAY        RGB(128, 128, 128)
 #define RGB_RED         RGB(255,0,0)
 #define RGB_DARKRED     RGB(207,0,0)
 #define RGB_YELLOW      RGB(255,255,0)
@@ -265,6 +277,8 @@ typedef enum {KOREAN=0, ENGLISH=1, JAPANESE=2} LANG;
 #define RGB_LT_BLUE		RGB(210,255,255)
 #define RGB_WH_ORANGE	RGB(255,220,190)
 
+#define	RGB_PCS_OUT		RGB_LTGRAY
+
 
 #define PATH_LOCAL_SPEC					_T("C:\\R2RSet\\LocalSpec")
 
@@ -312,6 +326,8 @@ typedef enum {KOREAN=0, ENGLISH=1, JAPANESE=2} LANG;
 #define IMG_JOG_UP_DlgMenu02			_T("C:\\R2RSet\\Pic\\DlgMenu02\\arrow_up_blue.bmp")
 #define IMG_JOG_LF_DlgMenu02			_T("C:\\R2RSet\\Pic\\DlgMenu02\\arrow_lf_blue.BMP")
 #define IMG_JOG_RT_DlgMenu02			_T("C:\\R2RSet\\Pic\\DlgMenu02\\arrow_rt_blue.BMP")
+#define NI_BTN_DN_DlgMenu02				_T("C:\\R2RSet\\Pic\\DlgMenu02\\Ni_Bk_Dn.bmp")
+#define NI_BTN_UP_DlgMenu02				_T("C:\\R2RSet\\Pic\\DlgMenu02\\Ni_Bk_Up.bmp")
 
 #define IMG_CIR_BLU_OFF_DlgMenu03		_T("C:\\R2RSet\\Pic\\DlgMenu03\\BTN_CIR_BLU_OFF.bmp")
 #define IMG_CIR_BLU_ON_DlgMenu03		_T("C:\\R2RSet\\Pic\\DlgMenu03\\BTN_CIR_BLU_ON.bmp")
@@ -473,7 +489,7 @@ typedef enum {KOREAN=0, ENGLISH=1, JAPANESE=2} LANG;
 
 #define DEF_UPPER					19
 
-#define MAX_DEF						26
+#define MAX_DEF						27
 #define DEF_NONE					0		// NONE 	
 #define DEF_NICK					1		// Nick 	
 #define DEF_PROTRUSION				2		// Excessive line width
@@ -500,6 +516,7 @@ typedef enum {KOREAN=0, ENGLISH=1, JAPANESE=2} LANG;
 #define DEF_NARROW					23	    // User Define 2
 #define DEF_WIDE					24	    // User Define 3
 #define DEF_LIGHT					25	
+#define DEF_INNER					26	
 
 enum SAPP3_CODE{	SAPP3_OPEN = 0,
 //					SAPP3_SHORT_USHORT = 1,
@@ -569,7 +586,7 @@ typedef struct {
 
 #define MYGL_GAP_PNL				5
 #define MAX_DISP_PNL				6
-#define MAX_PCR_PNL					24
+#define MAX_PCR_PNL					500	//24
 
 #define MENU01_STC_DEFINFO_HARF		6
 #define MAX_PCR						4
@@ -617,13 +634,14 @@ struct stSystem
 	CString sPathMkMenu01, sPathMkMenu03, sPathMkInfo, sPathMonDispMain;
 	CString sPathMkWork, sPathMkStatus;
 
-	CString sPathOldFile, sPathItsFile, sPathIts;
+	CString sPathOldFile, sPathItsFile, sPathItsInner, sPathItsOuter; //sPathIts, 
 	CString sIpPathOldFile, sIpPathItsFile, sIpPathIts;
 	CString sPathSapp3;
-	BOOL bSaveLog;
+	BOOL bSaveLog, bSaveReelmapTable, bRemakeReelmapInner, bDuplicateRmap, bInsertPunchingToDts, bDebugEngSig;
 	BOOL bNoMk;	// 0 : 마킹모드, 1 : 비젼모드
 	CString sReViewMkLen;
 	BOOL bReViewMk;
+	BOOL bVerifyPunching;	// 0 : 마킹여부 확인 않함, 1 : 마킹여부 확인
 
 	CString sMaxDispDefImg;
 	CString sCamSn[2];
@@ -659,15 +677,23 @@ struct stSystem
 
 		sPathOldFile = _T("");
 		sPathItsFile = _T("");
-		sPathIts = _T("");
+		//sPathIts = _T("");
+		sPathItsInner = _T("");
+		sPathItsOuter = _T("");
 		sIpPathOldFile = _T("");
 		sIpPathItsFile = _T("");
 		sIpPathIts = _T("");
 		bSaveLog = FALSE;
+		bSaveReelmapTable = FALSE;
+		bRemakeReelmapInner = FALSE;
+		bDuplicateRmap = FALSE;
+		bInsertPunchingToDts = FALSE;
+		bDebugEngSig = FALSE;
 		bNoMk = FALSE;	// 0 : 마킹모드, 1 : 비젼모드
 		sReViewMkLen = _T("");
 		bReViewMk = FALSE;
 		sPathSapp3 = _T("");
+		bVerifyPunching = FALSE;
 
 		sCamSn[0] = _T(""); sCamSn[1] = _T("");
 		sMaxDispDefImg = _T("");
@@ -725,7 +751,7 @@ struct stLastJob
 	BOOL bContFixDef;
 	CString sNumRangeFixDef, sNumContFixDef, sUltraSonicCleannerStTim, sEngItsCode;
 	BOOL bRclDrSen, bMkDrSen, bBufDrSen, bAoiUpDrSen, bAoiDnDrSen, bEngvDrSen, bUclDrSen;
-	BOOL bUse380mm;
+	BOOL bUse380mm, bUse346mm, bUse340mm;
 	BOOL bDispMkPcs, bStopFixDef, bMkSftySen, bAoiSftySen;
 	CString sJogSpd, sLotSerial; //sLightVal, 
 	BOOL bLightOn, bMkOnePnl, bAoiOnePnl, bEngraveOnePnl;
@@ -738,8 +764,10 @@ struct stLastJob
 	CString sAoiLastShot[2]; // [Up/Dn]
 	CString sPartialSpd;
 	BOOL bOneMetal, bTwoMetal;
+	BOOL bFeedRecoilerCcw, bFeedUncoilerCcw;
 	BOOL bDualTest, bDualTestInner, bSampleTest;
 	int nTestMode;
+	BOOL bFeedCcwRecoiler, bFeedCcwUncoiler;
 	BOOL bCore150Recoiler, bCore150Uncoiler;
 	CString sSampleTestShotNum;
 	BOOL bUse2Layer;
@@ -775,7 +803,7 @@ struct stLastJob
 		sNumContFixDef = _T("");
 		sUltraSonicCleannerStTim = _T("5.0"); // AOI_Dn : MW05940, AOI_Up : MW05942
 		bRclDrSen = FALSE; bMkDrSen = FALSE; bBufDrSen = FALSE; bAoiUpDrSen = FALSE; bAoiDnDrSen = FALSE; bEngvDrSen = FALSE; bUclDrSen = FALSE; 
-		bUse380mm = FALSE;
+		bUse380mm = FALSE; bUse346mm = FALSE; bUse340mm = FALSE;
 		bDispMkPcs = FALSE; bStopFixDef = FALSE; bMkSftySen = FALSE; bAoiSftySen = FALSE;
 		sJogSpd = _T(""); sLotSerial = _T(""); //sLightVal=""); 
 		bLightOn = FALSE; bMkOnePnl = FALSE; bAoiOnePnl = FALSE; bEngraveOnePnl = FALSE;
@@ -790,6 +818,8 @@ struct stLastJob
 		sPartialSpd = _T("10");
 
 		bOneMetal = FALSE; bTwoMetal = FALSE;
+		bFeedRecoilerCcw = FALSE; bFeedUncoilerCcw = FALSE;
+		bFeedCcwRecoiler = FALSE; bFeedCcwUncoiler = FALSE;
 		bDualTest = TRUE; bDualTestInner = TRUE; bSampleTest = FALSE; nTestMode = 0;
 		bCore150Recoiler = FALSE; bCore150Uncoiler = FALSE;
 		sSampleTestShotNum = _T("");
@@ -1159,6 +1189,9 @@ struct stBtnMain
 struct stBtnRunMode
 {
 	BOOL ConnectModule, FeedOnePanel;
+	BOOL PrevConnectModule, PrevFeedOnePanel;
+	BOOL IsConnectModule, IsFeedOnePanel;
+	BOOL IsPrevConnectModule, IsPrevFeedOnePanel;
 
 	stBtnRunMode()
 	{
@@ -1168,12 +1201,18 @@ struct stBtnRunMode
 	void Init()
 	{
 		ConnectModule = FALSE; FeedOnePanel = FALSE;
+		PrevConnectModule = FALSE; PrevFeedOnePanel = FALSE;
+		IsConnectModule = FALSE; IsFeedOnePanel = FALSE;
+		IsPrevConnectModule = FALSE; IsPrevFeedOnePanel = FALSE;
 	}
 };
 
 struct stBtnLaser
 {
 	BOOL Laser380mm, Laser346mm, Laser340mm;
+	BOOL PrevLaser380mm, PrevLaser346mm, PrevLaser340mm;
+	BOOL IsLaser380mm, IsLaser346mm, IsLaser340mm;
+	BOOL IsPrevLaser380mm, IsPrevLaser346mm, IsPrevLaser340mm;
 
 	stBtnLaser()
 	{
@@ -1183,12 +1222,18 @@ struct stBtnLaser
 	void Init()
 	{
 		Laser380mm = FALSE; Laser346mm = FALSE; Laser340mm = FALSE;
+		PrevLaser380mm = FALSE; PrevLaser346mm = FALSE; PrevLaser340mm = FALSE;
+		IsLaser380mm = FALSE; IsLaser346mm = FALSE; IsLaser340mm = FALSE;
+		IsPrevLaser380mm = FALSE; IsPrevLaser346mm = FALSE; IsPrevLaser340mm = FALSE;
 	}
 };
 
 struct stBtnFeedDir
 {
 	BOOL FeedCcwRecoiler, FeedCcwUncoiler;
+	BOOL PrevFeedCcwRecoiler, PrevFeedCcwUncoiler;
+	BOOL IsFeedCcwRecoiler, IsFeedCcwUncoiler;
+	BOOL IsPrevFeedCcwRecoiler, IsPrevFeedCcwUncoiler;
 
 	stBtnFeedDir()
 	{
@@ -1198,12 +1243,18 @@ struct stBtnFeedDir
 	void Init()
 	{
 		FeedCcwRecoiler = FALSE; FeedCcwUncoiler = FALSE;
+		PrevFeedCcwRecoiler = FALSE; PrevFeedCcwUncoiler = FALSE;
+		IsFeedCcwRecoiler = FALSE; IsFeedCcwUncoiler = FALSE;
+		IsPrevFeedCcwRecoiler = FALSE; IsPrevFeedCcwUncoiler = FALSE;
 	}
 };
 
 struct stBtnDancerRoll
 {
 	BOOL AllDancerUpDn, AllDancerFixOnOff;
+	BOOL PrevAllDancerUpDn, PrevAllDancerFixOnOff;
+	BOOL IsAllDancerUpDn, IsAllDancerFixOnOff;
+	BOOL IsPrevAllDancerUpDn, IsPrevAllDancerFixOnOff;
 
 	stBtnDancerRoll()
 	{
@@ -1213,6 +1264,9 @@ struct stBtnDancerRoll
 	void Init()
 	{
 		AllDancerUpDn = FALSE; AllDancerFixOnOff = FALSE;
+		PrevAllDancerUpDn = FALSE; PrevAllDancerFixOnOff = FALSE;
+		IsAllDancerUpDn = FALSE; IsAllDancerFixOnOff = FALSE;
+		IsPrevAllDancerUpDn = FALSE; IsPrevAllDancerFixOnOff = FALSE;
 	}
 };
 
@@ -1667,11 +1721,11 @@ struct stBtnUncoiler
 
 struct stBtnEngAuto
 {
-	BOOL Init, MkSt, OnMking, MkDone, Read2dSt, OnRead2d, Read2dDone, FdDone;
-	BOOL InitF, MkStF, OnMkingF, MkDoneF, Read2dStF, OnRead2dF, Read2dDoneF, FdDoneF;
+	BOOL Init, MkSt, OnMking, MkDone, Read2dSt, OnRead2d, Read2dDone, FdDone, GetCurrentInfoSignal, GetMonDispMainSignal;
+	BOOL InitF, MkStF, OnMkingF, MkDoneF, Read2dStF, OnRead2dF, Read2dDoneF, FdDoneF, GetCurrentInfoSignalF, GetMonDispMainSignalF;
 
-	BOOL IsInit, IsMkSt, IsOnMking, IsMkDone, IsRead2dSt, IsOnRead2d, IsRead2dDone, IsFdDone;
-	BOOL IsInitF, IsMkStF, IsOnMkingF, IsMkDoneF, IsRead2dStF, IsOnRead2dF, IsRead2dDoneF, IsFdDoneF;
+	BOOL IsInit, IsMkSt, IsOnMking, IsMkDone, IsRead2dSt, IsOnRead2d, IsRead2dDone, IsFdDone, IsGetCurrentInfoSignal, IsGetMonDispMainSignal;
+	BOOL IsInitF, IsMkStF, IsOnMkingF, IsMkDoneF, IsRead2dStF, IsOnRead2dF, IsRead2dDoneF, IsFdDoneF, IsGetCurrentInfoSignalF, IsGetMonDispMainSignalF;
 
 	stBtnEngAuto()
 	{
@@ -1680,11 +1734,11 @@ struct stBtnEngAuto
 
 	void _Init()
 	{
-		Init = FALSE; MkSt = FALSE; OnMking = FALSE; MkDone = FALSE; Read2dSt = FALSE; OnRead2d = FALSE; Read2dDone = FALSE; FdDone = FALSE;
-		InitF = FALSE; MkStF = FALSE; OnMkingF = FALSE; MkDoneF = FALSE; Read2dStF = FALSE; OnRead2dF = FALSE; Read2dDoneF = FALSE; FdDoneF = FALSE;
+		Init = FALSE; MkSt = FALSE; OnMking = FALSE; MkDone = FALSE; Read2dSt = FALSE; OnRead2d = FALSE; Read2dDone = FALSE; FdDone = FALSE; GetCurrentInfoSignal = FALSE; GetMonDispMainSignal = FALSE;
+		InitF = FALSE; MkStF = FALSE; OnMkingF = FALSE; MkDoneF = FALSE; Read2dStF = FALSE; OnRead2dF = FALSE; Read2dDoneF = FALSE; FdDoneF = FALSE; GetCurrentInfoSignalF = FALSE; GetMonDispMainSignalF = FALSE;
 
-		IsInit = FALSE; IsMkSt = FALSE; IsOnMking = FALSE; IsMkDone = FALSE; IsRead2dSt = FALSE; IsOnRead2d = FALSE; IsRead2dDone = FALSE; IsFdDone = FALSE;
-		IsInitF = FALSE; IsMkStF = FALSE; IsOnMkingF = FALSE; IsMkDoneF = FALSE; IsRead2dStF = FALSE; IsOnRead2dF = FALSE; IsRead2dDoneF = FALSE; IsFdDoneF = FALSE;
+		IsInit = FALSE; IsMkSt = FALSE; IsOnMking = FALSE; IsMkDone = FALSE; IsRead2dSt = FALSE; IsOnRead2d = FALSE; IsRead2dDone = FALSE; IsFdDone = FALSE; IsGetCurrentInfoSignal = FALSE; IsGetMonDispMainSignal = FALSE;
+		IsInitF = FALSE; IsMkStF = FALSE; IsOnMkingF = FALSE; IsMkDoneF = FALSE; IsRead2dStF = FALSE; IsOnRead2dF = FALSE; IsRead2dDoneF = FALSE; IsFdDoneF = FALSE; IsGetCurrentInfoSignalF = FALSE; IsGetMonDispMainSignalF = FALSE;
 	}
 };
 
@@ -1937,17 +1991,18 @@ typedef enum { EMG_F_AOI_UP = 0, EMG_B_AOI_UP = 1 }  EMG_AOI_UP;
 typedef enum { EMG_F_AOI_DN = 2, EMG_B_AOI_DN = 3 }  EMG_AOI_DN;
 typedef enum { LMT_NEG = 0, LMT_POS = 1 }  SENS_LIMIT;
 
-
+typedef enum { UNIT_UNCOILER = 0, UNIT_ENGRAVE, UNIT_AOIUP, UNIT_AOIDN, UNIT_PUNCH, UNIT_RECOILER }  UNIT_IDX;
 
 struct stPcrShare
 {
-	BOOL bExist;
+	BOOL bExist, bExistF;
 	int nSerial;
 	CString sModel, sLayer, sLot, sItsCode, sPrcsCode;
 
 	stPcrShare()
 	{
 		bExist = FALSE;
+		bExistF = FALSE;
 		nSerial = 0;
 		sModel = _T(""); sLayer = _T(""); sLot = _T(""); sItsCode = _T(""); sPrcsCode = _T("");
 	}
@@ -2113,10 +2168,13 @@ struct stDlgInfoReg
 	CString UltraSonicEngrave, UltraSonicAoi;
 	CString UltraSonicStTimeAoi, Laser346mm, Laser340mm;
 	CString SenserSaftyPunch;
+
 	CString LampCleanRollerAoiUp, LampCleanRollerAoiDn, LampUltraSonicAoi, LampUltraSonicEngrave, LampTwoMetal, LampOneMetal;
 	CString LampSampleTest, LampModeInner, LampModeOutter, LampFeedCcwRecoiler, LampFeedCcwUncoiler, LampDoorSensorUncoiler;
 	CString LampDoorSensorEngrave, LampDoorSensorAoiUp, LampDoorSensorAoiDn, LampDoorSensorPunch, LampDoorSensorRecoiler;
 	CString LampSenserSaftyPunch, LampUseStopLength, LampUseLotLength;
+
+	CString LampLaser340mm, LampLaser346mm, LampLaser380mm;
 
 	stDlgInfoReg()
 	{
@@ -2149,8 +2207,8 @@ struct stDlgInfoReg
 		Laser340mm = _T("MB400052");
 		UltraSonicEngrave = _T("MB400062");
 		UltraSonicAoi = _T("MB400067");
-
 		SenserSaftyPunch = _T("MB40001A");
+
 		LampCleanRollerAoiUp = _T("MB400265");
 		LampCleanRollerAoiDn = _T("MB400266");
 		LampUltraSonicAoi = _T("MB400267");
@@ -2171,13 +2229,131 @@ struct stDlgInfoReg
 		LampSenserSaftyPunch = _T("MB40021A");
 		LampUseStopLength = _T("MB40020B");
 		LampUseLotLength = _T("MB40020C");
+
+		LampLaser380mm = _T("MB400254");
+		LampLaser346mm = _T("MB400253");
+		LampLaser340mm = _T("MB400252");
+	}
+
+	void Load()
+	{
+		TCHAR szData[200];
+		CString sMenu = _T("IDD_DLG_INFO");
+		CString sPath = PATH_GUI_REGISTER;
+
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TwoMetal"), NULL, szData, sizeof(szData), sPath))
+			TwoMetal = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("OneMetal"), NULL, szData, sizeof(szData), sPath))
+			OneMetal = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("SampleTest"), NULL, szData, sizeof(szData), sPath))
+			SampleTest = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("SampleTestShotNum"), NULL, szData, sizeof(szData), sPath))
+			SampleTestShotNum = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("ModeInner"), NULL, szData, sizeof(szData), sPath))
+			ModeInner = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("ModeOutter"), NULL, szData, sizeof(szData), sPath))
+			ModeOutter = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedCcwRecoiler"), NULL, szData, sizeof(szData), sPath))
+			FeedCcwRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedCcwUncoiler"), NULL, szData, sizeof(szData), sPath))
+			FeedCcwUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("DoorSensorUncoiler"), NULL, szData, sizeof(szData), sPath))
+			DoorSensorUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("DoorSensorEngrave"), NULL, szData, sizeof(szData), sPath))
+			DoorSensorEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("DoorSensorAoiUp"), NULL, szData, sizeof(szData), sPath))
+			DoorSensorAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("DoorSensorAoiDn"), NULL, szData, sizeof(szData), sPath))
+			DoorSensorAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("DoorSensorPunch"), NULL, szData, sizeof(szData), sPath))
+			DoorSensorPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("DoorSensorRecoiler"), NULL, szData, sizeof(szData), sPath))
+			DoorSensorRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TotalReelLength"), NULL, szData, sizeof(szData), sPath))
+			TotalReelLength = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LotLength"), NULL, szData, sizeof(szData), sPath))
+			LotLength = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LotCutLength"), NULL, szData, sizeof(szData), sPath))
+			LotCutLength = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("StopLength"), NULL, szData, sizeof(szData), sPath))
+			StopLength = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("UseStopLength"), NULL, szData, sizeof(szData), sPath))
+			UseStopLength = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("UseLotLength"), NULL, szData, sizeof(szData), sPath))
+			UseLotLength = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("OneShotLength"), NULL, szData, sizeof(szData), sPath))
+			OneShotLength = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("CleanRollerAoiUp"), NULL, szData, sizeof(szData), sPath))
+			CleanRollerAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("CleanRollerAoiDn"), NULL, szData, sizeof(szData), sPath))
+			CleanRollerAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("Laser380mm"), NULL, szData, sizeof(szData), sPath))
+			Laser380mm = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("UltraSonicEngrave"), NULL, szData, sizeof(szData), sPath))
+			UltraSonicEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("UltraSonicAoi"), NULL, szData, sizeof(szData), sPath))
+			UltraSonicAoi = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("UltraSonicStTimeAoi"), NULL, szData, sizeof(szData), sPath))
+			UltraSonicStTimeAoi = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("Laser346mm"), NULL, szData, sizeof(szData), sPath))
+			Laser346mm = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("Laser340mm"), NULL, szData, sizeof(szData), sPath))
+			Laser340mm = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("SenserSaftyPunch"), NULL, szData, sizeof(szData), sPath))
+			SenserSaftyPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampCleanRollerAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampCleanRollerAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampCleanRollerAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LampCleanRollerAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampUltraSonicAoi"), NULL, szData, sizeof(szData), sPath))
+			LampUltraSonicAoi = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampUltraSonicEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampUltraSonicEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTwoMetal"), NULL, szData, sizeof(szData), sPath))
+			LampTwoMetal = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampOneMetal"), NULL, szData, sizeof(szData), sPath))
+			LampOneMetal = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampSampleTest"), NULL, szData, sizeof(szData), sPath))
+			LampSampleTest = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampModeInner"), NULL, szData, sizeof(szData), sPath))
+			LampModeInner = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampModeOutter"), NULL, szData, sizeof(szData), sPath))
+			LampModeOutter = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedCcwRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampFeedCcwRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedCcwUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampFeedCcwUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampDoorSensorUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampDoorSensorUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampDoorSensorEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampDoorSensorEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampDoorSensorAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampDoorSensorAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampDoorSensorAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LampDoorSensorAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampDoorSensorPunch"), NULL, szData, sizeof(szData), sPath))
+			LampDoorSensorPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampDoorSensorRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampDoorSensorRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampSenserSaftyPunch"), NULL, szData, sizeof(szData), sPath))
+			LampSenserSaftyPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampUseStopLength"), NULL, szData, sizeof(szData), sPath))
+			LampUseStopLength = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampUseLotLength"), NULL, szData, sizeof(szData), sPath))
+			LampUseLotLength = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampLaser380mm "), NULL, szData, sizeof(szData), sPath))
+			LampLaser380mm = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampLaser346mm "), NULL, szData, sizeof(szData), sPath))
+			LampLaser346mm = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampLaser340mm "), NULL, szData, sizeof(szData), sPath))
+			LampLaser340mm = CString(szData);
 	}
 };
 
 struct stDlgFrameHighReg
 {
 	CString FeedOffsetPunch, FeedOffsetAoiUp, FeedOffsetAoiDn, FeedOffsetEngrave;
-	CString FeedOffsetWriteDoneAoiUp, FeedOffsetWriteDoneAoiDn, FeedOffsetWriteDoneEngrave;
+	CString FeedOffsetWriteDoneAoiUp, FeedOffsetWriteDoneAoiDn, FeedOffsetWriteDoneEngrave, FeedOffsetWriteDonePunch;
 
 	stDlgFrameHighReg()
 	{
@@ -2188,6 +2364,31 @@ struct stDlgFrameHighReg
 		FeedOffsetWriteDoneAoiUp = _T("MB40024D");
 		FeedOffsetWriteDoneAoiDn = _T("MB40024E");
 		FeedOffsetWriteDoneEngrave = _T("MB40024C");
+		FeedOffsetWriteDonePunch = _T("MB40024F");
+	}
+
+	void Load()
+	{
+		TCHAR szData[200];
+		CString sMenu = _T("IDD_DLG_FRAME_HIGH");
+		CString sPath = PATH_GUI_REGISTER;
+
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedOffsetPunch"), NULL, szData, sizeof(szData), sPath))
+			FeedOffsetPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedOffsetAoiUp"), NULL, szData, sizeof(szData), sPath))
+			FeedOffsetAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedOffsetAoiDn"), NULL, szData, sizeof(szData), sPath))
+			FeedOffsetAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedOffsetEngrave"), NULL, szData, sizeof(szData), sPath))
+			FeedOffsetEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedOffsetWriteDoneAoiUp"), NULL, szData, sizeof(szData), sPath))
+			FeedOffsetWriteDoneAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedOffsetWriteDoneAoiDn"), NULL, szData, sizeof(szData), sPath))
+			FeedOffsetWriteDoneAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedOffsetWriteDoneEngrave"), NULL, szData, sizeof(szData), sPath))
+			FeedOffsetWriteDoneEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedOffsetWriteDonePunch"), NULL, szData, sizeof(szData), sPath))
+			FeedOffsetWriteDonePunch = CString(szData);
 	}
 };
 
@@ -2197,20 +2398,22 @@ struct stDlgMenu01
 	CString FeedTotalLengthPunch, FeedTotalLengthAoiDn, FeedTotalLengthAoiUp, FeedTotalLengthEngrave;
 	CString MarkingTotalLeft, MarkingCurrLeft, MarkingTotalRight, MarkingCurrRight, PlcReadyDone;
 	CString ResetAoiUp, ResetAoiDn, TestStartAoiUp, TestStartAoiDn, MarkingStart, MarkingDoing, MarkingDone;
-	CString JoinJob, AutoInitStatus, MarkingInitDone, FeedingDonePunch, TableVacuumAoiUp, LotEndAoiUp;
+	CString JoinJob, JoinCont, JoinContOffset, AutoInitStatus, MarkingInitDone, FeedingDonePunch, TableVacuumAoiUp, LotEndAoiUp;
 	CString TableVacuumAoiDn, LotEndAoiDn, MarkingStartEngrave, FeedingDoneEngrave, Reading2dStartEngrave;
 	CString MarkingOnEngrave, MarkingDoneEngrave, Reading2dOnEngrave, Reading2dDoneEngrave, ReTestAlarmAoiUp;
 	CString ReTestAlarmAoiDn, TensionOnPunch, TensionOnAoi, TensionOnEngrave;
 	CString AlarmMonitor, AlarmMonitorRtn, AlarmClear, AlarmClearRtn, AlarmPage;
 	CString ProhibitFeedingPunch, MainMc, Buzzer1, Buzzer2;
 	CString LampJobEnd, LampDoLastJob;
+	CString InitPlcData;
 
 
 	stDlgMenu01()
 	{
 		DoLastJob = _T("MB400010");
-		LastShotNum = _T("MW41113");
-		JobEnd = _T("MB400009");
+		LastShotNum = _T("MW41116");
+		JoinJob = _T("MB400009");
+		JobEnd = _T("MB40000A");
 		FeedCwPunch = _T("MB440161");
 		FeedCwAoi = _T("MB440160");
 		FeedCwEngrave = _T("MB440199");
@@ -2230,7 +2433,8 @@ struct stDlgMenu01
 		MarkingStart = _T("MB400350");
 		MarkingDoing = _T("MB400151");
 		MarkingDone = _T("MB400152");
-		JoinJob = _T("MB400009");
+		JoinCont = _T("MB400190"); 
+		JoinContOffset  = _T("ML41070");
 		AutoInitStatus = _T("MB400208");
 		MarkingInitDone = _T("MB40017D");
 		FeedingDonePunch = _T("MB400243");
@@ -2251,19 +2455,141 @@ struct stDlgMenu01
 		TensionOnAoi = _T("MB40017B");
 		TensionOnEngrave = _T("MB40017B");
 		
-		AlarmMonitor = _T("MB400182");
-		AlarmMonitorRtn = _T("MB400382");
-		AlarmClear = _T("MB400183");
-		AlarmClearRtn = _T("MB400383");
-		AlarmPage = _T("ML40040");
+		AlarmMonitor = _T("MB400382");
+		AlarmMonitorRtn = _T("MB400182");
+		AlarmClear = _T("MB400383");
+		AlarmClearRtn = _T("MB400183");
+		AlarmPage = _T("ML41290");
 
 		ProhibitFeedingPunch = _T("MB40015C");
 		MainMc = _T("MB40035F");
 		Buzzer1 = _T("MB40001D");
 		Buzzer2 = _T("MB40001E");
 
+		InitPlcData = _T("MB400180");
+
 		LampJobEnd = _T("MB400209");
 		LampDoLastJob = _T("MB400210");
+	}
+
+	void Load()
+	{
+		TCHAR szData[200];
+		CString sMenu = _T("IDD_DLG_MENU_01");
+		CString sPath = PATH_GUI_REGISTER;
+
+		if (0 < ::GetPrivateProfileString(sMenu, _T("DoLastJob"), NULL, szData, sizeof(szData), sPath))
+			DoLastJob = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LastShotNum"), NULL, szData, sizeof(szData), sPath))
+			LastShotNum = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("JobEnd"), NULL, szData, sizeof(szData), sPath))
+			JobEnd = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedCwPunch"), NULL, szData, sizeof(szData), sPath))
+			FeedCwPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedCwAoi"), NULL, szData, sizeof(szData), sPath))
+			FeedCwAoi = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedCwEngrave"), NULL, szData, sizeof(szData), sPath))
+			FeedCwEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedTotalLengthPunch"), NULL, szData, sizeof(szData), sPath))
+			FeedTotalLengthPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedTotalLengthAoiDn"), NULL, szData, sizeof(szData), sPath))
+			FeedTotalLengthAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedTotalLengthAoiUp"), NULL, szData, sizeof(szData), sPath))
+			FeedTotalLengthAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedTotalLengthEngrave"), NULL, szData, sizeof(szData), sPath))
+			FeedTotalLengthEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("MarkingTotalLeft"), NULL, szData, sizeof(szData), sPath))
+			MarkingTotalLeft = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("MarkingCurrLeft"), NULL, szData, sizeof(szData), sPath))
+			MarkingCurrLeft = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("MarkingTotalRight"), NULL, szData, sizeof(szData), sPath))
+			MarkingTotalRight = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("MarkingCurrRight"), NULL, szData, sizeof(szData), sPath))
+			MarkingCurrRight = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("PlcReadyDone"), NULL, szData, sizeof(szData), sPath))
+			PlcReadyDone = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("ResetAoiUp"), NULL, szData, sizeof(szData), sPath))
+			ResetAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("ResetAoiDn"), NULL, szData, sizeof(szData), sPath))
+			ResetAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TestStartAoiUp"), NULL, szData, sizeof(szData), sPath))
+			TestStartAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TestStartAoiDn"), NULL, szData, sizeof(szData), sPath))
+			TestStartAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("MarkingStart"), NULL, szData, sizeof(szData), sPath))
+			MarkingStart = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("MarkingDoing"), NULL, szData, sizeof(szData), sPath))
+			MarkingDoing = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("MarkingDone"), NULL, szData, sizeof(szData), sPath))
+			MarkingDone = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("InitPlcData"), NULL, szData, sizeof(szData), sPath))
+			InitPlcData = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("JoinJob"), NULL, szData, sizeof(szData), sPath))
+			JoinJob = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("JoinCont"), NULL, szData, sizeof(szData), sPath))
+			JoinCont = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("JoinContOffset"), NULL, szData, sizeof(szData), sPath))
+			JoinContOffset = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("AutoInitStatus"), NULL, szData, sizeof(szData), sPath))
+			AutoInitStatus = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("MarkingInitDone"), NULL, szData, sizeof(szData), sPath))
+			MarkingInitDone = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedingDonePunch"), NULL, szData, sizeof(szData), sPath))
+			FeedingDonePunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TableVacuumAoiUp"), NULL, szData, sizeof(szData), sPath))
+			TableVacuumAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LotEndAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LotEndAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TableVacuumAoiDn"), NULL, szData, sizeof(szData), sPath))
+			TableVacuumAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LotEndAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LotEndAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("MarkingStartEngrave"), NULL, szData, sizeof(szData), sPath))
+			MarkingStartEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedingDoneEngrave"), NULL, szData, sizeof(szData), sPath))
+			FeedingDoneEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("Reading2dStartEngrave"), NULL, szData, sizeof(szData), sPath))
+			Reading2dStartEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("MarkingOnEngrave"), NULL, szData, sizeof(szData), sPath))
+			MarkingOnEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("MarkingDoneEngrave"), NULL, szData, sizeof(szData), sPath))
+			MarkingDoneEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("Reading2dOnEngrave"), NULL, szData, sizeof(szData), sPath))
+			Reading2dOnEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("Reading2dDoneEngrave"), NULL, szData, sizeof(szData), sPath))
+			Reading2dDoneEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("ReTestAlarmAoiUp"), NULL, szData, sizeof(szData), sPath))
+			ReTestAlarmAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("ReTestAlarmAoiDn"), NULL, szData, sizeof(szData), sPath))
+			ReTestAlarmAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TensionOnPunch"), NULL, szData, sizeof(szData), sPath))
+			TensionOnPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TensionOnAoi"), NULL, szData, sizeof(szData), sPath))
+			TensionOnAoi = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TensionOnEngrave"), NULL, szData, sizeof(szData), sPath))
+			TensionOnEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("AlarmMonitor"), NULL, szData, sizeof(szData), sPath))
+			AlarmMonitor = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("AlarmMonitorRtn"), NULL, szData, sizeof(szData), sPath))
+			AlarmMonitorRtn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("AlarmClear"), NULL, szData, sizeof(szData), sPath))
+			AlarmClear = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("AlarmClearRtn"), NULL, szData, sizeof(szData), sPath))
+			AlarmClearRtn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("AlarmPage"), NULL, szData, sizeof(szData), sPath))
+			AlarmPage = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("ProhibitFeedingPunch"), NULL, szData, sizeof(szData), sPath))
+			ProhibitFeedingPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("MainMc"), NULL, szData, sizeof(szData), sPath))
+			MainMc = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("Buzzer1"), NULL, szData, sizeof(szData), sPath))
+			Buzzer1 = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("Buzzer2"), NULL, szData, sizeof(szData), sPath))
+			Buzzer2 = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampJobEnd"), NULL, szData, sizeof(szData), sPath))
+			LampJobEnd = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampDoLastJob"), NULL, szData, sizeof(szData), sPath))
+			LampDoLastJob = CString(szData);
 	}
 };
 
@@ -2294,7 +2620,8 @@ struct stDlgMenu03
 	CString FeedOnePanel, AllDancerUpDn, AllDancerFixOnOff;
 
 	CString PcrReceivedAoiUp, PcrReceivedAoiDn, PcrReceivedSerialAoiUp, PcrReceivedSerialAoiDn;
-	CString FeedingReadyEngrave, FeedingReadyPunch;
+	CString FeedingReadyEngrave;
+	CString FeedingReadyPunch, PcrMarkedSerialLeft, PcrMarkedSerialRight;
 
 	CString LampAlignDoneEngrave, LampMarkDoneEngrave, LampReadDoneEngrave, LampJobDoneEngrave, LampTestDoneAoiUp;
 	CString LampTestDoneAoiDn, LampMarkDonePunch, LampLaser340mm, LampLaser346mm, LampLaser380mm;
@@ -2304,7 +2631,7 @@ struct stDlgMenu03
 
 	CString LampChuckPcbRecoiler, LampChuckPaperRecoiler, LampJoinClampRecoiler, LampPcbShaftSupportRecoiler, LampEpcActHomeRecoiler;
 	CString LampEpcActFirstRecoiler, LampEpcActSecondRecoiler, LampEpcActThirdRecoiler, LampPcbInverterCwRecoiler, LampPcbInverterCcwRecoiler;
-	CString LampPaperInverterCwRecoiler, LampPaperInverterCcwRecoiler, LampDancerUpperRecoiler, LampDancerFixerRecoiler,LampEpcAutoRecoiler;
+	CString LampPaperInverterCwRecoiler, LampPaperInverterCcwRecoiler, LampDancerUpperRecoiler, LampDancerFixerRecoiler, LampEpcAutoRecoiler;
 	CString LampEpcManualRecoiler, LampEpcInRecoiler, LampEpcOutRecoiler, LampEpcHomeRecoiler;
 
 	CString LampFeedCwPunch, LampFeedCcwPunch, LampTensionCwPunch, LampTensionCcwPunch, LampFeedHomePunch, LampFeedVacuumPunch;
@@ -2338,17 +2665,22 @@ struct stDlgMenu03
 
 		PcrReceivedAoiUp = _T("MB400041");
 		PcrReceivedAoiDn = _T("MB400042");
+		PcrReceivedSerialAoiUp = _T("ML41124");
+		PcrReceivedSerialAoiDn = _T("ML41126");
+
 		FeedingReadyEngrave = _T("MB400040");
+
 		FeedingReadyPunch = _T("MB400043");
-		PcrReceivedSerialAoiUp = _T("MW41124");
-		PcrReceivedSerialAoiDn = _T("MW41126");
+		PcrMarkedSerialLeft = _T("ML41130");
+		PcrMarkedSerialRight = _T("ML41132");
+
 
 		ConnectModule = _T("MB40000F");
 
 		ChuckPcbRecoiler = _T("MB400160");
 		ChuckPaperRecoiler = _T("MB400161");
 		JoinClampRecoiler = _T("MB400162");
-		PcbShaftSupportUncoiler = _T("MB400163");
+		PcbShaftSupportRecoiler = _T("MB400163");
 		EpcActHomeRecoiler = _T("MB400164");
 		EpcActFirstRecoiler = _T("MB400165");
 		EpcActSecondRecoiler = _T("MB400166");
@@ -2389,9 +2721,9 @@ struct stDlgMenu03
 		TableBlowerAoiDn = _T("MB40012D");
 		TableVacuumAoiDn = _T("MB40012C");
 		TableCylinderAoiDn = _T("MB400130");
-		FeedClampAoiDn = _T("MB005709");
-		TensionClampAoiDn = _T("MB400133");
-		CleanRollerUpAoiDn = _T("MB400118");
+		FeedClampAoiDn = _T("MB40012A");
+		TensionClampAoiDn = _T("MB40012B");
+		CleanRollerUpAoiDn = _T("MB400113");
 		CleanRollerDnAoiDn = _T("MB400134");
 		CleanRollerPushAoiDn = _T("MB400135");
 		TestStartAoiDn = _T("MB400136");
@@ -2443,7 +2775,7 @@ struct stDlgMenu03
 		DancerFixerUncoiler = _T("MB400085");
 		JoinClampUncoiler = _T("MB400072");
 		PcbShaftSupportUncoiler = _T("MB400073");
-		ChuckPaperUncoiler = _T("MB005408");
+		ChuckPaperUncoiler = _T("MB400071");
 		EpcActHomeUncoiler = _T("MB400074");
 		EpcActFirstUncoiler = _T("MB400075");
 		EpcActSecondUncoiler = _T("MB400076");
@@ -2528,11 +2860,11 @@ struct stDlgMenu03
 		LampFeedHomeAoiDn = _T("MB40030E");
 		LampFeedVacuumAoiDn = _T("MB400329");
 		LampFeedClampAoiDn = _T("MB40032A");
-		LampTensionClampAoiDn = _T("MB400333");
+		LampTensionClampAoiDn = _T("MB40032B");
 		LampTableVacuumAoiDn = _T("MB40032C");
 		LampTableBlowerAoiDn = _T("MB40032D");
 		LampTableCylinderAoiDn = _T("MB400330");
-		LampCleanRollerUpAoiDn = _T("MB400318");
+		LampCleanRollerUpAoiDn = _T("MB400333");
 		LampCleanRollerDnAoiDn = _T("MB400334");
 		LampCleanRollerPushAoiDn = _T("MB400335");
 		LampTestStartAoiDn = _T("MB400336");
@@ -2598,6 +2930,516 @@ struct stDlgMenu03
 		LampEpcOutUncoiler = _T("MB40027D");
 		LampEpcHomeUncoiler = _T("MB40027B");
 	}
+
+	void Load()
+	{
+		TCHAR szData[200];
+		CString sMenu = _T("IDD_DLG_MENU_03");
+		CString sPath = PATH_GUI_REGISTER;
+
+		if (0 < ::GetPrivateProfileString(sMenu, _T("Ready"), NULL, szData, sizeof(szData), sPath))
+			Ready = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("Run"), NULL, szData, sizeof(szData), sPath))
+			Run = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("Reset"), NULL, szData, sizeof(szData), sPath))
+			Reset = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("Stop"), NULL, szData, sizeof(szData), sPath))
+			Stop = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("ConnectModule"), NULL, szData, sizeof(szData), sPath))
+			ConnectModule = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("ChuckPcbRecoiler"), NULL, szData, sizeof(szData), sPath))
+			ChuckPcbRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("ChuckPaperRecoiler"), NULL, szData, sizeof(szData), sPath))
+			ChuckPaperRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("JoinClampRecoiler"), NULL, szData, sizeof(szData), sPath))
+			JoinClampRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("PcbShaftSupportRecoiler"), NULL, szData, sizeof(szData), sPath))
+			PcbShaftSupportRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("EpcActHomeRecoiler"), NULL, szData, sizeof(szData), sPath))
+			EpcActHomeRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("EpcActFirstRecoiler"), NULL, szData, sizeof(szData), sPath))
+			EpcActFirstRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("EpcActSecondRecoiler"), NULL, szData, sizeof(szData), sPath))
+			EpcActSecondRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("EpcActThirdRecoiler"), NULL, szData, sizeof(szData), sPath))
+			EpcActThirdRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("EpcAutoRecoiler"), NULL, szData, sizeof(szData), sPath))
+			EpcAutoRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("EpcManualRecoiler"), NULL, szData, sizeof(szData), sPath))
+			EpcManualRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("EpcHomeRecoiler"), NULL, szData, sizeof(szData), sPath))
+			EpcHomeRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("EpcInRecoiler"), NULL, szData, sizeof(szData), sPath))
+			EpcInRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("EpcOutRecoiler"), NULL, szData, sizeof(szData), sPath))
+			EpcOutRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("PcbInverterCwRecoiler"), NULL, szData, sizeof(szData), sPath))
+			PcbInverterCwRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("PcbInverterCcwRecoiler"), NULL, szData, sizeof(szData), sPath))
+			PcbInverterCcwRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("PaperInverterCwRecoiler"), NULL, szData, sizeof(szData), sPath))
+			PaperInverterCwRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("PaperInverterCcwRecoiler"), NULL, szData, sizeof(szData), sPath))
+			PaperInverterCcwRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("DancerUpperRecoiler"), NULL, szData, sizeof(szData), sPath))
+			DancerUpperRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("DancerFixerRecoiler"), NULL, szData, sizeof(szData), sPath))
+			DancerFixerRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedCwPunch"), NULL, szData, sizeof(szData), sPath))
+			FeedCwPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedCcwPunch"), NULL, szData, sizeof(szData), sPath))
+			FeedCcwPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TensionCwPunch"), NULL, szData, sizeof(szData), sPath))
+			TensionCwPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TensionCcwPunch"), NULL, szData, sizeof(szData), sPath))
+			TensionCcwPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedHomePunch"), NULL, szData, sizeof(szData), sPath))
+			FeedHomePunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedVacuumPunch"), NULL, szData, sizeof(szData), sPath))
+			FeedVacuumPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedClampPunch"), NULL, szData, sizeof(szData), sPath))
+			FeedClampPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TensionClampPunch"), NULL, szData, sizeof(szData), sPath))
+			TensionClampPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TableBlowerPunch"), NULL, szData, sizeof(szData), sPath))
+			TableBlowerPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TableVacuumPunch"), NULL, szData, sizeof(szData), sPath))
+			TableVacuumPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TableCylinderPunch"), NULL, szData, sizeof(szData), sPath))
+			TableCylinderPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TableClampDnPunch"), NULL, szData, sizeof(szData), sPath))
+			TableClampDnPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TableClampForwardPunch"), NULL, szData, sizeof(szData), sPath))
+			TableClampForwardPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("PunchStartPunch"), NULL, szData, sizeof(szData), sPath))
+			PunchStartPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedCwAoiDn"), NULL, szData, sizeof(szData), sPath))
+			FeedCwAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedCcwAoiDn"), NULL, szData, sizeof(szData), sPath))
+			FeedCcwAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TensionCwAoiDn"), NULL, szData, sizeof(szData), sPath))
+			TensionCwAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TensionCcwAoiDn"), NULL, szData, sizeof(szData), sPath))
+			TensionCcwAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedHomeAoiDn"), NULL, szData, sizeof(szData), sPath))
+			FeedHomeAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedVacuumAoiDn"), NULL, szData, sizeof(szData), sPath))
+			FeedVacuumAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TableBlowerAoiDn"), NULL, szData, sizeof(szData), sPath))
+			TableBlowerAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TableVacuumAoiDn"), NULL, szData, sizeof(szData), sPath))
+			TableVacuumAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TableCylinderAoiDn"), NULL, szData, sizeof(szData), sPath))
+			TableCylinderAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedClampAoiDn"), NULL, szData, sizeof(szData), sPath))
+			FeedClampAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TensionClampAoiDn"), NULL, szData, sizeof(szData), sPath))
+			TensionClampAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("CleanRollerUpAoiDn"), NULL, szData, sizeof(szData), sPath))
+			CleanRollerUpAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("CleanRollerDnAoiDn"), NULL, szData, sizeof(szData), sPath))
+			CleanRollerDnAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("CleanRollerPushAoiDn"), NULL, szData, sizeof(szData), sPath))
+			CleanRollerPushAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TestStartAoiDn"), NULL, szData, sizeof(szData), sPath))
+			TestStartAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("BufferRollerUpAoiDn"), NULL, szData, sizeof(szData), sPath))
+			BufferRollerUpAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("BufferRollerFixAoiDn"), NULL, szData, sizeof(szData), sPath))
+			BufferRollerFixAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedCwAoiUp"), NULL, szData, sizeof(szData), sPath))
+			FeedCwAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedCcwAoiUp"), NULL, szData, sizeof(szData), sPath))
+			FeedCcwAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TensionCwAoiUp"), NULL, szData, sizeof(szData), sPath))
+			TensionCwAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TensionCcwAoiUp"), NULL, szData, sizeof(szData), sPath))
+			TensionCcwAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedHomeAoiUp"), NULL, szData, sizeof(szData), sPath))
+			FeedHomeAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedVacuumAoiUp"), NULL, szData, sizeof(szData), sPath))
+			FeedVacuumAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TableBlowerAoiUp"), NULL, szData, sizeof(szData), sPath))
+			TableBlowerAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TableVacuumAoiUp"), NULL, szData, sizeof(szData), sPath))
+			TableVacuumAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TableCylinderAoiUp"), NULL, szData, sizeof(szData), sPath))
+			TableCylinderAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedClampAoiUp"), NULL, szData, sizeof(szData), sPath))
+			FeedClampAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TensionClampAoiUp"), NULL, szData, sizeof(szData), sPath))
+			TensionClampAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("CleanRollerUpAoiUp"), NULL, szData, sizeof(szData), sPath))
+			CleanRollerUpAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("CleanRollerDnAoiUp"), NULL, szData, sizeof(szData), sPath))
+			CleanRollerDnAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("CleanRollerPushAoiUp"), NULL, szData, sizeof(szData), sPath))
+			CleanRollerPushAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TestStartAoiUp"), NULL, szData, sizeof(szData), sPath))
+			TestStartAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("UltrasonicDnAoiUp"), NULL, szData, sizeof(szData), sPath))
+			UltrasonicDnAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("UltrasonicRunAoiUp"), NULL, szData, sizeof(szData), sPath))
+			UltrasonicRunAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("UltrasonicSpeedAoiUp"), NULL, szData, sizeof(szData), sPath))
+			UltrasonicSpeedAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedCwEngrave"), NULL, szData, sizeof(szData), sPath))
+			FeedCwEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedCcwEngrave"), NULL, szData, sizeof(szData), sPath))
+			FeedCcwEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TensionCwEngrave"), NULL, szData, sizeof(szData), sPath))
+			TensionCwEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TensionCcwEngrave"), NULL, szData, sizeof(szData), sPath))
+			TensionCcwEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedHomeEngrave"), NULL, szData, sizeof(szData), sPath))
+			FeedHomeEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedVacuumEngrave"), NULL, szData, sizeof(szData), sPath))
+			FeedVacuumEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("PcbPushEngrave"), NULL, szData, sizeof(szData), sPath))
+			PcbPushEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TableBlowerEngrave"), NULL, szData, sizeof(szData), sPath))
+			TableBlowerEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TableVacuumEngrave"), NULL, szData, sizeof(szData), sPath))
+			TableVacuumEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TableCylinderEngrave"), NULL, szData, sizeof(szData), sPath))
+			TableCylinderEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedClampEngrave"), NULL, szData, sizeof(szData), sPath))
+			FeedClampEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("TensionClampEngrave"), NULL, szData, sizeof(szData), sPath))
+			TensionClampEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("UltrasonicDownEngrave"), NULL, szData, sizeof(szData), sPath))
+			UltrasonicDownEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("UltrasonicRunEngrave"), NULL, szData, sizeof(szData), sPath))
+			UltrasonicRunEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("UltrasonicSpeedEngrave"), NULL, szData, sizeof(szData), sPath))
+			UltrasonicSpeedEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("DancerUpperEngrave"), NULL, szData, sizeof(szData), sPath))
+			DancerUpperEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("DancerFixerEngrave"), NULL, szData, sizeof(szData), sPath))
+			DancerFixerEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("AlignStartEngrave"), NULL, szData, sizeof(szData), sPath))
+			AlignStartEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LaserStartEngrave"), NULL, szData, sizeof(szData), sPath))
+			LaserStartEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("ReadStartEngrave"), NULL, szData, sizeof(szData), sPath))
+			ReadStartEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("ChuckPcbUncoiler"), NULL, szData, sizeof(szData), sPath))
+			ChuckPcbUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("DancerUpperUncoiler"), NULL, szData, sizeof(szData), sPath))
+			DancerUpperUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("DancerFixerUncoiler"), NULL, szData, sizeof(szData), sPath))
+			DancerFixerUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("JoinClampUncoiler"), NULL, szData, sizeof(szData), sPath))
+			JoinClampUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("PcbShaftSupportUncoiler"), NULL, szData, sizeof(szData), sPath))
+			PcbShaftSupportUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("ChuckPaperUncoiler"), NULL, szData, sizeof(szData), sPath))
+			ChuckPaperUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("EpcActHomeUncoiler"), NULL, szData, sizeof(szData), sPath))
+			EpcActHomeUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("EpcActFirstUncoiler"), NULL, szData, sizeof(szData), sPath))
+			EpcActFirstUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("EpcActSecondUncoiler"), NULL, szData, sizeof(szData), sPath))
+			EpcActSecondUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("EpcActThirdUncoiler"), NULL, szData, sizeof(szData), sPath))
+			EpcActThirdUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("EpcAutoUncoiler"), NULL, szData, sizeof(szData), sPath))
+			EpcAutoUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("EpcManualUncoiler"), NULL, szData, sizeof(szData), sPath))
+			EpcManualUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("EpcHomeUncoiler"), NULL, szData, sizeof(szData), sPath))
+			EpcHomeUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("EpcInUncoiler"), NULL, szData, sizeof(szData), sPath))
+			EpcInUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("EpcOutUncoiler"), NULL, szData, sizeof(szData), sPath))
+			EpcOutUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("PcbInverterCwUncoiler"), NULL, szData, sizeof(szData), sPath))
+			PcbInverterCwUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("PcbInverterCcwUncoiler"), NULL, szData, sizeof(szData), sPath))
+			PcbInverterCcwUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("PaperInverterCwUncoiler"), NULL, szData, sizeof(szData), sPath))
+			PaperInverterCwUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("PaperInverterCcwUncoiler"), NULL, szData, sizeof(szData), sPath))
+			PaperInverterCcwUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedOnePanel"), NULL, szData, sizeof(szData), sPath))
+			FeedOnePanel = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("AllDancerUpDn"), NULL, szData, sizeof(szData), sPath))
+			AllDancerUpDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("AllDancerFixOnOff"), NULL, szData, sizeof(szData), sPath))
+			AllDancerFixOnOff = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("PcrReceivedAoiUp"), NULL, szData, sizeof(szData), sPath))
+			PcrReceivedAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("PcrReceivedAoiDn"), NULL, szData, sizeof(szData), sPath))
+			PcrReceivedAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("PcrReceivedSerialAoiUp"), NULL, szData, sizeof(szData), sPath))
+			PcrReceivedSerialAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("PcrReceivedSerialAoiDn"), NULL, szData, sizeof(szData), sPath))
+			PcrReceivedSerialAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedingReadyEngrave"), NULL, szData, sizeof(szData), sPath))
+			FeedingReadyEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedingReadyPunch"), NULL, szData, sizeof(szData), sPath))
+			FeedingReadyPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("PcrMarkedSerialLeft"), NULL, szData, sizeof(szData), sPath))
+			PcrMarkedSerialLeft = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("PcrMarkedSerialRight"), NULL, szData, sizeof(szData), sPath))
+			PcrMarkedSerialRight = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampAlignDoneEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampAlignDoneEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampMarkDoneEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampMarkDoneEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampReadDoneEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampReadDoneEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampJobDoneEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampJobDoneEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTestDoneAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampTestDoneAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTestDoneAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LampTestDoneAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampMarkDonePunch"), NULL, szData, sizeof(szData), sPath))
+			LampMarkDonePunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampLaser340mm"), NULL, szData, sizeof(szData), sPath))
+			LampLaser340mm = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampLaser346mm"), NULL, szData, sizeof(szData), sPath))
+			LampLaser346mm = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampLaser380mm"), NULL, szData, sizeof(szData), sPath))
+			LampLaser380mm = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampReady"), NULL, szData, sizeof(szData), sPath))
+			LampReady = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampRun"), NULL, szData, sizeof(szData), sPath))
+			LampRun = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampReset"), NULL, szData, sizeof(szData), sPath))
+			LampReset = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampStop"), NULL, szData, sizeof(szData), sPath))
+			LampStop = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampAuto"), NULL, szData, sizeof(szData), sPath))
+			LampAuto = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampManual"), NULL, szData, sizeof(szData), sPath))
+			LampManual = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampConnectModule"), NULL, szData, sizeof(szData), sPath))
+			LampConnectModule = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedOnePanel"), NULL, szData, sizeof(szData), sPath))
+			LampFeedOnePanel = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampAllDancerUpDn"), NULL, szData, sizeof(szData), sPath))
+			LampAllDancerUpDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampAllDancerFixOnOff"), NULL, szData, sizeof(szData), sPath))
+			LampAllDancerFixOnOff = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedCcwRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampFeedCcwRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedCcwUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampFeedCcwUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampChuckPcbRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampChuckPcbRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampChuckPaperRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampChuckPaperRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampJoinClampRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampJoinClampRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampPcbShaftSupportRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampPcbShaftSupportRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampEpcActHomeRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampEpcActHomeRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampEpcActFirstRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampEpcActFirstRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampEpcActSecondRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampEpcActSecondRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampEpcActThirdRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampEpcActThirdRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampPcbInverterCwRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampPcbInverterCwRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampPcbInverterCcwRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampPcbInverterCcwRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampPaperInverterCwRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampPaperInverterCwRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampPaperInverterCcwRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampPaperInverterCcwRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampDancerUpperRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampDancerUpperRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampDancerFixerRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampDancerFixerRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampEpcAutoRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampEpcAutoRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampEpcManualRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampEpcManualRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampEpcInRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampEpcInRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampEpcOutRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampEpcOutRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampEpcHomeRecoiler"), NULL, szData, sizeof(szData), sPath))
+			LampEpcHomeRecoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedCwPunch"), NULL, szData, sizeof(szData), sPath))
+			LampFeedCwPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedCcwPunch"), NULL, szData, sizeof(szData), sPath))
+			LampFeedCcwPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTensionCwPunch"), NULL, szData, sizeof(szData), sPath))
+			LampTensionCwPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTensionCcwPunch"), NULL, szData, sizeof(szData), sPath))
+			LampTensionCcwPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedHomePunch"), NULL, szData, sizeof(szData), sPath))
+			LampFeedHomePunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedVacuumPunch"), NULL, szData, sizeof(szData), sPath))
+			LampFeedVacuumPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedClampPunch"), NULL, szData, sizeof(szData), sPath))
+			LampFeedClampPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTensionClampPunch"), NULL, szData, sizeof(szData), sPath))
+			LampTensionClampPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTableVacuumPunch"), NULL, szData, sizeof(szData), sPath))
+			LampTableVacuumPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTableBlowerPunch"), NULL, szData, sizeof(szData), sPath))
+			LampTableBlowerPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTableCylinderPunch"), NULL, szData, sizeof(szData), sPath))
+			LampTableCylinderPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTableClampDnPunch"), NULL, szData, sizeof(szData), sPath))
+			LampTableClampDnPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTableClampForwardPunch"), NULL, szData, sizeof(szData), sPath))
+			LampTableClampForwardPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampPunchStartPunch"), NULL, szData, sizeof(szData), sPath))
+			LampPunchStartPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedCwAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LampFeedCwAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedCcwAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LampFeedCcwAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTensionCwAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LampTensionCwAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTensionCcwAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LampTensionCcwAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedHomeAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LampFeedHomeAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedVacuumAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LampFeedVacuumAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedClampAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LampFeedClampAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTensionClampAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LampTensionClampAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTableVacuumAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LampTableVacuumAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTableBlowerAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LampTableBlowerAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTableCylinderAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LampTableCylinderAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampCleanRollerUpAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LampCleanRollerUpAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampCleanRollerDnAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LampCleanRollerDnAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampCleanRollerPushAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LampCleanRollerPushAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTestStartAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LampTestStartAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampBufferRollerUpAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LampBufferRollerUpAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampBufferRollerFixAoiDn"), NULL, szData, sizeof(szData), sPath))
+			LampBufferRollerFixAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedCwAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampFeedCwAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedCcwAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampFeedCcwAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTensionCwAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampTensionCwAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTensionCcwAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampTensionCcwAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedHomeAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampFeedHomeAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedVacuumAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampFeedVacuumAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedClampAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampFeedClampAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTensionClampAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampTensionClampAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTableVacuumAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampTableVacuumAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTableBlowerAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampTableBlowerAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTableCylinderAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampTableCylinderAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampCleanRollerUpAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampCleanRollerUpAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampCleanRollerDnAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampCleanRollerDnAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampCleanRollerPushAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampCleanRollerPushAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTestStartAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampTestStartAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampUltrasonicDnAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampUltrasonicDnAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampUltrasonicRunAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampUltrasonicRunAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampUltrasonicSpeedAoiUp"), NULL, szData, sizeof(szData), sPath))
+			LampUltrasonicSpeedAoiUp = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedCwEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampFeedCwEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedCcwEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampFeedCcwEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTensionCwEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampTensionCwEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTensionCcwEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampTensionCcwEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedHomeEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampFeedHomeEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedVacuumEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampFeedVacuumEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampFeedClampEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampFeedClampEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTensionClampEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampTensionClampEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTableVacuumEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampTableVacuumEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTableBlowerEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampTableBlowerEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampTableCylinderEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampTableCylinderEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampUltrasonicDownEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampUltrasonicDownEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampUltrasonicRunEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampUltrasonicRunEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampUltrasonicSpeedEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampUltrasonicSpeedEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampDancerUpperEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampDancerUpperEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampDancerFixerEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampDancerFixerEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampAlignStartEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampAlignStartEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampLaserStartEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampLaserStartEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampReadStartEngrave"), NULL, szData, sizeof(szData), sPath))
+			LampReadStartEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampChuckPcbUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampChuckPcbUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampChuckPaperUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampChuckPaperUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampJoinClampUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampJoinClampUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampPcbShaftSupportUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampPcbShaftSupportUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampEpcActHomeUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampEpcActHomeUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampEpcActFirstUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampEpcActFirstUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampEpcActSecondUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampEpcActSecondUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampEpcActThirdUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampEpcActThirdUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampPcbInverterCwUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampPcbInverterCwUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampPcbInverterCcwUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampPcbInverterCcwUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampPaperInverterCwUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampPaperInverterCwUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampPaperInverterCcwUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampPaperInverterCcwUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampDancerUpperUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampDancerUpperUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampDancerFixerUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampDancerFixerUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampEpcAutoUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampEpcAutoUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampEpcManualUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampEpcManualUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampEpcInUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampEpcInUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampEpcOutUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampEpcOutUncoiler = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("LampEpcHomeUncoiler"), NULL, szData, sizeof(szData), sPath))
+			LampEpcHomeUncoiler = CString(szData);
+	}
 };
 
 struct stDlgMenu04
@@ -2644,6 +3486,66 @@ struct stDlgMenu04
 		BufferHomming = _T("MB40015B");
 		FeedLengthFromLaserToReader = _T("ML41060");
 	}
+
+	void Load()
+	{
+		TCHAR szData[200];
+		CString sMenu = _T("IDD_DLG_MENU_04");
+		CString sPath = PATH_GUI_REGISTER;
+
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedTorqueCwPunch"), NULL, szData, sizeof(szData), sPath))
+			FeedTorqueCwPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedTorqueCcwPunch"), NULL, szData, sizeof(szData), sPath))
+			FeedTorqueCcwPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedTorqueCwAoi"), NULL, szData, sizeof(szData), sPath))
+			FeedTorqueCwAoi = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedTorqueCcwAoi"), NULL, szData, sizeof(szData), sPath))
+			FeedTorqueCcwAoi = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedTorqueCwEngrave"), NULL, szData, sizeof(szData), sPath))
+			FeedTorqueCwEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedTorqueCcwEngrave"), NULL, szData, sizeof(szData), sPath))
+			FeedTorqueCcwEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedSpeed"), NULL, szData, sizeof(szData), sPath))
+			FeedSpeed = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedAcc"), NULL, szData, sizeof(szData), sPath))
+			FeedAcc = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedOnSpeed"), NULL, szData, sizeof(szData), sPath))
+			FeedOnSpeed = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedOnAcc"), NULL, szData, sizeof(szData), sPath))
+			FeedOnAcc = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedLeadPitchAoi"), NULL, szData, sizeof(szData), sPath))
+			FeedLeadPitchAoi = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedLeadPitchPunch"), NULL, szData, sizeof(szData), sPath))
+			FeedLeadPitchPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedLeadPitchEngrave"), NULL, szData, sizeof(szData), sPath))
+			FeedLeadPitchEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("BufferPosStAoi"), NULL, szData, sizeof(szData), sPath))
+			BufferPosStAoi = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("BufferPosStEngrave"), NULL, szData, sizeof(szData), sPath))
+			BufferPosStEngrave = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedLengthFromAoiToPunch"), NULL, szData, sizeof(szData), sPath))
+			FeedLengthFromAoiToPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("ShotNumFromAoiUpToAoiDn"), NULL, szData, sizeof(szData), sPath))
+			ShotNumFromAoiUpToAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedLengthFromEngraveToAoi"), NULL, szData, sizeof(szData), sPath))
+			FeedLengthFromEngraveToAoi = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedSpeed2dCode"), NULL, szData, sizeof(szData), sPath))
+			FeedSpeed2dCode = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedAcc2dCode"), NULL, szData, sizeof(szData), sPath))
+			FeedAcc2dCode = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("ShotNumFromAoiToPunch"), NULL, szData, sizeof(szData), sPath))
+			ShotNumFromAoiToPunch = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedLengthFromAoiUpToAoiDn"), NULL, szData, sizeof(szData), sPath))
+			FeedLengthFromAoiUpToAoiDn = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("ShotNumFromEngraveToAoi"), NULL, szData, sizeof(szData), sPath))
+			ShotNumFromEngraveToAoi = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("BufferInitPosMove"), NULL, szData, sizeof(szData), sPath))
+			BufferInitPosMove = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("BufferHomming"), NULL, szData, sizeof(szData), sPath))
+			BufferHomming = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("FeedLengthFromLaserToReader"), NULL, szData, sizeof(szData), sPath))
+			FeedLengthFromLaserToReader = CString(szData);
+	}
 };
 
 struct stGuiRegister
@@ -2653,6 +3555,20 @@ struct stGuiRegister
 	stDlgMenu01 DlgMenu01;
 	stDlgMenu03 DlgMenu03;
 	stDlgMenu04 DlgMenu04;
+
+	void Load()
+	{
+		CString sPath = PATH_GUI_REGISTER;
+		CFileFind findfile;
+		if (findfile.FindFile(sPath))
+		{
+			DlgInfo.Load();
+			DlgFrameHigh.Load();
+			DlgMenu01.Load();
+			DlgMenu03.Load();
+			DlgMenu04.Load();
+		}
+	}
 };
 
 

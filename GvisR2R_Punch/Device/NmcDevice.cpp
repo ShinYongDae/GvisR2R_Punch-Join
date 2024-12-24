@@ -243,7 +243,7 @@ BOOL CNmcDevice::DestroyDevice()
 	MC_GetErrorMessage(ms, MAX_ERR_LEN, cstrErrorMsg);
 	if (ms != MC_OK)
 	{
-		pView->ClrDispMsg(); AfxMessageBox(_T("Failed MMC Board Exit !!!"));
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Failed MMC Board Exit !!!"));
 		return FALSE;
 	}
 
@@ -286,7 +286,7 @@ BOOL CNmcDevice::ResetAxesGroup()
 		{
 			MC_GetErrorMessage(ms, MAX_ERR_LEN, cstrErrorMsg);
 			msg.Format(_T("Error - MC_GroupDisable :: 0x%08X, %s"), ms, cstrErrorMsg);
-			pView->ClrDispMsg(); AfxMessageBox(msg);
+			pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(msg);
 
 			return FALSE;
 		}
@@ -304,7 +304,7 @@ BOOL CNmcDevice::ResetAxesGroup()
 			{
 				//GroupDisable 실패하면 Status 값 출력
 				msg.Format(_T("GroupDisable Fail, GroupStatus: 0x%04x"), GroupStatus);
-				pView->ClrDispMsg(); AfxMessageBox(msg);
+				pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(msg);
 				return FALSE;
 			}
 		}
@@ -454,7 +454,7 @@ CNmcAxis* CNmcDevice::GetAxis(int nAxis)
 	if (!m_pAxis[nAxis])
 	{
 		strMsg.Format(_T("Didn't create %d axis."), nAxis);
-		pView->ClrDispMsg(); AfxMessageBox(strMsg);
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(strMsg);
 	}
 	return m_pAxis[nAxis];
 
@@ -1127,7 +1127,7 @@ BOOL CNmcDevice::GantryEnable(long lMaster, long lSlave, long lOnOff)
 
 	if (ms != MC_OK)
 	{
-		pView->ClrDispMsg(); AfxMessageBox(_T("Error-MC_GantryReadStatus(220)"));
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Error-MC_GantryReadStatus(220)"));
 		return FALSE;
 	}
 
@@ -1136,7 +1136,7 @@ BOOL CNmcDevice::GantryEnable(long lMaster, long lSlave, long lOnOff)
 	{
 		if (GetTickCount() - nTick >= 60000)
 		{
-			pView->ClrDispMsg(); AfxMessageBox(_T("Error-StartRsaHoming(221)"));
+			pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Error-StartRsaHoming(221)"));
 			return FALSE;
 		}
 		Sleep(100);
@@ -1144,7 +1144,7 @@ BOOL CNmcDevice::GantryEnable(long lMaster, long lSlave, long lOnOff)
 		ms = MC_GantryReadStatus(m_nBoardId, 0, &state);
 		if (ms != MC_OK)
 		{
-			pView->ClrDispMsg(); AfxMessageBox(_T("Error-StartRsaHoming(202)"));
+			pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Error-StartRsaHoming(202)"));
 			return FALSE;
 		}
 	}
@@ -1155,7 +1155,7 @@ BOOL CNmcDevice::GantryEnable(long lMaster, long lSlave, long lOnOff)
 		ms = MC_GantryEnable(m_nBoardId, 0, lMaster + m_nOffsetAxisID, lSlave + m_nOffsetAxisID, 50, 10000000);
 		if (ms != MC_OK)
 		{
-			pView->ClrDispMsg(); AfxMessageBox(_T("Error-MC_GantryEnable"));
+			pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Error-MC_GantryEnable"));
 			return FALSE;
 		}
 		m_bGantryEnabled = TRUE;
@@ -1167,7 +1167,7 @@ BOOL CNmcDevice::GantryEnable(long lMaster, long lSlave, long lOnOff)
 		ms = MC_GantryDisable(m_nBoardId, 0);
 		if (ms != MC_OK)
 		{
-			pView->ClrDispMsg(); AfxMessageBox(_T("Error-MC_GantryDisable"));
+			pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Error-MC_GantryDisable"));
 			return TRUE;		
 		}
 		m_bGantryEnabled = FALSE;
@@ -1193,14 +1193,14 @@ BOOL CNmcDevice::GetGantry(long lMaster, long lSlave, long *lOnOff)
 	if (ms != MC_OK)
 	{
 		*lOnOff = FALSE;
-		pView->ClrDispMsg(); AfxMessageBox(_T("Error-MC_GantryStatus"));
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Error-MC_GantryStatus"));
 		return FALSE;
 	}
 	else if(Status & mcGantry_Fault)
 	{
 		*lOnOff = FALSE;
 		sMsg.Format(_T("Error-MC_GantryStatus (0x%08x)"), Status);
-		pView->ClrDispMsg(); AfxMessageBox(sMsg);
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(sMsg);
 		return FALSE;
 	}
 	else if (Status & mcGantry_MotionCompleted)// || Status & mcGantry_YawStable
@@ -1238,7 +1238,7 @@ BOOL CNmcDevice::TriggerSetRange(int encAxisId, int nEcatAddr, int vAxisId, doub
 	ms = MC_WriteIntervalTrigParameterFM(m_nBoardId, nEcatAddr, vAxisId, dStartPos, dEndPos, usPeriod, usPulseWidth); // dStartPos[pulse], dEndPos[pulse], usPeriod[pulse], usPulseWidth[1/50nSec]
 	if (ms != MC_OK)
 	{
-		pView->ClrDispMsg(); AfxMessageBox(_T("Error-TriggerSetRange()"));
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Error-TriggerSetRange()"));
 		return FALSE;
 	}
 	Sleep(100);
@@ -1246,7 +1246,7 @@ BOOL CNmcDevice::TriggerSetRange(int encAxisId, int nEcatAddr, int vAxisId, doub
 	ms = MC_WriteIntervalTrigEnableFM(m_nBoardId, nEcatAddr, vAxisId, true);
 	if (ms != MC_OK)
 	{
-		pView->ClrDispMsg(); AfxMessageBox(_T("Error-EnableTriggerSetRange()"));
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Error-EnableTriggerSetRange()"));
 		return FALSE;
 	}
 	Sleep(100);
@@ -1262,7 +1262,7 @@ BOOL CNmcDevice::TriggerStop(int nEcatAddr, int vAxisId)
 	ms = MC_WriteIntervalTrigEnableFM(m_nBoardId, nEcatAddr, vAxisId, false);
 	if (ms != MC_OK)
 	{
-		pView->ClrDispMsg(); AfxMessageBox(_T("Error-TriggerStop()"));
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Error-TriggerStop()"));
 		return FALSE;
 	}
 	Sleep(100);
@@ -1282,7 +1282,7 @@ BOOL CNmcDevice::TriggerSetOriginPos(int nEcatAddr, int vAxisId, int nSdoIdx)
 	ms = MasterGetSDODataEcatAddr(m_nBoardId, nEcatAddr, nSdoIdx, 7, 4, &uRspsDataSize, Data);
 	if (ms != MC_OK)
 	{
-		pView->ClrDispMsg(); AfxMessageBox(_T("Error-MasterGetSDODataEcatAddr()"));
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Error-MasterGetSDODataEcatAddr()"));
 		return FALSE;
 	}
 	Sleep(100);
@@ -1294,7 +1294,7 @@ BOOL CNmcDevice::TriggerSetOriginPos(int nEcatAddr, int vAxisId, int nSdoIdx)
 	ms = MC_WriteParameter(m_nBoardId, vAxisId, 2147, -dCurPos); // ??? -dCurPos
 	if (ms != MC_OK)
 	{
-		pView->ClrDispMsg(); AfxMessageBox(_T("Error-TriggerSetOriginPos()"));
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Error-TriggerSetOriginPos()"));
 		return FALSE;
 	}
 
@@ -1314,7 +1314,7 @@ int CNmcDevice::GetTriggerEnc(int nEcatAddr, int nSdoIdx)
 	ms = MasterGetSDODataEcatAddr(m_nBoardId, nEcatAddr, nSdoIdx, 7, 4, &uRspsDataSize, Data);
 	if (ms != MC_OK)
 	{
-		pView->ClrDispMsg(); AfxMessageBox(_T("Error-GetTriggerEncCnt()"));
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Error-GetTriggerEncCnt()"));
 		return 0;
 	}
 	Sleep(30);
@@ -1334,7 +1334,7 @@ CString CNmcDevice::GetTriggerEncCnt(int nEcatAddr, int nSdoIdx)
 	ms = MasterGetSDODataEcatAddr(m_nBoardId, nEcatAddr, nSdoIdx, 7, 4, &uRspsDataSize, Data);
 	if (ms != MC_OK)
 	{
-		pView->ClrDispMsg(); AfxMessageBox(_T("Error-GetTriggerEncCnt()"));
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Error-GetTriggerEncCnt()"));
 		return _T("");
 	}
 	Sleep(30);
@@ -1362,13 +1362,13 @@ int CNmcDevice::UnGroup2Ax(int nGroupNum)
 	ms = MC_GroupDisable(m_nBoardId, nGroupNum);
 	if (ms != MC_OK)
 	{
-		pView->ClrDispMsg(); AfxMessageBox(_T("Error-MC_GroupDisable()"));
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Error-MC_GroupDisable()"));
 		return ms;
 	}
 	ms = MC_UngroupAllAxes(m_nBoardId, nGroupNum);
 	if (ms != MC_OK)
 	{
-		pView->ClrDispMsg(); AfxMessageBox(_T("Error-MC_UngroupAllAxes()"));
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Error-MC_UngroupAllAxes()"));
 		return ms;
 	}
 	Sleep(5);
@@ -1879,7 +1879,7 @@ int CNmcDevice::DisableGroup2Ax(int nGroupNum)
 	{
 		CString sMsg;
 		sMsg.Format(_T("Error-MC_GroupDisable(%d)"), nGroupNum);
-		pView->ClrDispMsg(); AfxMessageBox(sMsg);
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(sMsg);
 		return -1; // Error...
 	}
 	Sleep(30);
@@ -1934,7 +1934,7 @@ BOOL CNmcDevice::TwoStartPosMove0(int nMsId0, int nMsId1, double fPos0, double f
 				}
 				if (GetTickCount() - nTick > 30000)
 				{
-					pView->ClrDispMsg(); AfxMessageBox(_T("Time out 30 seconds."));
+					pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Time out 30 seconds."));
 					break;
 				}
 			}
@@ -1954,7 +1954,7 @@ BOOL CNmcDevice::TwoStartPosMove0(int nMsId0, int nMsId1, double fPos0, double f
 		if (TEN_SECOND < int(CurTimer - StartTimer))
 		{
 			sMsg.Format(_T("Error-Wait MotionDone Time Over(TEN_SECOND)."));
-			AfxMessageBox(sMsg);
+			pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(sMsg);
 			return FALSE;
 		}
 	}
@@ -2004,7 +2004,7 @@ BOOL CNmcDevice::TwoStartPosMove0(int nMsId0, int nMsId1, double fPos0, double f
 		{
 			MC_GetErrorMessage(ms, MAX_ERR_LEN, cstrErrorMsg);
 			msg.Format(_T("Error :: 0x%08X, %s"), ms, cstrErrorMsg);
-			pView->ClrDispMsg(); AfxMessageBox(msg);
+			pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(msg);
 			return FALSE;
 		}
 		//else
@@ -2043,7 +2043,7 @@ BOOL CNmcDevice::TwoStartPosMove0(int nMsId0, int nMsId1, double fPos0, double f
 	{
 		MC_GetErrorMessage(ms, MAX_ERR_LEN, cstrErrorMsg);
 		msg.Format(_T("Error :: 0x%08X, %s"), ms, cstrErrorMsg);
-		pView->ClrDispMsg(); AfxMessageBox(msg);
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(msg);
 		return FALSE;
 	}
 
@@ -2064,7 +2064,7 @@ BOOL CNmcDevice::TwoStartPosMove0(int nMsId0, int nMsId1, double fPos0, double f
 		}
 		if (GetTickCount() - nTick > 30000)
 		{
-			AfxMessageBox(_T("Time out 10 seconds."));
+			pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Time out 10 seconds."));
 			break;
 		}
 	}
@@ -2132,7 +2132,7 @@ BOOL CNmcDevice::TwoStartPosMove1(int nMsId0, int nMsId1, double fPos0, double f
 				}
 				if (GetTickCount() - nTick > 30000)
 				{
-					pView->ClrDispMsg(); AfxMessageBox(_T("Time out 30 seconds."));
+					pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Time out 30 seconds."));
 					break;
 				}
 			}
@@ -2152,7 +2152,7 @@ BOOL CNmcDevice::TwoStartPosMove1(int nMsId0, int nMsId1, double fPos0, double f
 		if (TEN_SECOND < int(CurTimer - StartTimer))
 		{
 			sMsg.Format(_T("Error-Wait MotionDone Time Over(TEN_SECOND)."));
-			pView->ClrDispMsg(); AfxMessageBox(sMsg);
+			pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(sMsg);
 			return FALSE;
 		}
 	}
@@ -2253,7 +2253,7 @@ BOOL CNmcDevice::TwoStartPosMove1(int nMsId0, int nMsId1, double fPos0, double f
 		{
 			MC_GetErrorMessage(ms, MAX_ERR_LEN, cstrErrorMsg);
 			msg.Format(_T("Error :: 0x%08X, %s"), ms, cstrErrorMsg);
-			pView->ClrDispMsg(); AfxMessageBox(msg);
+			pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(msg);
 			return FALSE;
 		}
 
@@ -2310,7 +2310,7 @@ BOOL CNmcDevice::TwoStartPosMove1(int nMsId0, int nMsId1, double fPos0, double f
 	{
 		MC_GetErrorMessage(ms, MAX_ERR_LEN, cstrErrorMsg);
 		msg.Format(_T("Error :: 0x%08X, %s"), ms, cstrErrorMsg);
-		pView->ClrDispMsg(); AfxMessageBox(msg);
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(msg);
 		return FALSE;
 	}
 
@@ -2332,7 +2332,7 @@ BOOL CNmcDevice::TwoStartPosMove1(int nMsId0, int nMsId1, double fPos0, double f
 		}
 		if (GetTickCount() - nTick > 30000)
 		{
-			pView->ClrDispMsg(); AfxMessageBox(_T("Time out 10 seconds."));
+			pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Time out 10 seconds."));
 			break;
 		}
 	}
@@ -2376,7 +2376,7 @@ BOOL CNmcDevice::TwoStartPosMove0(int nMsId0, int nMsId1, double fPos0, double f
 				}
 				if (GetTickCount() - nTick > 30000)
 				{
-					pView->ClrDispMsg(); AfxMessageBox(_T("Time out 30 seconds."));
+					pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Time out 30 seconds."));
 					break;
 				}
 			}
@@ -2396,7 +2396,7 @@ BOOL CNmcDevice::TwoStartPosMove0(int nMsId0, int nMsId1, double fPos0, double f
 		if (TEN_SECOND < int(CurTimer - StartTimer))
 		{
 			sMsg.Format(_T("Error-Wait MotionDone Time Over(TEN_SECOND)."));
-			pView->ClrDispMsg(); AfxMessageBox(sMsg);
+			pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(sMsg);
 			return FALSE;
 		}
 	}
@@ -2430,7 +2430,7 @@ BOOL CNmcDevice::TwoStartPosMove0(int nMsId0, int nMsId1, double fPos0, double f
 		{
 			MC_GetErrorMessage(ms, MAX_ERR_LEN, cstrErrorMsg);
 			msg.Format(_T("Error :: 0x%08X, %s"), ms, cstrErrorMsg);
-			pView->ClrDispMsg(); AfxMessageBox(msg);
+			pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(msg);
 			return FALSE;
 		}
 
@@ -2443,7 +2443,7 @@ BOOL CNmcDevice::TwoStartPosMove0(int nMsId0, int nMsId1, double fPos0, double f
 	{
 		MC_GetErrorMessage(ms, MAX_ERR_LEN, cstrErrorMsg);
 		msg.Format(_T("Error :: 0x%08X, %s"), ms, cstrErrorMsg);
-		pView->ClrDispMsg(); AfxMessageBox(msg);
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(msg);
 		return FALSE;
 	}
 
@@ -2464,7 +2464,7 @@ BOOL CNmcDevice::TwoStartPosMove0(int nMsId0, int nMsId1, double fPos0, double f
 		}
 		if (GetTickCount() - nTick > 30000)
 		{
-			pView->ClrDispMsg(); AfxMessageBox(_T("Time out 10 seconds."));
+			pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Time out 10 seconds."));
 			break;
 		}
 	}
@@ -2530,7 +2530,7 @@ BOOL CNmcDevice::TwoStartPosMove1(int nMsId0, int nMsId1, double fPos0, double f
 				}
 				if (GetTickCount() - nTick > 30000)
 				{
-					pView->ClrDispMsg(); AfxMessageBox(_T("Time out 30 seconds."));
+					pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Time out 30 seconds."));
 					break;
 				}
 			}
@@ -2550,7 +2550,7 @@ BOOL CNmcDevice::TwoStartPosMove1(int nMsId0, int nMsId1, double fPos0, double f
 		if (TEN_SECOND < int(CurTimer - StartTimer))
 		{
 			sMsg.Format(_T("Error-Wait MotionDone Time Over(TEN_SECOND)."));
-			pView->ClrDispMsg(); AfxMessageBox(sMsg);
+			pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(sMsg);
 			return FALSE;
 		}
 	}
@@ -2650,7 +2650,7 @@ BOOL CNmcDevice::TwoStartPosMove1(int nMsId0, int nMsId1, double fPos0, double f
 		{
 			MC_GetErrorMessage(ms, MAX_ERR_LEN, cstrErrorMsg);
 			msg.Format(_T("Error :: 0x%08X, %s"), ms, cstrErrorMsg);
-			pView->ClrDispMsg(); AfxMessageBox(msg);
+			pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(msg);
 			return FALSE;
 		}
 
@@ -2707,7 +2707,7 @@ BOOL CNmcDevice::TwoStartPosMove1(int nMsId0, int nMsId1, double fPos0, double f
 	{
 		MC_GetErrorMessage(ms, MAX_ERR_LEN, cstrErrorMsg);
 		msg.Format(_T("Error :: 0x%08X, %s"), ms, cstrErrorMsg);
-		pView->ClrDispMsg(); AfxMessageBox(msg);
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(msg);
 		return FALSE;
 	}
 
@@ -2729,7 +2729,7 @@ BOOL CNmcDevice::TwoStartPosMove1(int nMsId0, int nMsId1, double fPos0, double f
 		}
 		if (GetTickCount() - nTick > 30000)
 		{
-			pView->ClrDispMsg(); AfxMessageBox(_T("Time out 10 seconds."));
+			pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Time out 10 seconds."));
 			break;
 		}
 	}
@@ -2963,7 +2963,7 @@ double CNmcDevice::GetSCurveVelocity(double dLen, double &dVel, double &dAcc, do
 			}
 			else
 			{
-				pView->ClrDispMsg(); AfxMessageBox(_T("Calculation Error at Speed profile of S-Curve motion"));
+				pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Calculation Error at Speed profile of S-Curve motion"));
 			}
 		}
 	} while (1);

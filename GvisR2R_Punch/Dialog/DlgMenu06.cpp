@@ -303,31 +303,14 @@ BOOL CDlgMenu06::OnInitDialog()
 	}
 
 	HWND hCtrlV0[4] = { 0 };
-	//hCtrlV0[0] = GetDlgItem(IDC_STC_VISION)->GetSafeHwnd();
-	//MIL_ID MilSys = M_NULL;
+#ifdef USE_MIL
 	if(pView && pView->m_pDlgMenu02)
 		pView->m_pVisionInner[0] = new CVision(2, pView->m_pDlgMenu02->m_MilSys, hCtrlV0, this);
-	//MilSys = pView->m_pVisionInner[0]->GetSystemID();
 
-	//#ifndef TEST_MODE
 	HWND hCtrlV1[4] = { 0 };
-	//hCtrlV1[0] = GetDlgItem(IDC_STC_VISION_2)->GetSafeHwnd();
 	if (pView && pView->m_pDlgMenu02)
 		pView->m_pVisionInner[1] = new CVision(3, pView->m_pDlgMenu02->m_MilSys, hCtrlV1, this);
-	//#endif
-
-
-	//if (pView->m_pVisionInner[0])
-	//{
-	//	pView->m_pVisionInner[0]->ClearOverlay();
-	//	pView->m_pVisionInner[0]->DrawCenterMark();
-	//}
-
-	//if (pView->m_pVisionInner[1])
-	//{
-	//	pView->m_pVisionInner[1]->ClearOverlay();
-	//	pView->m_pVisionInner[1]->DrawCenterMark();
-	//}
+#endif
 #endif
 
 
@@ -598,28 +581,6 @@ void CDlgMenu06::SelMap(int nSel)
 	//	DispReelmap(m_nSerial);
 	//}
 }
-
-//BOOL CDlgMenu06::OpenReelmap(CString sPath)
-//{
-//#ifdef TEST_MODE
-//	pDoc->m_pReelMapInnerUp->Open(sPath);
-//#else
-//	stModelInfo stInfo;
-//	if (!pDoc->GetPcrInfo(sPath, stInfo))
-//	{
-//		pView->DispStsBar(_T("E(1)"), 5);
-//		pView->ClrDispMsg();
-//		AfxMessageBox(_T("Error-GetPcrInfo(1)"));
-//		return FALSE;
-//	}
-//
-//	if (pDoc->m_pReelMapInnerUp)
-//	{
-//		pDoc->m_pReelMapInnerUp->Open(pView->GetRmapPath(RMAP_INNER_UP, stInfo), stInfo.sModel, stInfo.sLayer, stInfo.sLot);
-//	}
-//#endif
-//	return TRUE;
-//}
 
 void CDlgMenu06::OpenReelmap(int nSelRmap)
 {
@@ -1868,7 +1829,7 @@ void CDlgMenu06::ShowDefInfoUp(int nIdx) // nIdx : 0 ~ 11 (12ea)
 	nDefCode = pDoc->m_pPcrInner[0][nPcrIdx]->m_pDefType[m_nIdxDef[0]];
 	rgbDef = pDoc->m_pReelMapInner->m_rgbDef[nDefCode];
 	if(pDoc->m_Master[0].m_pPcsRgn)
-		pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(nPcsIdx, nStrip, nCol, nRow);
+		pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[0].MasterInfo.nActionCode, nPcsIdx, nStrip, nCol, nRow);
 	str.Format(_T("%s\r\n%c - %d, %d"), pDoc->m_pReelMapInner->m_sKorDef[nDefCode], nStrip+'A', nCol+1, nRow+1);
 #else
  	int nPcrIdx = pDoc->GetPcrIdx0(m_nSerial);
@@ -1886,7 +1847,7 @@ void CDlgMenu06::ShowDefInfoUp(int nIdx) // nIdx : 0 ~ 11 (12ea)
 	nDefCode = pDoc->m_pPcrInner[0][nPcrIdx]->m_pDefType[m_nIdxDef[0]];
  	rgbDef = pDoc->m_pReelMapInner->m_rgbDef[nDefCode];	
 	if(pDoc->m_Master[0].m_pPcsRgn)
-		pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(nPcsIdx, nStrip, nCol, nRow);	
+		pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[0].MasterInfo.nActionCode, nPcsIdx, nStrip, nCol, nRow);
 	str.Format(_T("%s\r\n%c - %d, %d"), pDoc->m_pReelMapInner->m_sKorDef[nDefCode], nStrip+'A', nCol+1, nRow+1);
 #endif
 	myStcDefInfo[nIdx].SetText(str);
@@ -1919,7 +1880,7 @@ void CDlgMenu06::ShowDefInfoDn(int nIdx) // nIdx : 0 ~ 11 (12ea)
 	nDefCode = pDoc->m_pPcrInner[1][nPcrIdx]->m_pDefType[m_nIdxDef[1]];
 	rgbDef = pDoc->m_pReelMapInner->m_rgbDef[nDefCode];
 	if(pDoc->m_Master[0].m_pPcsRgn)
-		pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(nPcsIdx, nStrip, nCol, nRow);	
+		pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, nPcsIdx, nStrip, nCol, nRow);
 	str.Format(_T("%s\r\n%c - %d, %d"), pDoc->m_pReelMapInner->m_sKorDef[nDefCode], nStrip+'A', nCol+1, nRow+1);
 #else
  	int nPcrIdx = pDoc->GetPcrIdx1(m_nSerial);
@@ -1937,7 +1898,7 @@ void CDlgMenu06::ShowDefInfoDn(int nIdx) // nIdx : 0 ~ 11 (12ea)
 	nDefCode = pDoc->m_pPcrInner[1][nPcrIdx]->m_pDefType[m_nIdxDef[1]];
 	rgbDef = pDoc->m_pReelMapInner->m_rgbDef[nDefCode];	
 	if(pDoc->m_Master[0].m_pPcsRgn)
-		pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(nPcsIdx, nStrip, nCol, nRow);	
+		pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, nPcsIdx, nStrip, nCol, nRow);
 	str.Format(_T("%s\r\n%c - %d, %d"), pDoc->m_pReelMapInner->m_sKorDef[nDefCode], nStrip+'A', nCol+1, nRow+1);
 #endif
 	myStcDefInfo[MENU01_STC_DEFINFO_HARF+nIdx].SetText(str);
@@ -3357,7 +3318,7 @@ void CDlgMenu06::DispStripRatio()
 	// < 스트립 별 수율 >
 	pDoc->m_pReelMapInnerUp->GetPcsNum(nGood, nBad);
 	nTot = nGood + nBad;
-	nStTot = nTot / 4;
+	nStTot = nTot / MAX_STRIP;
 
 	// 상면
 	nVal[0][0] = pDoc->m_pReelMapInnerUp->GetDefStrip(0);
@@ -3964,70 +3925,6 @@ void CDlgMenu06::OnChkEjectBuffer()
 		{
 			m_bLastProc = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProc"), m_bLastProc);
 		}
-		//else
-		//{
-		//	//pView->MpeWrite(pView->Plc.DlgMenu01.LastJobFromEngrave, 0);			// 잔량처리 각인부 부터(PC가 On시키고, PLC가 확인하고 Off시킴)
-		//	//pView->MpeWrite(pView->Plc.DlgMenu01.LastJobFromAoiUp, 0);			// 잔량처리 AOI(상) 부터(PC가 On시키고, PLC가 확인하고 Off시킴)-20141112
-		//	//pView->MpeWrite(pView->Plc.DlgMenu01.LastJobFromAoiDn, 0);			// 잔량처리 AOI(상) 부터(PC가 On시키고, PLC가 확인하고 Off시킴)-20141112
-		//
-		//	if(MODE_INNER != pDoc->GetTestMode())
-		//	{ 
-		//		if(IDNO == pView->MsgBox(_T("AOI 상면부터 잔량처리를 하시겠습니까?"), 0, MB_YESNO))
-		//		{
-		//			if(IDNO == pView->MsgBox(_T("AOI 하면부터 잔량처리를 하시겠습니까?"), 0, MB_YESNO))
-		//			{
-		//				ResetLastProc();
-		//				myBtn[3].SetCheck(FALSE);
-		//			}
-		//			else // AOI 하면부터 잔량처리
-		//			{
-		//				m_bLastProcFromUp = FALSE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
-		//				m_bLastProc = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProc"), m_bLastProc);
-		//				pView->MpeWrite(pView->Plc.DlgMenu01.LastJobFromAoiDn, 1);			// 잔량처리 AOI(하) 부터(PC가 On시키고, PLC가 확인하고 Off시킴)-20141112
-		//			}
-		//		}
-		//		else // AOI 상면부터 잔량처리
-		//		{
-		//			m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
-		//			m_bLastProc = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProc"), m_bLastProc);
-		//			pView->MpeWrite(pView->Plc.DlgMenu01.LastJobFromAoiUp, 1);				// 잔량처리 AOI(상) 부터(PC가 On시키고, PLC가 확인하고 Off시킴)-20141112
-		//		}
-		//	}
-		//	else // MODE_INNER
-		//	{
-		//		if (IDNO == pView->MsgBox(_T("각인부부터 잔량처리를 하시겠습니까?"), 0, MB_YESNO))
-		//		{
-		//			if (IDNO == pView->MsgBox(_T("AOI 상면부터 잔량처리를 하시겠습니까?"), 0, MB_YESNO))
-		//			{
-		//				if (IDNO == pView->MsgBox(_T("AOI 하면부터 잔량처리를 하시겠습니까?"), 0, MB_YESNO))
-		//				{
-		//					ResetLastProc();
-		//					myBtn[3].SetCheck(FALSE);
-		//				}
-		//				else // AOI 하면부터 잔량처리
-		//				{
-		//					m_bLastProcFromUp = FALSE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
-		//					m_bLastProc = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProc"), m_bLastProc);
-		//					pView->MpeWrite(pView->Plc.DlgMenu01.LastJobFromAoiDn, 1);			// 잔량처리 AOI(하) 부터(PC가 On시키고, PLC가 확인하고 Off시킴)-20141112
-		//				}
-		//			}
-		//			else // AOI 상면부터 잔량처리 
-		//			{
-		//				m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
-		//				m_bLastProc = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProc"), m_bLastProc);
-		//				pView->MpeWrite(pView->Plc.DlgMenu01.LastJobFromAoiUp, 1);				// 잔량처리 AOI(상) 부터(PC가 On시키고, PLC가 확인하고 Off시킴)-20141112
-		//			}
-		//		}
-		//		else // 각인부부터 잔량처리
-		//		{
-		//			m_bLastProcFromEng = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromEng"), m_bLastProcFromEng);
-		//			m_bLastProc = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProc"), m_bLastProc);
-		//			pView->MpeWrite(pView->Plc.DlgMenu01.LastJobFromEngrave, 1);				// 잔량처리 각인부 부터(PC가 On시키고, PLC가 확인하고 Off시킴)
-		//			pView->MpeWrite(pView->Plc.DlgMenu01.LastJobFromAoiUp, 0);				// 잔량처리 AOI(상) 부터(PC가 On시키고, PLC가 확인하고 Off시킴)-20141112
-		//			pView->MpeWrite(pView->Plc.DlgMenu01.LastJobFromAoiDn, 0);				// 잔량처리 AOI(하) 부터(PC가 On시키고, PLC가 확인하고 Off시킴)-20141112
-		//		}
-		//	}
-		//}
 	}
 	else
 	{
@@ -4088,7 +3985,8 @@ BOOL CDlgMenu06::ShowKeypad(int nCtlID, CPoint ptSt, int nDir)
 			_tstof(strData) > _tstof(strMax))
 		{
 			SetDlgItemText(nCtlID, strPrev);
-			pView->DispMsg(_T("입력 범위를 벗어났습니다."), _T("주의"), RGB_YELLOW);
+			//pView->DispMsg(_T("입력 범위를 벗어났습니다."), _T("주의"), RGB_YELLOW);
+			pView->MsgBox(_T("입력 범위를 벗어났습니다."));
 		}
 		else
 			SetDlgItemText(nCtlID, strData);
@@ -4477,7 +4375,8 @@ void CDlgMenu06::OnChkRemarking()
 		else
 		{
 			myBtn[4].SetCheck(FALSE);
-			pView->m_bMkStSw = TRUE;
+			pView->m_bMkStSw[0] = TRUE;
+			pView->m_bMkStSw[1] = TRUE;
 		}
 	}
 	else

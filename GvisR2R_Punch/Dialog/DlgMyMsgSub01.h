@@ -22,12 +22,14 @@
 
 #define TIM_MYMSG01			215
 #define TIM_KILL_FOCUS01		216
+#define TIM_DISP_STS				450
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgMyMsgSub01 dialog
 
 class CDlgMyMsgSub01 : public CDlgMyMsg
 {
+	BOOL m_bTIM_DISP_STS;
 	BOOL m_bLoadImg;
 // 	HWND m_hParentWnd;
 	CRect* m_pRect;

@@ -86,10 +86,12 @@ CDlgKeyNum1::CDlgKeyNum1(CString *strFileName, CString sMsg/*=_T("")*/, CWnd* pP
 
 	m_bTIM_DLG_KEYBDNUM_Lock = FALSE;
 	m_bTIM_DLG_KEYBDNUM = FALSE;
+	m_bTIM_DISP_STS = FALSE;
 }
 
 CDlgKeyNum1::~CDlgKeyNum1()
 {
+	m_bTIM_DISP_STS = FALSE;
 	m_bTIM_DLG_KEYBDNUM = FALSE;
 	DelImg();
 
@@ -591,6 +593,10 @@ BOOL CDlgKeyNum1::OnInitDialog()
 
 	LoadImg();
 	DispVal();
+
+	//m_bTIM_DISP_STS = TRUE;
+	//SetTimer(TIM_DISP_STS, 100, NULL);
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
 }

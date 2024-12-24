@@ -28,6 +28,7 @@ CDlgMyMsgSub00::CDlgMyMsgSub00(CWnd* pParent, int nIDD)
 	if (pParent)
 		m_hParentWnd = pParent->GetSafeHwnd();
 
+	m_bTIM_DISP_STS = FALSE;
 	m_pRect = NULL;
 	m_bExit = TRUE;
 	m_bLoadImg = FALSE;
@@ -42,6 +43,7 @@ CDlgMyMsgSub00::CDlgMyMsgSub00(CWnd* pParent, int nIDD)
 
 CDlgMyMsgSub00::~CDlgMyMsgSub00()
 {
+	m_bTIM_DISP_STS = FALSE;
 	StopThread();
 
 	while(m_bThreadAlive)
@@ -235,6 +237,9 @@ BOOL CDlgMyMsgSub00::OnInitDialog()
 	{
 		GetDlgItem(IDC_BTN_00)->ShowWindow(SW_HIDE);
 	}
+
+	//m_bTIM_DISP_STS = TRUE;
+	//SetTimer(TIM_DISP_STS, 100, NULL);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE

@@ -17,13 +17,25 @@ BEGIN_MESSAGE_MAP(CEngrave, CWnd)
 	ON_MESSAGE(WM_CLIENT_RECEIVED, wmClientReceived)
 	ON_MESSAGE(WM_CLIENT_CLOSED, wmClientClosed)
 	//}}AFX_MSG_MAP
+	ON_WM_CREATE()
 END_MESSAGE_MAP()
 
 
 CEngrave::CEngrave(CString sAddrCli, CString sAddrSvr, CString sPortSvr, CWnd* pParent /*=NULL*/)
 {
+	int nMsgID;
+
 	if(pParent)
 		m_hParentWnd = pParent->GetSafeHwnd();
+
+	m_bTIM_CHK_RCV_SIG = FALSE;
+	for (nMsgID = 0; nMsgID < _SigInx::_EndIdx; nMsgID++)
+	{
+		m_bSendSig[nMsgID] = FALSE;
+		m_bRcvSig[nMsgID] = FALSE;
+		m_nSendSigData[nMsgID] = 0;
+		m_nRcvSigData[nMsgID] = 0;
+	}
 
 	m_pClient = NULL;
 	m_nServerID = ID_ENGRAVE;
@@ -43,7 +55,7 @@ CEngrave::CEngrave(CString sAddrCli, CString sAddrSvr, CString sPortSvr, CWnd* p
 
 	m_pThread = NULL;
 	m_bTIM_CHECK_CONNECT = FALSE;
-	m_bTIM_MPE_OFFSET_INITPOS_MOVE = FALSE;
+	//m_bTIM_MPE_OFFSET_INITPOS_MOVE = FALSE;
 
 	m_bGetOpInfo = FALSE; m_bGetInfo = FALSE; m_bGetEngInfo = FALSE;
 	m_bGetSignalMain = FALSE; m_bGetSignalTorqueMotor = FALSE; m_bGetSignalInductionMotor = FALSE; m_bGetSignalCore150mm = FALSE; m_bGetSignalEtc = FALSE;
@@ -52,13 +64,15 @@ CEngrave::CEngrave(CString sAddrCli, CString sAddrSvr, CString sPortSvr, CWnd* p
 	m_bGetTotRatio = FALSE; m_bGetStTime = FALSE; m_bGetRunTime = FALSE; m_bGetEdTime = FALSE; m_bGetStripRatio = FALSE; m_bGetDef = FALSE;
 	m_bGet2DReader = FALSE; m_bGetEngInfo = FALSE; m_bGetFdInfo = FALSE; m_bGetAoiInfo = FALSE; m_bGetMkInfo = FALSE; m_bGetMkInfoLf = FALSE; m_bGetMkInfoRt = FALSE;
 
+	SetSignalName();
 }
 
 
 CEngrave::~CEngrave()
 {
 	m_bTIM_CHECK_CONNECT = FALSE;
-	m_bTIM_MPE_OFFSET_INITPOS_MOVE = FALSE;
+	//m_bTIM_MPE_OFFSET_INITPOS_MOVE = FALSE;
+	m_bTIM_CHK_RCV_SIG = FALSE;
 
 	if (m_pClient)
 	{
@@ -176,36 +190,44 @@ LRESULT CEngrave::wmClientReceived(WPARAM wParam, LPARAM lParam)
 int CEngrave::OnClientReceived(WPARAM wParam, LPARAM lParam)
 {
 	int nServerID = (int)wParam;
-	//CString sReceived = (LPCTSTR)lParam;
+	//SOCKET_DATA *pSocketData = (SOCKET_DATA*)lParam;
+	SOCKET_DATA rSockData = m_SocketData;
+	int nMsgID = rSockData.nMsgID;
+	int nRequireRtn = rSockData.nData2;
+	if (nRequireRtn != 1)
+		nRequireRtn = 0;
 
-	//if (sReceived == _T("Fail to connect."))
-	//	return 1;
+	if (pView->m_pDlgMenu02)
+		pView->m_pDlgMenu02->GetDlgItem(IDC_STATIC_SIGNAL_RCV)->SetWindowText(GetSignalName(nMsgID));
 
+	GetSysSignal(rSockData);
+
+	if (nMsgID == _SigInx::_MyMsgYes || nMsgID == _SigInx::_MyMsgNo || nMsgID == _SigInx::_MyMsgOk)
+		return 1;
+
+	// 받은 신호에 대해 상대방에게 신호 받은 것을 알림. (Hand Shaking)
+	if (nMsgID < RCV_OFFSET)
+	{
+		SetSignal(nMsgID + RCV_OFFSET, 1);		// 1 : Return RCV_Signal, 0 : No Return
+	}
+	else
+	{
+		if (nRequireRtn)
+		{
+			SetSignal(nMsgID, 0);					// 1 : Return RCV_Signal, 0 : No Return
+		}
+		else
+		{
+			m_bSendSig[nMsgID] = FALSE;					// 최종 메시지 확인 후 재전송을 멈춤.
+			m_bSendSig[nMsgID - RCV_OFFSET] = FALSE;	// 최종 메시지 확인 후 재전송을 멈춤.
+			m_nSendSigData[nMsgID] = 0;					// 최종 메시지 확인 후 재전송을 멈춤.
+			m_nSendSigData[nMsgID - RCV_OFFSET] = 0;	// 최종 메시지 확인 후 재전송을 멈춤.
+		}
+	}
+	
 	if (m_hParentWnd)
 		::PostMessage(m_hParentWnd, WM_CLIENT_RECEIVED, (WPARAM)ID_ENGRAVE, (LPARAM)&m_SocketData); // "OrderNum-ShotNum" (9bytes'-'3bytes)
 	m_bWaitForResponse = FALSE;
-/*
-	switch (nServerID)
-	{
-	case ID_ENGRAVE:
-		if (m_hParentWnd)
-			::PostMessage(m_hParentWnd, WM_CLIENT_RECEIVED, (WPARAM)ID_ENGRAVE, (LPARAM)&m_SocketData); // "OrderNum-ShotNum" (9bytes'-'3bytes)
-		m_bWaitForResponse = FALSE;
-		//if (sReceived.GetLength() > 0)
-		//{
-		//	if (CheckResponse(m_nCmd, sReceived))
-		//	{
-		//		;
-		//	}
-		//	else
-		//	{
-		//		pView->MsgBox(_T("Error-CheckResponse"));
-		//		//AfxMessageBox(_T("Error-CheckResponse"));
-		//	}
-		//}
-		break;
-	}
-*/
 	return 1;
 }
 
@@ -216,22 +238,6 @@ BOOL CEngrave::CheckResponse(int nCmd, CString sResponse)
 
 	switch (nCmd)
 	{
-	//case SrTriggerInputOn:
-	//	if (nPos = sResponse.Find(_T("ERROR")) > 0)
-	//	{
-	//		pView->MsgBox(_T("Error-Mdx response"));
-	//		//AfxMessageBox(_T("Error-Mdx response"));
-	//		m_strResponse = sResponse;
-	//		m_bWaitForResponse = FALSE;
-	//	}
-	//	else
-	//	{
-	//		m_strResponse = sResponse;
-	//		m_bWaitForResponse = FALSE;
-	//		if (m_hParentWnd)
-	//			::PostMessage(m_hParentWnd, WM_CLIENT_RECEIVED_SR, (WPARAM)SrTriggerInputOn, (LPARAM)&m_strResponse); // "OrderNum-ShotNum" (9bytes'-'3bytes)
-	//	}
-	//	return TRUE;
 		;
 	}
 
@@ -392,6 +398,7 @@ BOOL CEngrave::IsConnected()
 void CEngrave::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	int nMsgID = 0;
 	SOCKET_DATA SocketData;
 
 	switch (nIDEvent)
@@ -426,25 +433,21 @@ void CEngrave::OnTimer(UINT_PTR nIDEvent)
 				SetTimer(TIM_CHECK_CONNECT, DELAY_CHECK_CONNECT, NULL);
 		}
 		break;
-	case TIM_MPE_OFFSET_INITPOS_MOVE:
-		KillTimer(TIM_MPE_OFFSET_INITPOS_MOVE);
-		if (m_bTIM_MPE_OFFSET_INITPOS_MOVE)
+	case TIM_CHK_RCV_SIG:
+		KillTimer(TIM_CHK_RCV_SIG);
+		for (nMsgID = 0; nMsgID < _SigInx::_EndIdx; nMsgID++)
 		{
-#ifdef USE_MPE
-			if (pDoc->m_pMpeSignal[3] & (0x01 << 15))
+			if (m_bSendSig[nMsgID])		// 상대방이 받지 못하면 500mSec 후에 다시 신호를 전송함.
 			{
-				SetTimer(TIM_MPE_OFFSET_INITPOS_MOVE, 100, NULL);
+				SetSignal(nMsgID, m_nSendSigData[nMsgID]);		// 1 : Return RCV_Signal, 0 : No Return
+				if (!m_nSendSigData[nMsgID])
+					m_bSendSig[nMsgID] = FALSE;
 			}
-			else
-			{
-#ifdef USE_ENGRAVE
-				pView->m_pEngrave->Set2DOffsetInitPosMove(FALSE);	//_stSigInx::_2DOffsetInitPosMove
-#endif
-				m_bTIM_MPE_OFFSET_INITPOS_MOVE = FALSE;
-			}
-#endif
 		}
+		if (m_bTIM_CHK_RCV_SIG)
+			SetTimer(TIM_CHK_RCV_SIG, 500, NULL);
 		break;
+
 	}
 	CWnd::OnTimer(nIDEvent);
 }
@@ -457,880 +460,60 @@ void CEngrave::GetSysSignal(SOCKET_DATA SockData)
 	GetInfo(SockData);
 	GetEngInfo(SockData);
 
-	//GetSignalDisp(SockData);
-	//GetSignalMain(SockData);
-	//GetSignalTorqueMotor(SockData);
-	//GetSignalInductionMotor(SockData);
-	//GetSignalCore150mm(SockData);
-	//GetSignalEtc(SockData);
-	//GetSignalRecoiler(SockData);
-	//GetSignalPunch(SockData);
-	//GetSignalAOIDn(SockData);
-	//GetSignalAOIUp(SockData);
-	//GetSignalEngrave(SockData);
-	//GetSignalUncoiler(SockData);
-
 	GetSignalEngraveAutoSequence(SockData);
 	GetSignalMyMsg(SockData);
 
 	GetSignal2dEng(SockData);
+	GetCurrentInfoSignal(SockData);
 }
 
 void CEngrave::GetSignalDisp(SOCKET_DATA SockData)
 {
-	//int nCmdCode = SockData.nCmdCode;
-	//int nMsgId = SockData.nMsgID;
-	//CString sVal;
-
-	//if (nCmdCode == _SetSig)
-	//{
-	//	switch (nMsgId)
-	//	{
-	//	case _SigInx::_DispReady:
-	//		pDoc->BtnStatus.Disp.Init();
-	//		pDoc->BtnStatus.Disp.Ready = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_DispRun:
-	//		pDoc->BtnStatus.Disp.Init();
-	//		pDoc->BtnStatus.Disp.Run = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_DispStop:
-	//		pDoc->BtnStatus.Disp.Init();
-	//		pDoc->BtnStatus.Disp.Stop = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_DispDualSample:
-	//		pDoc->BtnStatus.Disp.Init();
-	//		pDoc->BtnStatus.Disp.DualSample = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_DispSingleSample:
-	//		pDoc->BtnStatus.Disp.Init();
-	//		pDoc->BtnStatus.Disp.SingleSample = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_DispDualTest:
-	//		pDoc->BtnStatus.Disp.Init();
-	//		pDoc->BtnStatus.Disp.DualTest = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_DispSingleTest:
-	//		pDoc->BtnStatus.Disp.Init();
-	//		pDoc->BtnStatus.Disp.SingleTest = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	// Is
-	//	case _SigInx::_IsDispReady:
-	//		pDoc->BtnStatus.Disp.IsReady = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsDispRun:
-	//		pDoc->BtnStatus.Disp.IsRun = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsDispStop:
-	//		pDoc->BtnStatus.Disp.IsStop = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsDispDualSample:
-	//		pDoc->BtnStatus.Disp.IsDualSample = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsDispSingleSample:
-	//		pDoc->BtnStatus.Disp.IsSingleSample = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsDispDualTest:
-	//		pDoc->BtnStatus.Disp.IsDualTest = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsDispSingleTest:
-	//		pDoc->BtnStatus.Disp.IsSingleTest = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	}
-	//}
 }
 
 
 void CEngrave::GetSignalMain(SOCKET_DATA SockData)
 {
-	//int nCmdCode = SockData.nCmdCode;
-	//int nMsgId = SockData.nMsgID;
-	//CString sVal;
-
-	//if (nCmdCode == _SetSig)
-	//{
-	//	switch (nMsgId)
-	//	{
-	//	case _SigInx::_Ready:
-	//		pDoc->BtnStatus.Main.Ready = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_Ready] = TRUE;
-	//		break;
-	//	case _SigInx::_Run:
-	//		pDoc->BtnStatus.Main.Run = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pDoc->BtnStatus.Main.Stop = (SockData.nData1 > 0) ? FALSE : pDoc->BtnStatus.Main.Stop;
-	//		pView->m_bRcvSig[_SigInx::_Run] = TRUE;
-	//		break;
-	//	case _SigInx::_Reset:
-	//		pDoc->BtnStatus.Main.Reset = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_Reset] = TRUE;
-	//		break;
-	//	case _SigInx::_Stop:
-	//		pDoc->BtnStatus.Main.Stop = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pDoc->BtnStatus.Main.Run = (SockData.nData1 > 0) ? FALSE : pDoc->BtnStatus.Main.Run;
-	//		pView->m_bRcvSig[_SigInx::_Stop] = TRUE;
-	//		break;
-	//	case _SigInx::_Auto:
-	//		pDoc->BtnStatus.Main.Auto = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pDoc->BtnStatus.Main.Manual = (SockData.nData1 > 0) ? FALSE : pDoc->BtnStatus.Main.Manual;
-	//		break;
-	//	case _SigInx::_Manual:
-	//		pDoc->BtnStatus.Main.Manual = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pDoc->BtnStatus.Main.Auto = (SockData.nData1 > 0) ? FALSE : pDoc->BtnStatus.Main.Auto;
-	//		break;
-	//		// Is
-	//	case _SigInx::_IsReady:
-	//		pDoc->BtnStatus.Main.IsReady = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsRun:
-	//		pDoc->BtnStatus.Main.IsRun = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsReset:
-	//		pDoc->BtnStatus.Main.IsReset = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsStop:
-	//		pDoc->BtnStatus.Main.IsStop = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsAuto:
-	//		pDoc->Status.bAuto = pDoc->BtnStatus.Main.IsAuto = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsManual:
-	//		pDoc->Status.bManual = pDoc->BtnStatus.Main.IsManual = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	}
-	//}
 }
 
 void CEngrave::GetSignalTorqueMotor(SOCKET_DATA SockData)
 {
-	//int nCmdCode = SockData.nCmdCode;
-	//int nMsgId = SockData.nMsgID;
-	//CString sVal;
-
-	//if (nCmdCode == _SetSig)
-	//{
-	//	switch (nMsgId)
-	//	{
-	//	case _SigInx::_MkTq:
-	//		pDoc->BtnStatus.Tq.Mk = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_Stop] = TRUE;
-	//		break;
-	//	case _SigInx::_AoiTq:
-	//		pDoc->BtnStatus.Tq.Aoi = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_AoiTq] = TRUE;
-	//		break;
-	//	case _SigInx::_EngTq:
-	//		pDoc->BtnStatus.Tq.Eng = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_EngTq] = TRUE;
-	//		break;
-	//		// Is
-	//	case _SigInx::_IsMkTq:
-	//		pDoc->BtnStatus.Tq.IsMk = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsAoiTq:
-	//		pDoc->BtnStatus.Tq.IsAoi = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsEngTq:
-	//		pDoc->BtnStatus.Tq.IsEng = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	}
-	//}
 }
 
 void CEngrave::GetSignalInductionMotor(SOCKET_DATA SockData)
 {
-	//int nCmdCode = SockData.nCmdCode;
-	//int nMsgId = SockData.nMsgID;
-	//CString sVal;
-
-	//if (nCmdCode == _SetSig)
-	//{
-	//	switch (nMsgId)
-	//	{
-	//	case _SigInx::_CcwModRe:
-	//		pDoc->BtnStatus.Induct.Rc = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_CcwModRe] = TRUE;
-	//		break;
-	//	case _SigInx::_CcwModUn:
-	//		pDoc->BtnStatus.Induct.Uc = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_CcwModUn] = TRUE;
-	//		break;
-	//		// Is
-	//	case _SigInx::_IsCcwModRe:
-	//		pDoc->BtnStatus.Induct.IsRc = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsCcwModUn:
-	//		pDoc->BtnStatus.Induct.IsUc = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	}
-	//}
 }
 
 void CEngrave::GetSignalCore150mm(SOCKET_DATA SockData)
 {
-	//int nCmdCode = SockData.nCmdCode;
-	//int nMsgId = SockData.nMsgID;
-	//CString sVal;
-
-	//if (nCmdCode == _SetSig)
-	//{
-	//	switch (nMsgId)
-	//	{
-	//	case _SigInx::_Core150Re:
-	//		pDoc->BtnStatus.Core150.Rc = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_Core150Re] = TRUE;
-	//		break;
-	//	case _SigInx::_Core150Un:
-	//		pDoc->BtnStatus.Core150.Uc = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_Core150Un] = TRUE;
-	//		break;
-	//		// Is
-	//	case _SigInx::_IsCore150Re:
-	//		pDoc->BtnStatus.Core150.IsRc = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsCore150Un:
-	//		pDoc->BtnStatus.Core150.IsUc = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	}
-	//}
 }
 
 void CEngrave::GetSignalEtc(SOCKET_DATA SockData)
 {
-	//int nCmdCode = SockData.nCmdCode;
-	//int nMsgId = SockData.nMsgID;
-	//CString sVal;
-
-	//if (nCmdCode == _SetSig)
-	//{
-	//	switch (nMsgId)
-	//	{
-	//	case _SigInx::_EmgAoi:
-	//		pDoc->BtnStatus.Etc.EmgAoi = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//		// Is
-	//	case _SigInx::_IsEmgAoi:
-	//		pDoc->BtnStatus.Etc.IsEmgAoi = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	}
-	//}
 }
 
 void CEngrave::GetSignalRecoiler(SOCKET_DATA SockData)
 {
-	//int nCmdCode = SockData.nCmdCode;
-	//int nMsgId = SockData.nMsgID;
-	//CString sVal;
-
-	//if (nCmdCode == _SetSig)
-	//{
-	//	switch (nMsgId)
-	//	{
-	//	case _SigInx::_Relation:
-	//		break;
-	//	case _SigInx::_MvCwRe:
-	//		pDoc->BtnStatus.Rc.FdCw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_MvCwRe] = TRUE;
-	//		//if (pView && pView->m_pDlgMenu03)
-	//		//	pView->m_pDlgMenu03->SwMpeBtn(IDC_CHK_5, 1);	// 리코일러 제품휠 정회전 스위치
-	//		break;
-	//	case _SigInx::_MvCcwRe:
-	//		pDoc->BtnStatus.Rc.FdCcw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_MvCcwRe] = TRUE;
-	//		//if (pView && pView->m_pDlgMenu03)
-	//		//	pView->m_pDlgMenu03->SwMpeBtn(IDC_CHK_6, 1);	// 리코일러 제품휠 역회전 스위치
-	//		break;
-	//	case _SigInx::_PrdChuckRe:
-	//		pDoc->BtnStatus.Rc.ReelChuck = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_PrdChuckRe] = TRUE;
-	//		//if (pView && pView->m_pDlgMenu03)
-	//		//	pView->m_pDlgMenu03->SwMpeBtn(IDC_CHK_41, 1);	// 리코일러 제품척 클램프 스위치
-	//		break;
-	//	case _SigInx::_DancerUpRe:
-	//		pDoc->BtnStatus.Rc.DcRlUpDn = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_DancerUpRe] = TRUE;
-	//		//if (pView && pView->m_pDlgMenu03)
-	//		//	pView->m_pDlgMenu03->SwMpeBtn(IDC_CHK_42, 1);	// 리코일러 댄서롤 상승/하강 스위치
-	//		break;
-	//	case _SigInx::_PasteUpLfRe:
-	//		pDoc->BtnStatus.Rc.ReelJoinL = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_PasteUpLfRe] = TRUE;
-	//		//if (pView && pView->m_pDlgMenu03)
-	//		//	pView->m_pDlgMenu03->SwMpeBtn(IDC_CHK_43, 1);	// 리코일러 제품 이음매(상/좌) 스위치
-	//		break;
-	//	case _SigInx::_PasteUpRtRe:
-	//		pDoc->BtnStatus.Rc.ReelJoinR = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_PasteUpRtRe] = TRUE;
-	//		//if (pView && pView->m_pDlgMenu03)
-	//		//	pView->m_pDlgMenu03->SwMpeBtn(IDC_CHK_7, 1);	// 리코일러 제품 이음매(하/우) 스위치
-	//		break;
-	//	case _SigInx::_PasteVacRe:
-	//		pDoc->BtnStatus.Rc.ReelJoinVac = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_PasteVacRe] = TRUE;
-	//		//if (pView && pView->m_pDlgMenu03)
-	//		//	pView->m_pDlgMenu03->SwMpeBtn(IDC_CHK_8, 1);	// 리코일러 제품 이음매 진공 스위치
-	//		break;
-	//	case _SigInx::_PprChuckRe:
-	//		pDoc->BtnStatus.Rc.PprChuck = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_PprChuckRe] = TRUE;
-	//		//if (pView && pView->m_pDlgMenu03)
-	//		//	pView->m_pDlgMenu03->SwMpeBtn(IDC_CHK_44, 1);	// 리코일러 간지척 클램프 스위치
-	//		break;
-	//	case _SigInx::_PprCwRe:
-	//		pDoc->BtnStatus.Rc.PprCw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_PprCwRe] = TRUE;
-	//		//if (pView && pView->m_pDlgMenu03)
-	//		//	pView->m_pDlgMenu03->SwMpeBtn(IDC_CHK_45, 1);	// 리코일러 간지휠 정회전 스위치
-	//		break;
-	//	case _SigInx::_PprCcwRe:
-	//		pDoc->BtnStatus.Rc.PprCcw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_PprCcwRe] = TRUE;
-	//		//if (pView && pView->m_pDlgMenu03)
-	//		//	pView->m_pDlgMenu03->SwMpeBtn(IDC_CHK_46, 1);	// 리코일러 간지휠 역회전 스위치
-	//		break;
-	//	case _SigInx::_DoRe:
-	//		pDoc->BtnStatus.Rc.Rewine = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_DoRe] = TRUE;
-	//		//if (pView && pView->m_pDlgMenu03)
-	//		//	pView->m_pDlgMenu03->SwMpeBtn(IDC_CHK_66, 1);	// 리코일러 Rewinder 동작 스위치
-	//		break;
-	//	case _SigInx::_PrdPprRe:
-	//		pDoc->BtnStatus.Rc.RewineReelPpr = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_PrdPprRe] = TRUE;
-	//		//if (pView && pView->m_pDlgMenu03)
-	//		//	pView->m_pDlgMenu03->SwMpeBtn(IDC_CHK_67, 1);	// 리코일러 Rewinder 제품 & 간지 스위치
-	//		break;
-	//		// Is
-	//	case _SigInx::_IsRelation:
-	//		pDoc->BtnStatus.Rc.IsRelation = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsMvCwRe:
-	//		pDoc->BtnStatus.Rc.IsFdCw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsMvCcwRe:
-	//		pDoc->BtnStatus.Rc.IsFdCcw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsPrdChuckRe:
-	//		pDoc->BtnStatus.Rc.IsReelChuck = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsDancerUpRe:
-	//		pDoc->BtnStatus.Rc.IsDcRlUpDn = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsPasteUpLfRe:
-	//		pDoc->BtnStatus.Rc.ReelJoinL = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsPasteUpRtRe:
-	//		pDoc->BtnStatus.Rc.IsReelJoinR = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsPasteVacRe:
-	//		pDoc->BtnStatus.Rc.IsReelJoinVac = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsPprChuckRe:
-	//		pDoc->BtnStatus.Rc.IsPprChuck = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsPprCwRe:
-	//		pDoc->BtnStatus.Rc.IsPprCw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsPprCcwRe:
-	//		pDoc->BtnStatus.Rc.IsPprCcw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsDoRe:
-	//		pDoc->BtnStatus.Rc.IsRewine = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsPrdPprRe:
-	//		pDoc->BtnStatus.Rc.IsRewineReelPpr = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	}
-	//}
 }
 
 void CEngrave::GetSignalPunch(SOCKET_DATA SockData)
 {
-	//int nCmdCode = SockData.nCmdCode;
-	//int nMsgId = SockData.nMsgID;
-	//CString sVal;
-
-	//if (nCmdCode == _SetSig)
-	//{
-	//	switch (nMsgId)
-	//	{
-	//	case _SigInx::_Relation:
-	//		pDoc->BtnStatus.Rc.Relation = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pDoc->BtnStatus.Mk.Relation = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pDoc->BtnStatus.AoiDn.Relation = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pDoc->BtnStatus.AoiUp.Relation = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pDoc->BtnStatus.Eng.Relation = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pDoc->BtnStatus.Uc.Relation = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_Relation] = TRUE;
-	//		break;
-	//	case _SigInx::_MvCwMk:
-	//		pDoc->BtnStatus.Mk.FdCw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_MvCwMk] = TRUE;
-	//		break;
-	//	case _SigInx::_MvCcwMk:
-	//		pDoc->BtnStatus.Mk.FdCcw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_MvCcwMk] = TRUE;
-	//		break;
-	//	case _SigInx::_FdVacMk:
-	//		pDoc->BtnStatus.Mk.FdVac = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_FdVacMk] = TRUE;
-	//		break;
-	//	case _SigInx::_PushUpMk:
-	//		pDoc->BtnStatus.Mk.PushUp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_PushUpMk] = TRUE;
-	//		break;
-	//	case _SigInx::_TblBlwMk:
-	//		pDoc->BtnStatus.Mk.TblBlw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_TblBlwMk] = TRUE;
-	//		break;
-	//	case _SigInx::_TblVacMk:
-	//		pDoc->BtnStatus.Mk.TblVac = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_TblVacMk] = TRUE;
-	//		break;
-	//	case _SigInx::_FdClampMk:
-	//		pDoc->BtnStatus.Mk.FdClp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_FdClampMk] = TRUE;
-	//		break;
-	//	case _SigInx::_TensClampMk:
-	//		pDoc->BtnStatus.Mk.TqClp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_TensClampMk] = TRUE;
-	//		break;
-	//	case _SigInx::_OnePnlMk:
-	//		//pDoc->BtnStatus.Mk.MvOne = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		//pView->m_bRcvSig[_SigInx::_OnePnlMk] = TRUE;
-	//		break;
-	//	case _SigInx::_DancerUpMk:
-	//		pDoc->BtnStatus.Mk.DcRSol = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_DancerUpMk] = TRUE;
-	//		break;
-	//		// Is
-	//	case _SigInx::_IsRelation:
-	//		pDoc->BtnStatus.Mk.IsRelation = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsMvCwMk:
-	//		pDoc->BtnStatus.Mk.IsFdCw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsMvCcwMk:
-	//		pDoc->BtnStatus.Mk.IsFdCcw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsFdVacMk:
-	//		pDoc->BtnStatus.Mk.IsFdVac = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsPushUpMk:
-	//		pDoc->BtnStatus.Mk.IsPushUp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsTblBlwMk:
-	//		pDoc->BtnStatus.Mk.IsTblBlw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsTblVacMk:
-	//		pDoc->BtnStatus.Mk.IsTblVac = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsFdClampMk:
-	//		pDoc->BtnStatus.Mk.IsFdClp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsTensClampMk:
-	//		pDoc->BtnStatus.Mk.IsTqClp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsOnePnlMk:
-	//		pDoc->BtnStatus.Mk.IsMvOne = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsDancerUpMk:
-	//		pDoc->BtnStatus.Mk.IsDcRSol = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	}
-	//}
 }
 
 void CEngrave::GetSignalAOIDn(SOCKET_DATA SockData)
 {
-	//int nCmdCode = SockData.nCmdCode;
-	//int nMsgId = SockData.nMsgID;
-	//CString sVal;
-
-	//if (nCmdCode == _SetSig)
-	//{
-	//	switch (nMsgId)
-	//	{
-	//	case _SigInx::_Relation:
-	//		break;
-	//	case _SigInx::_MvCwAoiDn:
-	//		pDoc->BtnStatus.AoiDn.FdCw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_MvCwAoiDn] = TRUE;
-	//		break;
-	//	case _SigInx::_MvCcwAoiDn:
-	//		pDoc->BtnStatus.AoiDn.FdCcw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_MvCcwAoiDn] = TRUE;
-	//		break;
-	//	case _SigInx::_FdVacAoiDn:
-	//		pDoc->BtnStatus.AoiDn.FdVac = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_FdVacAoiDn] = TRUE;
-	//		break;
-	//	case _SigInx::_PushUpAoiDn:
-	//		pDoc->BtnStatus.AoiDn.PushUp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_PushUpAoiDn] = TRUE;
-	//		break;
-	//	case _SigInx::_TblBlwAoiDn:
-	//		pDoc->BtnStatus.AoiDn.TblBlw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_TblBlwAoiDn] = TRUE;
-	//		break;
-	//	case _SigInx::_TblVacAoiDn:
-	//		pDoc->BtnStatus.AoiDn.TblVac = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_TblVacAoiDn] = TRUE;
-	//		break;
-	//	case _SigInx::_FdClampAoiDn:
-	//		pDoc->BtnStatus.AoiDn.FdClp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_FdClampAoiDn] = TRUE;
-	//		break;
-	//	case _SigInx::_TensClampAoiDn:
-	//		pDoc->BtnStatus.AoiDn.TqClp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_TensClampAoiDn] = TRUE;
-	//		break;
-	//	case _SigInx::_OnePnlAoiDn:
-	//		pDoc->BtnStatus.AoiDn.MvOne = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_OnePnlAoiDn] = TRUE;
-	//		break;
-	//	case _SigInx::_ClrRollAoiDn:
-	//		pDoc->BtnStatus.AoiDn.ClrRoll = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_VelClrSonicAoiDn:
-	//		pDoc->BtnStatus.AoiDn.VelSonicBlw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_VelClrSonicAoiDn] = TRUE;
-	//		break;
-	//	case _SigInx::_TestAoiDn:
-	//		pDoc->BtnStatus.AoiDn.Test = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_ResetAoiDn:
-	//		pDoc->BtnStatus.AoiDn.Reset = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_LotEndAoiDn:
-	//		pDoc->BtnStatus.AoiDn.LotEnd = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//		// Is
-	//	case _SigInx::_IsRelation:
-	//		pDoc->BtnStatus.AoiDn.IsRelation = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsMvCwAoiDn:
-	//		pDoc->BtnStatus.AoiDn.IsFdCw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsMvCcwAoiDn:
-	//		pDoc->BtnStatus.AoiDn.IsFdCcw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsFdVacAoiDn:
-	//		pDoc->BtnStatus.AoiDn.IsFdVac = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsPushUpAoiDn:
-	//		pDoc->BtnStatus.AoiDn.IsPushUp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsTblBlwAoiDn:
-	//		pDoc->BtnStatus.AoiDn.IsTblBlw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsTblVacAoiDn:
-	//		pDoc->BtnStatus.AoiDn.IsTblVac = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsFdClampAoiDn:
-	//		pDoc->BtnStatus.AoiDn.IsFdClp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsTensClampAoiDn:
-	//		pDoc->BtnStatus.AoiDn.IsTqClp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsOnePnlAoiDn:
-	//		pDoc->BtnStatus.AoiDn.IsMvOne = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsClrRollAoiDn:
-	//		pDoc->BtnStatus.AoiDn.IsClrRoll = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsVelClrSonicAoiDn:
-	//		pDoc->BtnStatus.AoiDn.IsVelSonicBlw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsTestAoiDn:
-	//		pDoc->BtnStatus.AoiDn.IsTest = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsResetAoiDn:
-	//		pDoc->BtnStatus.AoiDn.IsReset = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsLotEndAoiDn:
-	//		pDoc->BtnStatus.AoiDn.IsLotEnd = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	}
-	//}
 }
 
 void CEngrave::GetSignalAOIUp(SOCKET_DATA SockData)
 {
-	//int nCmdCode = SockData.nCmdCode;
-	//int nMsgId = SockData.nMsgID;
-	//CString sVal;
-
-	//if (nCmdCode == _SetSig)
-	//{
-	//	switch (nMsgId)
-	//	{
-	//	case _SigInx::_Relation:
-	//		break;
-	//	case _SigInx::_MvCwAoiUp:
-	//		pDoc->BtnStatus.AoiUp.FdCw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_MvCcwAoiUp:
-	//		pDoc->BtnStatus.AoiUp.FdCcw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_FdVacAoiUp:
-	//		pDoc->BtnStatus.AoiUp.FdVac = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_PushUpAoiUp:
-	//		pDoc->BtnStatus.AoiUp.PushUp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_TblBlwAoiUp:
-	//		pDoc->BtnStatus.AoiUp.TblBlw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_TblVacAoiUp:
-	//		pDoc->BtnStatus.AoiUp.TblVac = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_FdClampAoiUp:
-	//		pDoc->BtnStatus.AoiUp.FdClp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_TensClampAoiUp:
-	//		pDoc->BtnStatus.AoiUp.TqClp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_OnePnlAoiUp:
-	//		pDoc->BtnStatus.AoiUp.MvOne = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_OnePnlAoiUp] = TRUE;
-	//		break;
-	//	case _SigInx::_ClrRollAoiUp:
-	//		pDoc->BtnStatus.AoiUp.ClrRoll = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_TestAoiUp:
-	//		pDoc->BtnStatus.AoiUp.Test = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_ResetAoiUp:
-	//		pDoc->BtnStatus.AoiUp.Reset = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_LotEndAoiUp:
-	//		pDoc->BtnStatus.AoiUp.LotEnd = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//		// Is
-	//	case _SigInx::_IsRelation:
-	//		pDoc->BtnStatus.AoiUp.IsRelation = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsMvCwAoiUp:
-	//		pDoc->BtnStatus.AoiUp.IsFdCw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsMvCcwAoiUp:
-	//		pDoc->BtnStatus.AoiUp.IsFdCcw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsFdVacAoiUp:
-	//		pDoc->BtnStatus.AoiUp.IsFdVac = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsPushUpAoiUp:
-	//		pDoc->BtnStatus.AoiUp.IsPushUp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsTblBlwAoiUp:
-	//		pDoc->BtnStatus.AoiUp.IsTblBlw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsTblVacAoiUp:
-	//		pDoc->BtnStatus.AoiUp.IsTblVac = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsFdClampAoiUp:
-	//		pDoc->BtnStatus.AoiUp.IsFdClp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsTensClampAoiUp:
-	//		pDoc->BtnStatus.AoiUp.IsTqClp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsOnePnlAoiUp:
-	//		pDoc->BtnStatus.AoiUp.IsMvOne = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsClrRollAoiUp:
-	//		pDoc->BtnStatus.AoiUp.IsClrRoll = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsTestAoiUp:
-	//		pDoc->BtnStatus.AoiUp.IsTest = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsResetAoiUp:
-	//		pDoc->BtnStatus.AoiUp.IsReset = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsLotEndAoiUp:
-	//		pDoc->BtnStatus.AoiUp.IsLotEnd = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	}
-	//}
 }
 
 void CEngrave::GetSignalEngrave(SOCKET_DATA SockData)
 {
-	//int nCmdCode = SockData.nCmdCode;
-	//int nMsgId = SockData.nMsgID;
-	//CString sVal;
-
-	//if (nCmdCode == _SetSig)
-	//{
-	//	switch (nMsgId)
-	//	{
-	//	case _SigInx::_Relation:
-	//		break;
-	//	case _SigInx::_MvCwEng:
-	//		pDoc->BtnStatus.Eng.FdCw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_MvCcwEng:
-	//		pDoc->BtnStatus.Eng.FdCcw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_FdVacEng:
-	//		pDoc->BtnStatus.Eng.FdVac = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_PushUpEng:
-	//		pDoc->BtnStatus.Eng.PushUp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _TblBlwEng:
-	//		pDoc->BtnStatus.Eng.TblBlw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_TblVacEng:
-	//		pDoc->BtnStatus.Eng.TblVac = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_FdClampEng:
-	//		pDoc->BtnStatus.Eng.FdClp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_TensClampEng:
-	//		pDoc->BtnStatus.Eng.TqClp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_OnePnlEng:
-	//		pDoc->BtnStatus.Eng.MvOne = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_OnePnlEng] = TRUE;
-	//		break;
-	//	case _SigInx::_DancerUpEng:
-	//		pDoc->BtnStatus.Eng.DcRSol = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_VelClrSonicEng:
-	//		pDoc->BtnStatus.Eng.VelSonicBlw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		pView->m_bRcvSig[_SigInx::_VelClrSonicEng] = TRUE;
-	//		break;
-	//		// Is
-	//	case _SigInx::_IsRelation:
-	//		pDoc->BtnStatus.Eng.IsRelation = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsMvCwEng:
-	//		pDoc->BtnStatus.Eng.IsFdCw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsMvCcwEng:
-	//		pDoc->BtnStatus.Eng.IsFdCcw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsFdVacEng:
-	//		pDoc->BtnStatus.Eng.IsFdVac = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsPushUpEng:
-	//		pDoc->BtnStatus.Eng.IsPushUp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _IsTblBlwEng:
-	//		pDoc->BtnStatus.Eng.IsTblBlw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsTblVacEng:
-	//		pDoc->BtnStatus.Eng.IsTblVac = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsFdClampEng:
-	//		pDoc->BtnStatus.Eng.IsFdClp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsTensClampEng:
-	//		pDoc->BtnStatus.Eng.IsTqClp = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsOnePnlEng:
-	//		pDoc->BtnStatus.Eng.IsMvOne = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsDancerUpEng:
-	//		pDoc->BtnStatus.Eng.IsDcRSol = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsVelClrSonicEng:
-	//		pDoc->BtnStatus.Eng.IsVelSonicBlw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	}
-	//}
 }
 
 void CEngrave::GetSignalUncoiler(SOCKET_DATA SockData)
 {
-	//int nCmdCode = SockData.nCmdCode;
-	//int nMsgId = SockData.nMsgID;
-	//CString sVal;
-
-	//if (nCmdCode == _SetSig)
-	//{
-	//	switch (nMsgId)
-	//	{
-	//	case _SigInx::_Relation:
-	//		break;
-	//	case _SigInx::_MvCwUn:
-	//		pDoc->BtnStatus.Uc.FdCw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_MvCcwUn:
-	//		pDoc->BtnStatus.Uc.FdCcw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_PrdChuckUn:
-	//		pDoc->BtnStatus.Uc.ReelChuck = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_DancerUpUn:
-	//		pDoc->BtnStatus.Uc.DcRlUpDn = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_PasteUpLfUn:
-	//		pDoc->BtnStatus.Uc.ReelJoinL = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_PasteUpRtUn:
-	//		pDoc->BtnStatus.Uc.ReelJoinR = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_PasteVacUn:
-	//		pDoc->BtnStatus.Uc.ReelJoinVac = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_PprChuckUn:
-	//		pDoc->BtnStatus.Uc.PprChuck = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_PprCwUn:
-	//		pDoc->BtnStatus.Uc.PprCw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_PprCcwUn:
-	//		pDoc->BtnStatus.Uc.PprCcw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_ClrRollUpUn:
-	//		pDoc->BtnStatus.Uc.ClRlUpDn = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_ClrRollPushUn:
-	//		pDoc->BtnStatus.Uc.ClRlPshUpDn = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//		// Is
-	//	case _SigInx::_IsRelation:
-	//		pDoc->BtnStatus.Uc.IsRelation = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsMvCwUn:
-	//		pDoc->BtnStatus.Uc.IsFdCw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsMvCcwUn:
-	//		pDoc->BtnStatus.Uc.IsFdCcw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsPrdChuckUn:
-	//		pDoc->BtnStatus.Uc.IsReelChuck = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsDancerUpUn:
-	//		pDoc->BtnStatus.Uc.IsDcRlUpDn = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsPasteUpLfUn:
-	//		pDoc->BtnStatus.Uc.IsReelJoinL = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsPasteUpRtUn:
-	//		pDoc->BtnStatus.Uc.IsReelJoinR = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsPasteVacUn:
-	//		pDoc->BtnStatus.Uc.IsReelJoinVac = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsPprChuckUn:
-	//		pDoc->BtnStatus.Uc.IsPprChuck = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsPprCwUn:
-	//		pDoc->BtnStatus.Uc.IsPprCw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsPprCcwUn:
-	//		pDoc->BtnStatus.Uc.IsPprCcw = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsClrRollUpUn:
-	//		pDoc->BtnStatus.Uc.IsClRlUpDn = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	case _SigInx::_IsClrRollPushUn:
-	//		pDoc->BtnStatus.Uc.IsClRlPshUpDn = (SockData.nData1 > 0) ? TRUE : FALSE;
-	//		break;
-	//	}
-	//}
 }
 
 void CEngrave::GetSignalEngraveAutoSequence(SOCKET_DATA SockData)
@@ -1344,53 +527,83 @@ void CEngrave::GetSignalEngraveAutoSequence(SOCKET_DATA SockData)
 		switch (nMsgId)
 		{
 		case _SigInx::_EngAutoInit:
-			pDoc->BtnStatus.EngAuto.Init = (SockData.nData1 > 0) ? TRUE : FALSE;
-			pView->m_bRcvSig[_SigInx::_EngAutoInit] = TRUE;
+			//pDoc->BtnStatus.EngAuto.Init = (SockData.nData1 > 0) ? TRUE : FALSE;
+			pDoc->BtnStatus.EngAuto.Init = pDoc->GetCurrentInfoSignal(_SigInx::_EngAutoInit);
+			m_bRcvSig[_SigInx::_EngAutoInit] = TRUE;
 			break;
 		case _SigInx::_EngAutoSeqMkSt:
-			pDoc->BtnStatus.EngAuto.MkSt = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//pDoc->BtnStatus.EngAuto.MkSt = (SockData.nData1 > 0) ? TRUE : FALSE;
+			pDoc->BtnStatus.EngAuto.MkSt = pDoc->GetCurrentInfoSignal(_SigInx::_EngAutoSeqMkSt);
+			m_bRcvSig[_SigInx::_EngAutoSeqMkSt] = TRUE;
 			break;
 		case _SigInx::_EngAutoSeqOnMkIng:
-			pDoc->BtnStatus.EngAuto.OnMking = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//pDoc->BtnStatus.EngAuto.OnMking = (SockData.nData1 > 0) ? TRUE : FALSE;
+			pDoc->BtnStatus.EngAuto.MkSt = pDoc->GetCurrentInfoSignal(_SigInx::_EngAutoSeqOnMkIng);
+			m_bRcvSig[_SigInx::_EngAutoSeqOnMkIng] = TRUE;
 			break;
 		case _SigInx::_EngAutoSeqMkDone:
-			pDoc->BtnStatus.EngAuto.MkDone = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//pDoc->BtnStatus.EngAuto.MkDone = (SockData.nData1 > 0) ? TRUE : FALSE;
+			pDoc->BtnStatus.EngAuto.MkDone = pDoc->GetCurrentInfoSignal(_SigInx::_EngAutoSeqMkDone);
+			m_bRcvSig[_SigInx::_EngAutoSeqMkDone] = TRUE;
 			break;
 		case _SigInx::_EngAutoSeq2dReadSt:
-			pDoc->BtnStatus.EngAuto.Read2dSt = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//pDoc->BtnStatus.EngAuto.Read2dSt = (SockData.nData1 > 0) ? TRUE : FALSE;
+			pDoc->BtnStatus.EngAuto.Read2dSt = pDoc->GetCurrentInfoSignal(_SigInx::_EngAutoSeq2dReadSt);
+			m_bRcvSig[_SigInx::_EngAutoSeq2dReadSt] = TRUE;
 			break;
 		case _SigInx::_EngAutoSeqOnReading2d:
-			pDoc->BtnStatus.EngAuto.OnRead2d = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//pDoc->BtnStatus.EngAuto.OnRead2d = (SockData.nData1 > 0) ? TRUE : FALSE;
+			pDoc->BtnStatus.EngAuto.OnRead2d = pDoc->GetCurrentInfoSignal(_SigInx::_EngAutoSeqOnReading2d);
+			m_bRcvSig[_SigInx::_EngAutoSeqOnReading2d] = TRUE;
 			break;
 		case _SigInx::_EngAutoSeq2dReadDone:
-			pDoc->BtnStatus.EngAuto.Read2dDone = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//pDoc->BtnStatus.EngAuto.Read2dDone = (SockData.nData1 > 0) ? TRUE : FALSE;
+			pDoc->BtnStatus.EngAuto.Read2dDone = pDoc->GetCurrentInfoSignal(_SigInx::_EngAutoSeq2dReadDone);
+			m_bRcvSig[_SigInx::_EngAutoSeq2dReadDone] = TRUE;
+			break;
+		case _SigInx::_MyMsg:
+			pDoc->m_sEngAlarm = CharToString(SockData.strData);
+			m_bRcvSig[_SigInx::_MyMsg] = TRUE;
 			break;
 			// Is
 		case _SigInx::_IsEngAutoInit:
-			pDoc->BtnStatus.EngAuto.IsInit = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//pDoc->BtnStatus.EngAuto.IsInit = (SockData.nData1 > 0) ? TRUE : FALSE;
+			pDoc->BtnStatus.EngAuto.IsInit = pDoc->GetCurrentInfoSignal(_SigInx::_IsEngAutoInit);
+			m_bRcvSig[_SigInx::_IsEngAutoInit] = TRUE;
 			break;
 		case _SigInx::_IsEngAutoSeqMkSt:
-			pDoc->BtnStatus.EngAuto.IsMkSt = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//pDoc->BtnStatus.EngAuto.IsMkSt = (SockData.nData1 > 0) ? TRUE : FALSE;
+			pDoc->BtnStatus.EngAuto.IsMkSt = pDoc->GetCurrentInfoSignal(_SigInx::_IsEngAutoSeqMkSt);
+			m_bRcvSig[_SigInx::_IsEngAutoSeqMkSt] = TRUE;
 			break;
 		case _SigInx::_IsEngAutoSeqOnMkIng:
-			pDoc->BtnStatus.EngAuto.IsOnMking = (SockData.nData1 > 0) ? TRUE : FALSE; pDoc->SetStatus(_T("Engrave"), _T("IsOnMking"), pDoc->BtnStatus.EngAuto.IsOnMking);
+			//pDoc->BtnStatus.EngAuto.IsOnMking = (SockData.nData1 > 0) ? TRUE : FALSE; pDoc->SetStatus(_T("Engrave"), _T("IsOnMking"), pDoc->BtnStatus.EngAuto.IsOnMking);
+			pDoc->BtnStatus.EngAuto.IsOnMking = pDoc->GetCurrentInfoSignal(_SigInx::_IsEngAutoSeqOnMkIng);
+			m_bRcvSig[_SigInx::_IsEngAutoSeqOnMkIng] = TRUE;
 			break;
 		case _SigInx::_IsEngAutoSeqMkDone:
-			pDoc->BtnStatus.EngAuto.IsMkDone = (SockData.nData1 > 0) ? TRUE : FALSE; pDoc->SetStatus(_T("Engrave"), _T("IsMkDone"), pDoc->BtnStatus.EngAuto.IsMkDone);
+			//pDoc->BtnStatus.EngAuto.IsMkDone = (SockData.nData1 > 0) ? TRUE : FALSE; pDoc->SetStatus(_T("Engrave"), _T("IsMkDone"), pDoc->BtnStatus.EngAuto.IsMkDone);
+			pDoc->BtnStatus.EngAuto.IsMkDone = pDoc->GetCurrentInfoSignal(_SigInx::_IsEngAutoSeqMkDone);
+			m_bRcvSig[_SigInx::_IsEngAutoSeqMkDone] = TRUE;
 			break;
 		case _SigInx::_IsEngAutoSeq2dReadSt:
-			pDoc->BtnStatus.EngAuto.IsRead2dSt = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//pDoc->BtnStatus.EngAuto.IsRead2dSt = (SockData.nData1 > 0) ? TRUE : FALSE;
+			pDoc->BtnStatus.EngAuto.IsRead2dSt = pDoc->GetCurrentInfoSignal(_SigInx::_IsEngAutoSeq2dReadSt);
+			m_bRcvSig[_SigInx::_IsEngAutoSeq2dReadSt] = TRUE;
 			break;
 		case _SigInx::_IsEngAutoSeqOnReading2d:
-			pDoc->BtnStatus.EngAuto.IsOnRead2d = (SockData.nData1 > 0) ? TRUE : FALSE; pDoc->SetStatus(_T("Engrave"), _T("IsOnRead2d"), pDoc->BtnStatus.EngAuto.IsOnRead2d);
+			//pDoc->BtnStatus.EngAuto.IsOnRead2d = (SockData.nData1 > 0) ? TRUE : FALSE; pDoc->SetStatus(_T("Engrave"), _T("IsOnRead2d"), pDoc->BtnStatus.EngAuto.IsOnRead2d);
+			pDoc->BtnStatus.EngAuto.IsOnRead2d = pDoc->GetCurrentInfoSignal(_SigInx::_IsEngAutoSeqOnReading2d);
+			m_bRcvSig[_SigInx::_IsEngAutoSeqOnReading2d] = TRUE;
 			break;
 		case _SigInx::_IsEngAutoSeq2dReadDone:
-			pDoc->BtnStatus.EngAuto.IsRead2dDone = (SockData.nData1 > 0) ? TRUE : FALSE; pDoc->SetStatus(_T("Engrave"), _T("IsRead2dDone"), pDoc->BtnStatus.EngAuto.IsRead2dDone);
+			//pDoc->BtnStatus.EngAuto.IsRead2dDone = (SockData.nData1 > 0) ? TRUE : FALSE; pDoc->SetStatus(_T("Engrave"), _T("IsRead2dDone"), pDoc->BtnStatus.EngAuto.IsRead2dDone);
+			pDoc->BtnStatus.EngAuto.IsRead2dDone = pDoc->GetCurrentInfoSignal(_SigInx::_IsEngAutoSeq2dReadDone);
+			m_bRcvSig[_SigInx::_IsEngAutoSeq2dReadDone] = TRUE;
 			break;
 		}
 	}
 }
-
 
 void CEngrave::GetSignalMyMsg(SOCKET_DATA SockData)
 {
@@ -1403,26 +616,72 @@ void CEngrave::GetSignalMyMsg(SOCKET_DATA SockData)
 		switch (nMsgId)
 		{
 		case _SigInx::_MyMsgYes:
-			pView->m_bRcvSig[_SigInx::_MyMsgYes] = TRUE;
+			pDoc->SetCurrentInfoSignal(_SigInx::_MyMsgYes, FALSE);
+			//m_bRcvSig[_SigInx::_MyMsgYes] = TRUE;
 			//pView->SetMyMsgYes();
+			//Sleep(500);
 			break;
 		case _SigInx::_MyMsgNo:
-			pView->m_bRcvSig[_SigInx::_MyMsgNo] = TRUE;
+			pDoc->SetCurrentInfoSignal(_SigInx::_MyMsgNo, FALSE);
+			//m_bRcvSig[_SigInx::_MyMsgNo] = TRUE;
 			//pView->SetMyMsgNo();
+			//Sleep(500);
 			break;
 		case _SigInx::_MyMsgOk:
-			pView->m_bRcvSig[_SigInx::_MyMsgOk] = TRUE;
+			pDoc->SetCurrentInfoSignal(_SigInx::_MyMsgOk, FALSE);
+			//m_bRcvSig[_SigInx::_MyMsgOk] = TRUE;
 			//pView->SetMyMsgOk();
+			//Sleep(500);
+			break;
+		case _SigInx::_ErrorRead2dCode:
+			pView->ErrorRead2dCode(SockData.nData1); // 각인부에서 메시지처리 후 들어오는 곳
 			break;
 			// Is
 		case _SigInx::_IsMyMsgYes:
 			pDoc->BtnStatus.Msg.IsYes = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//m_bRcvSig[_SigInx::_IsMyMsgYes] = TRUE;
 			break;
 		case _SigInx::_IsMyMsgNo:
 			pDoc->BtnStatus.Msg.IsNo = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//m_bRcvSig[_SigInx::_IsMyMsgNo] = TRUE;
 			break;
 		case _SigInx::_IsMyMsgOk:
 			pDoc->BtnStatus.Msg.IsOk = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//m_bRcvSig[_SigInx::_IsMyMsgOk] = TRUE;
+			break;
+		}
+	}
+}
+
+void CEngrave::GetCurrentInfoSignal(SOCKET_DATA SockData)
+{
+	int nCmdCode = SockData.nCmdCode;
+	int nMsgId = SockData.nMsgID;
+	CString sVal;
+
+	if (nCmdCode == _SetSig)
+	{
+		switch (nMsgId)
+		{
+		case _SigInx::_GetCurrentInfoSignal:
+			pDoc->BtnStatus.EngAuto.GetCurrentInfoSignal = (SockData.nData1 > 0) ? TRUE : FALSE;
+			m_bRcvSig[SockData.nData1] = TRUE;
+			//m_bRcvSig[_SigInx::_GetCurrentInfoSignal] = TRUE;
+			break;
+		case _SigInx::_GetMonDispMainSignal:
+			pDoc->BtnStatus.EngAuto.GetMonDispMainSignal = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//m_bRcvSig[_SigInx::_GetMonDispMainSignal] = TRUE;
+			break;
+			// Is
+		case _SigInx::_IsGetCurrentInfoSignal:
+			pDoc->BtnStatus.EngAuto.IsGetCurrentInfoSignal = (SockData.nData1 > 0) ? TRUE : FALSE;
+			pView->m_bTIM_CHK_RCV_CURR_INFO_SIG = FALSE;
+			//m_bRcvSig[_SigInx::_IsGetCurrentInfoSignal] = TRUE;
+			break;
+		case _SigInx::_IsGetMonDispMainSignal:
+			pDoc->BtnStatus.EngAuto.IsGetMonDispMainSignal = (SockData.nData1 > 0) ? TRUE : FALSE;
+			pView->m_bTIM_CHK_RCV_MON_DISP_MAIN_SIG = FALSE;
+			//m_bRcvSig[_SigInx::_IsGetMonDispMainSignal] = TRUE;
 			break;
 		}
 	}
@@ -1466,63 +725,74 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 			if (pDoc->WorkingInfo.LastJob.bDualTest != (SockData.nData1 > 0) ? TRUE : FALSE)
 			{
 				m_bGetOpInfo = TRUE;
-				pDoc->WorkingInfo.LastJob.bDualTest = (SockData.nData1 > 0) ? TRUE : FALSE;
-				pView->m_bRcvSig[_SigInx::_DualTest] = TRUE;
+				pDoc->SetDualTest();
+				//pDoc->WorkingInfo.LastJob.bDualTest = (SockData.nData1 > 0) ? TRUE : FALSE;
+				//m_bRcvSig[_SigInx::_DualTest] = TRUE;
 			}
 			break;
 		case _SigInx::_SampleTest:
-			if (pDoc->WorkingInfo.LastJob.bSampleTest != (SockData.nData1 > 0) ? TRUE : FALSE)
-			{
-				m_bGetOpInfo = TRUE;
-				pDoc->WorkingInfo.LastJob.bSampleTest = (SockData.nData1 > 0) ? TRUE : FALSE;
-				pView->m_bRcvSig[_SigInx::_SampleTest] = TRUE;
-			}
+			//if (pDoc->WorkingInfo.LastJob.bSampleTest != (SockData.nData1 > 0) ? TRUE : FALSE)
+			//{
+			//	m_bGetOpInfo = TRUE;
+			//	pDoc->WorkingInfo.LastJob.bSampleTest = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//	//m_bRcvSig[_SigInx::_SampleTest] = TRUE;
+			//}
 			break;
-		case _SigInx::_TestMode:
-			if(pDoc->GetTestMode() != (int)SockData.nData1) // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2
-			{
-				m_bGetOpInfo = TRUE;
-				pDoc->WorkingInfo.LastJob.nTestMode = (int)SockData.nData1; // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2
-				pView->m_bRcvSig[_SigInx::_TestMode] = TRUE;
-			}
-			break;
+		//case _SigInx::_TestMode:
+		//	if(pDoc->GetTestMode() != (int)SockData.nData1) // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2
+		//	{
+		//		m_bGetOpInfo = TRUE;
+		//		pDoc->WorkingInfo.LastJob.nTestMode = (int)SockData.nData1; // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2
+		//		m_bRcvSig[_SigInx::_TestMode] = TRUE;
+		//	}
+		//	break;
 		case _SigInx::_RecoilerCcw:
-			if(pDoc->WorkingInfo.LastJob.bOneMetal != (SockData.nData1 > 0) ? TRUE : FALSE)	// OneMetal : TRUE -> SetTwoMetal(FALSE);
+			//if(pDoc->WorkingInfo.LastJob.bOneMetal != (SockData.nData1 > 0) ? TRUE : FALSE)	// OneMetal : TRUE -> SetTwoMetal(FALSE);
+			//if(pDoc->BtnStatus.FeedDir.FeedCcwRecoiler != (SockData.nData1 > 0) ? TRUE : FALSE)
 			{
 				m_bGetOpInfo = TRUE;
-				pDoc->BtnStatus.Induct.Rc = pDoc->WorkingInfo.LastJob.bOneMetal = (SockData.nData1 > 0) ? TRUE : FALSE;	// OneMetal : TRUE -> SetTwoMetal(FALSE);
-				pView->m_bRcvSig[_SigInx::_RecoilerCcw] = TRUE;
+				pDoc->RecoilerCcw();
+				//pDoc->BtnStatus.Induct.Rc = pDoc->WorkingInfo.LastJob.bOneMetal = (SockData.nData1 > 0) ? TRUE : FALSE;	// OneMetal : TRUE -> SetTwoMetal(FALSE);
+				//pDoc->BtnStatus.FeedDir.FeedCcwRecoiler = (SockData.nData1 > 0) ? TRUE : FALSE;
+				//m_bRcvSig[_SigInx::_RecoilerCcw] = TRUE;
 			}
 			break;
 		case _SigInx::_UncoilerCcw:
-			if(pDoc->WorkingInfo.LastJob.bTwoMetal != (SockData.nData1 > 0) ? TRUE : FALSE)	// TwoMetal : TRUE -> SetTwoMetal(TRUE);
+			//if(pDoc->WorkingInfo.LastJob.bTwoMetal != (SockData.nData1 > 0) ? TRUE : FALSE)	// TwoMetal : TRUE -> SetTwoMetal(TRUE);
+			//if(pDoc->BtnStatus.FeedDir.FeedCcwUncoiler != (SockData.nData1 > 0) ? TRUE : FALSE)
 			{
 				m_bGetOpInfo = TRUE;
-				pDoc->BtnStatus.Induct.Uc = pDoc->WorkingInfo.LastJob.bTwoMetal = (SockData.nData1 > 0) ? TRUE : FALSE;	// TwoMetal : TRUE -> SetTwoMetal(TRUE);
-				pView->m_bRcvSig[_SigInx::_UncoilerCcw] = TRUE;
+				pDoc->UncoilerCcw();
+				//pDoc->BtnStatus.Induct.Uc = pDoc->WorkingInfo.LastJob.bTwoMetal = (SockData.nData1 > 0) ? TRUE : FALSE;	// TwoMetal : TRUE -> SetTwoMetal(TRUE);
+				//pDoc->BtnStatus.FeedDir.FeedCcwUncoiler = (SockData.nData1 > 0) ? TRUE : FALSE;
+				//m_bRcvSig[_SigInx::_UncoilerCcw] = TRUE;
 			}
 			break;
 		case _SigInx::_AlignMethode:
 			if(pDoc->WorkingInfo.LastJob.nAlignMethode != (int)SockData.nData1) // TWO_POINT, FOUR_POINT
 			{
 				m_bGetOpInfo = TRUE;
-				pDoc->WorkingInfo.LastJob.nAlignMethode = (int)SockData.nData1; // TWO_POINT, FOUR_POINT
+				pDoc->SetAlignMethode();
+				//pDoc->WorkingInfo.LastJob.nAlignMethode = (int)SockData.nData1; // TWO_POINT, FOUR_POINT
+				//m_bRcvSig[_SigInx::_AlignMethode] = TRUE;
 			}
 			break;
 		case _SigInx::_DoorRecoiler:
-			if (pDoc->WorkingInfo.LastJob.bRclDrSen != (SockData.nData1 > 0) ? TRUE : FALSE)
+			//if (pDoc->WorkingInfo.LastJob.bRclDrSen != (SockData.nData1 > 0) ? TRUE : FALSE)
 			{
 				m_bGetOpInfo = TRUE;
-				pDoc->WorkingInfo.LastJob.bRclDrSen = (SockData.nData1 > 0) ? TRUE : FALSE;
-				pView->m_bRcvSig[_SigInx::_DoorRecoiler] = TRUE;
+				pDoc->SetDoorRecoiler();
+				//pDoc->WorkingInfo.LastJob.bRclDrSen = (SockData.nData1 > 0) ? TRUE : FALSE;
+				//m_bRcvSig[_SigInx::_DoorRecoiler] = TRUE;
 			}
 			break;
 		case _SigInx::_DoorAoiUp:
-			if (pDoc->WorkingInfo.LastJob.bAoiUpDrSen != (SockData.nData1 > 0) ? TRUE : FALSE)
+			//if (pDoc->WorkingInfo.LastJob.bAoiUpDrSen != (SockData.nData1 > 0) ? TRUE : FALSE)
 			{
 				m_bGetOpInfo = TRUE;
-				pDoc->WorkingInfo.LastJob.bAoiUpDrSen = (SockData.nData1 > 0) ? TRUE : FALSE;
-				pView->m_bRcvSig[_SigInx::_DoorAoiUp] = TRUE;
+				pDoc->SetDoorAoiUp();
+				//pDoc->WorkingInfo.LastJob.bAoiUpDrSen = (SockData.nData1 > 0) ? TRUE : FALSE;
+				//m_bRcvSig[_SigInx::_DoorAoiUp] = TRUE;
 			}
 			break;
 		case _SigInx::_DoorAoiDn:
@@ -1530,7 +800,7 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 			{
 				m_bGetOpInfo = TRUE;
 				pDoc->WorkingInfo.LastJob.bAoiDnDrSen = (SockData.nData1 > 0) ? TRUE : FALSE;
-				pView->m_bRcvSig[_SigInx::_DoorAoiDn] = TRUE;
+				//m_bRcvSig[_SigInx::_DoorAoiDn] = TRUE;
 			}
 			break;
 		case _SigInx::_DoorMk:
@@ -1538,7 +808,7 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 			{
 				m_bGetOpInfo = TRUE;
 				pDoc->WorkingInfo.LastJob.bMkDrSen = (SockData.nData1 > 0) ? TRUE : FALSE;
-				pView->m_bRcvSig[_SigInx::_DoorMk] = TRUE;
+				//m_bRcvSig[_SigInx::_DoorMk] = TRUE;
 			}
 			break;
 		case _SigInx::_DoorEngrave:
@@ -1546,7 +816,7 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 			{
 				m_bGetOpInfo = TRUE;
 				pDoc->WorkingInfo.LastJob.bEngvDrSen = (SockData.nData1 > 0) ? TRUE : FALSE;
-				pView->m_bRcvSig[_SigInx::_DoorEngrave] = TRUE;
+				//m_bRcvSig[_SigInx::_DoorEngrave] = TRUE;
 			}
 			break;
 
@@ -1555,7 +825,7 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 			{
 				m_bGetOpInfo = TRUE;
 				pDoc->WorkingInfo.LastJob.bUclDrSen = (SockData.nData1 > 0) ? TRUE : FALSE;
-				pView->m_bRcvSig[_SigInx::_DoorUncoiler] = TRUE;
+				//m_bRcvSig[_SigInx::_DoorUncoiler] = TRUE;
 			}
 			break;
 		case _SigInx::_SaftyMk:
@@ -1563,6 +833,7 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 			{
 				m_bGetOpInfo = TRUE;
 				pDoc->WorkingInfo.LastJob.bMkSftySen = (SockData.nData1 > 0) ? TRUE : FALSE;
+				//m_bRcvSig[_SigInx::_SaftyMk] = TRUE;
 			}
 			break;
 		case _SigInx::_CleannerAoiUp:
@@ -1570,7 +841,7 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 			{
 				m_bGetOpInfo = TRUE;
 				pDoc->WorkingInfo.LastJob.bUseAoiUpCleanRoler = (SockData.nData1 > 0) ? TRUE : FALSE;
-				pView->m_bRcvSig[_SigInx::_CleannerAoiUp] = TRUE;
+				//m_bRcvSig[_SigInx::_CleannerAoiUp] = TRUE;
 			}
 			break;
 		case _SigInx::_CleannerAoiDn:
@@ -1578,7 +849,7 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 			{
 				m_bGetOpInfo = TRUE;
 				pDoc->WorkingInfo.LastJob.bUseAoiDnCleanRoler = (SockData.nData1 > 0) ? TRUE : FALSE;
-				pView->m_bRcvSig[_SigInx::_CleannerAoiDn] = TRUE;
+				//m_bRcvSig[_SigInx::_CleannerAoiDn] = TRUE;
 			}
 			break;
 		case _SigInx::_UltraSonicAoiDn:
@@ -1586,7 +857,7 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 			{
 				m_bGetOpInfo = TRUE;
 				pDoc->WorkingInfo.LastJob.bUseAoiDnUltrasonic = (SockData.nData1 > 0) ? TRUE : FALSE;
-				pView->m_bRcvSig[_SigInx::_UltraSonicAoiDn] = TRUE;
+				//m_bRcvSig[_SigInx::_UltraSonicAoiDn] = TRUE;
 			}
 			break;
 		case _SigInx::_UltraSonicEngrave:
@@ -1594,7 +865,7 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 			{
 				m_bGetOpInfo = TRUE;
 				pDoc->WorkingInfo.LastJob.bUseEngraveUltrasonic = (SockData.nData1 > 0) ? TRUE : FALSE;
-				pView->m_bRcvSig[_SigInx::_UltraSonicEngrave] = TRUE;
+				//m_bRcvSig[_SigInx::_UltraSonicEngrave] = TRUE;
 			}
 			break;
 		case _SigInx::_Use380mm:
@@ -1602,7 +873,7 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 			{
 				m_bGetOpInfo = TRUE;
 				pDoc->WorkingInfo.LastJob.bUse380mm = (SockData.nData1 > 0) ? TRUE : FALSE;
-				pView->m_bRcvSig[_SigInx::_Use380mm] = TRUE;
+				//m_bRcvSig[_SigInx::_Use380mm] = TRUE;
 			}
 			break;
 		case _SigInx::_TempPause:
@@ -1610,7 +881,7 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 			{
 				m_bGetOpInfo = TRUE;
 				pDoc->WorkingInfo.LastJob.bTempPause = (SockData.nData1 > 0) ? TRUE : FALSE;
-				pView->m_bRcvSig[_SigInx::_TempPause] = TRUE;
+				//m_bRcvSig[_SigInx::_TempPause] = TRUE;
 			}
 			break;
 		case _SigInx::_LotCut:
@@ -1618,6 +889,7 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 			{
 				m_bGetOpInfo = TRUE;
 				pDoc->WorkingInfo.LastJob.bLotSep = (SockData.nData1 > 0) ? TRUE : FALSE;
+				//m_bRcvSig[_SigInx::_LotCut] = TRUE;
 			}
 			break;
 		}
@@ -1626,6 +898,16 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 	{
 		switch (nMsgId)
 		{
+		case _ItemInx::_TestMode:
+			if (pDoc->GetTestMode() != (int)SockData.nData1) // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2
+			{
+				m_bGetOpInfo = TRUE;
+				pDoc->SetTestMode();
+				//pDoc->WorkingInfo.LastJob.nTestMode = (int)SockData.nData1; // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2
+				//m_bRcvSig[_SigInx::_TestMode] = TRUE;
+				//pDoc->SetTestMode(pDoc->WorkingInfo.LastJob.nTestMode); // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2
+			}
+			break;
 		case _ItemInx::_OpName:
 			if (pDoc->WorkingInfo.LastJob.sSelUserName != CharToString(SockData.strData))
 			{
@@ -1789,8 +1071,9 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 			if (pDoc->WorkingInfo.LastJob.sEngItsCode != CharToString(SockData.strData))
 			{
 				m_bGetOpInfo = TRUE;
-				pDoc->m_sItsCode = pDoc->WorkingInfo.LastJob.sEngItsCode = CharToString(SockData.strData);
-				pDoc->SetEngItsCode(pDoc->WorkingInfo.LastJob.sEngItsCode);
+				pDoc->SetEngItsCode();
+				//pDoc->m_sItsCode = pDoc->WorkingInfo.LastJob.sEngItsCode = CharToString(SockData.strData);
+				//pDoc->SetEngItsCode(pDoc->WorkingInfo.LastJob.sEngItsCode);
 
 				//::WritePrivateProfileString(_T("Last Job"), _T("Engrave Order Num"), pDoc->WorkingInfo.LastJob.sEngOrderNum, PATH_WORKING_INFO);
 			}
@@ -1814,7 +1097,7 @@ void CEngrave::GetInfo(SOCKET_DATA SockData)
 			{
 				m_bGetInfo = TRUE;
 				pDoc->WorkingInfo.LastJob.bTempPause = (SockData.nData1 > 0) ? TRUE : FALSE;
-				pView->m_bRcvSig[_SigInx::_TempPause] = TRUE;
+				//m_bRcvSig[_SigInx::_TempPause] = TRUE;
 			}
 			break;
 		}
@@ -1837,13 +1120,6 @@ void CEngrave::GetInfo(SOCKET_DATA SockData)
 				pDoc->WorkingInfo.EngInfo.sModel = CharToString(SockData.strData);
 			}
 			break;
-		//case _ItemInx::_ModelDnName:
-		//	if (pDoc->WorkingInfo.LastJob.sModelDn != CharToString(SockData.strData))
-		//	{
-		//		m_bGetInfo = TRUE;
-		//		pDoc->WorkingInfo.LastJob.sModelDn = CharToString(SockData.strData);
-		//	}
-		//	break;
 		case _ItemInx::_LotUpName:
 			if (pDoc->WorkingInfo.EngInfo.sLot != CharToString(SockData.strData))
 			{
@@ -1852,11 +1128,11 @@ void CEngrave::GetInfo(SOCKET_DATA SockData)
 			}
 			break;
 		case _ItemInx::_LotDnName:
-			if (pDoc->WorkingInfo.EngInfo.sLot != CharToString(SockData.strData))
-			{
-				m_bGetInfo = TRUE;
-				pDoc->WorkingInfo.EngInfo.sLot = CharToString(SockData.strData);
-			}
+			//if (pDoc->WorkingInfo.EngInfo.sLotDn != CharToString(SockData.strData))
+			//{
+			//	m_bGetInfo = TRUE;
+			//	pDoc->WorkingInfo.EngInfo.sLotDn = CharToString(SockData.strData);
+			//}
 			break;
 		case _ItemInx::_LayerUpName:
 			if (pDoc->WorkingInfo.EngInfo.sLayerUp != CharToString(SockData.strData))
@@ -2231,24 +1507,31 @@ void CEngrave::GetEngInfo(SOCKET_DATA SockData)
 		{
 		case _SigInx::_EngBuffJogCw:
 			pDoc->WorkingInfo.Motion.bEngBuffJogCw = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//m_bRcvSig[_SigInx::_EngBuffJogCw] = TRUE;
 			break;
 		case _SigInx::_EngBuffJogCcw:
 			pDoc->WorkingInfo.Motion.bEngBuffJogCcw = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//m_bRcvSig[_SigInx::_EngBuffJogCcw] = TRUE;
 			break;
 		case _SigInx::_EngBuffOrgMv:
 			pDoc->WorkingInfo.Motion.bEngBuffHomming = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//m_bRcvSig[_SigInx::_EngBuffOrgMv] = TRUE;
 			break;
 		case _SigInx::_EngBuffOrgMvDone:
 			pDoc->WorkingInfo.Motion.bEngBuffHommingDone = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//m_bRcvSig[_SigInx::_EngBuffOrgMvDone] = TRUE;
 			break;
 		case _SigInx::_EngBuffInitPosMv:
 			pDoc->WorkingInfo.Motion.bEngBuffInitMv = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//m_bRcvSig[_SigInx::_EngBuffInitPosMv] = TRUE;
 			break;
 		case _SigInx::_EngBuffInitPosMvDone:
 			pDoc->WorkingInfo.Motion.bEngBuffInitMvDone = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//m_bRcvSig[_SigInx::_EngBuffInitPosMvDone] = TRUE;
 			break;
 		case _SigInx::_EngBuffInitPosSave:
 			pDoc->WorkingInfo.Motion.bEngBuffInitPosSave = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//m_bRcvSig[_SigInx::_EngBuffInitPosSave] = TRUE;
 			break;
 		}
 	}
@@ -2265,6 +1548,7 @@ void CEngrave::GetEngInfo(SOCKET_DATA SockData)
 			break;
 		case _ItemInx::_EngTqVal:
 			pDoc->WorkingInfo.Motion.sEngraveTq = CharToString(SockData.strData);
+			pDoc->SetEngraveToq(_tstof(pDoc->WorkingInfo.Motion.sEngraveTq));
 			break;
 		case _ItemInx::_EngAoiLen:
 			pDoc->WorkingInfo.Motion.sFdEngraveAoiInitDist = CharToString(SockData.strData);
@@ -2826,7 +2110,7 @@ void CEngrave::SetOpInfo()
 	SetDualTest();
 	SetSampleTest();
 	SetSampleShotNum();
-	SetTestMode();
+	//SetTestMode();
 	SetRecoilerCcw();
 	SetUncoilerCcw();
 	SetAlignMethode();
@@ -2986,7 +2270,7 @@ void CEngrave::SetStripRatio()
 	// < 스트립 별 수율 >
 	pDoc->m_pReelMapUp->GetPcsNum(nGood, nBad);
 	nTot = nGood + nBad;
-	nStTot = nTot / 4;
+	nStTot = nTot / MAX_STRIP;
 
 	// 상면
 	nSum = 0;
@@ -3197,6 +2481,7 @@ void CEngrave::SetDef()
 			pReelMap = pDoc->m_pReelMapUp;
 		else
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			pView->ClrDispMsg();
 			AfxMessageBox(_T("m_pReelMapUp is NULL."));
 		}
@@ -3206,6 +2491,7 @@ void CEngrave::SetDef()
 			pReelMap = pDoc->m_pReelMapDn;
 		else
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			pView->ClrDispMsg();
 			AfxMessageBox(_T("m_pReelMapDn is NULL."));
 		}
@@ -3215,6 +2501,7 @@ void CEngrave::SetDef()
 			pReelMap = pDoc->m_pReelMapAllUp;
 		else
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			pView->ClrDispMsg();
 			AfxMessageBox(_T("m_pReelMapAllUp is NULL."));
 		}
@@ -3224,6 +2511,7 @@ void CEngrave::SetDef()
 			pReelMap = pDoc->m_pReelMapAllDn;
 		else
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			pView->ClrDispMsg();
 			AfxMessageBox(_T("m_pReelMapAllDn is NULL."));
 		}
@@ -3233,6 +2521,7 @@ void CEngrave::SetDef()
 			pReelMap = pDoc->m_pReelMapInnerUp;
 		else
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			pView->ClrDispMsg();
 			AfxMessageBox(_T("m_pReelMapInnerUp is NULL."));
 		}
@@ -3242,6 +2531,7 @@ void CEngrave::SetDef()
 			pReelMap = pDoc->m_pReelMapInnerDn;
 		else
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			pView->ClrDispMsg();
 			AfxMessageBox(_T("m_pReelMapInnerDn is NULL."));
 		}
@@ -3251,6 +2541,7 @@ void CEngrave::SetDef()
 			pReelMap = pDoc->m_pReelMapInnerAllUp;
 		else
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			pView->ClrDispMsg();
 			AfxMessageBox(_T("m_pReelMapInnerAllUp is NULL."));
 		}
@@ -3260,6 +2551,7 @@ void CEngrave::SetDef()
 			pReelMap = pDoc->m_pReelMapInnerAllDn;
 		else
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			pView->ClrDispMsg();
 			AfxMessageBox(_T("m_pReelMapInnerAllDn is NULL."));
 		}
@@ -3269,6 +2561,7 @@ void CEngrave::SetDef()
 			pReelMap = pDoc->m_pReelMapIts;
 		else
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			pView->ClrDispMsg();
 			AfxMessageBox(_T("m_pReelMapIts is NULL."));
 		}
@@ -3587,9 +2880,9 @@ void CEngrave::SetTestMode()
 		return;
 
 	SOCKET_DATA SocketData;
-	SocketData.nCmdCode = _SetSig;
+	SocketData.nCmdCode = _SetData;
 
-	SocketData.nMsgID = _stSigInx::_TestMode;
+	SocketData.nMsgID = _ItemInx::_TestMode;
 	SocketData.nData1 = pDoc->GetTestMode(); // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2
 	//SocketData.nData1 = pDoc->WorkingInfo.LastJob.nTestMode; // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2
 	SendCommand(SocketData);
@@ -3936,8 +3229,7 @@ void CEngrave::SetStripOutRatio()
 
 void CEngrave::SetCustomNeedRatio()
 {
-	if (!pDoc)
-		return;
+	if (!pDoc) return;
 
 	SOCKET_DATA SocketData;
 	SocketData.nCmdCode = _SetData;
@@ -3951,8 +3243,7 @@ void CEngrave::SetCustomNeedRatio()
 
 void CEngrave::SetNumRangeFixDef()
 {
-	if (!pDoc)
-		return;
+	if (!pDoc) return;
 
 	SOCKET_DATA SocketData;
 	SocketData.nCmdCode = _SetData;
@@ -3966,8 +3257,7 @@ void CEngrave::SetNumRangeFixDef()
 
 void CEngrave::SetFixDef()
 {
-	if (!pDoc)
-		return;
+	if (!pDoc) return;
 
 	SOCKET_DATA SocketData;
 	SocketData.nCmdCode = _SetSig;
@@ -3979,8 +3269,7 @@ void CEngrave::SetFixDef()
 
 void CEngrave::SetNumContFixDef()
 {
-	if (!pDoc)
-		return;
+	if (!pDoc) return;
 
 	SOCKET_DATA SocketData;
 	SocketData.nCmdCode = _SetData;
@@ -4100,8 +3389,7 @@ void CEngrave::SetLayerUpName()
 
 void CEngrave::SetLayerDnName()
 {
-	if (!pDoc)
-		return;
+	if (!pDoc) return;
 
 	SOCKET_DATA SocketData;
 	SocketData.nCmdCode = _SetData;
@@ -4115,8 +3403,7 @@ void CEngrave::SetLayerDnName()
 
 void CEngrave::SetLoadMstInfo()
 {
-	if (!pDoc)
-		return;
+	if (!pDoc) return;
 
 	SOCKET_DATA SocketData;
 	SocketData.nCmdCode = _SetData;
@@ -4127,8 +3414,7 @@ void CEngrave::SetLoadMstInfo()
 
 void CEngrave::SetOrderNum()
 {
-	if (!pDoc)
-		return;
+	if (!pDoc) return;
 
 	SOCKET_DATA SocketData;
 	SocketData.nCmdCode = _SetData;
@@ -4142,8 +3428,7 @@ void CEngrave::SetOrderNum()
 
 void CEngrave::SetShotNum()
 {
-	if (!pDoc)
-		return;
+	if (!pDoc) return;
 
 	SOCKET_DATA SocketData;
 	SocketData.nCmdCode = _SetData;
@@ -4157,8 +3442,7 @@ void CEngrave::SetShotNum()
 
 void CEngrave::SetTotOpRto()
 {
-	if (!pDoc || !pView || !pView->m_pDlgFrameHigh)
-		return;
+	if (!pDoc || !pView || !pView->m_pDlgFrameHigh) return;
 
 	SOCKET_DATA SocketData;
 	SocketData.nCmdCode = _SetData;
@@ -4175,8 +3459,7 @@ void CEngrave::SetTotOpRto()
 
 void CEngrave::SetTotVel()
 {
-	if (!pView)
-		return;
+	if (!pView) return;
 
 	SOCKET_DATA SocketData;
 	SocketData.nCmdCode = _SetData;
@@ -4192,8 +3475,7 @@ void CEngrave::SetTotVel()
 
 void CEngrave::SetPartVel()
 {
-	if (!pDoc)
-		return;
+	if (!pDoc) return;
 
 	SOCKET_DATA SocketData;
 	SocketData.nCmdCode = _SetData;
@@ -4207,8 +3489,7 @@ void CEngrave::SetPartVel()
 
 void CEngrave::SetMkDoneLen()
 {
-	if (!pDoc || !pView || !pView->m_pDlgFrameHigh)
-		return;
+	if (!pDoc || !pView || !pView->m_pDlgFrameHigh) return;
 
 	SOCKET_DATA SocketData;
 	SocketData.nCmdCode = _SetData;
@@ -4225,8 +3506,7 @@ void CEngrave::SetMkDoneLen()
 
 void CEngrave::SetAoiDnDoneLen()
 {
-	if (!pView)
-		return;
+	if (!pView) return;
 
 	SOCKET_DATA SocketData;
 	SocketData.nCmdCode = _SetData;
@@ -4242,8 +3522,7 @@ void CEngrave::SetAoiDnDoneLen()
 
 void CEngrave::SetAoiUpDoneLen()
 {
-	if (!pView)
-		return;
+	if (!pView) return;
 
 	SOCKET_DATA SocketData;
 	SocketData.nCmdCode = _SetData;
@@ -4259,8 +3538,7 @@ void CEngrave::SetAoiUpDoneLen()
 
 void CEngrave::SetLotSerial()
 {
-	if (!pDoc)
-		return;
+	if (!pDoc) return;
 
 	SOCKET_DATA SocketData;
 	SocketData.nCmdCode = _SetData;
@@ -4274,8 +3552,7 @@ void CEngrave::SetLotSerial()
 
 void CEngrave::SetMkVerfyLen()
 {
-	if (!pDoc)
-		return;
+	if (!pDoc) return;
 
 	SOCKET_DATA SocketData;
 	SocketData.nCmdCode = _SetData;
@@ -4837,7 +4114,7 @@ void CEngrave::SetEngBuffCurrPos()
 	char cData[BUFFER_DATA_SIZE];
 
 	CString str;
-	double dBufEnc = (double)pDoc->m_pMpeData[1][1] / 1000.0;	// 각인부 버퍼 엔코더 값(단위 mm * 1000)
+	double dBufEnc = (double)pDoc->m_pMpeData[1][15] / 1000.0;	// 각인부 버퍼 엔코더 값(단위 mm * 1000)
 	str.Format(_T("%.1f"), dBufEnc);
 	pDoc->WorkingInfo.Motion.sEngBuffCurrPos = str;
 
@@ -5183,7 +4460,7 @@ void CEngrave::SetMkBuffCurrPos() // (Engrave)
 	SocketData.nCmdCode = _SetData;
 
 	SocketData.nMsgID = _stItemInx::_MkBuffCurrPos;
-	double dBufEnc = (double)pDoc->m_pMpeData[1][1] / 1000.0;	// 각인부 버퍼 엔코더 값(단위 mm * 1000)
+	double dBufEnc = (double)pDoc->m_pMpeData[1][15] / 1000.0;	// 각인부 버퍼 엔코더 값(단위 mm * 1000)
 																//sprintf(SocketData.strData, "%.1f", dBufEnc);
 	SocketData.fData1 = (float)dBufEnc;
 	SendCommand(SocketData);
@@ -7640,6 +6917,28 @@ void CEngrave::IsSwAoiEmg(BOOL bOn)
 
 // EngraveAutoSequence
 
+void CEngrave::EngDispAlarm(BOOL bOn) // 각인부에 Alarm 표시
+{
+	SOCKET_DATA SocketData;
+	SocketData.nCmdCode = _SetSig;
+
+	//pDoc->BtnStatus.EngAuto.Init = bOn;
+	SocketData.nMsgID = _SigInx::_MyMsg;
+	SocketData.nData1 = bOn ? 1 : 0;
+	SendCommand(SocketData);
+}
+
+void CEngrave::IsEngDispAlarm(BOOL bOn) // 각인부에 Alarm 표시 Return 확인
+{
+	SOCKET_DATA SocketData;
+	SocketData.nCmdCode = _SetSig;
+
+	//pDoc->BtnStatus.EngAuto.Init = bOn;
+	SocketData.nMsgID = _SigInx::_IsMyMsg;
+	SocketData.nData1 = bOn ? 1 : 0;
+	SendCommand(SocketData);
+}
+
 void CEngrave::SwEngAutoInit(BOOL bOn) // 각인부 초기화(Reset)
 {
 	SOCKET_DATA SocketData;
@@ -7899,14 +7198,66 @@ void CEngrave::SetMyMsgOk()
 
 void CEngrave::IsSetMyMsgOk()
 {
-	if (!pDoc)
-		return;
+	if (!pDoc)	return;	
 
 	SOCKET_DATA SocketData;
 	SocketData.nCmdCode = _SetSig;
 
 	//pDoc->BtnStatus.Msg.IsNo = TRUE;
 	SocketData.nMsgID = _SigInx::_IsMyMsgOk;
+	SocketData.nData1 = 1;
+	SendCommand(SocketData);
+}
+
+// CurrentInfoSignal
+void CEngrave::SetCurrentInfoSignal(int nMsgID, int nData)
+{
+	if (!pDoc)	return;	
+
+	SOCKET_DATA SocketData;
+	SocketData.nCmdCode = _SetSig;
+
+	//SocketData.nMsgID = _SigInx::_GetCurrentInfoSignal;
+	//SocketData.nData1 = nIdxSig;
+	SocketData.nMsgID = nMsgID;
+	SocketData.nData1 = nData;
+	SendCommand(SocketData);
+}
+
+void CEngrave::IsSetCurrentInfoSignal()
+{
+	if (!pDoc)	return;	
+
+	SOCKET_DATA SocketData;
+	SocketData.nCmdCode = _SetSig;
+
+	SocketData.nMsgID = _SigInx::_IsGetCurrentInfoSignal;
+	SocketData.nData1 = 1;
+	SendCommand(SocketData);
+}
+
+// MonDispMain
+void CEngrave::SetMonDispMainSignal()
+{
+	if (!pDoc)	return;	
+
+	SOCKET_DATA SocketData;
+	SocketData.nCmdCode = _SetSig;
+
+	SocketData.nMsgID = _SigInx::_GetMonDispMainSignal;
+	SocketData.nData1 = 1;
+	SendCommand(SocketData);
+}
+
+void CEngrave::IsSetMonDispMainSignal()
+{
+	if (!pDoc)
+		return;
+
+	SOCKET_DATA SocketData;
+	SocketData.nCmdCode = _SetSig;
+
+	SocketData.nMsgID = _SigInx::_IsGetMonDispMainSignal;
 	SocketData.nData1 = 1;
 	SendCommand(SocketData);
 }
@@ -8346,18 +7697,177 @@ void CEngrave::GetSignal2dEng(SOCKET_DATA SockData)
 		switch (nMsgId)
 		{
 		case _SigInx::_2DOffsetInitPos:
-			pView->m_bRcvSig[_SigInx::_2DOffsetInitPos] = TRUE;
-			break;
-
-		case _SigInx::_2DOffsetInitPosMove:
-			pDoc->BtnStatus.SettingEng.OffsetInitPosMove = (SockData.nData1 > 0) ? TRUE : FALSE;
-			if (pDoc->BtnStatus.SettingEng.OffsetInitPosMove)
-			{
-				m_bTIM_MPE_OFFSET_INITPOS_MOVE = TRUE;
-				SetTimer(TIM_MPE_OFFSET_INITPOS_MOVE, 100, NULL);
-				pView->m_bRcvSig[_SigInx::_2DOffsetInitPosMove] = TRUE;
-			}
+			//m_bRcvSig[_SigInx::_2DOffsetInitPos] = TRUE;
 			break;
 		}
 	}
+}
+
+
+int CEngrave::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	if (CWnd::OnCreate(lpCreateStruct) == -1)
+		return -1;
+
+	// TODO:  여기에 특수화된 작성 코드를 추가합니다.
+	m_bTIM_CHK_RCV_SIG = TRUE;
+	SetTimer(TIM_CHK_RCV_SIG, 500, NULL);
+
+	return 0;
+}
+
+void CEngrave::SetSignal(int nMsgID, int nData)
+{
+	SOCKET_DATA SocketData;
+	SocketData.nCmdCode = _SetSig;
+
+	SocketData.nMsgID = nMsgID;
+	SocketData.nData2 = nData;
+	SendCommand(SocketData);
+	m_bSendSig[nMsgID] = TRUE; // 상대방이 받지 못하면 500mSec 후에 다시 신호를 전송함.
+	m_nSendSigData[nMsgID] = nData;
+
+	if (pView->m_pDlgMenu02)
+		pView->m_pDlgMenu02->GetDlgItem(IDC_STATIC_SIGNAL_SEND)->SetWindowText(GetSignalName(nMsgID));
+}
+
+CString CEngrave::GetSignalName(int nMsgID)
+{
+	if (nMsgID >= _SigInx::_EndIdx)
+		return _T("");
+	return m_sSignalName[nMsgID];
+}
+
+void CEngrave::SetSignalName()
+{
+	m_sSignalName[_SigInx::_Idle] = _T("_Idle"); m_sSignalName[_SigInx::_Busy] = _T("_Busy"); m_sSignalName[_SigInx::_Connect] = _T("_Connect");
+	m_sSignalName[_SigInx::_DispDualSample] = _T("_DispDualSample"); m_sSignalName[_SigInx::_DispDualTest] = _T("_DispDualTest"); m_sSignalName[_SigInx::_DispSingleSample] = _T("_DispSingleSample");
+	m_sSignalName[_SigInx::_DispSingleTest] = _T("_DispSingleTest"); m_sSignalName[_SigInx::_DispInitRun] = _T("_DispInitRun"); m_sSignalName[_SigInx::_DispRun] = _T("_DispRun");
+	m_sSignalName[_SigInx::_DispStop] = _T("_DispStop"); m_sSignalName[_SigInx::_DispReady] = _T("_DispReady"); m_sSignalName[_SigInx::_DualTest] = _T("_DualTest");
+	//m_sSignalName[_SigInx::_SampleTest] = _T("_SampleTest"); m_sSignalName[_SigInx::_TestMode] = _T("_TestMode"); m_sSignalName[_SigInx::_RecoilerCcw] = _T("_RecoilerCcw");
+	m_sSignalName[_SigInx::_UncoilerCcw] = _T("_UncoilerCcw"); m_sSignalName[_SigInx::_AlignMethode] = _T("_AlignMethode"); m_sSignalName[_SigInx::_DoorRecoiler] = _T("_DoorRecoiler"); 
+	m_sSignalName[_SigInx::_DoorAoiUp] = _T("_DoorAoiUp"); m_sSignalName[_SigInx::_DoorAoiDn] = _T("_DoorAoiDn"); m_sSignalName[_SigInx::_DoorMk] = _T("_DoorMk");
+	m_sSignalName[_SigInx::_DoorEngrave] = _T("_DoorEngrave"); m_sSignalName[_SigInx::_DoorUncoiler] = _T("_DoorUncoiler"); m_sSignalName[_SigInx::_SaftyMk] = _T("_SaftyMk"); 
+	m_sSignalName[_SigInx::_CleannerAoiUp] = _T("_CleannerAoiUp"); m_sSignalName[_SigInx::_CleannerAoiDn] = _T("_CleannerAoiDn"); m_sSignalName[_SigInx::_UltraSonicAoiDn] = _T("_UltraSonicAoiDn");
+	m_sSignalName[_SigInx::_UltraSonicEngrave] = _T("_UltraSonicEngrave"); m_sSignalName[_SigInx::_FixDef] = _T("_FixDef"); m_sSignalName[_SigInx::_Use380mm] = _T("_Use380mm");
+	m_sSignalName[_SigInx::_DispContRun] = _T("_DispContRun"); m_sSignalName[_SigInx::_DispLotEnd] = _T("_DispLotEnd"); m_sSignalName[_SigInx::_TempStop] = _T("_TempStop");
+	m_sSignalName[_SigInx::_TempPause] = _T("_TempPause"); m_sSignalName[_SigInx::_LotCut] = _T("_LotCut"); m_sSignalName[_SigInx::_MkPosMv] = _T("_MkPosMv"); m_sSignalName[_SigInx::_MkVerify] = _T("_MkVerify");
+	m_sSignalName[_SigInx::_ReelmapUp] = _T("_ReelmapUp"); m_sSignalName[_SigInx::_ReelmapDn] = _T("_ReelmapDn"); m_sSignalName[_SigInx::_ReelmapTot] = _T("_ReelmapTot"); 
+	m_sSignalName[_SigInx::_RemainMode] = _T("_RemainMode"); m_sSignalName[_SigInx::_EndWork] = _T("_EndWork"); m_sSignalName[_SigInx::_ReMk] = _T("_ReMk"); m_sSignalName[_SigInx::_2Layer] = _T("_2Layer"); 
+	m_sSignalName[_SigInx::_1LnMk] = _T("_1LnMk"); m_sSignalName[_SigInx::_2LnMk] = _T("_2LnMk"); m_sSignalName[_SigInx::_3LnMk] = _T("_3LnMk"); m_sSignalName[_SigInx::_4LnMk] = _T("_4LnMk"); 
+	m_sSignalName[_SigInx::_TotLnMk] = _T("_TotLnMk"); m_sSignalName[_SigInx::_UpdateWork] = _T("_UpdateWork"); m_sSignalName[_SigInx::_DispDefImg] = _T("_DispDefImg");
+	m_sSignalName[_SigInx::_2DEngLenMvCw] = _T("_2DEngLenMvCw"); m_sSignalName[_SigInx::_2DEngLenMvCcw] = _T("_2DEngLenMvCcw"); m_sSignalName[_SigInx::_2DAoiLenMvCw] = _T("_2DAoiLenMvCw"); 
+	m_sSignalName[_SigInx::_2DAoiLenMvCcw] = _T("_2DAoiLenMvCcw"); m_sSignalName[_SigInx::_2DMkLenMvCw] = _T("_2DMkLenMvCw"); m_sSignalName[_SigInx::_2DMkLenMvCcw] = _T("_2DMkLenMvCcw");
+	m_sSignalName[_SigInx::_2DOneShotLenCw] = _T("_2DOneShotLenCw"); m_sSignalName[_SigInx::_2DOneShotLenCcw] = _T("_2DOneShotLenCcw"); m_sSignalName[_SigInx::_2DOffsetInitPos] = _T("_2DOffsetInitPos"); 
+	m_sSignalName[_SigInx::_2DOffsetInitPosMove] = _T("_2DOffsetInitPosMove"); m_sSignalName[_SigInx::_Ready] = _T("_Ready"); m_sSignalName[_SigInx::_Run] = _T("_Run");
+	m_sSignalName[_SigInx::_Reset] = _T("_Reset"); m_sSignalName[_SigInx::_Stop] = _T("_Stop"); m_sSignalName[_SigInx::_Auto] = _T("_Auto"); m_sSignalName[_SigInx::_OneCycle] = _T("_OneCycle"); 
+	m_sSignalName[_SigInx::_Manual] = _T("_Manual"); m_sSignalName[_SigInx::_MkTq] = _T("_MkTq");
+	m_sSignalName[_SigInx::_AoiTq] = _T("_AoiTq"); m_sSignalName[_SigInx::_EngTq] = _T("_EngTq"); m_sSignalName[_SigInx::_CcwModRe] = _T("_CcwModRe"); m_sSignalName[_SigInx::_CcwModUn] = _T("_CcwModUn"); 
+	m_sSignalName[_SigInx::_Core150Re] = _T("_Core150Re"); m_sSignalName[_SigInx::_Core150Un] = _T("_Core150Un"); m_sSignalName[_SigInx::_Relation] = _T("_Relation"); 
+	m_sSignalName[_SigInx::_JoinSelRe] = _T("_JoinSelRe"); m_sSignalName[_SigInx::_MvCwRe] = _T("_MvCwRe"); m_sSignalName[_SigInx::_MvCcwRe] = _T("_MvCcwRe"); m_sSignalName[_SigInx::_PrdChuckRe] = _T("_PrdChuckRe"); 
+	m_sSignalName[_SigInx::_DancerUpRe] = _T("_DancerUpRe"); m_sSignalName[_SigInx::_PasteUpLfRe] = _T("_PasteUpLfRe"); m_sSignalName[_SigInx::_PasteUpRtRe] = _T("_PasteUpRtRe"); 
+	m_sSignalName[_SigInx::_PasteVacRe] = _T("_PasteVacRe"); m_sSignalName[_SigInx::_PprChuckRe] = _T("_PprChuckRe"); m_sSignalName[_SigInx::_PprCwRe] = _T("_PprCwRe"); m_sSignalName[_SigInx::_PprCcwRe] = _T("_PprCcwRe");
+	m_sSignalName[_SigInx::_DoRe] = _T("_DoRe"); m_sSignalName[_SigInx::_PrdPprRe] = _T("_PrdPprRe"); m_sSignalName[_SigInx::_JoinSelMk] = _T("_JoinSelMk"); m_sSignalName[_SigInx::_MvCwMk] = _T("_MvCwMk"); 
+	m_sSignalName[_SigInx::_MvCcwMk] = _T("_MvCcwMk"); m_sSignalName[_SigInx::_FdVacMk] = _T("_FdVacMk"); m_sSignalName[_SigInx::_PushUpMk] = _T("_PushUpMk"); m_sSignalName[_SigInx::_TblBlwMk] = _T("_TblBlwMk"); 
+	m_sSignalName[_SigInx::_TblVacMk] = _T("_TblVacMk"); m_sSignalName[_SigInx::_FdClampMk] = _T("_FdClampMk"); m_sSignalName[_SigInx::_TensClampMk] = _T("_TensClampMk"); m_sSignalName[_SigInx::_OnePnlMk] = _T("_OnePnlMk");
+	m_sSignalName[_SigInx::_LsrMk] = _T("_LsrMk"); m_sSignalName[_SigInx::_DancerUpMk] = _T("_DancerUpMk"); m_sSignalName[_SigInx::_TqVacMk] = _T("_TqVacMk"); m_sSignalName[_SigInx::_JoinSelAoiDn] = _T("_JoinSelAoiDn"); 
+	m_sSignalName[_SigInx::_MvCwAoiDn] = _T("_MvCwAoiDn"); m_sSignalName[_SigInx::_MvCcwAoiDn] = _T("_MvCcwAoiDn"); m_sSignalName[_SigInx::_FdVacAoiDn] = _T("_FdVacAoiDn");
+	m_sSignalName[_SigInx::_PushUpAoiDn] = _T("_PushUpAoiDn"); m_sSignalName[_SigInx::_TblBlwAoiDn] = _T("_TblBlwAoiDn"); m_sSignalName[_SigInx::_TblVacAoiDn] = _T("_TblVacAoiDn"); 
+	m_sSignalName[_SigInx::_FdClampAoiDn] = _T("_FdClampAoiDn"); m_sSignalName[_SigInx::_TensClampAoiDn] = _T("_TensClampAoiDn"); m_sSignalName[_SigInx::_OnePnlAoiDn] = _T("_OnePnlAoiDn"); 
+	m_sSignalName[_SigInx::_LsrAoiDn] = _T("_LsrAoiDn"); m_sSignalName[_SigInx::_ClrRollAoiDn] = _T("_ClrRollAoiDn"); m_sSignalName[_SigInx::_VelClrSonicAoiDn] = _T("_VelClrSonicAoiDn");
+	m_sSignalName[_SigInx::_TestAoiDn] = _T("_TestAoiDn"); m_sSignalName[_SigInx::_ResetAoiDn] = _T("_ResetAoiDn"); m_sSignalName[_SigInx::_LotEndAoiDn] = _T("_LotEndAoiDn"); 
+	m_sSignalName[_SigInx::_JoinSelAoiUp] = _T("_JoinSelAoiUp"); m_sSignalName[_SigInx::_MvCwAoiUp] = _T("_MvCwAoiUp"); m_sSignalName[_SigInx::_MvCcwAoiUp] = _T("_MvCcwAoiUp"); 
+	m_sSignalName[_SigInx::_FdVacAoiUp] = _T("_FdVacAoiUp"); m_sSignalName[_SigInx::_PushUpAoiUp] = _T("_PushUpAoiUp"); m_sSignalName[_SigInx::_TblBlwAoiUp] = _T("_TblBlwAoiUp");
+	m_sSignalName[_SigInx::_TblVacAoiUp] = _T("_TblVacAoiUp"); m_sSignalName[_SigInx::_FdClampAoiUp] = _T("_FdClampAoiUp"); m_sSignalName[_SigInx::_TensClampAoiUp] = _T("_TensClampAoiUp"); 
+	m_sSignalName[_SigInx::_OnePnlAoiUp] = _T("_OnePnlAoiUp"); m_sSignalName[_SigInx::_LsrAoiUp] = _T("_LsrAoiUp"); m_sSignalName[_SigInx::_ClrRollAoiUp] = _T("_ClrRollAoiUp"); 
+	m_sSignalName[_SigInx::_TestAoiUp] = _T("_TestAoiUp"); m_sSignalName[_SigInx::_ResetAoiUp] = _T("_ResetAoiUp"); m_sSignalName[_SigInx::_LotEndAoiUp] = _T("_LotEndAoiUp");
+	m_sSignalName[_SigInx::_JoinSelEng] = _T("_JoinSelEng"); m_sSignalName[_SigInx::_MvCwEng] = _T("_MvCwEng"); m_sSignalName[_SigInx::_MvCcwEng] = _T("_MvCcwEng"); m_sSignalName[_SigInx::_FdVacEng] = _T("_FdVacEng"); 
+	m_sSignalName[_SigInx::_PushUpEng] = _T("_PushUpEng"); m_sSignalName[_SigInx::_TblBlwEng] = _T("_TblBlwEng"); m_sSignalName[_SigInx::_TblVacEng] = _T("_TblVacEng"); m_sSignalName[_SigInx::_FdClampEng] = _T("_FdClampEng");
+	m_sSignalName[_SigInx::_TensClampEng] = _T("_TensClampEng"); m_sSignalName[_SigInx::_OnePnlEng] = _T("_OnePnlEng"); m_sSignalName[_SigInx::_LsrEng] = _T("_LsrEng"); m_sSignalName[_SigInx::_DancerUpEng] = _T("_DancerUpEng");
+	m_sSignalName[_SigInx::_VelClrSonicEng] = _T("_VelClrSonicEng"); m_sSignalName[_SigInx::_JoinSelUn] = _T("_JoinSelUn"); m_sSignalName[_SigInx::_MvCwUn] = _T("_MvCwUn"); m_sSignalName[_SigInx::_MvCcwUn] = _T("_MvCcwUn"); 
+	m_sSignalName[_SigInx::_PrdChuckUn] = _T("_PrdChuckUn"); m_sSignalName[_SigInx::_DancerUpUn] = _T("_DancerUpUn"); m_sSignalName[_SigInx::_PasteUpLfUn] = _T("_PasteUpLfUn"); m_sSignalName[_SigInx::_PasteUpRtUn] = _T("_PasteUpRtUn");
+	m_sSignalName[_SigInx::_PasteVacUn] = _T("_PasteVacUn"); m_sSignalName[_SigInx::_PprChuckUn] = _T("_PprChuckUn"); m_sSignalName[_SigInx::_PprCwUn] = _T("_PprCwUn"); m_sSignalName[_SigInx::_PprCcwUn] = _T("_PprCcwUn"); 
+	m_sSignalName[_SigInx::_ClrRollUpUn] = _T("_ClrRollUpUn"); m_sSignalName[_SigInx::_ClrRollPushUn] = _T("_ClrRollPushUn"); m_sSignalName[_SigInx::_EmgAoi] = _T("_EmgAoi");
+	m_sSignalName[_SigInx::_MkResetLf] = _T("_MkResetLf"); m_sSignalName[_SigInx::_MkResetRt] = _T("_MkResetRt"); m_sSignalName[_SigInx::_MkBuffJogCw] = _T("_MkBuffJogCw"); 
+	m_sSignalName[_SigInx::_MkBuffJogCcw] = _T("_MkBuffJogCcw"); m_sSignalName[_SigInx::_MkBuffOrgMv] = _T("_MkBuffOrgMv"); m_sSignalName[_SigInx::_MkBuffInitPosMv] = _T("_MkBuffInitPosMv"); 
+	m_sSignalName[_SigInx::_MkBuffPosSave] = _T("_MkBuffPosSave"); m_sSignalName[_SigInx::_EngBuffJogCw] = _T("_EngBuffJogCw"); m_sSignalName[_SigInx::_EngBuffJogCcw] = _T("_EngBuffJogCcw");
+	m_sSignalName[_SigInx::_EngBuffOrgMv] = _T("_EngBuffOrgMv"); m_sSignalName[_SigInx::_EngBuffOrgMvDone] = _T("_EngBuffOrgMvDone"); m_sSignalName[_SigInx::_EngBuffInitPosMv] = _T("_EngBuffInitPosMv"); 
+	m_sSignalName[_SigInx::_EngBuffInitPosMvDone] = _T("_EngBuffInitPosMvDone"); m_sSignalName[_SigInx::_EngBuffInitPosSave] = _T("_EngBuffInitPosSave"); m_sSignalName[_SigInx::_EngAutoInit] = _T("_EngAutoInit");
+	m_sSignalName[_SigInx::_EngAutoSeqMkSt] = _T("_EngAutoSeqMkSt"); m_sSignalName[_SigInx::_EngAutoSeqOnMkIng] = _T("_EngAutoSeqOnMkIng"); m_sSignalName[_SigInx::_EngAutoSeqMkDone] = _T("_EngAutoSeqMkDone"); 
+	m_sSignalName[_SigInx::_EngAutoSeq2dReadSt] = _T("_EngAutoSeq2dReadSt"); m_sSignalName[_SigInx::_EngAutoSeqOnReading2d] = _T("_EngAutoSeqOnReading2d"); 
+	m_sSignalName[_SigInx::_EngAutoSeq2dReadDone] = _T("_EngAutoSeq2dReadDone"); m_sSignalName[_SigInx::_EngAutoSeqFdDone] = _T("_EngAutoSeqFdDone"); m_sSignalName[_SigInx::_MyMsgYes] = _T("_MyMsgYes");
+	m_sSignalName[_SigInx::_MyMsgNo] = _T("_MyMsgNo"); m_sSignalName[_SigInx::_MyMsgCancel] = _T("_MyMsgCancel"); m_sSignalName[_SigInx::_MyMsgOk] = _T("_MyMsgOk"); m_sSignalName[_SigInx::_MyMsg] = _T("_MyMsg");
+	m_sSignalName[_SigInx::_Buzzer] = _T("_Buzzer"); m_sSignalName[_SigInx::_TowerLamp] = _T("_TowerLamp"); m_sSignalName[_SigInx::_ErrorRead2dCode] = _T("_ErrorRead2dCode"); 
+	m_sSignalName[_SigInx::_GetCurrentInfoSignal] = _T("_GetCurrentInfoSignal"); m_sSignalName[_SigInx::_GetMonDispMainSignal] = _T("_GetMonDispMainSignal"); 
+	m_sSignalName[_SigInx::_IsIdle] = _T("_IsIdle"); m_sSignalName[_SigInx::_IsBusy] = _T("_IsBusy"); m_sSignalName[_SigInx::_IsConnect] = _T("_IsConnect");
+	m_sSignalName[_SigInx::_IsDispDualSample] = _T("_IsDispDualSample"); m_sSignalName[_SigInx::_IsDispDualTest] = _T("_IsDispDualTest"); m_sSignalName[_SigInx::_IsDispSingleSample] = _T("_IsDispSingleSample");
+	m_sSignalName[_SigInx::_IsDispSingleTest] = _T("_IsDispSingleTest"); m_sSignalName[_SigInx::_IsDispInitRun] = _T("_IsDispInitRun"); m_sSignalName[_SigInx::_IsDispRun] = _T("_IsDispRun");
+	m_sSignalName[_SigInx::_IsDispStop] = _T("_IsDispStop"); m_sSignalName[_SigInx::_IsDispReady] = _T("_IsDispReady"); m_sSignalName[_SigInx::_IsDualTest] = _T("_IsDualTest"); 
+	//m_sSignalName[_SigInx::_IsSampleTest] = _T("_IsSampleTest"); m_sSignalName[_SigInx::_IsTestMode] = _T("_IsTestMode"); m_sSignalName[_SigInx::_IsRecoilerCcw] = _T("_IsRecoilerCcw");
+	m_sSignalName[_SigInx::_IsUncoilerCcw] = _T("_IsUncoilerCcw"); m_sSignalName[_SigInx::_IsAlignMethode] = _T("_IsAlignMethode"); m_sSignalName[_SigInx::_IsDoorRecoiler] = _T("_IsDoorRecoiler"); 
+	m_sSignalName[_SigInx::_IsDoorAoiUp] = _T("_IsDoorAoiUp"); m_sSignalName[_SigInx::_IsDoorAoiDn] = _T("_IsDoorAoiDn"); m_sSignalName[_SigInx::_IsDoorMk] = _T("_IsDoorMk");
+	m_sSignalName[_SigInx::_IsDoorEngrave] = _T("_IsDoorEngrave"); m_sSignalName[_SigInx::_IsDoorUncoiler] = _T("_IsDoorUncoiler"); m_sSignalName[_SigInx::_IsSaftyMk] = _T("_IsSaftyMk"); 
+	m_sSignalName[_SigInx::_IsCleannerAoiUp] = _T("_IsCleannerAoiUp"); m_sSignalName[_SigInx::_IsCleannerAoiDn] = _T("_IsCleannerAoiDn"); m_sSignalName[_SigInx::_IsUltraSonicAoiDn] = _T("_IsUltraSonicAoiDn");
+	m_sSignalName[_SigInx::_IsUltraSonicEngrave] = _T("_IsUltraSonicEngrave"); m_sSignalName[_SigInx::_IsFixDef] = _T("_IsFixDef"); m_sSignalName[_SigInx::_IsUse380mm] = _T("_IsUse380mm"); 
+	m_sSignalName[_SigInx::_IsDispContRun] = _T("_IsDispContRun"); m_sSignalName[_SigInx::_IsDispLotEnd] = _T("_IsDispLotEnd"); m_sSignalName[_SigInx::_IsTempStop] = _T("_IsTempStop");
+	m_sSignalName[_SigInx::_IsTempPause] = _T("_IsTempPause"); m_sSignalName[_SigInx::_IsLotCut] = _T("_IsLotCut"); m_sSignalName[_SigInx::_IsMkPosMv] = _T("_IsMkPosMv"); m_sSignalName[_SigInx::_IsMkVerify] = _T("_IsMkVerify"); 
+	m_sSignalName[_SigInx::_IsReelmapUp] = _T("_IsReelmapUp"); m_sSignalName[_SigInx::_IsReelmapDn] = _T("_IsReelmapDn"); m_sSignalName[_SigInx::_IsReelmapTot] = _T("_IsReelmapTot"); 
+	m_sSignalName[_SigInx::_IsRemainMode] = _T("_IsRemainMode"); m_sSignalName[_SigInx::_IsEndWork] = _T("_IsEndWork"); m_sSignalName[_SigInx::_IsReMk] = _T("_IsReMk"); m_sSignalName[_SigInx::_Is2Layer] = _T("_Is2Layer"); 
+	m_sSignalName[_SigInx::_Is1LnMk] = _T("_Is1LnMk"); m_sSignalName[_SigInx::_Is2LnMk] = _T("_Is2LnMk"); m_sSignalName[_SigInx::_Is3LnMk] = _T("_Is3LnMk"); m_sSignalName[_SigInx::_Is4LnMk] = _T("_Is4LnMk"); 
+	m_sSignalName[_SigInx::_IsTotLnMk] = _T("_IsTotLnMk"); m_sSignalName[_SigInx::_IsUpdateWork] = _T("_IsUpdateWork"); m_sSignalName[_SigInx::_IsDispDefImg] = _T("_IsDispDefImg");
+	m_sSignalName[_SigInx::_Is2DEngLenMvCw] = _T("_Is2DEngLenMvCw"); m_sSignalName[_SigInx::_Is2DEngLenMvCcw] = _T("_Is2DEngLenMvCcw"); m_sSignalName[_SigInx::_Is2DAoiLenMvCw] = _T("_Is2DAoiLenMvCw");
+	m_sSignalName[_SigInx::_Is2DAoiLenMvCcw] = _T("_Is2DAoiLenMvCcw"); m_sSignalName[_SigInx::_Is2DMkLenMvCw] = _T("_Is2DMkLenMvCw"); m_sSignalName[_SigInx::_Is2DMkLenMvCcw] = _T("_Is2DMkLenMvCcw");
+	m_sSignalName[_SigInx::_Is2DOneShotLenCw] = _T("_Is2DOneShotLenCw"); m_sSignalName[_SigInx::_Is2DOneShotLenCcw] = _T("_Is2DOneShotLenCcw"); m_sSignalName[_SigInx::_Is2DOffsetInitPos] = _T("_Is2DOffsetInitPos");
+	m_sSignalName[_SigInx::_Is2DOffsetInitPosMove] = _T("_Is2DOffsetInitPosMove"); m_sSignalName[_SigInx::_IsReady] = _T("_IsReady"); m_sSignalName[_SigInx::_IsRun] = _T("_IsRun");
+	m_sSignalName[_SigInx::_IsReset] = _T("_IsReset"); m_sSignalName[_SigInx::_IsStop] = _T("_IsStop"); m_sSignalName[_SigInx::_IsAuto] = _T("_IsAuto"); m_sSignalName[_SigInx::_IsOneCycle] = _T("_IsOneCycle"); 
+	m_sSignalName[_SigInx::_IsManual] = _T("_IsManual"); m_sSignalName[_SigInx::_IsMkTq] = _T("_IsMkTq"); m_sSignalName[_SigInx::_IsAoiTq] = _T("_IsAoiTq"); m_sSignalName[_SigInx::_IsEngTq] = _T("_IsEngTq"); 
+	m_sSignalName[_SigInx::_IsCcwModRe] = _T("_IsCcwModRe"); m_sSignalName[_SigInx::_IsCcwModUn] = _T("_IsCcwModUn"); m_sSignalName[_SigInx::_IsCore150Re] = _T("_IsCore150Re");
+	m_sSignalName[_SigInx::_IsCore150Un] = _T("_IsCore150Un"); m_sSignalName[_SigInx::_IsRelation] = _T("_IsRelation"); m_sSignalName[_SigInx::_IsJoinSelRe] = _T("_IsJoinSelRe"); 
+	m_sSignalName[_SigInx::_IsMvCwRe] = _T("_IsMvCwRe"); m_sSignalName[_SigInx::_IsMvCcwRe] = _T("_IsMvCcwRe"); m_sSignalName[_SigInx::_IsPrdChuckRe] = _T("_IsPrdChuckRe"); m_sSignalName[_SigInx::_IsDancerUpRe] = _T("_IsDancerUpRe");
+	m_sSignalName[_SigInx::_IsPasteUpLfRe] = _T("_IsPasteUpLfRe"); m_sSignalName[_SigInx::_IsPasteUpRtRe] = _T("_IsPasteUpRtRe"); m_sSignalName[_SigInx::_IsPasteVacRe] = _T("_IsPasteVacRe");
+	m_sSignalName[_SigInx::_IsPprChuckRe] = _T("_IsPprChuckRe"); m_sSignalName[_SigInx::_IsPprCwRe] = _T("_IsPprCwRe"); m_sSignalName[_SigInx::_IsPprCcwRe] = _T("_IsPprCcwRe");
+	m_sSignalName[_SigInx::_IsDoRe] = _T("_IsDoRe"); m_sSignalName[_SigInx::_IsPrdPprRe] = _T("_IsPrdPprRe"); m_sSignalName[_SigInx::_IsJoinSelMk] = _T("_IsJoinSelMk"); m_sSignalName[_SigInx::_IsMvCwMk] = _T("_IsMvCwMk"); 
+	m_sSignalName[_SigInx::_IsMvCcwMk] = _T("_IsMvCcwMk"); m_sSignalName[_SigInx::_IsFdVacMk] = _T("_IsFdVacMk"); m_sSignalName[_SigInx::_IsPushUpMk] = _T("_IsPushUpMk"); m_sSignalName[_SigInx::_IsTblBlwMk] = _T("_IsTblBlwMk"); 
+	m_sSignalName[_SigInx::_IsTblVacMk] = _T("_IsTblVacMk"); m_sSignalName[_SigInx::_IsFdClampMk] = _T("_IsFdClampMk"); m_sSignalName[_SigInx::_IsTensClampMk] = _T("_IsTensClampMk"); 
+	m_sSignalName[_SigInx::_IsOnePnlMk] = _T("_IsOnePnlMk"); m_sSignalName[_SigInx::_IsLsrMk] = _T("_IsLsrMk"); m_sSignalName[_SigInx::_IsDancerUpMk] = _T("_IsDancerUpMk"); m_sSignalName[_SigInx::_IsTqVacMk] = _T("_IsTqVacMk"); 
+	m_sSignalName[_SigInx::_IsJoinSelAoiDn] = _T("_IsJoinSelAoiDn"); m_sSignalName[_SigInx::_IsMvCwAoiDn] = _T("_IsMvCwAoiDn"); m_sSignalName[_SigInx::_IsMvCcwAoiDn] = _T("_IsMvCcwAoiDn");
+	m_sSignalName[_SigInx::_IsFdVacAoiDn] = _T("_IsFdVacAoiDn"); m_sSignalName[_SigInx::_IsPushUpAoiDn] = _T("_IsPushUpAoiDn"); m_sSignalName[_SigInx::_IsTblBlwAoiDn] = _T("_IsTblBlwAoiDn"); 
+	m_sSignalName[_SigInx::_IsTblVacAoiDn] = _T("_IsTblVacAoiDn"); m_sSignalName[_SigInx::_IsFdClampAoiDn] = _T("_IsFdClampAoiDn"); m_sSignalName[_SigInx::_IsTensClampAoiDn] = _T("_IsTensClampAoiDn");
+	m_sSignalName[_SigInx::_IsOnePnlAoiDn] = _T("_IsOnePnlAoiDn"); m_sSignalName[_SigInx::_IsLsrAoiDn] = _T("_IsLsrAoiDn"); m_sSignalName[_SigInx::_IsClrRollAoiDn] = _T("_IsClrRollAoiDn");
+	m_sSignalName[_SigInx::_IsVelClrSonicAoiDn] = _T("_IsVelClrSonicAoiDn"); m_sSignalName[_SigInx::_IsTestAoiDn] = _T("_IsTestAoiDn"); m_sSignalName[_SigInx::_IsResetAoiDn] = _T("_IsResetAoiDn");
+	m_sSignalName[_SigInx::_IsLotEndAoiDn] = _T("_IsLotEndAoiDn"); m_sSignalName[_SigInx::_IsJoinSelAoiUp] = _T("_IsJoinSelAoiUp"); m_sSignalName[_SigInx::_IsMvCwAoiUp] = _T("_IsMvCwAoiUp"); 
+	m_sSignalName[_SigInx::_IsMvCcwAoiUp] = _T("_IsMvCcwAoiUp"); m_sSignalName[_SigInx::_IsFdVacAoiUp] = _T("_IsFdVacAoiUp"); m_sSignalName[_SigInx::_IsPushUpAoiUp] = _T("_IsPushUpAoiUp");
+	m_sSignalName[_SigInx::_IsTblBlwAoiUp] = _T("_IsTblBlwAoiUp"); m_sSignalName[_SigInx::_IsTblVacAoiUp] = _T("_IsTblVacAoiUp"); m_sSignalName[_SigInx::_IsFdClampAoiUp] = _T("_IsFdClampAoiUp"); 
+	m_sSignalName[_SigInx::_IsTensClampAoiUp] = _T("_IsTensClampAoiUp"); m_sSignalName[_SigInx::_IsOnePnlAoiUp] = _T("_IsOnePnlAoiUp"); m_sSignalName[_SigInx::_IsLsrAoiUp] = _T("_IsLsrAoiUp");
+	m_sSignalName[_SigInx::_IsClrRollAoiUp] = _T("_IsClrRollAoiUp"); m_sSignalName[_SigInx::_IsTestAoiUp] = _T("_IsTestAoiUp"); m_sSignalName[_SigInx::_IsResetAoiUp] = _T("_IsResetAoiUp"); 
+	m_sSignalName[_SigInx::_IsLotEndAoiUp] = _T("_IsLotEndAoiUp"); m_sSignalName[_SigInx::_IsJoinSelEng] = _T("_IsJoinSelEng"); m_sSignalName[_SigInx::_IsMvCwEng] = _T("_IsMvCwEng");
+	m_sSignalName[_SigInx::_IsMvCcwEng] = _T("_IsMvCcwEng"); m_sSignalName[_SigInx::_IsFdVacEng] = _T("_IsFdVacEng"); m_sSignalName[_SigInx::_IsPushUpEng] = _T("_IsPushUpEng"); 
+	m_sSignalName[_SigInx::_IsTblBlwEng] = _T("_IsTblBlwEng"); m_sSignalName[_SigInx::_IsTblVacEng] = _T("_IsTblVacEng"); m_sSignalName[_SigInx::_IsFdClampEng] = _T("_IsFdClampEng");
+	m_sSignalName[_SigInx::_IsTensClampEng] = _T("_IsTensClampEng"); m_sSignalName[_SigInx::_IsOnePnlEng] = _T("_IsOnePnlEng"); m_sSignalName[_SigInx::_IsLsrEng] = _T("_IsLsrEng");
+	m_sSignalName[_SigInx::_IsDancerUpEng] = _T("_IsDancerUpEng"); m_sSignalName[_SigInx::_IsVelClrSonicEng] = _T("_IsVelClrSonicEng"); m_sSignalName[_SigInx::_IsJoinSelUn] = _T("_IsJoinSelUn");
+	m_sSignalName[_SigInx::_IsMvCwUn] = _T("_IsMvCwUn"); m_sSignalName[_SigInx::_IsMvCcwUn] = _T("_IsMvCcwUn"); m_sSignalName[_SigInx::_IsPrdChuckUn] = _T("_IsPrdChuckUn"); 
+	m_sSignalName[_SigInx::_IsDancerUpUn] = _T("_IsDancerUpUn"); m_sSignalName[_SigInx::_IsPasteUpLfUn] = _T("_IsPasteUpLfUn"); m_sSignalName[_SigInx::_IsPasteUpRtUn] = _T("_IsPasteUpRtUn");
+	m_sSignalName[_SigInx::_IsPasteVacUn] = _T("_IsPasteVacUn"); m_sSignalName[_SigInx::_IsPprChuckUn] = _T("_IsPprChuckUn"); m_sSignalName[_SigInx::_IsPprCwUn] = _T("_IsPprCwUn"); 
+	m_sSignalName[_SigInx::_IsPprCcwUn] = _T("_IsPprCcwUn"); m_sSignalName[_SigInx::_IsClrRollUpUn] = _T("_IsClrRollUpUn"); m_sSignalName[_SigInx::_IsClrRollPushUn] = _T("_IsClrRollPushUn");
+	m_sSignalName[_SigInx::_IsEmgAoi] = _T("_IsEmgAoi"); m_sSignalName[_SigInx::_IsMkResetLf] = _T("_IsMkResetLf"); m_sSignalName[_SigInx::_IsMkResetRt] = _T("_IsMkResetRt");
+	m_sSignalName[_SigInx::_IsMkBuffJogCw] = _T("_IsMkBuffJogCw"); m_sSignalName[_SigInx::_IsMkBuffJogCcw] = _T("_IsMkBuffJogCcw"); m_sSignalName[_SigInx::_IsMkBuffOrgMv] = _T("_IsMkBuffOrgMv");
+	m_sSignalName[_SigInx::_IsMkBuffInitPosMv] = _T("_IsMkBuffInitPosMv"); m_sSignalName[_SigInx::_IsMkBuffPosSave] = _T("_IsMkBuffPosSave"); m_sSignalName[_SigInx::_IsEngBuffJogCw] = _T("_IsEngBuffJogCw"); 
+	m_sSignalName[_SigInx::_IsEngBuffJogCcw] = _T("_IsEngBuffJogCcw"); m_sSignalName[_SigInx::_IsEngBuffOrgMv] = _T("_IsEngBuffOrgMv"); m_sSignalName[_SigInx::_IsEngBuffOrgMvDone] = _T("_IsEngBuffOrgMvDone");
+	m_sSignalName[_SigInx::_IsEngBuffInitPosMv] = _T("_IsEngBuffInitPosMv"); m_sSignalName[_SigInx::_IsEngBuffInitPosMvDone] = _T("_IsEngBuffInitPosMvDone"); m_sSignalName[_SigInx::_IsEngBuffInitPosSave] = _T("_IsEngBuffInitPosSave");
+	m_sSignalName[_SigInx::_IsEngAutoInit] = _T("_IsEngAutoInit"); m_sSignalName[_SigInx::_IsEngAutoSeqMkSt] = _T("_IsEngAutoSeqMkSt"); m_sSignalName[_SigInx::_IsEngAutoSeqOnMkIng] = _T("_IsEngAutoSeqOnMkIng");
+	m_sSignalName[_SigInx::_IsEngAutoSeqMkDone] = _T("_IsEngAutoSeqMkDone"); m_sSignalName[_SigInx::_IsEngAutoSeq2dReadSt] = _T("_IsEngAutoSeq2dReadSt"); m_sSignalName[_SigInx::_IsEngAutoSeqOnReading2d] = _T("_IsEngAutoSeqOnReading2d"); 
+	m_sSignalName[_SigInx::_IsEngAutoSeq2dReadDone] = _T("_IsEngAutoSeq2dReadDone"); m_sSignalName[_SigInx::_IsEngAutoSeqFdDone] = _T("_IsEngAutoSeqFdDone"); 
+	m_sSignalName[_SigInx::_IsMyMsgYes] = _T("_IsMyMsgYes"); m_sSignalName[_SigInx::_IsMyMsgNo] = _T("_IsMyMsgNo"); m_sSignalName[_SigInx::_IsMyMsgCancel] = _T("_IsMyMsgCancel"); m_sSignalName[_SigInx::_IsMyMsgOk] = _T("_IsMyMsgOk"); 
+	m_sSignalName[_SigInx::_IsMyMsg] = _T("_IsMyMsg"); m_sSignalName[_SigInx::_IsBuzzer] = _T("_IsBuzzer"); m_sSignalName[_SigInx::_IsTowerLamp] = _T("_IsTowerLamp");
+	m_sSignalName[_SigInx::_IsErrorRead2dCode] = _T("_IsErrorRead2dCode"); m_sSignalName[_SigInx::_IsGetCurrentInfoSignal] = _T("_IsGetCurrentInfoSignal"); m_sSignalName[_SigInx::_IsGetMonDispMainSignal] = _T("_IsGetMonDispMainSignal"); 
+}
+
+void CEngrave::SetJobEndEngrave()
+{
+	SOCKET_DATA SocketData;
+	SocketData.nCmdCode = _SetSig;
+
+	SocketData.nMsgID = _SigInx::_JobEnd;
+	SocketData.nData1 = 1;
+	SendCommand(SocketData);
 }

@@ -114,7 +114,7 @@ void CDataMarking::Init(int nSerial, int nTot) // m_nIdx : From 0 to nTot.....
 
 	if(nSerial <= 0)
 	{
-		pView->ClrDispMsg(); AfxMessageBox(_T("Serial Error.1"));
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Serial Error.1"));
 		return;
 	}
 
@@ -151,11 +151,15 @@ void CDataMarking::Init(int nSerial, int nTot) // m_nIdx : From 0 to nTot.....
 
 	int nR, nC;
 	for (nR = 0; nR < 100; nR++)
+	{
 		for (nC = 0; nC < 100; nC++)
 		{
 			m_arDefType[nR][nC] = -1;
 			m_arPcrLineNum[nR][nC] = -1;
+			m_arDefTypeForIts[nR][nC] = -1;
+			m_arPcrLineNumForIts[nR][nC] = -1;
 		}
+	}
 
 	m_MkOffset.x = 0;
 	m_MkOffset.y = 0;

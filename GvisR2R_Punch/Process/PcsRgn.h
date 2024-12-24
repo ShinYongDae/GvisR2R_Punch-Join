@@ -22,8 +22,8 @@ public:
 
 // Attributes
 public:
-	int nTotPcs;
-	int nCol, nRow;
+	int m_nTotPcs;
+	int m_nCol, m_nRow;
 	CRect rtFrm;
 	CRect *pPcs;
 	CfPoint *pCenter, *pMkPnt[2]; // [Cam]
@@ -37,8 +37,10 @@ public:
 	CfPoint GetMkPnt0(int nPcsId);
 	CfPoint GetMkPnt1(int nPcsId);
 	void SetPinPos(int nCam, CfPoint ptPnt);
-	BOOL GetMkMatrix(int nPcsId, int &nC, int &nR);					// Strip의 Col, Row정보를 얻음
-	BOOL GetMkMatrix(int nPcsId, int &nStrip, int &nC, int &nR);	// Strip의 Col, Row정보를 얻음
+	//BOOL GetMkMatrix(int nPcsId, int &nC, int &nR);					// Strip의 Col, Row정보를 얻음
+	//BOOL GetMkMatrix(int nPcsId, int &nStrip, int &nC, int &nR);	// Strip의 Col, Row정보를 얻음
+	BOOL GetMkMatrix(int nActionCode, int nPcsId, int &nC, int &nR);					// Strip의 Col, Row정보를 얻음
+	BOOL GetMkMatrix(int nActionCode, int nPcsId, int &nStrip, int &nC, int &nR);	// Strip의 Col, Row정보를 얻음
 
 	void GetPcsRgn(int nC, int nR, int &nPcsId, CRect &ptRect);
 

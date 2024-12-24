@@ -309,7 +309,11 @@ void CDlgUtil05::OnBtn00()
 		}
 	}
 	else
+	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
+		pView->ClrDispMsg();
 		AfxMessageBox(_T("Failed IO control..."));
+	}
 #endif
 }
 
@@ -330,7 +334,11 @@ void CDlgUtil05::OnBtn01()
 		}
 	}
 	else
+	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
+		pView->ClrDispMsg();
 		AfxMessageBox(_T("Failed IO control..."));
+	}
 #endif
 }
 

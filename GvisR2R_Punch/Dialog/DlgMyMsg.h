@@ -15,6 +15,7 @@
 #define DEFAULT_TIME_OUT			120000		// [mSec]
 #define MB_TIME_OUT					-1
 #define MAX_THREAD_ID				100
+#define TIM_DISP_STS				450
 
 typedef struct _MyMsgBox
 {
@@ -92,6 +93,7 @@ class CDlgMyMsg : public CDialog
 // 	HWND m_hParentWnd;
 	CWnd* m_pParent;
 
+	BOOL m_bTIM_DISP_STS;
 	int m_nTimeOut;
 	int m_nRtnVal;
 	BOOL m_bSetMsg;

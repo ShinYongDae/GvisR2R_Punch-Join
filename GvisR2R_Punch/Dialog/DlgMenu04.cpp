@@ -83,8 +83,8 @@ BEGIN_MESSAGE_MAP(CDlgMenu04, CDialog)
 	ON_BN_CLICKED(IDC_STC_25, OnStc25)
 	ON_BN_CLICKED(IDC_STC_28, OnStc28)
 	ON_WM_TIMER()
-	ON_BN_CLICKED(IDC_BTN_BUFF_HOME2, OnBtnBuffHome2)
-	ON_BN_CLICKED(IDC_BTN_BUFF_INIT_MOVE2, OnBtnBuffInitMove2)
+	//ON_BN_CLICKED(IDC_BTN_BUFF_HOME2, OnBtnBuffHome2)
+	//ON_BN_CLICKED(IDC_BTN_BUFF_INIT_MOVE2, OnBtnBuffInitMove2)
 	ON_BN_CLICKED(IDC_BTN_BUFF_INIT_SAVE2, OnBtnBuffInitSave2)
 	ON_BN_CLICKED(IDC_STC_48, OnStc48)
 	ON_BN_CLICKED(IDC_STC_52, OnStc52)
@@ -239,9 +239,12 @@ BOOL CDlgMenu04::OnInitDialog()
 	GetDlgItem(IDC_CHK_1)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_STC_00_5)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_CHK_2)->ShowWindow(SW_HIDE);
-	
-	m_bTIM_BUF_ENC = TRUE;
-	SetTimer(TIM_BUF_ENC_, 100, NULL);
+
+	GetDlgItem(IDC_BTN_BUFF_HOME2)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_BTN_BUFF_INIT_MOVE2)->ShowWindow(SW_HIDE);
+
+	//m_bTIM_BUF_ENC = TRUE;
+	//SetTimer(TIM_BUF_ENC_, 100, NULL);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
@@ -637,8 +640,9 @@ void CDlgMenu04::InitStcData()
 	myStcData[55].SubclassDlgItem(IDC_STC_221, this);	
 	myStcData[56].SubclassDlgItem(IDC_STC_220, this);
 	myStcData[57].SubclassDlgItem(IDC_STC_222, this);
+	myStcData[58].SubclassDlgItem(IDC_STC_15, this);
 
-	for(i=54; i<58; i++)
+	for(i=54; i<MAX_MENU04_STC_DATA - 1; i++)
 	{
 		myStcData[i].SetFontName(_T("Arial"));
 		myStcData[i].SetFontSize(15);
@@ -647,7 +651,6 @@ void CDlgMenu04::InitStcData()
 		myStcData[i].SetBkColor(RGB_WHITE);
 	}
 
-	myStcData[58].SubclassDlgItem(IDC_STC_15, this);
 	myStcData[58].SetFontName(_T("Arial"));
 	myStcData[58].SetFontSize(20);
 	myStcData[58].SetFontBold(TRUE);
@@ -677,7 +680,8 @@ BOOL CDlgMenu04::ShowKeypad(int nCtlID, CPoint ptSt, int nDir)
 			_tstof(strData) > _tstof(strMax))
 		{
 			SetDlgItemText(nCtlID, strPrev);
-			pView->DispMsg(_T("입력 범위를 벗어났습니다."), _T("주의"), RGB_YELLOW);
+			//pView->DispMsg(_T("입력 범위를 벗어났습니다."), _T("주의"), RGB_YELLOW);
+			pView->MsgBox(_T("수동 모드가 아닙니다."));
 		}
 		else
 			SetDlgItemText(nCtlID, strData);
@@ -1230,11 +1234,13 @@ BOOL CDlgMenu04::PreTranslateMessage(MSG* pMsg)
 
 void CDlgMenu04::DispBufEnc()
 {
+	return;
+
 	if (!pDoc->m_pMpeData)
 		return;
 
 	CString str;
-	double dBufEnc = (double)pDoc->m_pMpeData[0][1]	/ 1000.0;	// 마킹부 버퍼 엔코더 값(단위 mm * 1000)
+	double dBufEnc = (double)pDoc->m_pMpeData[2][1]	/ 1000.0;	// 마킹부 버퍼 엔코더 값(단위 mm * 1000)
 	str.Format(_T("%.1f"), dBufEnc);
 	myStcData[14].SetText(str);
 
@@ -1246,29 +1252,29 @@ void CDlgMenu04::DispBufEnc()
 		if (pDoc->WorkingInfo.Motion.bEngBuffJogCw && !m_bEngBuffJogCwF)
 		{
 			m_bEngBuffJogCwF = TRUE;
-				pView->MpeWrite(pView->Plc.DlgMenu03.FeedCwPunch, 1);		// 각인부 피딩 정회전 스위치
+			pView->MpeWrite(pView->Plc.DlgMenu03.FeedCwPunch, 1);		// 각인부 피딩 정회전 스위치
 		}
 		else if (!pDoc->WorkingInfo.Motion.bEngBuffJogCw && m_bEngBuffJogCwF)
 		{
 			m_bEngBuffJogCwF = FALSE;
-				pView->MpeWrite(pView->Plc.DlgMenu03.FeedCwPunch, 0);		// 각인부 피딩 정회전 스위치
+			pView->MpeWrite(pView->Plc.DlgMenu03.FeedCwPunch, 0);		// 각인부 피딩 정회전 스위치
 		}
 
 		if (pDoc->WorkingInfo.Motion.bEngBuffJogCcw && !m_bEngBuffJogCcwF)
 		{
 			m_bEngBuffJogCcwF = TRUE;
-				pView->MpeWrite(pView->Plc.DlgMenu03.FeedCwPunch, 1);		// 각인부 피딩 역회전 스위치
+			pView->MpeWrite(pView->Plc.DlgMenu03.FeedCwPunch, 1);		// 각인부 피딩 역회전 스위치
 		}
 		else if (!pDoc->WorkingInfo.Motion.bEngBuffJogCcw && m_bEngBuffJogCcwF)
 		{
 			m_bEngBuffJogCcwF = FALSE;
-				pView->MpeWrite(pView->Plc.DlgMenu03.FeedCwPunch, 0);		// 각인부 피딩 역회전 스위치
+			pView->MpeWrite(pView->Plc.DlgMenu03.FeedCwPunch, 0);		// 각인부 피딩 역회전 스위치
 		}
 
 		if (pDoc->WorkingInfo.Motion.bEngBuffHomming && !m_bEngBuffHommingF)
 		{
 			m_bEngBuffHommingF = TRUE;
-				pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 1);		// 각인부 버퍼롤러 홈동작 ON (PLC가 홈동작 완료 후 OFF)
+			pView->MpeWrite(pView->Plc.DlgMenu03.FeedHomeEngrave, 1);		// 각인부 버퍼롤러 홈동작 ON (PLC가 홈동작 완료 후 OFF)
 		}
 		else if (!pDoc->WorkingInfo.Motion.bEngBuffHomming && m_bEngBuffHommingF)
 		{
@@ -1278,7 +1284,7 @@ void CDlgMenu04::DispBufEnc()
 		if (pDoc->WorkingInfo.Motion.bEngBuffInitMv && !m_bEngBuffInitMvF)
 		{
 			m_bEngBuffInitMvF = TRUE;
-//				pView->MpeWrite(_T("MB44017A"), 1);		// 각인부 버퍼 초기위치 이동(PC가 ON, PLC가 OFF)
+//			pView->MpeWrite(_T("MB44017A"), 1);		// 각인부 버퍼 초기위치 이동(PC가 ON, PLC가 OFF)
 		}
 		else if (!pDoc->WorkingInfo.Motion.bEngBuffInitMv && m_bEngBuffInitMvF)
 		{
@@ -1429,29 +1435,29 @@ void CDlgMenu04::ResetMotion(int nMsId)
 }
 
 
-void CDlgMenu04::OnBtnBuffHome2() 
-{
-	// TODO: Add your control notification handler code here
-	if (!pDoc)
-		return;
+//void CDlgMenu04::OnBtnBuffHome2() 
+//{
+//	// TODO: Add your control notification handler code here
+//	if (!pDoc)
+//		return;
+//
+//	if(pDoc->WorkingInfo.Motion.bBufHomming)
+//	{
+//		pView->DispMsg(_T("Homming"),_T("Searching Buffer Home Position..."),RGB_GREEN,2000,TRUE);
+//			pView->MpeWrite(pView->Plc.DlgMenu04.BufferHomming, 1);	// 마킹부 버퍼롤러 홈동작 ON (PLC가 홈동작 완료 후 OFF)
+//		if(pView->m_pDlgMenu03)
+//			pView->m_pDlgMenu03->ChkBufHomeDone();
+//	}	
+//}
 
-	if(pDoc->WorkingInfo.Motion.bBufHomming)
-	{
-		pView->DispMsg(_T("Homming"),_T("Searching Buffer Home Position..."),RGB_GREEN,2000,TRUE);
-			pView->MpeWrite(pView->Plc.DlgMenu04.BufferHomming, 1);	// 마킹부 버퍼롤러 홈동작 ON (PLC가 홈동작 완료 후 OFF)
-		if(pView->m_pDlgMenu03)
-			pView->m_pDlgMenu03->ChkBufHomeDone();
-	}	
-}
-
-void CDlgMenu04::OnBtnBuffInitMove2() 
-{
-	// TODO: Add your control notification handler code here
-	pView->DispMsg(_T("Moving"),_T("Searching Buffer Initial Position..."),RGB_GREEN,2000,TRUE);
-		pView->MpeWrite(pView->Plc.DlgMenu04.BufferInitPosMove, 1);	// 마킹부 버퍼 초기위치 이동(PC가 ON, PLC가 OFF)
-	if(pView->m_pDlgMenu03)
-		pView->m_pDlgMenu03->ChkBufInitDone();
-}
+//void CDlgMenu04::OnBtnBuffInitMove2() 
+//{
+//	// TODO: Add your control notification handler code here
+//	pView->DispMsg(_T("Moving"),_T("Searching Buffer Initial Position..."),RGB_GREEN,2000,TRUE);
+//		pView->MpeWrite(pView->Plc.DlgMenu04.BufferInitPosMove, 1);	// 마킹부 버퍼 초기위치 이동(PC가 ON, PLC가 OFF)
+//	if(pView->m_pDlgMenu03)
+//		pView->m_pDlgMenu03->ChkBufInitDone();
+//}
 
 void CDlgMenu04::OnBtnBuffInitSave2() 
 {
@@ -1464,7 +1470,7 @@ void CDlgMenu04::OnBtnBuffInitSave2()
 		return;
 
 #ifdef USE_MPE
-	double dBufEnc = (double)pDoc->m_pMpeData[0][1]	/ 1000.0;	// 마킹부 버퍼 엔코더 값(단위 mm * 1000)
+	double dBufEnc = (double)pDoc->m_pMpeData[2][1]	/ 1000.0;	// 마킹부 버퍼 엔코더 값(단위 mm * 1000)
 	pView->SetBufInitPos(dBufEnc);		// ML45016	,	버퍼 관련 설정 롤러 초기위치(단위 mm * 1000)
 #endif
 }
@@ -2603,7 +2609,7 @@ void CDlgMenu04::EngBuffInitPosSave()
 		return;
 
 #ifdef USE_MPE
-	double dBufEnc = (double)pDoc->m_pMpeData[1][1] / 1000.0;	// 각인부 버퍼 엔코더 값(단위 mm * 1000)
+	double dBufEnc = (double)pDoc->m_pMpeData[1][15] / 1000.0;	// 각인부 버퍼 엔코더 값(단위 mm * 1000)
 	pView->SetEngBufInitPos(dBufEnc);								// ML44054	,	각인부 버퍼 관련 설정 롤러 초기위치(단위 mm * 1000)
 #endif
 }
