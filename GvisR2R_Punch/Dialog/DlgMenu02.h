@@ -195,6 +195,7 @@ public:
 	void Grab4PntAlign2();
 
 	void ShowDebugEngSig();
+	BOOL SetModelMarkImage();
 
 	// ITS
 #ifdef USE_MIL

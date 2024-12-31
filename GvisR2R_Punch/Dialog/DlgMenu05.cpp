@@ -2961,16 +2961,17 @@ CString CDlgMenu05::Sapp3Data()
 			strFileData += strData;
 		}
 		
-		if(m_nDefPerStrip[0][DEF_NICK] > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
+		nSum = m_nDefPerStrip[0][DEF_NICK] + m_nDefPerStrip[0][DEF_EDGE_NICK];
+		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], m_nDefPerStrip[0][DEF_NICK]); // °á¼Õ(B137)
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], nSum); // °á¼Õ+¿§Áö°á¼Õ(B137)
 			strFileData += strData;
 		}
 
-		nSum = m_nDefPerStrip[0][DEF_SPACE] + m_nDefPerStrip[0][DEF_EXTRA] + m_nDefPerStrip[0][DEF_PROTRUSION];
+		nSum = m_nDefPerStrip[0][DEF_SPACE] + m_nDefPerStrip[0][DEF_EXTRA] + m_nDefPerStrip[0][DEF_PROTRUSION] + m_nDefPerStrip[0][DEF_EDGE_SPACE] + m_nDefPerStrip[0][DEF_EDGE_PROT];
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â(B160)
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â+¿§Áö¼±°£Æø+¿§Áöµ¹±â(B160)
 			strFileData += strData;
 		}
 
@@ -3030,16 +3031,17 @@ CString CDlgMenu05::Sapp3Data()
 			strFileData += strData;
 		}
 		
-		if(m_nDefPerStrip[1][DEF_NICK] > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
+		nSum = m_nDefPerStrip[1][DEF_NICK] + m_nDefPerStrip[1][DEF_EDGE_NICK];
+		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], m_nDefPerStrip[1][DEF_NICK]); // °á¼Õ(B137)
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], nSum); // °á¼Õ+¿§Áö°á¼Õ(B137)
 			strFileData += strData;
 		}
 
-		nSum = m_nDefPerStrip[1][DEF_SPACE] + m_nDefPerStrip[1][DEF_EXTRA] + m_nDefPerStrip[1][DEF_PROTRUSION];
+		nSum = m_nDefPerStrip[1][DEF_SPACE] + m_nDefPerStrip[1][DEF_EXTRA] + m_nDefPerStrip[1][DEF_PROTRUSION] + m_nDefPerStrip[1][DEF_EDGE_SPACE] + m_nDefPerStrip[1][DEF_EDGE_PROT];
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â(B160)
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â+¿§Áö¼±°£Æø+¿§Áöµ¹±â(B160)
 			strFileData += strData;
 		}
 
@@ -3100,16 +3102,17 @@ CString CDlgMenu05::Sapp3Data()
 			strFileData += strData;
 		}
 		
-		if(m_nDefPerStrip[2][DEF_NICK] > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
+		nSum = m_nDefPerStrip[2][DEF_NICK] + m_nDefPerStrip[2][DEF_EDGE_NICK];
+		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], m_nDefPerStrip[2][DEF_NICK]); // °á¼Õ(B137)
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], nSum); // °á¼Õ+¿§Áö°á¼Õ(B137)
 			strFileData += strData;
 		}
 
-		nSum = m_nDefPerStrip[2][DEF_SPACE] + m_nDefPerStrip[2][DEF_EXTRA] + m_nDefPerStrip[2][DEF_PROTRUSION];
+		nSum = m_nDefPerStrip[2][DEF_SPACE] + m_nDefPerStrip[2][DEF_EXTRA] + m_nDefPerStrip[2][DEF_PROTRUSION] + m_nDefPerStrip[2][DEF_EDGE_SPACE] + m_nDefPerStrip[2][DEF_EDGE_PROT];
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â(B160)
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â+¿§Áö¼±°£Æø+¿§Áöµ¹±â(B160)
 			strFileData += strData;
 		}
 
@@ -3129,14 +3132,14 @@ CString CDlgMenu05::Sapp3Data()
 
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_HOPEN] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"),pDoc->m_nSapp3Code[SAPP3_HOPEN], m_nDefPerStrip[2][DEF_HOLE_OPEN]);
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_HOPEN], m_nDefPerStrip[2][DEF_HOLE_OPEN]);
 			strFileData += strData;
 		}
 
 		nSum = m_nDefPerStrip[2][DEF_HOLE_MISS] + m_nDefPerStrip[2][DEF_HOLE_POSITION] + m_nDefPerStrip[2][DEF_HOLE_DEFECT];
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_HMISS_HPOS_HBAD] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"),pDoc->m_nSapp3Code[SAPP3_HMISS_HPOS_HBAD], nSum);
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_HMISS_HPOS_HBAD], nSum);
 			strFileData += strData;
 		}
 
@@ -3159,7 +3162,7 @@ CString CDlgMenu05::Sapp3Data()
 		nSum = m_nDefPerStrip[3][DEF_SHORT];// + m_nDefPerStrip[3][DEF_USHORT];
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SHORT] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"),pDoc->m_nSapp3Code[SAPP3_SHORT], nSum); // ¼îÆ®(B129) // +u¼îÆ®
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SHORT], nSum); // ¼îÆ®(B129) // +u¼îÆ®
 			strFileData += strData;
 		}
 
@@ -3170,43 +3173,44 @@ CString CDlgMenu05::Sapp3Data()
 			strFileData += strData;
 		}
 		
-		if(m_nDefPerStrip[3][DEF_NICK] > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
+		nSum = m_nDefPerStrip[3][DEF_NICK] + m_nDefPerStrip[3][DEF_EDGE_NICK];
+		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"),pDoc->m_nSapp3Code[SAPP3_NICK], m_nDefPerStrip[3][DEF_NICK]); // °á¼Õ(B137)
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], nSum); // °á¼Õ+¿§Áö°á¼Õ(B137)
 			strFileData += strData;
 		}
 
-		nSum = m_nDefPerStrip[3][DEF_SPACE] + m_nDefPerStrip[3][DEF_EXTRA] + m_nDefPerStrip[3][DEF_PROTRUSION];
+		nSum = m_nDefPerStrip[3][DEF_SPACE] + m_nDefPerStrip[3][DEF_EXTRA] + m_nDefPerStrip[3][DEF_PROTRUSION] + m_nDefPerStrip[3][DEF_EDGE_SPACE] + m_nDefPerStrip[3][DEF_EDGE_PROT];
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"),pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â(B160)
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â+¿§Áö¼±°£Æø+¿§Áöµ¹±â(B160)
 			strFileData += strData;
 		}
 
 		nSum = m_nDefPerStrip[3][DEF_PINHOLE];
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_PINHOLE] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"),pDoc->m_nSapp3Code[SAPP3_PINHOLE], nSum); // ÇÉÈ¦(B134)
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_PINHOLE], nSum); // ÇÉÈ¦(B134)
 			strFileData += strData;
 		}
 
 		nSum = m_nDefPerStrip[3][DEF_PAD];
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_PAD] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"),pDoc->m_nSapp3Code[SAPP3_PAD], nSum); // ÆÐµå(B316)
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_PAD], nSum); // ÆÐµå(B316)
 			strFileData += strData;
 		}
 
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_HOPEN] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"),pDoc->m_nSapp3Code[SAPP3_HOPEN], m_nDefPerStrip[3][DEF_HOLE_OPEN]);
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_HOPEN], m_nDefPerStrip[3][DEF_HOLE_OPEN]);
 			strFileData += strData;
 		}
 
 		nSum = m_nDefPerStrip[3][DEF_HOLE_MISS] + m_nDefPerStrip[3][DEF_HOLE_POSITION] + m_nDefPerStrip[3][DEF_HOLE_DEFECT];
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_HMISS_HPOS_HBAD] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"),pDoc->m_nSapp3Code[SAPP3_HMISS_HPOS_HBAD], nSum);
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_HMISS_HPOS_HBAD], nSum);
 			strFileData += strData;
 		}
 
@@ -3269,16 +3273,17 @@ CString CDlgMenu05::Sapp3Data()
 			strFileData += strData;
 		}
 		
-		if(m_nDefPerStrip[3][DEF_NICK] > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
+		nSum = m_nDefPerStrip[3][DEF_NICK] + m_nDefPerStrip[3][DEF_EDGE_NICK];
+		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], m_nDefPerStrip[3][DEF_NICK]); // °á¼Õ(B137)
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], nSum); // °á¼Õ+¿§Áö°á¼Õ(B137)
 			strFileData += strData;
 		}
 
-		nSum = m_nDefPerStrip[3][DEF_SPACE] + m_nDefPerStrip[3][DEF_EXTRA] + m_nDefPerStrip[3][DEF_PROTRUSION];
+		nSum = m_nDefPerStrip[3][DEF_SPACE] + m_nDefPerStrip[3][DEF_EXTRA] + m_nDefPerStrip[3][DEF_PROTRUSION] + m_nDefPerStrip[3][DEF_EDGE_SPACE] + m_nDefPerStrip[3][DEF_EDGE_PROT];
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â(B160)
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â+¿§Áö¼±°£Æø+¿§Áöµ¹±â(B160)
 			strFileData += strData;
 		}
 
@@ -3345,16 +3350,17 @@ CString CDlgMenu05::Sapp3Data()
 			strFileData += strData;
 		}
 		
-		if(m_nDefPerStrip[2][DEF_NICK] > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
+		nSum = m_nDefPerStrip[2][DEF_NICK] + m_nDefPerStrip[2][DEF_EDGE_NICK];
+		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], m_nDefPerStrip[2][DEF_NICK]); // °á¼Õ(B137)
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], nSum); // °á¼Õ+¿§Áö°á¼Õ(B137)
 			strFileData += strData;
 		}
 
-		nSum = m_nDefPerStrip[2][DEF_SPACE] + m_nDefPerStrip[2][DEF_EXTRA] + m_nDefPerStrip[2][DEF_PROTRUSION];
+		nSum = m_nDefPerStrip[2][DEF_SPACE] + m_nDefPerStrip[2][DEF_EXTRA] + m_nDefPerStrip[2][DEF_PROTRUSION] + m_nDefPerStrip[2][DEF_EDGE_SPACE] + m_nDefPerStrip[2][DEF_EDGE_PROT];
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â(B160)
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â+¿§Áö¼±°£Æø+¿§Áöµ¹±â(B160)
 			strFileData += strData;
 		}
 
@@ -3415,16 +3421,17 @@ CString CDlgMenu05::Sapp3Data()
 			strFileData += strData;
 		}
 		
-		if(m_nDefPerStrip[1][DEF_NICK] > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
+		nSum = m_nDefPerStrip[1][DEF_NICK] + m_nDefPerStrip[1][DEF_EDGE_NICK];
+		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], m_nDefPerStrip[1][DEF_NICK]); // °á¼Õ(B137)
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], nSum); // °á¼Õ+¿§Áö°á¼Õ(B137)
 			strFileData += strData;
 		}
 
-		nSum = m_nDefPerStrip[1][DEF_SPACE] + m_nDefPerStrip[1][DEF_EXTRA] + m_nDefPerStrip[1][DEF_PROTRUSION];
+		nSum = m_nDefPerStrip[1][DEF_SPACE] + m_nDefPerStrip[1][DEF_EXTRA] + m_nDefPerStrip[1][DEF_PROTRUSION] + m_nDefPerStrip[1][DEF_EDGE_SPACE] + m_nDefPerStrip[1][DEF_EDGE_PROT];
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â(B160)
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â+¿§Áö¼±°£Æø+¿§Áöµ¹±â(B160)
 			strFileData += strData;
 		}
 
@@ -3444,14 +3451,14 @@ CString CDlgMenu05::Sapp3Data()
 
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_HOPEN] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"),pDoc->m_nSapp3Code[SAPP3_HOPEN], m_nDefPerStrip[1][DEF_HOLE_OPEN]);
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_HOPEN], m_nDefPerStrip[1][DEF_HOLE_OPEN]);
 			strFileData += strData;
 		}
 
 		nSum = m_nDefPerStrip[1][DEF_HOLE_MISS] + m_nDefPerStrip[1][DEF_HOLE_POSITION] + m_nDefPerStrip[1][DEF_HOLE_DEFECT];
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_HMISS_HPOS_HBAD] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"),pDoc->m_nSapp3Code[SAPP3_HMISS_HPOS_HBAD], nSum);
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_HMISS_HPOS_HBAD], nSum);
 			strFileData += strData;
 		}
 
@@ -3474,7 +3481,7 @@ CString CDlgMenu05::Sapp3Data()
 		nSum = m_nDefPerStrip[0][DEF_SHORT];// + m_nDefPerStrip[3][DEF_USHORT];
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SHORT] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"),pDoc->m_nSapp3Code[SAPP3_SHORT], nSum); // ¼îÆ®(B129) // +u¼îÆ®
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SHORT], nSum); // ¼îÆ®(B129) // +u¼îÆ®
 			strFileData += strData;
 		}
 
@@ -3485,43 +3492,44 @@ CString CDlgMenu05::Sapp3Data()
 			strFileData += strData;
 		}
 		
-		if(m_nDefPerStrip[0][DEF_NICK] > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
+		nSum = m_nDefPerStrip[0][DEF_NICK] + m_nDefPerStrip[0][DEF_EDGE_NICK];
+		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"),pDoc->m_nSapp3Code[SAPP3_NICK], m_nDefPerStrip[0][DEF_NICK]); // °á¼Õ(B137)
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], nSum); // °á¼Õ+¿§Áö°á¼Õ(B137)
 			strFileData += strData;
 		}
 
-		nSum = m_nDefPerStrip[0][DEF_SPACE] + m_nDefPerStrip[0][DEF_EXTRA] + m_nDefPerStrip[0][DEF_PROTRUSION];
+		nSum = m_nDefPerStrip[0][DEF_SPACE] + m_nDefPerStrip[0][DEF_EXTRA] + m_nDefPerStrip[0][DEF_PROTRUSION] + m_nDefPerStrip[0][DEF_EDGE_SPACE] + m_nDefPerStrip[0][DEF_EDGE_PROT];
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"),pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â(B160)
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â+¿§Áö¼±°£Æø+¿§Áöµ¹±â(B160)
 			strFileData += strData;
 		}
 
 		nSum = m_nDefPerStrip[0][DEF_PINHOLE];
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_PINHOLE] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"),pDoc->m_nSapp3Code[SAPP3_PINHOLE], nSum); // ÇÉÈ¦(B134)
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_PINHOLE], nSum); // ÇÉÈ¦(B134)
 			strFileData += strData;
 		}
 
 		nSum = m_nDefPerStrip[0][DEF_PAD];
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_PAD] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"),pDoc->m_nSapp3Code[SAPP3_PAD], nSum); // ÆÐµå(B316)
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_PAD], nSum); // ÆÐµå(B316)
 			strFileData += strData;
 		}
 
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_HOPEN] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"),pDoc->m_nSapp3Code[SAPP3_HOPEN], m_nDefPerStrip[0][DEF_HOLE_OPEN]);
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_HOPEN], m_nDefPerStrip[0][DEF_HOLE_OPEN]);
 			strFileData += strData;
 		}
 
 		nSum = m_nDefPerStrip[0][DEF_HOLE_MISS] + m_nDefPerStrip[0][DEF_HOLE_POSITION] + m_nDefPerStrip[0][DEF_HOLE_DEFECT];
 		if(nSum > 0 && pDoc->m_nSapp3Code[SAPP3_HMISS_HPOS_HBAD] > 0)
 		{
-			strData.Format(_T("B%d,%d\r\n"),pDoc->m_nSapp3Code[SAPP3_HMISS_HPOS_HBAD], nSum);
+			strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_HMISS_HPOS_HBAD], nSum);
 			strFileData += strData;
 		}
 

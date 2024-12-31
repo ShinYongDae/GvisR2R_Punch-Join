@@ -363,6 +363,7 @@ public:
 
 	int m_nMkStrip[2][MAX_STRIP]; // [nCam][nStrip] - [좌/우][] : 스트립에 펀칭한 피스 수 count
 	int m_nStepMk[4], m_nMkPcs[4]; 	// [0] Auto-Left, [1] Auto-Right, [2] Manual-Left, [3] Manual-Right  ; m_nStepMk(마킹Sequence), nMkOrderIdx(마킹한 count)
+	int m_nMarkingOrder[2]; 	// [0] Auto-Left, [1] Auto-Right
 	int m_nTotMk[2], m_nCurMk[2]; // [0]: 좌 MK, [1]: 우 MK
 	int m_nPrevTotMk[2], m_nPrevCurMk[2]; // [0]: 좌 MK, [1]: 우 MK
 	int m_nPrevStepAuto, m_nPrevMkStAuto;
@@ -1300,6 +1301,11 @@ public:
 	void ClearBuffer();
 	BOOL IsDoneReloadReelmap();
 	BOOL IsDoneReloadYield();
+	void InitVoiceCoil(int nCam);
+	BOOL IsSetPinPos();
+
+	BOOL SetMkPcs0(int nSerial, int nMkPcs); // pcr 시리얼, pcr 불량 피스 마킹 순서 인덱스
+	BOOL SetMkPcs1(int nSerial, int nMkPcs); // pcr 시리얼, pcr 불량 피스 마킹 순서 인덱스
 
 // 재정의입니다.
 public:

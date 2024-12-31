@@ -2402,6 +2402,11 @@ void CDlgMenu02::OnBtnPinSave()
 			return;
 		}
 	}
+
+	//if (pView->IsSetPinPos())
+	//{
+	//	SetModelMarkImage();
+	//}
 }
 
 void CDlgMenu02::OnBtnPinSave2() 
@@ -2437,6 +2442,11 @@ void CDlgMenu02::OnBtnPinSave2()
 			return;
 		}
 	}
+
+	//if (pView->IsSetPinPos())
+	//{
+	//	SetModelMarkImage();
+	//}
 
 	if (pView->m_nMkStAuto > MK_ST + 11 && pView->m_nMkStAuto < MK_ST + 29)
 	{
@@ -5122,3 +5132,34 @@ BOOL CDlgMenu02::Do4PtAlign1(int nPos, BOOL bDraw)
 
 
 //====================================================================================================
+
+BOOL CDlgMenu02::SetModelMarkImage()
+{
+	if (IDNO == pView->MsgBox(_T("마킹 여부를 확인하기 위한 패턴모델을 설정하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, TRUE))
+		return FALSE;
+	return TRUE;
+
+	// 1. 우측 카메라가 첫번째 패턴 위치로 이동
+
+	// 2. 우측 카메라 패턴 선택 질문 후 No인 경우, 좌측 카메라 충돌 여부 확인 후 다음 패턴으로 이동
+
+	// 3. 우측 카메라 패턴 선택 후 Grab Test
+
+	// 4. Score를 설정하기 위해 10개의 패턴을 Grab 후 최소값에서 마진을 뺀 값으로 설정 
+
+	// 5. 자동 설정된 값을 작업자가 수정할 수 있도록 함.
+
+	// 6. 우측 카메라를 초기 위치로 보냄
+
+	// 7. 좌측 카메라가 첫번째 패턴 위치로 이동
+
+	// 8. 좌측 카메라 패턴 선택 질문 후 No인 경우, 우측 카메라 충돌 여부 확인 후 다음 패턴으로 이동
+
+	// 9. 좌측 카메라 패턴 선택 후 Grab Test
+
+	// 10. Score를 설정하기 위해 10개의 패턴을 Grab 후 최소값에서 마진을 뺀 값으로 설정 
+
+	// 11. 자동 설정된 값을 작업자가 수정할 수 있도록 함.
+
+	// 12. 좌측 카메라를 초기 위치로 보냄
+}

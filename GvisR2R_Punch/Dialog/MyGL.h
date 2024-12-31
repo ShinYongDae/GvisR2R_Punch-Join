@@ -46,6 +46,7 @@ class CMyGL : public CWnd
 
 	GVertex **m_pFrmRgn;
 	GVertex ***m_pPcsPnt;	// [pnl][pcsIdx][LT], 	// [pnl][pcsIdx][RB]
+	GVertex ***m_pPcsMarkPnt;	// [pnl][pcsIdx][LT], 	// [pnl][pcsIdx][RB]
 
 	int m_nWorldW, m_nWorldH;
 	GVColor m_rgbDef[MAX_DEF];
@@ -61,6 +62,7 @@ class CMyGL : public CWnd
 
 	void DrawBack();
 	void DrawRgn();
+	void DrawMark();
 	void DrawPnlNum();
 	void DrawPnlDefNum();
 

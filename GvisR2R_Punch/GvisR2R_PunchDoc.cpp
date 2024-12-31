@@ -1505,7 +1505,7 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	else
 	{
 		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Sapp3Path가 설정되어 있지 않습니다."), MB_ICONWARNING | MB_OK);
-		WorkingInfo.System.sPathSapp3 = CString(_T(""));
+		WorkingInfo.System.sPathSapp3 = CString(_T("C:\\LOSS\\"));
 	}
 
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("SaveReelmapTable"), NULL, szData, sizeof(szData), sPath))

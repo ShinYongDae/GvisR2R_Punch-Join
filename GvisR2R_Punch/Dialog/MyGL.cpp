@@ -43,6 +43,7 @@ CMyGL::CMyGL(CWnd* pParent)
 	m_nPrevTotPcs = 0;
 	m_pFrmRgn = NULL;
 	m_pPcsPnt = NULL;
+	m_pPcsMarkPnt = NULL;
 	m_pPnlNum = NULL;
 	m_pPnlDefNum = NULL;
 
@@ -104,6 +105,26 @@ CMyGL::~CMyGL()
 		}
 		delete[] m_pPcsPnt;
 		m_pPcsPnt = NULL;
+	}
+
+	if (m_pPcsMarkPnt)
+	{
+		for (k = 0; k < m_nTotPnl; k++)
+		{
+			if (m_pPcsMarkPnt[k])
+			{
+				for (i = 0; i < m_nTotPcs; i++)
+				{
+					delete[] m_pPcsMarkPnt[k][i];
+					m_pPcsMarkPnt[k][i] = NULL;
+				}
+
+				delete[] m_pPcsMarkPnt[k];
+				m_pPcsMarkPnt[k] = NULL;
+			}
+		}
+		delete[] m_pPcsMarkPnt;
+		m_pPcsMarkPnt = NULL;
 	}
 
 	if(m_hRC)
@@ -277,6 +298,7 @@ void CMyGL::ResetRgn()
 
 	int i, k;
 	int nTotPnl = m_pReelMap->nTotPnl;// pDoc->
+
 	if(m_pPcsPnt)
 	{
 		for(k=0; k<nTotPnl; k++)
@@ -291,6 +313,22 @@ void CMyGL::ResetRgn()
 		}
 		delete[] m_pPcsPnt;
 		m_pPcsPnt = NULL;
+	}
+
+	if (m_pPcsMarkPnt)
+	{
+		for (k = 0; k < nTotPnl; k++)
+		{
+			if (m_pPcsMarkPnt[k])
+			{
+				for (i = 0; i < m_nTotPcs; i++)
+					delete[] m_pPcsMarkPnt[k][i];
+
+				delete[] m_pPcsMarkPnt[k];
+			}
+		}
+		delete[] m_pPcsMarkPnt;
+		m_pPcsMarkPnt = NULL;
 	}
 }
 
@@ -341,12 +379,10 @@ void CMyGL::SetRgn()
 
 	if(m_pPcsPnt)
 	{
-// 		for(k=0; k<nTotPnl; k++)
 		for(k=0; k<m_nPrevTotPnl; k++)
 		{
 			if(m_pPcsPnt[k])
 			{
-// 				for(i=0; i<nTotPcs; i++)
 				for(i=0; i<m_nPrevTotPcs; i++)
 				{
 					delete[] m_pPcsPnt[k][i];
@@ -369,6 +405,37 @@ void CMyGL::SetRgn()
 			m_pPcsPnt[k] = new GVertex*[nTotPcs];
 			for(i=0; i<nTotPcs; i++)
 				m_pPcsPnt[k][i] = new GVertex[2];
+		}
+	}
+
+	if (m_pPcsMarkPnt)
+	{
+		for (k = 0; k < m_nPrevTotPnl; k++)
+		{
+			if (m_pPcsMarkPnt[k])
+			{
+				for (i = 0; i < m_nPrevTotPcs; i++)
+				{
+					delete[] m_pPcsMarkPnt[k][i];
+					m_pPcsMarkPnt[k][i] = NULL;
+				}
+
+				delete[] m_pPcsMarkPnt[k];
+				m_pPcsMarkPnt[k] = NULL;
+			}
+		}
+		delete[] m_pPcsMarkPnt;
+		m_pPcsMarkPnt = NULL;
+	}
+
+	if (!m_pPcsMarkPnt)
+	{
+		m_pPcsMarkPnt = new GVertex**[nTotPnl];
+		for (k = 0; k < nTotPnl; k++)
+		{
+			m_pPcsMarkPnt[k] = new GVertex*[nTotPcs];
+			for (i = 0; i < nTotPcs; i++)
+				m_pPcsMarkPnt[k][i] = new GVertex[2];
 		}
 	}
 
@@ -447,6 +514,7 @@ void CMyGL::Draw()
 	case IDC_STC_REELMAP_IMG:
 		DrawPnlDefNum();
 		DrawPnlNum();
+		DrawMark();
 		DrawRgn();
 		DrawBack();
 		break;
@@ -501,6 +569,64 @@ void CMyGL::DrawBack()
 	GVGLDrawInit(GV_RECTF, 3, m_rgbBk);
 	GVGLDrawRectF(vtBkSt, vtBkEd);
 	GVGLDrawShow();
+}
+
+void CMyGL::DrawMark()
+{
+	GVertex vtMarkPnt;
+	int i, k, nDef;
+	BOOL bMarked;
+	if (!m_pReelMap || !m_pFrmRgn || !m_pPcsPnt || !m_pPcsMarkPnt)//pDoc->
+		return;
+
+	BOOL bDualTest;
+	if (m_nCtrlId == IDC_STC_REELMAP_INNER)
+		bDualTest = pDoc->m_bEngDualTest;
+	else
+		bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
+
+	for (k = m_nTotPnl - 1; k >= 2; k--)
+	{
+		for (i = 0; i < m_nTotPcs; i++)
+		{
+			if (m_pReelMap)//pDoc->
+			{
+				if (m_pPnlNum[k] <= 0)
+				{
+					GVGLDrawInit(GV_RECTF, 2, m_rgbWhite);
+				}
+				else
+				{
+					GVGLDrawInit(GV_RECTF, 2, m_rgbBlack);
+				}
+			}
+
+			nDef = m_pReelMap->pPcsDef[k][i];
+			bMarked = m_pReelMap->pMkedPcsDef[k][i];
+
+			if (nDef > 0 && bMarked)
+			{
+				CfPoint ptPnt;
+				int nLength;
+				ptPnt.x = (m_pPcsPnt[k][i][0].x + m_pPcsPnt[k][i][1].x) / 2.0;
+				ptPnt.y = (m_pPcsPnt[k][i][0].y + m_pPcsPnt[k][i][1].y) / 2.0;
+				double dLengthX = m_pPcsPnt[k][i][1].x - m_pPcsPnt[k][i][0].x;
+				double dLengthY = m_pPcsPnt[k][i][1].x - m_pPcsPnt[k][i][0].x;
+				if (dLengthX < 0.0)
+					dLengthX *= -1.0;
+				if (dLengthY < 0.0)
+					dLengthY *= -1.0;
+				if (dLengthY < dLengthX)
+					nLength = int(dLengthY);
+				else
+					nLength = int(dLengthX);
+
+				GVertexFill(&vtMarkPnt, (GLfloat)ptPnt.x, (GLfloat)ptPnt.y, 0.0f);
+				GVGLDrawCross(vtMarkPnt, nLength); // (CenterPoint, LineLength)
+				GVGLDrawShow();
+			}
+		}
+	}
 }
 
 void CMyGL::DrawRgn()
@@ -666,7 +792,7 @@ void CMyGL::DrawRgn()
 
 void CMyGL::DrawPnlNum()
 {
-	if (!m_pPnlNum || !m_pReelMap /*|| !m_pReelMap->m_hWnd*/)
+	if (!m_pPnlNum || !m_pReelMap || pView->m_bTIM_INIT_VIEW)
 		return;
 
 	int k;
@@ -717,7 +843,7 @@ void CMyGL::DrawPnlNum()
 
 void CMyGL::DrawPnlDefNum()
 {
-	if(!m_pPnlDefNum || !m_pReelMap /*|| !m_pReelMap->m_hWnd*/)
+	if(!m_pPnlDefNum || !m_pReelMap || pView->m_bTIM_INIT_VIEW)
 		return;
 
 	if (m_pPnlDefNum < 0 || m_pReelMap < 0)

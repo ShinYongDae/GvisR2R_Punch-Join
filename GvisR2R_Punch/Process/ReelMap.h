@@ -129,7 +129,7 @@ public:
 	CRect **pPcsRgn;
 
 	int **pPcsDef;		// [DispPnlIdx][PcsID] : 불량코드.
-	int **pMkedPcsDef;	// [DispPnlIdx][PcsID] : 불량코드.
+	BOOL **pMkedPcsDef;	// [DispPnlIdx][PcsID] : 마킹여부.
 	CString m_sKorDef[MAX_DEF], m_sEngDef[MAX_DEF];
 	char m_cBigDef[MAX_DEF], m_cSmallDef[MAX_DEF];
 	COLORREF m_rgbDef[MAX_DEF];
@@ -298,7 +298,8 @@ public:
 	int Rotate180(int nPcsId);// 180도 회전 = 좌우 미러링 & 상하 미러링
 	int MirrorUD(int nPcsId); // 상하 미러링
 
-	BOOL SetPcsMkOut(int nSerial, int nPcsIdx);
+	BOOL SetPcsMkOut(int nCam, int nPcsIdx); // 0: Left Cam Or 1: Right Cam , 불량 피스 인덱스 [ 0 ~ (Total Pcs - 1) ]
+	BOOL ShiftMkedPcsDef();
 
 // Overrides
 	// ClassWizard generated virtual function overrides

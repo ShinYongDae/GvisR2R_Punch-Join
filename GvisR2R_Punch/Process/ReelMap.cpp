@@ -53,67 +53,98 @@ CReelMap::CReelMap(int nLayer, int nPnl, int nPcs, int nDir)
 	m_nPrevSerial[0] = 0;	// --
 	m_nPrevSerial[1] = 0;	// ++
 
-	m_rgbDef[DEF_NONE]=(RGB_WHITE); // (RGB_GREEN)
-	m_rgbDef[DEF_NICK]=(RGB_MAGENTA);
-	m_rgbDef[DEF_PROTRUSION]=(RGB_SKYBLUE);
-	m_rgbDef[DEF_SPACE]=(RGB_LTGREEN);
-	m_rgbDef[DEF_OPEN]=(RGB_LTRED);
-	m_rgbDef[DEF_SHORT]=(RGB_RED);
-	m_rgbDef[DEF_USHORT]=(RGB_LTCYAN);
-	m_rgbDef[DEF_PINHOLE]=(RGB_LLTGREEN);
-	m_rgbDef[DEF_HOLE_MISS]=(RGB_LTBLUE);
-	m_rgbDef[DEF_EXTRA]=(RGB_CLOUDBLUE);
-	m_rgbDef[DEF_PAD]=(RGB_LTPURPLE);
-	m_rgbDef[DEF_HOLE_POSITION]=(RGB_PINK);
-	m_rgbDef[DEF_POI]=(RGB_LTMAGENTA);
-	m_rgbDef[DEF_VH_POSITION]=(RGB_LTYELLOW);
-	m_rgbDef[DEF_VH_MISS]=(RGB_BOON);
-	m_rgbDef[DEF_HOLE_DEFECT]=(RGB_LTPINK);
-	m_rgbDef[DEF_HOLE_OPEN]=(RGB_YELLOWGREEN);
-	m_rgbDef[DEF_VH_OPEN]=(RGB_RED);
-	m_rgbDef[DEF_VH_DEF]=(RGB_BROWN);
-	m_rgbDef[DEF_LIGHT]=(RGB_YELLOW);
-	m_rgbDef[DEF_INNER] = (RGB_PCS_OUT);
+	m_rgbDef[DEF_NONE]=(RGB_WHITE);						// 0=ºÒ·®¾øÀ½
+	m_rgbDef[DEF_NICK]=(RGB_MAGENTA);					// 1=°á¼Õ
+	m_rgbDef[DEF_PROTRUSION]=(RGB_SKYBLUE);				// 2=µ¹±â
+	m_rgbDef[DEF_SPACE]=(RGB_LTGREEN);					// 3=¼±°£Æø
+	m_rgbDef[DEF_OPEN]=(RGB_LTRED);						// 4=¿ÀÇÂ
+	m_rgbDef[DEF_SHORT]=(RGB_RED);						// 5=¼îÆ®
+	m_rgbDef[DEF_USHORT]=(RGB_LTCYAN);					// 6=u¼îÆ®
+	m_rgbDef[DEF_PINHOLE]=(RGB_LLTGREEN);				// 7=ÇÉÈ¦
+	m_rgbDef[DEF_HOLE_MISS]=(RGB_LTBLUE);				// 8=È¦¾øÀ½
+	m_rgbDef[DEF_EXTRA]=(RGB_CLOUDBLUE);				// 9=ÀÜµ¿
+	m_rgbDef[DEF_PAD]=(RGB_LTPURPLE);					// 10=ÆÐµå
+	m_rgbDef[DEF_HOLE_POSITION] = (RGB_PINK);			// 11=È¦Æí½É
+	m_rgbDef[DEF_POI]=(RGB_LTMAGENTA);					// 12=POI
+	m_rgbDef[DEF_VH_POSITION]=(RGB_LTYELLOW);			// 13=VHÆí½É
+	m_rgbDef[DEF_VH_MISS]=(RGB_BOON);					// 14=VH¾øÀ½
+	m_rgbDef[DEF_HOLE_DEFECT]=(RGB_LTPINK);				// 15=È¦ºÒ·®
+	m_rgbDef[DEF_HOLE_OPEN]=(RGB_LTGREEN);				// 16=È¦¿ÀÇÂ
+	m_rgbDef[DEF_VH_OPEN]=(RGB_LT_DARKMAGENTA);			// 17=VH¿ÀÇÂ
+	m_rgbDef[DEF_VH_DEF]=(RGB_ORANGE);					// 18=VH°áÇÔ
+	m_rgbDef[DEF_EDGE_NICK] = (RGB_MUSTARD);			// 19 = E.°á¼Õ
+	m_rgbDef[DEF_EDGE_PROT] = (RGB_SKY);				// 20 = E.µ¹±â
+	m_rgbDef[DEF_EDGE_SPACE] = (RGB_LT_BROWN);			// 21 = E.¼±°£Æø
+	m_rgbDef[DEF_USER_DEFINE_1] = (RGB_PEACOCK_GREEN);	// 22 = UDD1
+	m_rgbDef[DEF_NARROW] = (RGB_PURPLE);				// 23 = Narrow
+	m_rgbDef[DEF_WIDE] = (RGB_FOREST_GREEN);			// 24 = Wide
+	m_rgbDef[DEF_FIXED_DEF] = (RGB_RED);				// 25 = °íÁ¤ºÒ·®
+	m_rgbDef[DEF_VH_SIZE] = (RGB_PURPLE);				// 26 = VHÅ©±â
+	m_rgbDef[DEF_VH_EDGE] = (RGB_EVER_GREEN);			// 27 = VH¿¡Áö°áÇÔ
+	m_rgbDef[DEF_LIGHT]=(RGB_YELLOW);					// 28 = ³ë±¤ºÒ·®
+	m_rgbDef[DEF_INNER] = (RGB_PCS_OUT);				// 29 = ³»ÃþºÒ·®
 
 	m_cBigDef[0] = '*';		//	NONE
-	m_cBigDef[1] = 'N';		//	NICK
-	m_cBigDef[2] = 'D';		//	PROTRUSION
-	m_cBigDef[3] = 'A';		//	SPACE
-	m_cBigDef[4] = 'O';		//	OPEN
-	m_cBigDef[5] = 'S';		//	SHORT
-	m_cBigDef[6] = 'U';		//	USHORT
-	m_cBigDef[7] = 'I';		//	PINHOLE
-	m_cBigDef[8] = 'H';		//	HOLE_MISS
-	m_cBigDef[9] = 'E';		//	EXTRA
-	m_cBigDef[10] = 'P';	//	PAD
-	m_cBigDef[11] = 'L';	//	HOLE_POSITION
-	m_cBigDef[12] = 'X';	//	POI
-	m_cBigDef[13] = 'T';	//	VH_POSITION
-	m_cBigDef[14] = 'M';	//	VH_MISS
-	m_cBigDef[15] = 'F';	//	HOLE_DEFECT
-	m_cBigDef[16] = 'C';	//	HOLE_OPEN
-	m_cBigDef[17] = 'G';	//	VH_OPEN
-	m_cBigDef[18] = 'V';	//	VH_DEF
+	m_cBigDef[1] = 'N';		//	DEF_NICK
+	m_cBigDef[2] = 'D';		//	DEF_PROTRUSION
+	m_cBigDef[3] = 'A';		//	DEF_SPACE
+	m_cBigDef[4] = 'O';		//	DEF_OPEN
+	m_cBigDef[5] = 'S';		//	DEF_SHORT
+	m_cBigDef[6] = 'U';		//	DEF_USHORT
+	m_cBigDef[7] = 'I';		//	DEF_PINHOLE
+	m_cBigDef[8] = 'H';		//	DEF_HOLE_MISS
+	m_cBigDef[9] = 'E';		//	DEF_EXTRA
+	m_cBigDef[10] = 'P';	//	DEF_PAD
+	m_cBigDef[11] = 'L';	//	DEF_HOLE_POSITION
+	m_cBigDef[12] = 'X';	//	DEF_POI
+	m_cBigDef[13] = 'T';	//	DEF_VH_POSITION
+	m_cBigDef[14] = 'M';	//	DEF_VH_MISS
+	m_cBigDef[15] = 'F';	//	DEF_HOLE_DEFECT		'F'
+	m_cBigDef[16] = 'C';	//	DEF_HOLE_OPEN
+	m_cBigDef[17] = 'G';	//	DEF_VH_OPEN
+	m_cBigDef[18] = 'V';	//	DEF_VH_DEF
+	m_cBigDef[19] = 'K';	//	DEF_EDGE_NICK
+	m_cBigDef[20] = 'R';	//	DEF_EDGE_PROT
+	m_cBigDef[21] = 'B';	//	DEF_EDGE_SPACE
+	m_cBigDef[22] = 'J';	//	DEF_USER_DEFINE_1
+	m_cBigDef[23] = 'Q';	//	DEF_NARROW
+	m_cBigDef[24] = 'W';	//	DEF_WIDE
+	m_cBigDef[25] = 'F';	//	DEF_FIXED_DEF		'F'
+	m_cBigDef[26] = 'Y';	//	DEF_VH_SIZE
+	m_cBigDef[27] = 'Z';	//	DEF_VH_EDGE
+	m_cBigDef[28] = '?';	//	DEF_LIGHT
+	m_cBigDef[29] = '@';	//	DEF_INNER
 
-	m_cSmallDef[0] = '*';
-	m_cSmallDef[1] = 'n';
-	m_cSmallDef[2] = 'd';
-	m_cSmallDef[3] = 'a';
-	m_cSmallDef[4] = 'o';
-	m_cSmallDef[5] = 's';
-	m_cSmallDef[6] = 'u';
-	m_cSmallDef[7] = 'i';
-	m_cSmallDef[8] = 'h';
-	m_cSmallDef[9] = 'e';
-	m_cSmallDef[10] = 'p';
-	m_cSmallDef[11] = 'l';
-	m_cSmallDef[12] = 'x';
-	m_cSmallDef[13] = 't';
-	m_cSmallDef[14] = 'm';
-	m_cSmallDef[15] = 'f';
-	m_cSmallDef[16] = 'c';
-	m_cSmallDef[17] = 'g';
-	m_cSmallDef[18] = 'v';
+	m_cSmallDef[0] = '*';	//	NONE
+	m_cSmallDef[1] = 'n';	//	DEF_NICK
+	m_cSmallDef[2] = 'd';	//	DEF_PROTRUSION
+	m_cSmallDef[3] = 'a';	//	DEF_SPACE
+	m_cSmallDef[4] = 'o';	//	DEF_OPEN
+	m_cSmallDef[5] = 's';	//	DEF_SHORT
+	m_cSmallDef[6] = 'u';	//	DEF_USHORT
+	m_cSmallDef[7] = 'i';	//	DEF_PINHOLE
+	m_cSmallDef[8] = 'h';	//	DEF_HOLE_MISS
+	m_cSmallDef[9] = 'e';	//	DEF_EXTRA
+	m_cSmallDef[10] = 'p';	//	DEF_PAD
+	m_cSmallDef[11] = 'l';	//	DEF_HOLE_POSITION
+	m_cSmallDef[12] = 'x';	//	DEF_POI
+	m_cSmallDef[13] = 't';	//	DEF_VH_POSITION
+	m_cSmallDef[14] = 'm';	//	DEF_VH_MISS
+	m_cSmallDef[15] = 'f';	//	DEF_HOLE_DEFECT		'f'
+	m_cSmallDef[16] = 'c';	//	DEF_HOLE_OPEN
+	m_cSmallDef[17] = 'g';	//	DEF_VH_OPEN
+	m_cSmallDef[18] = 'v';	//	DEF_VH_DEF
+	m_cSmallDef[19] = 'k';	//	DEF_EDGE_NICK
+	m_cSmallDef[20] = 'r';	//	DEF_EDGE_PROT
+	m_cSmallDef[21] = 'b';	//	DEF_EDGE_SPACE
+	m_cSmallDef[22] = 'j';	//	DEF_USER_DEFINE_1
+	m_cSmallDef[23] = 'q';	//	DEF_NARROW
+	m_cSmallDef[24] = 'w';	//	DEF_WIDE
+	m_cSmallDef[25] = 'f';	//	DEF_FIXED_DEF		'f'
+	m_cSmallDef[26] = 'y';	//	DEF_VH_SIZE
+	m_cSmallDef[27] = 'z';	//	DEF_VH_EDGE
+	m_cSmallDef[28] = '?';	//	DEF_LIGHT
+	m_cSmallDef[29] = '@';	//	DEF_INNER
 
 	m_pPnlNum = NULL;
 	m_pPnlDefNum = NULL;
@@ -1015,7 +1046,7 @@ void CReelMap::InitPcs()
 
 		if (!pMkedPcsDef)
 		{
-			pMkedPcsDef = new int*[nTotPnl];
+			pMkedPcsDef = new BOOL*[nTotPnl];
 			for (k = 0; k < nTotPnl; k++)
 			{
 				if (nTotPcs > MAX_PCS)
@@ -1024,9 +1055,9 @@ void CReelMap::InitPcs()
 					pView->ClrDispMsg();
 					AfxMessageBox(_T("MAX_PCS ÃÊ°ú Error."));
 				}
-				pMkedPcsDef[k] = new int[MAX_PCS];
+				pMkedPcsDef[k] = new BOOL[MAX_PCS];
 				for (i = 0; i < MAX_PCS; i++)
-					pMkedPcsDef[k][i] = DEF_NONE;
+					pMkedPcsDef[k][i] = FALSE;
 			}
 		}
 	}
@@ -1329,7 +1360,7 @@ BOOL CReelMap::Disp(int nMkPnl, BOOL bDumy)
 						}
 
 						nDefCode = _tstoi(sVal);
-						pPcsDef[k][nP] = nDefCode; // k=7, nP = PcsIdx : ÁÂ»ó´Ü¿¡¼­ nP 0ÀÌ ½ÃÀÛÇÏ¿© ZigZeg·Î ¿ìÇÏ´ÜÀ¸·Î Áõ°¡
+						pPcsDef[k][nP] = nDefCode; // k=7, nP = PcsIdx : ÁÂ»ó´Ü¿¡¼­ nP 0ÀÌ ½ÃÀÛÇÏ¿© ZigZeg·Î ¿ìÇÏ´ÜÀ¸·Î Áõ°¡ (ÇÇ½ºÀÎµ¦½º´Â CamMaster¿¡¼­ Á¤ÇÑ °ÍÀ» ±âÁØÀ¸·Î ÇÔ.)
 
 					}
 				}
@@ -1525,6 +1556,7 @@ BOOL CReelMap::Disp(int nMkPnl, BOOL bDumy)
 		pDataFile = NULL;
 	}
 
+	ShiftMkedPcsDef();
 	return TRUE;
 }
 
@@ -5100,16 +5132,17 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
-	if (m_stResult.nDefPerStrip[0][DEF_NICK] > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
+	nSum = m_stResult.nDefPerStrip[0][DEF_NICK] + m_stResult.nDefPerStrip[0][DEF_EDGE_NICK];
+	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
 	{
-		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], m_stResult.nDefPerStrip[0][DEF_NICK]); // °á¼Õ(B137)
+		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], nSum); // °á¼Õ+¿§Áö°á¼Õ(B137)
 		strFileData += strData;
 	}
 
-	nSum = m_stResult.nDefPerStrip[0][DEF_SPACE] + m_stResult.nDefPerStrip[0][DEF_EXTRA] + m_stResult.nDefPerStrip[0][DEF_PROTRUSION];
+	nSum = m_stResult.nDefPerStrip[0][DEF_SPACE] + m_stResult.nDefPerStrip[0][DEF_EXTRA] + m_stResult.nDefPerStrip[0][DEF_PROTRUSION] + m_stResult.nDefPerStrip[0][DEF_EDGE_SPACE] + m_stResult.nDefPerStrip[0][DEF_EDGE_PROT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] > 0)
 	{
-		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â(B160)
+		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â+¿§Áö¼±°£Æø+¿§Áöµ¹±â(B160)
 		strFileData += strData;
 	}
 
@@ -5168,16 +5201,17 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
-	if (m_stResult.nDefPerStrip[1][DEF_NICK] > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
+	nSum = m_stResult.nDefPerStrip[1][DEF_NICK] + m_stResult.nDefPerStrip[1][DEF_EDGE_NICK];
+	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
 	{
-		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], m_stResult.nDefPerStrip[1][DEF_NICK]); // °á¼Õ(B137)
+		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], nSum); // °á¼Õ+¿§Áö°á¼Õ(B137)
 		strFileData += strData;
 	}
 
-	nSum = m_stResult.nDefPerStrip[1][DEF_SPACE] + m_stResult.nDefPerStrip[1][DEF_EXTRA] + m_stResult.nDefPerStrip[1][DEF_PROTRUSION];
+	nSum = m_stResult.nDefPerStrip[1][DEF_SPACE] + m_stResult.nDefPerStrip[1][DEF_EXTRA] + m_stResult.nDefPerStrip[1][DEF_PROTRUSION] + m_stResult.nDefPerStrip[1][DEF_EDGE_SPACE] + m_stResult.nDefPerStrip[1][DEF_EDGE_PROT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] > 0)
 	{
-		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â(B160)
+		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â+¿§Áö¼±°£Æø+¿§Áöµ¹±â(B160)
 		strFileData += strData;
 	}
 
@@ -5238,16 +5272,17 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
-	if (m_stResult.nDefPerStrip[2][DEF_NICK] > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
+	nSum = m_stResult.nDefPerStrip[2][DEF_NICK] + m_stResult.nDefPerStrip[2][DEF_EDGE_NICK];
+	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
 	{
-		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], m_stResult.nDefPerStrip[2][DEF_NICK]); // °á¼Õ(B137)
+		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], nSum); // °á¼Õ+¿§Áö°á¼Õ(B137)
 		strFileData += strData;
 	}
 
-	nSum = m_stResult.nDefPerStrip[2][DEF_SPACE] + m_stResult.nDefPerStrip[2][DEF_EXTRA] + m_stResult.nDefPerStrip[2][DEF_PROTRUSION];
+	nSum = m_stResult.nDefPerStrip[2][DEF_SPACE] + m_stResult.nDefPerStrip[2][DEF_EXTRA] + m_stResult.nDefPerStrip[2][DEF_PROTRUSION] + m_stResult.nDefPerStrip[2][DEF_EDGE_SPACE] + m_stResult.nDefPerStrip[2][DEF_EDGE_PROT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] > 0)
 	{
-		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â(B160)
+		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â+¿§Áö¼±°£Æø+¿§Áöµ¹±â(B160)
 		strFileData += strData;
 	}
 
@@ -5308,16 +5343,17 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
-	if (m_stResult.nDefPerStrip[3][DEF_NICK] > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
+	nSum = m_stResult.nDefPerStrip[3][DEF_NICK] + m_stResult.nDefPerStrip[3][DEF_EDGE_NICK];
+	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
 	{
-		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], m_stResult.nDefPerStrip[3][DEF_NICK]); // °á¼Õ(B137)
+		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], nSum); // °á¼Õ+¿§Áö°á¼Õ(B137)
 		strFileData += strData;
 	}
 
-	nSum = m_stResult.nDefPerStrip[3][DEF_SPACE] + m_stResult.nDefPerStrip[3][DEF_EXTRA] + m_stResult.nDefPerStrip[3][DEF_PROTRUSION];
+	nSum = m_stResult.nDefPerStrip[3][DEF_SPACE] + m_stResult.nDefPerStrip[3][DEF_EXTRA] + m_stResult.nDefPerStrip[3][DEF_PROTRUSION] + m_stResult.nDefPerStrip[3][DEF_EDGE_SPACE] + m_stResult.nDefPerStrip[3][DEF_EDGE_PROT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] > 0)
 	{
-		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â(B160)
+		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â+¿§Áö¼±°£Æø+¿§Áöµ¹±â(B160)
 		strFileData += strData;
 	}
 
@@ -5428,16 +5464,17 @@ CString CReelMap::GetSapp3TxtReverse()
 		strFileData += strData;
 	}
 
-	if (m_stResult.nDefPerStrip[3][DEF_NICK] > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
+	nSum = m_stResult.nDefPerStrip[3][DEF_NICK] + m_stResult.nDefPerStrip[3][DEF_EDGE_NICK];
+	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
 	{
-		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], m_stResult.nDefPerStrip[3][DEF_NICK]); // °á¼Õ(B137)
+		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], nSum); // °á¼Õ+¿§Áö°á¼Õ(B137)
 		strFileData += strData;
 	}
 
-	nSum = m_stResult.nDefPerStrip[3][DEF_SPACE] + m_stResult.nDefPerStrip[3][DEF_EXTRA] + m_stResult.nDefPerStrip[3][DEF_PROTRUSION];
+	nSum = m_stResult.nDefPerStrip[3][DEF_SPACE] + m_stResult.nDefPerStrip[3][DEF_EXTRA] + m_stResult.nDefPerStrip[3][DEF_PROTRUSION] + m_stResult.nDefPerStrip[3][DEF_EDGE_SPACE] + m_stResult.nDefPerStrip[3][DEF_EDGE_PROT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] > 0)
 	{
-		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â(B160)
+		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â+¿§Áö¼±°£Æø+¿§Áöµ¹±â(B160)
 		strFileData += strData;
 	}
 
@@ -5497,16 +5534,17 @@ CString CReelMap::GetSapp3TxtReverse()
 		strFileData += strData;
 	}
 
-	if (m_stResult.nDefPerStrip[2][DEF_NICK] > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
+	nSum = m_stResult.nDefPerStrip[2][DEF_NICK] + m_stResult.nDefPerStrip[2][DEF_EDGE_NICK];
+	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
 	{
-		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], m_stResult.nDefPerStrip[2][DEF_NICK]); // °á¼Õ(B137)
+		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], nSum); // °á¼Õ+¿§Áö°á¼Õ(B137)
 		strFileData += strData;
 	}
 
-	nSum = m_stResult.nDefPerStrip[2][DEF_SPACE] + m_stResult.nDefPerStrip[2][DEF_EXTRA] + m_stResult.nDefPerStrip[2][DEF_PROTRUSION];
+	nSum = m_stResult.nDefPerStrip[2][DEF_SPACE] + m_stResult.nDefPerStrip[2][DEF_EXTRA] + m_stResult.nDefPerStrip[2][DEF_PROTRUSION] + m_stResult.nDefPerStrip[2][DEF_EDGE_SPACE] + m_stResult.nDefPerStrip[2][DEF_EDGE_PROT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] > 0)
 	{
-		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â(B160)
+		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â+¿§Áö¼±°£Æø+¿§Áöµ¹±â(B160)
 		strFileData += strData;
 	}
 
@@ -5567,16 +5605,17 @@ CString CReelMap::GetSapp3TxtReverse()
 		strFileData += strData;
 	}
 
-	if (m_stResult.nDefPerStrip[1][DEF_NICK] > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
+	nSum = m_stResult.nDefPerStrip[1][DEF_NICK] + m_stResult.nDefPerStrip[1][DEF_EDGE_NICK];
+	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
 	{
-		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], m_stResult.nDefPerStrip[1][DEF_NICK]); // °á¼Õ(B137)
+		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], nSum); // °á¼Õ+¿§Áö°á¼Õ(B137)
 		strFileData += strData;
 	}
 
-	nSum = m_stResult.nDefPerStrip[1][DEF_SPACE] + m_stResult.nDefPerStrip[1][DEF_EXTRA] + m_stResult.nDefPerStrip[1][DEF_PROTRUSION];
+	nSum = m_stResult.nDefPerStrip[1][DEF_SPACE] + m_stResult.nDefPerStrip[1][DEF_EXTRA] + m_stResult.nDefPerStrip[1][DEF_PROTRUSION] + m_stResult.nDefPerStrip[1][DEF_EDGE_SPACE] + m_stResult.nDefPerStrip[1][DEF_EDGE_PROT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] > 0)
 	{
-		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â(B160)
+		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â+¿§Áö¼±°£Æø+¿§Áöµ¹±â(B160)
 		strFileData += strData;
 	}
 
@@ -5637,16 +5676,17 @@ CString CReelMap::GetSapp3TxtReverse()
 		strFileData += strData;
 	}
 
-	if (m_stResult.nDefPerStrip[0][DEF_NICK] > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
+	nSum = m_stResult.nDefPerStrip[0][DEF_NICK] + m_stResult.nDefPerStrip[0][DEF_EDGE_NICK];
+	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
 	{
-		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], m_stResult.nDefPerStrip[0][DEF_NICK]); // °á¼Õ(B137)
+		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_NICK], nSum); // °á¼Õ+¿§Áö°á¼Õ(B137)
 		strFileData += strData;
 	}
 
-	nSum = m_stResult.nDefPerStrip[0][DEF_SPACE] + m_stResult.nDefPerStrip[0][DEF_EXTRA] + m_stResult.nDefPerStrip[0][DEF_PROTRUSION];
+	nSum = m_stResult.nDefPerStrip[0][DEF_SPACE] + m_stResult.nDefPerStrip[0][DEF_EXTRA] + m_stResult.nDefPerStrip[0][DEF_PROTRUSION] + m_stResult.nDefPerStrip[0][DEF_EDGE_SPACE] + m_stResult.nDefPerStrip[0][DEF_EDGE_PROT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] > 0)
 	{
-		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â(B160)
+		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION], nSum); // ¼±°£Æø+ÀÜµ¿+µ¹±â+¿§Áö¼±°£Æø+¿§Áöµ¹±â(B160)
 		strFileData += strData;
 	}
 
@@ -6934,12 +6974,6 @@ int CReelMap::Rotate180(int nPcsId) // 180µµ È¸Àü
 	return nId;
 }
 
-BOOL CReelMap::SetPcsMkOut(int nSerial, int nPcsIdx)
-{
-	return TRUE;
-}
-
-
 CString CReelMap::GetYieldPathOnOffline(int nRmap)
 {
 	CString sPath = _T("");
@@ -7634,4 +7668,34 @@ BOOL CReelMap::WriteYieldOffline(int nSerial, CString sPath)
 	int dwElapsed = dwEnd - dwStart;
 
 	return TRUE;
+}
+
+BOOL CReelMap::SetPcsMkOut(int nCam, int nPcsIdx) // 0: Left Cam Or 1: Right Cam , ºÒ·® ÇÇ½º ÀÎµ¦½º [ 0 ~ (Total Pcs - 1) ]  // (ÇÇ½ºÀÎµ¦½º´Â CamMaster¿¡¼­ Á¤ÇÑ °ÍÀ» ±âÁØÀ¸·Î ÇÔ.)
+{
+	if (nCam == 0)
+	{
+		pMkedPcsDef[m_nSelMarkingPnl+1][nPcsIdx] = TRUE; // FALSE: No mark, TRUE: mark
+	}
+	else if(nCam == 1)
+	{
+		pMkedPcsDef[m_nSelMarkingPnl][nPcsIdx] = TRUE; // FALSE: No mark, TRUE: mark
+	}
+
+	return TRUE;
+}
+
+BOOL CReelMap::ShiftMkedPcsDef() // (ÇÇ½ºÀÎµ¦½º´Â CamMaster¿¡¼­ Á¤ÇÑ °ÍÀ» ±âÁØÀ¸·Î ÇÔ.)
+{
+	if (!pMkedPcsDef)
+		return FALSE;
+
+	int k, i;
+
+	for (k = nTotPnl - 1; k > 1; k--) // k : 5 <-- 4 <-- 3 <-- 2 <-- 1 ;
+	{
+		for (i = 0; i < nTotPcs; i++) // i : ÇÇ½ºÀÎµ¦½º
+		{                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+			pMkedPcsDef[k][i] = pMkedPcsDef[k-1][i];
+		}
+	}
 }

@@ -133,6 +133,7 @@ public:
 
 	//int GetElementID(int nMotionId);
 //	BOOL SetFeedRate(int nMotionId, double dFeedRate);
+	void ResetPinPos();
 	void SetPinPos(int nCam, int nMotionId, double &dX, double &dY);
 	void SetPinPos(int nCam, double dX, double dY);
 	void GetPinPos(int nCam, double &dX, double &dY);

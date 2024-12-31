@@ -1810,6 +1810,13 @@ void CMotion::OnTimer(UINT_PTR nIDEvent)//(UINT nIDEvent)
 	CWnd::OnTimer(nIDEvent);
 }
 
+void CMotion::ResetPinPos()
+{
+	m_dPinPosX[0] = 0.0;
+	m_dPinPosY[0] = 0.0;
+	m_dPinPosX[1] = 0.0;
+	m_dPinPosY[1] = 0.0;
+}
 
 void CMotion::SetPinPos(int nCam, int nMotionId, double &dX, double &dY)
 {	
