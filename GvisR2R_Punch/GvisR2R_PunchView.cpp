@@ -1394,7 +1394,7 @@ LRESULT CGvisR2R_PunchView::OnMyMsgExit(WPARAM wPara, LPARAM lPara)
 int CGvisR2R_PunchView::MsgBox(CString sMsg, int nThreadIdx, int nType, int nTimOut, BOOL bEngave)
 {
 	int nRtnVal = -1; // Reply(-1) is None.
-
+	pView->ClrDispMsg();
 	if (bEngave)
 	{
 		if (m_pEngrave)
@@ -10048,8 +10048,8 @@ void CGvisR2R_PunchView::InitAuto(BOOL bInit)
 	m_bInitAuto = TRUE; pDoc->SetStatus(_T("General"), _T("bInitAuto"), m_bInitAuto);
 	m_bInitAutoLoadMstInfo = TRUE; pDoc->SetStatus(_T("General"), _T("bInitAutoLoadMstInfo"), m_bInitAutoLoadMstInfo);
 
-	if (pView->m_pMotion)
-		pView->m_pMotion->ResetPinPos();
+	//if (pView->m_pMotion)
+	//	pView->m_pMotion->ResetPinPos();
 
 	if (bInit) // 이어가기가 아닌경우.
 	{
@@ -19931,11 +19931,15 @@ void CGvisR2R_PunchView::Mk2PtDoMarking()
 						{
 							m_bCam = FALSE; pDoc->SetStatus(_T("General"), _T("bCam"), m_bCam);
 							m_nMkStAuto = MK_ST + (Mk2PtIdx::DoneMk); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);	// Mk 마킹 완료
+							if (m_bInitAuto)
+								ShowLive(FALSE);
 						}
 					}
 					else
 					{
 						m_nMkStAuto = MK_ST + (Mk2PtIdx::DoneMk); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);	// Mk 마킹 완료
+						if (m_bInitAuto)
+							ShowLive(FALSE);
 					}
 				}
 			}

@@ -3302,10 +3302,10 @@ void CDlgMenu03::SwStop()
 	pView->m_bSwReady = FALSE;
 	pView->m_bSwReset = FALSE;
 
-	pView->DispMain(_T("정 지"), RGB_RED);
 	pView->TowerLamp(RGB_RED, TRUE, FALSE);
 	pView->MpeWrite(pView->Plc.DlgMenu03.LampStop, 1); // 마킹부 정지 스위치 램프 ON(PC가 On/Off시킴)
 	pView->ClrDispMsg();
+	pView->DispMain(_T("정 지"), RGB_RED);
 }
 
 void CDlgMenu03::SwReady()

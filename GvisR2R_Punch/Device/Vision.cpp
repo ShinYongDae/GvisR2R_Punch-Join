@@ -4408,6 +4408,7 @@ BOOL CVision::SaveMkImg(CString sPath)
 	//	delete MilOriginDisp;
 	if (MilGrabImg)
 		delete MilGrabImg;
+	Sleep(10);
 	m_cs.Unlock();
 #endif
 	return TRUE;

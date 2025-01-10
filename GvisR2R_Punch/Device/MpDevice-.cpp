@@ -29,6 +29,7 @@ CMpDevice::CMpDevice(CWnd* pParent)
 #endif
 	if (!Create(NULL, _T("MPE"), WS_CHILD, CRect(0, 0, 0, 0), m_pParent, (UINT)this))
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("CMpDevice::Create() Failed!!!"));
 	}
@@ -83,8 +84,10 @@ BOOL CMpDevice::Init(unsigned short nCpuNumber, unsigned short nPortNumber)
 	m_dwReturnVal = ymcOpenController(&m_ComDevice, &m_hController);
 	if (m_dwReturnVal != MP_SUCCESS)
 	{
-		pView->DispMsg(_T("콘트롤러 오픈 실패."), _T("경고"), RGB_RED, DELAY_TIME_MSG);
- 		m_cs.Unlock();
+		pView->SetAlarmToPlc(UNIT_PUNCH);
+		//pView->DispMsg(_T("콘트롤러 오픈 실패."), _T("경고"), RGB_RED, DELAY_TIME_MSG);
+		pView->MsgBox(_T("콘트롤러 오픈 실패."));
+		m_cs.Unlock();
 		return FALSE;
 	}
 
@@ -113,25 +116,32 @@ BOOL CMpDevice::SetIoDataValue(CString strRegAddr, long OutputData)
 	m_dwReturnVal = ymcSetController(m_hController);
 	if (m_dwReturnVal !=MP_SUCCESS)
 	{
-		pView->DispMsg(_T("Controller 핸들을 취득할 수 없습니다."), _T("경고"), RGB_RED, DELAY_TIME_MSG);
+		//pView->SetAlarmToPlc(UNIT_PUNCH);
+		//pView->DispMsg(_T("Controller 핸들을 취득할 수 없습니다."), _T("경고"), RGB_RED, DELAY_TIME_MSG);
+		pView->MsgBox(_T("Controller 핸들을 취득할 수 없습니다."));
 		return FALSE;
 	}
-	
+	Sleep(10);
 	m_dwReturnVal = ymcGetRegisterDataHandle((LPBYTE)chrRegAddr, &m_hOutRegData);
 	delete chrRegAddr;
 
 	if (m_dwReturnVal !=MP_SUCCESS)
 	{
-		pView->DispMsg(_T("출력 레지스터 핸들을 취득할 수 없습니다."), _T("경고"), RGB_RED, DELAY_TIME_MSG);
+		//pView->SetAlarmToPlc(UNIT_PUNCH);
+		//pView->DispMsg(_T("출력 레지스터 핸들을 취득할 수 없습니다."), _T("경고"), RGB_RED, DELAY_TIME_MSG);
+		pView->MsgBox(_T("출력 레지스터 핸들을 취득할 수 없습니다."));
 		return FALSE;
 	}
-	
+	//Sleep(10);
 	m_dwReturnVal = ymcSetRegisterData(m_hOutRegData, 1, &OutputData);
 	if (m_dwReturnVal !=MP_SUCCESS)
 	{	
-		pView->DispMsg(_T("출력 데이터 설정 실패."), _T("경고"), RGB_RED, DELAY_TIME_MSG);
+		//pView->SetAlarmToPlc(UNIT_PUNCH);
+		//pView->DispMsg(_T("출력 데이터 설정 실패."), _T("경고"), RGB_RED, DELAY_TIME_MSG);
+		pView->MsgBox(_T("출력 데이터 설정 실패."));
 		return FALSE;
 	}
+	Sleep(10);
 #endif
 	return TRUE;
 }
@@ -167,10 +177,12 @@ long CMpDevice::Read(CString strRegAddr)
 			strRegAddr.SetAt(1,'L');
 			if(!GetIoDataValue(strRegAddr, lReadBuffer))
 			{
+				//pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->ClrDispMsg();
 				AfxMessageBox(_T("Mp2100m - Reading Error!!!"));
 				return 0;
 			}
+			//Sleep(10);
 			lReadBuffer = (lReadBuffer>>16);
 		}
 		else
@@ -178,10 +190,12 @@ long CMpDevice::Read(CString strRegAddr)
 			strRegAddr.SetAt(1,'L');
 			if(!GetIoDataValue(strRegAddr, lReadBuffer))
 			{
+				//pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->ClrDispMsg();
 				AfxMessageBox(_T("Mp2100m - Reading Error!!!"));
 				return 0;
 			}
+			//Sleep(10);
 		}
 		if(lReadBuffer & lReadBuffer2)
 			lData = 1;
@@ -200,10 +214,12 @@ long CMpDevice::Read(CString strRegAddr)
 			strRegAddr.SetAt(strRegAddr.GetLength()-1,('0'+nAddrLastNum-1));
 			if(!GetIoDataValue(strRegAddr, lReadBuffer))
 			{
+				//pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->ClrDispMsg();
 				AfxMessageBox(_T("Mp2100m - Reading Error!!!"));
 				return 0;
 			}
+			//Sleep(10);
 			lData = (lReadBuffer>>16) & (0x0000FFFF);
 			lData = (lData >= 0x8000) ? (0xFFFF0000 | lData) : lData;
 		}
@@ -212,10 +228,12 @@ long CMpDevice::Read(CString strRegAddr)
 			strRegAddr.SetAt(1,'L');
 			if(!GetIoDataValue(strRegAddr, lReadBuffer))
 			{
+				//pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->ClrDispMsg();
 				AfxMessageBox(_T("Mp2100m - Reading Error!!!"));
 				return 0;
 			}
+			//Sleep(10);
 			lData = lReadBuffer & (0x0000FFFF);
 			lData = (lData >= 0x8000) ? (0xFFFF0000 | lData) : lData;
 		}
@@ -230,18 +248,21 @@ long CMpDevice::Read(CString strRegAddr)
 			strRegAddr.SetAt(strRegAddr.GetLength()-1,('0'+nAddrLastNum-1));
 			if(!GetIoDataValue(strRegAddr, lReadBuffer))
 			{
+				//pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->ClrDispMsg();
 				AfxMessageBox(_T("Mp2100m - Reading Error!!!"));
 				return 0;
 			}
+			//Sleep(10);
 			strRegAddr.SetAt(strRegAddr.GetLength()-1,('0'+nAddrLastNum+1));
 			if(!GetIoDataValue(strRegAddr, lReadBuffer))
 			{
+				//pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->ClrDispMsg();
 				AfxMessageBox(_T("Mp2100m - Reading Error!!!"));
 				return 0;
 			}
-			
+			//Sleep(10);
 			lReadBuffer = (lReadBuffer>>16) & 0xFFFF;
 			lReadBuffer2 = (lReadBuffer2<<16) & 0xFFFF0000;
 			lReadBuffer |= lReadBuffer2;
@@ -251,10 +272,12 @@ long CMpDevice::Read(CString strRegAddr)
 		{
 			if(!GetIoDataValue(strRegAddr, lReadBuffer))
 			{
+				//pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->ClrDispMsg();
 				AfxMessageBox(_T("Mp2100m - Reading Error!!!"));
 				return 0;
 			}
+			//Sleep(10);
 			lData = lReadBuffer;
 		}
 		break;
@@ -340,21 +363,25 @@ BOOL CMpDevice::SetIo(CString strRegAddr, LPVOID pIoData, int nIoSize)
 	m_dwReturnVal = ymcSetController(m_hController);
 	if (m_dwReturnVal !=MP_SUCCESS)
 	{
-		pView->DispMsg(_T("Controller 핸들을 취득할 수 없습니다."), _T("경고"), RGB_RED, DELAY_TIME_MSG);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
+		//pView->DispMsg(_T("Controller 핸들을 취득할 수 없습니다."), _T("경고"), RGB_RED, DELAY_TIME_MSG);
+		pView->MsgBox(_T("Controller 핸들을 취득할 수 없습니다."));
 		m_cs.Unlock();
 		return FALSE;
 	}
-	
+	Sleep(10);
 	m_dwReturnVal = ymcGetRegisterDataHandle((LPBYTE)chrRegAddr, &m_hOutRegData);
 	delete chrRegAddr;
 
 	if (m_dwReturnVal !=MP_SUCCESS)
 	{
-		pView->DispMsg(_T("출력 레지스터 핸들을 취득할 수 없습니다."), _T("경고"), RGB_RED, DELAY_TIME_MSG);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
+		//pView->DispMsg(_T("출력 레지스터 핸들을 취득할 수 없습니다."), _T("경고"), RGB_RED, DELAY_TIME_MSG);
+		pView->MsgBox(_T("출력 레지스터 핸들을 취득할 수 없습니다."));
 		m_cs.Unlock();
 		return FALSE;
 	}
-
+	Sleep(10);
 	char chDataType = strRegAddr.GetAt(1);
 
 	if(chDataType=='W' || chDataType=='w')
@@ -366,6 +393,7 @@ BOOL CMpDevice::SetIo(CString strRegAddr, LPVOID pIoData, int nIoSize)
 			m_cs.Unlock();
 			return FALSE;
 		}
+		//Sleep(10);
 	}
 
 	if(chDataType=='L' || chDataType=='l')
@@ -377,6 +405,7 @@ BOOL CMpDevice::SetIo(CString strRegAddr, LPVOID pIoData, int nIoSize)
 			m_cs.Unlock();
 			return FALSE;
 		}
+		//Sleep(10);
 	}
 
 // 	m_dwReturnVal = ymcSetRegisterData(m_hOutRegData, (DWORD)nIoSize, pIoData);
@@ -415,6 +444,7 @@ int CMpDevice::GetIo(CString strRegAddr, LPVOID pIoData, int nIoSize)	// nRtn : 
 		pView->MsgBox(_T("ymcSetController Error!!!"));
 		return 0;
 	}
+	//Sleep(10);
 	wRtn = ymcGetRegisterDataHandle((LPBYTE)chrRegAddr, &hRData);
 	delete chrRegAddr;
 
@@ -425,7 +455,7 @@ int CMpDevice::GetIo(CString strRegAddr, LPVOID pIoData, int nIoSize)	// nRtn : 
 		m_cs.Unlock();
 		return 0;
 	}
-
+	//Sleep(10);
 	char chDataType = strRegAddr.GetAt(1);
 
 	if(chDataType=='W' || chDataType=='w')
@@ -439,6 +469,7 @@ int CMpDevice::GetIo(CString strRegAddr, LPVOID pIoData, int nIoSize)	// nRtn : 
 			m_cs.Unlock();
 			return 0;
 		}
+		//Sleep(10);
 	}
 
 	if(chDataType=='L' || chDataType=='l')
@@ -452,6 +483,7 @@ int CMpDevice::GetIo(CString strRegAddr, LPVOID pIoData, int nIoSize)	// nRtn : 
 			m_cs.Unlock();
 			return 0;
 		}
+		//Sleep(10);
 	}
 // 	wRtn = ymcGetRegisterData(hRData, (DWORD)nIoSize, pIoData, &nRtn);
 // 	if (wRtn!=MP_SUCCESS)
@@ -487,31 +519,36 @@ BOOL CMpDevice::GetIoDataValue(CString strRegAddr, long &InputData)
 	m_dwReturnVal = ymcSetController(m_hController);
 	if (m_dwReturnVal !=MP_SUCCESS)
 	{
-		pView->DispMsg(_T("Controller 핸들을 취득할 수 없습니다."), _T("경고"), RGB_RED, DELAY_TIME_MSG);
+		//pView->DispMsg(_T("Controller 핸들을 취득할 수 없습니다."), _T("경고"), RGB_RED, DELAY_TIME_MSG);
+		pView->MsgBox(_T("Controller 핸들을 취득할 수 없습니다."));
 		return FALSE;
 	}
-	
+	Sleep(10);
 	m_dwReturnVal = ymcGetRegisterDataHandle((LPBYTE)chrRegAddr, &m_hInRegData);
 	delete chrRegAddr;
 
 	if (m_dwReturnVal !=MP_SUCCESS)
 	{
-		pView->DispMsg(_T("입력 레지스터 핸들을 취득할 수 없습니다."), _T("경고"), RGB_RED, DELAY_TIME_MSG);
+		//pView->DispMsg(_T("입력 레지스터 핸들을 취득할 수 없습니다."), _T("경고"), RGB_RED, DELAY_TIME_MSG);
+		pView->MsgBox(_T("입력 레지스터 핸들을 취득할 수 없습니다."));
 		return FALSE;
 	}
+	Sleep(10);
 	m_dwReturnVal = ymcGetRegisterData(m_hInRegData, 1, &InputData, &dwCount);
 	if (m_dwReturnVal!=MP_SUCCESS)
 	{	
-		pView->DispMsg(_T("입력 데이터 설정 실패."), _T("경고"), RGB_RED, DELAY_TIME_MSG);
+		//pView->DispMsg(_T("입력 데이터 설정 실패."), _T("경고"), RGB_RED, DELAY_TIME_MSG);
+		pView->MsgBox(_T("입력 데이터 설정 실패."));
 		return FALSE;
 	}
+	//Sleep(10);
 #endif
 	return TRUE;
 }
 
 BOOL CMpDevice::WriteRegisterDataO(int nAddr, long lData)
 {	
-#ifndef USE_MPE
+#ifdef USE_MPE
 	if(nAddr&0x01)
 	{
 		return FALSE;
@@ -524,6 +561,7 @@ BOOL CMpDevice::WriteRegisterDataO(int nAddr, long lData)
 	{
 		return FALSE;
 	}
+	//Sleep(10);
 #endif	
 	return TRUE;
 }
@@ -532,7 +570,7 @@ BOOL CMpDevice::WriteRegisterDataO(int nAddr, long lData)
 long CMpDevice::GetRegisterDataO(int nAddr)
 {	
 	long lRtn=0;
-#ifndef USE_MPE
+#ifdef USE_MPE
 	if(nAddr&0x01)
 	{
 		return 0;
@@ -540,7 +578,7 @@ long CMpDevice::GetRegisterDataO(int nAddr)
 
 	CString strAddr;
 	strAddr.Format(_T("OL%04x"), nAddr);
-
+	//Sleep(10);
 	if(!GetIoDataValue(strAddr, lRtn))
 		return 0;
 #endif
@@ -596,6 +634,7 @@ BOOL CMpDevice::Write(CString strRegAddr, long lData, BOOL bCheck)
 				return FALSE;
 			}
 
+			//Sleep(10);
 
 			if(lData)
 				lWriteBuffer = lReadBuffer | (0x01<<(16+nthBit));
@@ -612,6 +651,8 @@ BOOL CMpDevice::Write(CString strRegAddr, long lData, BOOL bCheck)
 				return FALSE;
 			}
 
+			//Sleep(10);
+
 			if(lData)
 				lWriteBuffer = lReadBuffer | (0x01<<(nthBit));
 			else
@@ -623,7 +664,7 @@ BOOL CMpDevice::Write(CString strRegAddr, long lData, BOOL bCheck)
 			m_cs.Unlock();
 			return FALSE;
 		}		
-		
+		//Sleep(10);
 		break;
 	case 'W':
 	case 'w':
@@ -640,7 +681,7 @@ BOOL CMpDevice::Write(CString strRegAddr, long lData, BOOL bCheck)
 				m_cs.Unlock();
 				return FALSE;
 			}
-
+			//Sleep(10);
 			lData = (lData<<16);
 			lWriteBuffer = (lReadBuffer & 0x0000FFFF) | lData;
 		}
@@ -653,6 +694,7 @@ BOOL CMpDevice::Write(CString strRegAddr, long lData, BOOL bCheck)
 				m_cs.Unlock();
 				return FALSE;
 			}
+			//Sleep(10);
 			lWriteBuffer = (lReadBuffer & 0xFFFF0000) | (lData & 0x0000FFFF);
 		}
 		
@@ -661,7 +703,7 @@ BOOL CMpDevice::Write(CString strRegAddr, long lData, BOOL bCheck)
 			m_cs.Unlock();
 			return FALSE;
 		}
-
+		//Sleep(10);
 		break;
 	case 'L':
 	case 'l':
@@ -677,13 +719,14 @@ BOOL CMpDevice::Write(CString strRegAddr, long lData, BOOL bCheck)
 				m_cs.Unlock();
 				return FALSE;
 			}
+			//Sleep(10);
 			lWriteBuffer = (lReadBuffer & 0x0000FFFF) | (lData<<16);
 			if(!SetIoDataValue(strAddr, lWriteBuffer))
 			{
 				m_cs.Unlock();
 				return FALSE;
 			}
-
+			//Sleep(10);
 			strAddr.SetAt(strAddr.GetLength()-1,('0'+nAddrLastNum+1));
 			if(!GetIoDataValue(strAddr, lReadBuffer))
 			{
@@ -691,12 +734,14 @@ BOOL CMpDevice::Write(CString strRegAddr, long lData, BOOL bCheck)
 				m_cs.Unlock();
 				return FALSE;
 			}
+			//Sleep(10);
 			lWriteBuffer = (lReadBuffer & 0xFFFF0000) | (lData>>16);
 			if(!SetIoDataValue(strAddr, lWriteBuffer))
 			{
 				m_cs.Unlock();
 				return FALSE;
 			}
+			//Sleep(10);
 		}
 		else
 		{
@@ -706,6 +751,7 @@ BOOL CMpDevice::Write(CString strRegAddr, long lData, BOOL bCheck)
 				m_cs.Unlock();
 				return FALSE;
 			}
+			//Sleep(10);
 		}
 		break;
 	case 'F':
@@ -716,7 +762,7 @@ BOOL CMpDevice::Write(CString strRegAddr, long lData, BOOL bCheck)
 			m_cs.Unlock();
 			return FALSE;
 		}
-		
+		//Sleep(10);
 		break;
 	}
 
@@ -760,7 +806,7 @@ BOOL CMpDevice::WriteRegisterDataM(int nAddr, long lData)
 		m_cs.Unlock();
 		return FALSE;
 	}
-	
+	//Sleep(10);
 	m_cs.Unlock();
 	return TRUE;
 }
@@ -1451,6 +1497,7 @@ void CMpDevice::GetMpeIO()
 
 	if (nGrpIn + nGrpOut > 15)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("Error - nInSeg+nOutSeg > 15"));
 		return;
@@ -1484,6 +1531,12 @@ void CMpDevice::GetMpeIO()
 
 		dwRC = ymcGetRegisterDataHandle((LPBYTE)cAddr, &hRegisterData[nLoop]);
 		delete cAddr;
+		if (dwRC != MP_SUCCESS)
+		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
+			AfxMessageBox(_T("ymcGetRegisterDataHandle ERROR"));
+		}
+		//Sleep(10);
 
 		RegInfo[nLoop].hRegisterData = hRegisterData[nLoop];	// Register handle
 		RegInfo[nLoop].RegisterDataNumber = nGrpStep;		// The number of register data
@@ -1511,6 +1564,13 @@ void CMpDevice::GetMpeIO()
 		dwRC = ymcGetRegisterDataHandle((LPBYTE)cAddr, &hRegisterData[nLoop + nGrpIn]);
 		delete cAddr;
 
+		if (dwRC != MP_SUCCESS)
+		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
+			AfxMessageBox(_T("ymcGetRegisterDataHandle ERROR"));
+		}
+		//Sleep(10);
+
 		RegInfo[nLoop + nGrpIn].hRegisterData = hRegisterData[nLoop + nGrpIn];	// Register handle
 		RegInfo[nLoop + nGrpIn].RegisterDataNumber = nGrpStep;		// The number of register data
 		RegInfo[nLoop + nGrpIn].pRegisterData = RegisterWData[nLoop + nGrpIn];		// The number of register data
@@ -1528,18 +1588,19 @@ void CMpDevice::GetMpeIO()
 		// Error check processing
 		if (dwRC != MP_SUCCESS)
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			pView->ClrDispMsg();
 			AfxMessageBox(_T("ymcGetGroupRegisterData ERROR"));
 			return;
 		}
-
+		//Sleep(10);
 		for (nIdx = 0; nIdx < nGrpStep; nIdx++)
 		{
 			RegWData = *((WORD*)RegInfo[nLoop].pRegisterData + nIdx);
 			pDoc->m_pMpeIo[nIdx + nSt] = (unsigned short)RegWData;
 		}
 		nSt += nGrpStep;
-		Sleep(10);
+		//Sleep(10);
 	}
 
 /*	// MpeIO
@@ -1687,21 +1748,30 @@ void CMpDevice::GetMpeSignal()
 		dwRC = ymcGetRegisterDataHandle((LPBYTE)cAddr, &hRegisterData[nLoop]);
 		delete cAddr;
 
+		if (dwRC != MP_SUCCESS)
+		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
+			pView->ClrDispMsg();
+			AfxMessageBox(_T("ymcGetRegisterDataHandle ERROR"));
+		}
+		//Sleep(10);
+
 		RegInfo[nLoop].hRegisterData = hRegisterData[nLoop];	// Register handle
 		RegInfo[nLoop].RegisterDataNumber = nGrpStep;			// The number of register data
 		RegInfo[nLoop].pRegisterData = RegisterWData[nLoop];	// The number of register data
 
 		dwRC = ymcGetGroupRegisterData(1, &RegInfo[nLoop]);
-		Sleep(10);
+		//Sleep(10);
 
 		// Error check processing
 		if (dwRC != MP_SUCCESS)
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			pView->ClrDispMsg();
 			AfxMessageBox(_T("ymcGetGroupRegisterData ERROR"));
 			return;
 		}
-		
+		//Sleep(10);
 		for (nIdx = 0; nIdx < nGrpStep; nIdx++)
 		{
 			RegWData = *((WORD*)RegInfo[nLoop].pRegisterData + nIdx);
@@ -1728,17 +1798,24 @@ void CMpDevice::GetMpeSignal()
 	cAddr = StringToChar(sAddr.Left(7));
 	dwRC = ymcGetRegisterDataHandle((LPBYTE)cAddr, &hRegisterData[nLoop]);
 	delete cAddr;
-
+	if (dwRC != MP_SUCCESS)
+	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
+		pView->ClrDispMsg();
+		AfxMessageBox(_T("ymcGetRegisterDataHandle ERROR"));
+	}
+	//Sleep(10);
 	RegInfo[nLoop].hRegisterData = hRegisterData[nLoop];	// Register handle
 	RegInfo[nLoop].RegisterDataNumber = nGrpStep;			// The number of register data
 	RegInfo[nLoop].pRegisterData = RegisterWData[nLoop];	// The number of register data
 
 	dwRC = ymcGetGroupRegisterData(1, &RegInfo[nLoop]);
-	Sleep(10);
+	//Sleep(10);
 
 	// Error check processing
 	if (dwRC != MP_SUCCESS)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("ymcGetGroupRegisterData ERROR"));
 		return;
@@ -1766,16 +1843,25 @@ void CMpDevice::GetMpeSignal()
 	dwRC = ymcGetRegisterDataHandle((LPBYTE)cAddr, &hRegisterData[nLoop]);
 	delete cAddr;
 
+	if (dwRC != MP_SUCCESS)
+	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
+		pView->ClrDispMsg();
+		AfxMessageBox(_T("ymcGetRegisterDataHandle ERROR"));
+	}
+	//Sleep(10);
+
 	RegInfo[nLoop].hRegisterData = hRegisterData[nLoop];	// Register handle
 	RegInfo[nLoop].RegisterDataNumber = nGrpStep;			// The number of register data
 	RegInfo[nLoop].pRegisterData = RegisterWData[nLoop];	// The number of register data
 
 	dwRC = ymcGetGroupRegisterData(1, &RegInfo[nLoop]);
-	Sleep(10);
+	//Sleep(10);
 
 	// Error check processing
 	if (dwRC != MP_SUCCESS)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("ymcGetGroupRegisterData ERROR"));
 		return;
@@ -1808,31 +1894,38 @@ void CMpDevice::GetMpeSignal()
 	cAddr = StringToChar(sAddr);
 	dwRC = ymcGetRegisterDataHandle((LPBYTE)cAddr, &hRegisterData[nLoop]);
 	delete cAddr;
-
+	if (dwRC != MP_SUCCESS)
+	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
+		pView->ClrDispMsg();
+		AfxMessageBox(_T("ymcGetRegisterDataHandle ERROR"));
+	}
+	//Sleep(10);
 	RegInfo[nLoop].hRegisterData = hRegisterData[nLoop];	// Register handle
 	RegInfo[nLoop].RegisterDataNumber = nGrpStep * 16;		// The number of register data
 	RegInfo[nLoop].pRegisterData = RegisterLData[nLoop];	// The number of register data
 
 	dwRC = ymcGetGroupRegisterData(1, &RegInfo[nLoop]);
-	Sleep(10);
+	//Sleep(10);
 
 	// Error check processing
 	if (dwRC != MP_SUCCESS)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("ymcGetGroupRegisterData ERROR"));
 		return;
 	}
-
-	//nSt = pDoc->MkIo.MpeData.nGrpInSt;
+	//Sleep(10);
+		//nSt = pDoc->MkIo.MpeData.nGrpInSt;
 	for (nIdx = 0; nIdx < nGrpStep; nIdx++)
 	{
 		for (k = 0; k < 16; k++)
 		{
 			RegLData = *((long*)RegInfo[nLoop].pRegisterData + (k + 16 * nIdx));
 				pDoc->m_pMpeData[nIdx + nStIn][k] = (long)RegLData;
+			}
 		}
-	}
 		nStIn += nGrpStep;
 	}
 
@@ -1849,21 +1942,29 @@ void CMpDevice::GetMpeSignal()
 	cAddr = StringToChar(sAddr);
 	dwRC = ymcGetRegisterDataHandle((LPBYTE)cAddr, &hRegisterData[nLoop]);
 	delete cAddr;
+	if (dwRC != MP_SUCCESS)
+	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
+		pView->ClrDispMsg();
+		AfxMessageBox(_T("ymcGetRegisterDataHandle ERROR"));
+	}
+	//Sleep(10);
 
 	RegInfo[nLoop].hRegisterData = hRegisterData[nLoop];	// Register handle
 	RegInfo[nLoop].RegisterDataNumber = nGrpStep * 16;		// The number of register data
 	RegInfo[nLoop].pRegisterData = RegisterLData[nLoop];	// The number of register data
 
 	dwRC = ymcGetGroupRegisterData(1, &RegInfo[nLoop]);
-	Sleep(10);
 
 	// Error check processing
 	if (dwRC != MP_SUCCESS)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("ymcGetGroupRegisterData ERROR"));
 		return;
 	}
+	//Sleep(10);
 
 		nStOut = pDoc->MkIo.MpeData.nGrpOutSt + nStIn;
 	for (nIdx = 0; nIdx < nGrpStep; nIdx++)
@@ -1873,7 +1974,7 @@ void CMpDevice::GetMpeSignal()
 			RegLData = *((long*)RegInfo[nLoop].pRegisterData + (k + 16 * nIdx));
 				pDoc->m_pMpeData[nIdx + nStOut][k] = (long)RegLData;
 		}
-		}
+	}
 		nStIn += nGrpStep;
 	}
 

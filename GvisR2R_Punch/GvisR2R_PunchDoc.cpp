@@ -6447,11 +6447,198 @@ void CGvisR2R_PunchDoc::MakeImageDirUp(int nSerial)
 		CreateDirectory(strMakeFolderPath, NULL);
 }
 
+//BOOL CGvisR2R_PunchDoc::CopyDefImgUp(int nSerial, CString sNewLot)
+//{
+//	if (nSerial <= 0)
+//	{
+//		pView->SetAlarmToPlc(UNIT_PUNCH);
+//		pView->ClrDispMsg();
+//		AfxMessageBox(_T("Serial Error.18"));
+//		return 0;
+//	}
+//
+//	CString strDefImgPathS, strDefImgPathD;// , strMakeFolderPath;
+//	int i;
+//	CString strTemp;
+//	CString sLot;
+//
+//	CString strAOIImgDataPath;
+//	if (WorkingInfo.System.sPathAoiUpDefImg.Right(1) != "\\")
+//	{
+//		strAOIImgDataPath.Format(_T("%s"), WorkingInfo.System.sPathAoiUpDefImg);
+//		//strAOIImgDataPath.Format(_T("%s\\VRSImage"), WorkingInfo.System.sPathAoiUpDefImg);
+//	}
+//	else
+//	{ 
+//		i = WorkingInfo.System.sPathAoiUpDefImg.GetLength();
+//		strAOIImgDataPath.Format(_T("%s"), WorkingInfo.System.sPathAoiUpDefImg.Left(i-1));
+//	}
+//
+//	if (sNewLot.IsEmpty())
+//		sLot = WorkingInfo.LastJob.sLot;
+//	else
+//		sLot = sNewLot;
+//	CString sMsg;
+//
+//	CFileFind finder;
+//	//if (finder.FindFile(strAOIImgDataPath))
+//	{
+//
+//		MakeImageDirUp(nSerial);
+//
+//		int nIdx = GetIdxPcrBufUp(nSerial);
+//		if (nIdx < 0)
+//			return FALSE;
+//
+//		int nTotDef = 0;
+//		if (m_pPcr[0])
+//		{
+//			if (m_pPcr[0][nIdx])
+//				nTotDef = m_pPcr[0][nIdx]->m_nTotDef;
+//		}
+//		if (nTotDef <= 0)
+//			return TRUE;
+//
+//		int nErrorCnt = 0;
+//		for (i = 0; i < nTotDef; i++)
+//		{
+//			if (pDoc->m_pPcr[0][nIdx]->m_pMk[i] != -2) // -2 (NoMarking)
+//			{
+//				int nDefImg = pDoc->m_pPcr[0][nIdx]->m_pImg[i];
+//				if (strAOIImgDataPath.Right(1) != "\\")
+//					strDefImgPathS.Format(_T("%s\\%s\\%s\\%s\\%d\\%05d.tif"), strAOIImgDataPath,
+//						WorkingInfo.LastJob.sModel,
+//						WorkingInfo.LastJob.sLayerUp,
+//						sLot,
+//						nSerial,
+//						nDefImg);
+//				else
+//					strDefImgPathS.Format(_T("%s%s\\%s\\%s\\%d\\%05d.tif"), strAOIImgDataPath,
+//						WorkingInfo.LastJob.sModel,
+//						WorkingInfo.LastJob.sLayerUp,
+//						sLot,
+//						nSerial,
+//						nDefImg);
+//
+//				if (WorkingInfo.System.sPathOldFile.Right(1) != "\\")
+//					strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImage\\%d\\%05d.tif"), WorkingInfo.System.sPathOldFile,
+//						WorkingInfo.LastJob.sModel,
+//						sLot,
+//						WorkingInfo.LastJob.sLayerUp,
+//						nSerial,
+//						nDefImg);
+//				else
+//					strDefImgPathD.Format(_T("%s%s\\%s\\%s\\DefImage\\%d\\%05d.tif"), WorkingInfo.System.sPathOldFile,
+//						WorkingInfo.LastJob.sModel,
+//						sLot,
+//						WorkingInfo.LastJob.sLayerUp,
+//						nSerial,
+//						nDefImg);
+//
+//				if (finder.FindFile(strDefImgPathS))
+//				{
+//					if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
+//					{
+//						if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
+//						{
+//							strTemp.Format(_T("%s \r\n: Defect Image File Copy Fail"), strDefImgPathS);
+//							pView->MsgBox(strTemp);
+//							return FALSE;
+//						}
+//					}
+//				}
+//				else
+//				{
+//					Sleep(30);
+//					if (nErrorCnt > 10)
+//					{
+//						nErrorCnt = 0;
+//						strTemp.Format(_T("%s \r\n: Defect Image File Not Exist"), strDefImgPathS);
+//						return TRUE;
+//					}
+//					else
+//					{
+//						nErrorCnt++;
+//						i--;
+//						continue;
+//					}
+//				}
+//
+//
+//				int nStrip = -1, nCol = -1, nRow = -1;
+//				int nPcrIdx = pDoc->GetPcrIdx0(nSerial);
+//				int nPcsIdx = pDoc->m_pPcr[0][nPcrIdx]->m_pDefPcs[i];
+//				int nDefCode = pDoc->m_pPcr[0][nPcrIdx]->m_pDefType[i];
+//				if (pDoc->m_Master[0].m_pPcsRgn)
+//					pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[0].MasterInfo.nActionCode, nPcsIdx, nStrip, nCol, nRow);
+//
+//				if (WorkingInfo.System.sPathOldFile.Right(1) != "\\")
+//				{
+//					strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImagePos\\%d\\%05d_%s_%c_%d_%d.tif"), WorkingInfo.System.sPathOldFile,
+//						WorkingInfo.LastJob.sModel,
+//						sLot,
+//						WorkingInfo.LastJob.sLayerUp,
+//						nSerial,
+//						nDefImg, pDoc->m_pReelMap->m_sKorDef[nDefCode], nStrip + 'A', nCol + 1, nRow + 1);
+//				}
+//				else
+//				{
+//					strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImagePos\\%d\\%05d_%s_%c_%d_%d.tif"), WorkingInfo.System.sPathOldFile,
+//						WorkingInfo.LastJob.sModel,
+//						sLot,
+//						WorkingInfo.LastJob.sLayerUp,
+//						nSerial,
+//						nDefImg, pDoc->m_pReelMap->m_sKorDef[nDefCode], nStrip + 'A', nCol + 1, nRow + 1);
+//				}
+//
+//				if (finder.FindFile(strDefImgPathS))
+//				{
+//					if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
+//					{
+//						if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
+//						{
+//							strTemp.Format(_T("%s \r\n: Defect Image Position File Copy Fail"), strDefImgPathS);
+//							pView->MsgBox(strTemp);
+//							return FALSE;
+//						}
+//					}
+//				}
+//				else
+//				{
+//					Sleep(30);
+//					if (nErrorCnt > 10)
+//					{
+//						nErrorCnt = 0;
+//						strTemp.Format(_T("%s \r\n: Defect Image Position File Not Exist"), strDefImgPathS);
+//						//AfxMessageBox(strTemp);
+//						return TRUE;
+//					}
+//					else
+//					{
+//						nErrorCnt++;
+//						i--;
+//						continue;
+//					}
+//				}
+//			}
+//		}
+//	}
+//	//else
+//	//{
+//	//	pView->SetAlarmToPlc(UNIT_PUNCH);
+//	//	sMsg.Format(_T("%s 폴더가 없습니다."), strAOIImgDataPath);
+//	//	pView->ClrDispMsg();
+//	//	AfxMessageBox(sMsg);
+//	//}
+//
+//	return TRUE;
+//}
+
+
 BOOL CGvisR2R_PunchDoc::CopyDefImgUp(int nSerial, CString sNewLot)
 {
 	if (nSerial <= 0)
 	{
-		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("Serial Error.18"));
 		return 0;
@@ -6459,176 +6646,156 @@ BOOL CGvisR2R_PunchDoc::CopyDefImgUp(int nSerial, CString sNewLot)
 
 	CString strDefImgPathS, strDefImgPathD;// , strMakeFolderPath;
 	int i;
+	CFileFind finder;
 	CString strTemp;
 	CString sLot;
 
 	CString strAOIImgDataPath;
-	if (WorkingInfo.System.sPathAoiUpDefImg.Right(1) != "\\")
-	{
-		strAOIImgDataPath.Format(_T("%s"), WorkingInfo.System.sPathAoiUpDefImg);
-		//strAOIImgDataPath.Format(_T("%s\\VRSImage"), WorkingInfo.System.sPathAoiUpDefImg);
-	}
-	else
-	{ 
-		i = WorkingInfo.System.sPathAoiUpDefImg.GetLength();
-		strAOIImgDataPath.Format(_T("%s"), WorkingInfo.System.sPathAoiUpDefImg.Left(i-1));
-	}
+	strAOIImgDataPath.Format(_T("%s\\VRSImage"), WorkingInfo.System.sPathAoiUpDefImg);
 
 	if (sNewLot.IsEmpty())
 		sLot = WorkingInfo.LastJob.sLot;
 	else
 		sLot = sNewLot;
-	CString sMsg;
 
-	CFileFind finder;
-	if (finder.FindFile(strAOIImgDataPath))
+	MakeImageDirUp(nSerial);
+
+	int nIdx = GetIdxPcrBufUp(nSerial);
+	if (nIdx < 0)
+		return FALSE;
+
+	int nTotDef = 0;
+	if (m_pPcr[0])
 	{
+		if (m_pPcr[0][nIdx])
+			nTotDef = m_pPcr[0][nIdx]->m_nTotDef;
+	}
+	if (nTotDef <= 0)
+		return TRUE;
 
-		MakeImageDirUp(nSerial);
-
-		int nIdx = GetIdxPcrBufUp(nSerial);
-		if (nIdx < 0)
-			return FALSE;
-
-		int nTotDef = 0;
-		if (m_pPcr[0])
+	int nErrorCnt = 0;
+	for (i = 0; i < nTotDef; i++)
+	{
+		if (pDoc->m_pPcr[0][nIdx]->m_pMk[i] != -2) // -2 (NoMarking)
 		{
-			if (m_pPcr[0][nIdx])
-				nTotDef = m_pPcr[0][nIdx]->m_nTotDef;
-		}
-		if (nTotDef <= 0)
-			return TRUE;
+			int nDefImg = pDoc->m_pPcr[0][nIdx]->m_pImg[i];
+			if (strAOIImgDataPath.Right(1) != "\\")
+				strDefImgPathS.Format(_T("%s\\%s\\%s\\%s\\%d\\%05d.tif"), strAOIImgDataPath,
+					WorkingInfo.LastJob.sModel,
+					WorkingInfo.LastJob.sLayerUp,
+					sLot,
+					nSerial,
+					nDefImg);
+			else
+				strDefImgPathS.Format(_T("%s%s\\%s\\%s\\%d\\%05d.tif"), strAOIImgDataPath,
+					WorkingInfo.LastJob.sModel,
+					WorkingInfo.LastJob.sLayerUp,
+					sLot,
+					nSerial,
+					nDefImg);
 
-		int nErrorCnt = 0;
-		for (i = 0; i < nTotDef; i++)
-		{
-			if (pDoc->m_pPcr[0][nIdx]->m_pMk[i] != -2) // -2 (NoMarking)
+			if (WorkingInfo.System.sPathOldFile.Right(1) != "\\")
+				strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImage\\%d\\%05d.tif"), WorkingInfo.System.sPathOldFile,
+					WorkingInfo.LastJob.sModel,
+					sLot,
+					WorkingInfo.LastJob.sLayerUp,
+					nSerial,
+					nDefImg);
+			else
+				strDefImgPathD.Format(_T("%s%s\\%s\\%s\\DefImage\\%d\\%05d.tif"), WorkingInfo.System.sPathOldFile,
+					WorkingInfo.LastJob.sModel,
+					sLot,
+					WorkingInfo.LastJob.sLayerUp,
+					nSerial,
+					nDefImg);
+
+			if (finder.FindFile(strDefImgPathS))
 			{
-				int nDefImg = pDoc->m_pPcr[0][nIdx]->m_pImg[i];
-				if (strAOIImgDataPath.Right(1) != "\\")
-					strDefImgPathS.Format(_T("%s\\%s\\%s\\%s\\%d\\%05d.tif"), strAOIImgDataPath,
-						WorkingInfo.LastJob.sModel,
-						WorkingInfo.LastJob.sLayerUp,
-						sLot,
-						nSerial,
-						nDefImg);
-				else
-					strDefImgPathS.Format(_T("%s%s\\%s\\%s\\%d\\%05d.tif"), strAOIImgDataPath,
-						WorkingInfo.LastJob.sModel,
-						WorkingInfo.LastJob.sLayerUp,
-						sLot,
-						nSerial,
-						nDefImg);
-
-				if (WorkingInfo.System.sPathOldFile.Right(1) != "\\")
-					strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImage\\%d\\%05d.tif"), WorkingInfo.System.sPathOldFile,
-						WorkingInfo.LastJob.sModel,
-						sLot,
-						WorkingInfo.LastJob.sLayerUp,
-						nSerial,
-						nDefImg);
-				else
-					strDefImgPathD.Format(_T("%s%s\\%s\\%s\\DefImage\\%d\\%05d.tif"), WorkingInfo.System.sPathOldFile,
-						WorkingInfo.LastJob.sModel,
-						sLot,
-						WorkingInfo.LastJob.sLayerUp,
-						nSerial,
-						nDefImg);
-
-				if (finder.FindFile(strDefImgPathS))
+				if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
 				{
 					if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
 					{
-						if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
-						{
-							strTemp.Format(_T("%s \r\n: Defect Image File Copy Fail"), strDefImgPathS);
-							pView->MsgBox(strTemp);
-							return FALSE;
-						}
-					}
-				}
-				else
-				{
-					Sleep(30);
-					if (nErrorCnt > 10)
-					{
-						nErrorCnt = 0;
-						strTemp.Format(_T("%s \r\n: Defect Image File Not Exist"), strDefImgPathS);
-						return TRUE;
-					}
-					else
-					{
-						nErrorCnt++;
-						i--;
-						continue;
-					}
-				}
-
-
-				int nStrip = -1, nCol = -1, nRow = -1;
-				int nPcrIdx = pDoc->GetPcrIdx0(nSerial);
-				int nPcsIdx = pDoc->m_pPcr[0][nPcrIdx]->m_pDefPcs[i];
-				int nDefCode = pDoc->m_pPcr[0][nPcrIdx]->m_pDefType[i];
-				if (pDoc->m_Master[0].m_pPcsRgn)
-					pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[0].MasterInfo.nActionCode, nPcsIdx, nStrip, nCol, nRow);
-
-				if (WorkingInfo.System.sPathOldFile.Right(1) != "\\")
-				{
-					strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImagePos\\%d\\%05d_%s_%c_%d_%d.tif"), WorkingInfo.System.sPathOldFile,
-						WorkingInfo.LastJob.sModel,
-						sLot,
-						WorkingInfo.LastJob.sLayerUp,
-						nSerial,
-						nDefImg, pDoc->m_pReelMap->m_sKorDef[nDefCode], nStrip + 'A', nCol + 1, nRow + 1);
-				}
-				else
-				{
-					strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImagePos\\%d\\%05d_%s_%c_%d_%d.tif"), WorkingInfo.System.sPathOldFile,
-						WorkingInfo.LastJob.sModel,
-						sLot,
-						WorkingInfo.LastJob.sLayerUp,
-						nSerial,
-						nDefImg, pDoc->m_pReelMap->m_sKorDef[nDefCode], nStrip + 'A', nCol + 1, nRow + 1);
-				}
-
-				if (finder.FindFile(strDefImgPathS))
-				{
-					if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
-					{
-						if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
-						{
-							strTemp.Format(_T("%s \r\n: Defect Image Position File Copy Fail"), strDefImgPathS);
-							pView->MsgBox(strTemp);
-							return FALSE;
-						}
-					}
-				}
-				else
-				{
-					Sleep(30);
-					if (nErrorCnt > 10)
-					{
-						nErrorCnt = 0;
-						strTemp.Format(_T("%s \r\n: Defect Image Position File Not Exist"), strDefImgPathS);
-						//AfxMessageBox(strTemp);
-						return TRUE;
-					}
-					else
-					{
-						nErrorCnt++;
-						i--;
-						continue;
+						strTemp.Format(_T("%s \r\n: Defect Image File Copy Fail"), strDefImgPathS);
+						pView->MsgBox(strTemp);
+						return FALSE;
 					}
 				}
 			}
+			else
+			{
+				Sleep(30);
+				if (nErrorCnt > 10)
+				{
+					nErrorCnt = 0;
+					strTemp.Format(_T("%s \r\n: Defect Image File Not Exist"), strDefImgPathS);
+					//AfxMessageBox(strTemp);
+					return TRUE;
+				}
+				else
+				{
+					nErrorCnt++;
+					i--;
+					continue;
+				}
+			}
+
+
+			int nStrip = -1, nCol = -1, nRow = -1;
+			int nPcrIdx = pDoc->GetPcrIdx0(nSerial);
+			int nPcsIdx = pDoc->m_pPcr[0][nPcrIdx]->m_pDefPcs[i];
+			int nDefCode = pDoc->m_pPcr[0][nPcrIdx]->m_pDefType[i];
+			if (pDoc->m_Master[0].m_pPcsRgn)
+				pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(nPcsIdx, nStrip, nCol, nRow);
+
+			if (WorkingInfo.System.sPathOldFile.Right(1) != "\\")
+			{
+				strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImagePos\\%d\\%05d_%s_%c_%d_%d.tif"), WorkingInfo.System.sPathOldFile,
+					WorkingInfo.LastJob.sModel,
+					sLot,
+					WorkingInfo.LastJob.sLayerUp,
+					nSerial,
+					nDefImg, pDoc->m_pReelMap->m_sKorDef[nDefCode], nStrip + 'A', nCol + 1, nRow + 1);
+			}
+			else
+			{
+				strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImagePos\\%d\\%05d_%s_%c_%d_%d.tif"), WorkingInfo.System.sPathOldFile,
+					WorkingInfo.LastJob.sModel,
+					sLot,
+					WorkingInfo.LastJob.sLayerUp,
+					nSerial,
+					nDefImg, pDoc->m_pReelMap->m_sKorDef[nDefCode], nStrip + 'A', nCol + 1, nRow + 1);
+			}
+
+			if (finder.FindFile(strDefImgPathS))
+			{
+				if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
+				{
+					if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
+					{
+						strTemp.Format(_T("%s \r\n: Defect Image Position File Copy Fail"), strDefImgPathS);
+						pView->MsgBox(strTemp);
+						return FALSE;
+					}
+				}
+			}
+			else
+			{
+				Sleep(30);
+				if (nErrorCnt > 10)
+				{
+					nErrorCnt = 0;
+					strTemp.Format(_T("%s \r\n: Defect Image Position File Not Exist"), strDefImgPathS);
+					//AfxMessageBox(strTemp);
+					return TRUE;
+				}
+				else
+				{
+					nErrorCnt++;
+					i--;
+					continue;
+				}
+			}
 		}
-	}
-	else
-	{
-		pView->SetAlarmToPlc(UNIT_PUNCH);
-		sMsg.Format(_T("%s 폴더가 없습니다."), strAOIImgDataPath);
-		pView->ClrDispMsg();
-		AfxMessageBox(sMsg);
 	}
 
 	return TRUE;
@@ -6768,6 +6935,199 @@ void CGvisR2R_PunchDoc::MakeImageDirDn(int nSerial)
 		CreateDirectory(strMakeFolderPath, NULL);
 }
 
+//BOOL CGvisR2R_PunchDoc::CopyDefImgDn(int nSerial, CString sNewLot)
+//{
+//	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
+//	if (!bDualTest)
+//		return 0;
+//
+//	if (nSerial <= 0)
+//	{
+//		pView->SetAlarmToPlc(UNIT_PUNCH);
+//		pView->ClrDispMsg();
+//		AfxMessageBox(_T("Serial Error.19"));
+//		return 0;
+//	}
+//
+//	CString strDefImgPathS, strDefImgPathD;
+//	int i;
+//	CString strTemp;
+//	CString sLot;
+//
+//	if (sNewLot.IsEmpty())
+//		sLot = WorkingInfo.LastJob.sLot;
+//	else
+//		sLot = sNewLot;
+//
+//	CString strAOIImgDataPath;
+//	if (WorkingInfo.System.sPathAoiDnDefImg.Right(1) != "\\")
+//	{
+//		strAOIImgDataPath.Format(_T("%s"), WorkingInfo.System.sPathAoiDnDefImg);
+//		//strAOIImgDataPath.Format(_T("%s\\VRSImage"), WorkingInfo.System.sPathAoiDnDefImg);
+//	}
+//	else
+//	{
+//		i = WorkingInfo.System.sPathAoiDnDefImg.GetLength();
+//		strAOIImgDataPath.Format(_T("%s"), WorkingInfo.System.sPathAoiDnDefImg.Left(i - 1));
+//	}
+//
+//	CString sMsg;
+//
+//	CFileFind finder;
+//	//if (finder.FindFile(strAOIImgDataPath))
+//	{
+//
+//		MakeImageDirDn(nSerial);
+//
+//		int nIdx = GetIdxPcrBufDn(nSerial);
+//		if (nIdx < 0)
+//			return FALSE;
+//
+//		int nTotDef = 0;
+//		if (m_pPcr[1])
+//		{
+//			if (m_pPcr[1][nIdx])
+//				nTotDef = m_pPcr[1][nIdx]->m_nTotDef;
+//		}
+//		if (nTotDef <= 0)
+//			return TRUE;
+//
+//		int nErrorCnt = 0;
+//		for (i = 0; i < nTotDef; i++)
+//		{
+//			if (pDoc->m_pPcr[1][nIdx]->m_pMk[i] != -2) // -2 (NoMarking)
+//			{
+//				int nDefImg = pDoc->m_pPcr[1][nIdx]->m_pImg[i];
+//
+//				if (strAOIImgDataPath.Right(1) != "\\")
+//					strDefImgPathS.Format(_T("%s\\%s\\%s\\%s\\%d\\%05d.tif"), strAOIImgDataPath,
+//						WorkingInfo.LastJob.sModel,
+//						WorkingInfo.LastJob.sLayerDn,
+//						sLot,
+//						nSerial,
+//						nDefImg);
+//				else
+//					strDefImgPathS.Format(_T("%s%s\\%s\\%s\\%d\\%05d.tif"), strAOIImgDataPath,
+//						WorkingInfo.LastJob.sModel,
+//						WorkingInfo.LastJob.sLayerDn,
+//						sLot,
+//						nSerial,
+//						nDefImg);
+//
+//				if (WorkingInfo.System.sPathOldFile.Right(1) != "\\")
+//					strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImage\\%d\\%05d.tif"), WorkingInfo.System.sPathOldFile,
+//						WorkingInfo.LastJob.sModel,
+//						sLot,
+//						WorkingInfo.LastJob.sLayerDn,
+//						nSerial,
+//						nDefImg);
+//				else
+//					strDefImgPathD.Format(_T("%s%s\\%s\\%s\\DefImage\\%d\\%05d.tif"), WorkingInfo.System.sPathOldFile,
+//						WorkingInfo.LastJob.sModel,
+//						sLot,
+//						WorkingInfo.LastJob.sLayerDn,
+//						nSerial,
+//						nDefImg);
+//
+//				if (finder.FindFile(strDefImgPathS))
+//				{
+//					if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
+//					{
+//						if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
+//						{
+//							strTemp.Format(_T("%s \r\n: Defect Image File Copy Fail"), strDefImgPathS);
+//							pView->MsgBox(strTemp);
+//							return FALSE;
+//						}
+//					}
+//				}
+//				else
+//				{
+//					Sleep(30);
+//					if (nErrorCnt > 10)
+//					{
+//						nErrorCnt = 0;
+//						strTemp.Format(_T("%s \r\n: Defect Image File Not Exist"), strDefImgPathS);
+//						return TRUE;
+//					}
+//					else
+//					{
+//						nErrorCnt++;
+//						i--;
+//						continue;
+//					}
+//				}
+//
+//
+//				int nStrip = -1, nCol = -1, nRow = -1;
+//				int nPcrIdx = pDoc->GetPcrIdx1(nSerial);
+//				int nPcsIdx = pDoc->m_pPcr[1][nPcrIdx]->m_pDefPcs[i];
+//				int nDefCode = pDoc->m_pPcr[1][nPcrIdx]->m_pDefType[i];
+//				if (pDoc->m_Master[0].m_pPcsRgn)
+//					pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, nPcsIdx, nStrip, nCol, nRow);
+//
+//				if (WorkingInfo.System.sPathOldFile.Right(1) != "\\")
+//				{
+//					strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImagePos\\%d\\%05d_%s_%c_%d_%d.tif"), WorkingInfo.System.sPathOldFile,
+//						WorkingInfo.LastJob.sModel,
+//						sLot,
+//						WorkingInfo.LastJob.sLayerDn,
+//						nSerial,
+//						nDefImg, pDoc->m_pReelMap->m_sKorDef[nDefCode], nStrip + 'A', nCol + 1, nRow + 1);
+//				}
+//				else
+//				{
+//					strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImagePos\\%d\\%05d_%s_%c_%d_%d.tif"), WorkingInfo.System.sPathOldFile,
+//						WorkingInfo.LastJob.sModel,
+//						sLot,
+//						WorkingInfo.LastJob.sLayerDn,
+//						nSerial,
+//						nDefImg, pDoc->m_pReelMap->m_sKorDef[nDefCode], nStrip + 'A', nCol + 1, nRow + 1);
+//				}
+//
+//				if (finder.FindFile(strDefImgPathS))
+//				{
+//					if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
+//					{
+//						if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
+//						{
+//							strTemp.Format(_T("%s \r\n: Defect Image Position File Copy Fail"), strDefImgPathS);
+//							pView->MsgBox(strTemp);
+//							return FALSE;
+//						}
+//					}
+//				}
+//				else
+//				{
+//					Sleep(30);
+//					if (nErrorCnt > 10)
+//					{
+//						nErrorCnt = 0;
+//						strTemp.Format(_T("%s \r\n: Defect Image Position File Not Exist"), strDefImgPathS);
+//						//AfxMessageBox(strTemp);
+//						return TRUE;
+//					}
+//					else
+//					{
+//						nErrorCnt++;
+//						i--;
+//						continue;
+//					}
+//				}
+//			}
+//		}
+//	}
+//	//else
+//	//{
+//	//	pView->SetAlarmToPlc(UNIT_PUNCH);
+//	//	sMsg.Format(_T("%s 폴더가 없습니다."), strAOIImgDataPath);
+//	//	pView->ClrDispMsg();
+//	//	AfxMessageBox(sMsg);
+//	//}
+//
+//	return TRUE;
+//}
+
 BOOL CGvisR2R_PunchDoc::CopyDefImgDn(int nSerial, CString sNewLot)
 {
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
@@ -6776,14 +7136,14 @@ BOOL CGvisR2R_PunchDoc::CopyDefImgDn(int nSerial, CString sNewLot)
 
 	if (nSerial <= 0)
 	{
-		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("Serial Error.19"));
 		return 0;
 	}
 
-	CString strDefImgPathS, strDefImgPathD;
+	CString strDefImgPathS, strDefImgPathD;// , strMakeFolderPath;
 	int i;
+	CFileFind finder;
 	CString strTemp;
 	CString sLot;
 
@@ -6793,169 +7153,151 @@ BOOL CGvisR2R_PunchDoc::CopyDefImgDn(int nSerial, CString sNewLot)
 		sLot = sNewLot;
 
 	CString strAOIImgDataPath;
-	if (WorkingInfo.System.sPathAoiDnDefImg.Right(1) != "\\")
+	strAOIImgDataPath.Format(_T("%s\\VRSImage"), WorkingInfo.System.sPathAoiDnDefImg);
+
+	MakeImageDirDn(nSerial);
+
+	int nIdx = GetIdxPcrBufDn(nSerial);
+	if (nIdx < 0)
+		return FALSE;
+
+	int nTotDef = 0;
+	if (m_pPcr[1])
 	{
-		strAOIImgDataPath.Format(_T("%s"), WorkingInfo.System.sPathAoiDnDefImg);
-		//strAOIImgDataPath.Format(_T("%s\\VRSImage"), WorkingInfo.System.sPathAoiDnDefImg);
+		if (m_pPcr[1][nIdx])
+			nTotDef = m_pPcr[1][nIdx]->m_nTotDef;
 	}
-	else
+	if (nTotDef <= 0)
+		return TRUE;
+
+	int nErrorCnt = 0;
+	for (i = 0; i < nTotDef; i++)
 	{
-		i = WorkingInfo.System.sPathAoiDnDefImg.GetLength();
-		strAOIImgDataPath.Format(_T("%s"), WorkingInfo.System.sPathAoiDnDefImg.Left(i - 1));
-	}
-
-	CString sMsg;
-
-	CFileFind finder;
-	if (finder.FindFile(strAOIImgDataPath))
-	{
-
-		MakeImageDirDn(nSerial);
-
-		int nIdx = GetIdxPcrBufDn(nSerial);
-		if (nIdx < 0)
-			return FALSE;
-
-		int nTotDef = 0;
-		if (m_pPcr[1])
+		if (pDoc->m_pPcr[1][nIdx]->m_pMk[i] != -2) // -2 (NoMarking)
 		{
-			if (m_pPcr[1][nIdx])
-				nTotDef = m_pPcr[1][nIdx]->m_nTotDef;
-		}
-		if (nTotDef <= 0)
-			return TRUE;
+			int nDefImg = pDoc->m_pPcr[1][nIdx]->m_pImg[i];
 
-		int nErrorCnt = 0;
-		for (i = 0; i < nTotDef; i++)
-		{
-			if (pDoc->m_pPcr[1][nIdx]->m_pMk[i] != -2) // -2 (NoMarking)
+			if (strAOIImgDataPath.Right(1) != "\\")
+				strDefImgPathS.Format(_T("%s\\%s\\%s\\%s\\%d\\%05d.tif"), strAOIImgDataPath,
+					WorkingInfo.LastJob.sModel,
+					//WorkingInfo.LastJob.sModelDn,
+					WorkingInfo.LastJob.sLayerDn,
+					sLot,
+					nSerial,
+					nDefImg);
+			else
+				strDefImgPathS.Format(_T("%s%s\\%s\\%s\\%d\\%05d.tif"), strAOIImgDataPath,
+					WorkingInfo.LastJob.sModel,
+					//WorkingInfo.LastJob.sModelDn,
+					WorkingInfo.LastJob.sLayerDn,
+					sLot,
+					nSerial,
+					nDefImg);
+
+			if (WorkingInfo.System.sPathOldFile.Right(1) != "\\")
+				strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImage\\%d\\%05d.tif"), WorkingInfo.System.sPathOldFile,
+					WorkingInfo.LastJob.sModel,
+					//WorkingInfo.LastJob.sModelDn,
+					sLot,
+					WorkingInfo.LastJob.sLayerDn,
+					nSerial,
+					nDefImg);
+			else
+				strDefImgPathD.Format(_T("%s%s\\%s\\%s\\DefImage\\%d\\%05d.tif"), WorkingInfo.System.sPathOldFile,
+					WorkingInfo.LastJob.sModel,
+					//WorkingInfo.LastJob.sModelDn,
+					sLot,
+					WorkingInfo.LastJob.sLayerDn,
+					nSerial,
+					nDefImg);
+
+			if (finder.FindFile(strDefImgPathS))
 			{
-				int nDefImg = pDoc->m_pPcr[1][nIdx]->m_pImg[i];
-
-				if (strAOIImgDataPath.Right(1) != "\\")
-					strDefImgPathS.Format(_T("%s\\%s\\%s\\%s\\%d\\%05d.tif"), strAOIImgDataPath,
-						WorkingInfo.LastJob.sModel,
-						WorkingInfo.LastJob.sLayerDn,
-						sLot,
-						nSerial,
-						nDefImg);
-				else
-					strDefImgPathS.Format(_T("%s%s\\%s\\%s\\%d\\%05d.tif"), strAOIImgDataPath,
-						WorkingInfo.LastJob.sModel,
-						WorkingInfo.LastJob.sLayerDn,
-						sLot,
-						nSerial,
-						nDefImg);
-
-				if (WorkingInfo.System.sPathOldFile.Right(1) != "\\")
-					strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImage\\%d\\%05d.tif"), WorkingInfo.System.sPathOldFile,
-						WorkingInfo.LastJob.sModel,
-						sLot,
-						WorkingInfo.LastJob.sLayerDn,
-						nSerial,
-						nDefImg);
-				else
-					strDefImgPathD.Format(_T("%s%s\\%s\\%s\\DefImage\\%d\\%05d.tif"), WorkingInfo.System.sPathOldFile,
-						WorkingInfo.LastJob.sModel,
-						sLot,
-						WorkingInfo.LastJob.sLayerDn,
-						nSerial,
-						nDefImg);
-
-				if (finder.FindFile(strDefImgPathS))
+				if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
 				{
 					if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
 					{
-						if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
-						{
-							strTemp.Format(_T("%s \r\n: Defect Image File Copy Fail"), strDefImgPathS);
-							pView->MsgBox(strTemp);
-							return FALSE;
-						}
-					}
-				}
-				else
-				{
-					Sleep(30);
-					if (nErrorCnt > 10)
-					{
-						nErrorCnt = 0;
-						strTemp.Format(_T("%s \r\n: Defect Image File Not Exist"), strDefImgPathS);
-						return TRUE;
-					}
-					else
-					{
-						nErrorCnt++;
-						i--;
-						continue;
-					}
-				}
-
-
-				int nStrip = -1, nCol = -1, nRow = -1;
-				int nPcrIdx = pDoc->GetPcrIdx1(nSerial);
-				int nPcsIdx = pDoc->m_pPcr[1][nPcrIdx]->m_pDefPcs[i];
-				int nDefCode = pDoc->m_pPcr[1][nPcrIdx]->m_pDefType[i];
-				if (pDoc->m_Master[0].m_pPcsRgn)
-					pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, nPcsIdx, nStrip, nCol, nRow);
-
-				if (WorkingInfo.System.sPathOldFile.Right(1) != "\\")
-				{
-					strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImagePos\\%d\\%05d_%s_%c_%d_%d.tif"), WorkingInfo.System.sPathOldFile,
-						WorkingInfo.LastJob.sModel,
-						sLot,
-						WorkingInfo.LastJob.sLayerDn,
-						nSerial,
-						nDefImg, pDoc->m_pReelMap->m_sKorDef[nDefCode], nStrip + 'A', nCol + 1, nRow + 1);
-				}
-				else
-				{
-					strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImagePos\\%d\\%05d_%s_%c_%d_%d.tif"), WorkingInfo.System.sPathOldFile,
-						WorkingInfo.LastJob.sModel,
-						sLot,
-						WorkingInfo.LastJob.sLayerDn,
-						nSerial,
-						nDefImg, pDoc->m_pReelMap->m_sKorDef[nDefCode], nStrip + 'A', nCol + 1, nRow + 1);
-				}
-
-				if (finder.FindFile(strDefImgPathS))
-				{
-					if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
-					{
-						if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
-						{
-							strTemp.Format(_T("%s \r\n: Defect Image Position File Copy Fail"), strDefImgPathS);
-							pView->MsgBox(strTemp);
-							return FALSE;
-						}
-					}
-				}
-				else
-				{
-					Sleep(30);
-					if (nErrorCnt > 10)
-					{
-						nErrorCnt = 0;
-						strTemp.Format(_T("%s \r\n: Defect Image Position File Not Exist"), strDefImgPathS);
-						//AfxMessageBox(strTemp);
-						return TRUE;
-					}
-					else
-					{
-						nErrorCnt++;
-						i--;
-						continue;
+						strTemp.Format(_T("%s \r\n: Defect Image File Copy Fail"), strDefImgPathS);
+						pView->MsgBox(strTemp);
+						return FALSE;
 					}
 				}
 			}
+			else
+			{
+				Sleep(30);
+				if (nErrorCnt > 10)
+				{
+					nErrorCnt = 0;
+					strTemp.Format(_T("%s \r\n: Defect Image File Not Exist"), strDefImgPathS);
+					//AfxMessageBox(strTemp);
+					return TRUE;
+				}
+				else
+				{
+					nErrorCnt++;
+					i--;
+					continue;
+				}
+			}
+
+
+			int nStrip = -1, nCol = -1, nRow = -1;
+			int nPcrIdx = pDoc->GetPcrIdx1(nSerial);
+			int nPcsIdx = pDoc->m_pPcr[1][nPcrIdx]->m_pDefPcs[i];
+			int nDefCode = pDoc->m_pPcr[1][nPcrIdx]->m_pDefType[i];
+			if (pDoc->m_Master[0].m_pPcsRgn)
+				pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(nPcsIdx, nStrip, nCol, nRow);
+
+			if (WorkingInfo.System.sPathOldFile.Right(1) != "\\")
+			{
+				strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImagePos\\%d\\%05d_%s_%c_%d_%d.tif"), WorkingInfo.System.sPathOldFile,
+					WorkingInfo.LastJob.sModel,
+					sLot,
+					WorkingInfo.LastJob.sLayerDn,
+					nSerial,
+					nDefImg, pDoc->m_pReelMap->m_sKorDef[nDefCode], nStrip + 'A', nCol + 1, nRow + 1);
+			}
+			else
+			{
+				strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImagePos\\%d\\%05d_%s_%c_%d_%d.tif"), WorkingInfo.System.sPathOldFile,
+					WorkingInfo.LastJob.sModel,
+					sLot,
+					WorkingInfo.LastJob.sLayerDn,
+					nSerial,
+					nDefImg, pDoc->m_pReelMap->m_sKorDef[nDefCode], nStrip + 'A', nCol + 1, nRow + 1);
+			}
+
+			if (finder.FindFile(strDefImgPathS))
+			{
+				if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
+				{
+					if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
+					{
+						strTemp.Format(_T("%s \r\n: Defect Image Position File Copy Fail"), strDefImgPathS);
+						pView->MsgBox(strTemp);
+						return FALSE;
+					}
+				}
+			}
+			else
+			{
+				Sleep(30);
+				if (nErrorCnt > 10)
+				{
+					nErrorCnt = 0;
+					strTemp.Format(_T("%s \r\n: Defect Image Position File Not Exist"), strDefImgPathS);
+					//AfxMessageBox(strTemp);
+					return TRUE;
+				}
+				else
+				{
+					nErrorCnt++;
+					i--;
+					continue;
+				}
+			}
 		}
-	}
-	else
-	{
-		pView->SetAlarmToPlc(UNIT_PUNCH);
-		sMsg.Format(_T("%s 폴더가 없습니다."), strAOIImgDataPath);
-		pView->ClrDispMsg();
-		AfxMessageBox(sMsg);
 	}
 
 	return TRUE;

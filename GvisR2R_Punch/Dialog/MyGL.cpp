@@ -514,7 +514,7 @@ void CMyGL::Draw()
 	case IDC_STC_REELMAP_IMG:
 		DrawPnlDefNum();
 		DrawPnlNum();
-		DrawMark();
+		//DrawMark();
 		DrawRgn();
 		DrawBack();
 		break;
