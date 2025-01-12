@@ -1255,7 +1255,8 @@ void SaveLog(CString strMsg, int nType)
 
 	file.SeekToEnd();
 	int nLenth = strContents.GetLength();
-	file.Write(cameraKey, nLenth);
+	int nLenth2 = strlen(cameraKey);
+	file.Write(cameraKey, nLenth2);
 	file.Flush();
 	file.Close();
 }

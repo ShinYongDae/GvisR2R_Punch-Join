@@ -1611,7 +1611,7 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("IP_SERVER_ENGRAVE"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.System.sIpServer[ID_ENGRAVE] = CString(szData);
 	else
-		WorkingInfo.System.sIpServer[ID_ENGRAVE] = CString(_T("100.100.100.113"));
+		WorkingInfo.System.sIpServer[ID_ENGRAVE] = CString(_T("100.100.100.119"));
 
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("Port_ENGRAVE"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.System.sPort[ID_ENGRAVE] = CString(szData);
@@ -12938,7 +12938,8 @@ void CGvisR2R_PunchDoc::LogAuto(CString strMsg, int nType)
 
 	file.SeekToEnd();
 	int nLenth = strContents.GetLength();
-	file.Write(cameraKey, nLenth);
+	int nLenth2 = strlen(cameraKey);
+	file.Write(cameraKey, nLenth2);
 	file.Flush();
 	file.Close();
 }
@@ -12992,7 +12993,8 @@ void CGvisR2R_PunchDoc::LogPLC(CString strMsg, int nType)
 
 	file.SeekToEnd();
 	int nLenth = strContents.GetLength();
-	file.Write(cameraKey, nLenth);
+	int nLenth2 = strlen(cameraKey);
+	file.Write(cameraKey, nLenth2);
 	file.Flush();
 	file.Close();
 }
@@ -15610,6 +15612,7 @@ void CGvisR2R_PunchDoc::SetTestMode()
 		return;
 
 	CString sData;
+	sData.Format(_T("%d"), WorkingInfo.LastJob.nTestMode);
 	::WritePrivateProfileString(_T("Infomation"), _T("Test Mode"), sData, sPath);
 	::WritePrivateProfileString(_T("Infomation"), _T("Lot End"), _T("0"), sPath);
 	::WritePrivateProfileString(_T("Infomation"), _T("Last Shot"), _T("10000"), pDoc->WorkingInfo.System.sPathMkCurrInfo);

@@ -899,7 +899,7 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 		switch (nMsgId)
 		{
 		case _ItemInx::_TestMode:
-			if (pDoc->GetTestMode() != (int)SockData.nData1) // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2
+			//if (pDoc->GetTestMode() != (int)SockData.nData1) // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2
 			{
 				m_bGetOpInfo = TRUE;
 				pDoc->SetTestMode();

@@ -2857,7 +2857,12 @@ UINT CGvisR2R_PunchView::ThreadProc0(LPVOID lpContext)	// DoMark0(), DoMark1()
 				if (pThread->m_bTHREAD_MK[1])
 				{
 					if (pThread->m_nBufUpSerial[1] > 0)
-						pThread->DoMark1();
+					{
+						if (pDoc->GetTestMode() == MODE_OUTER)
+							pThread->DoMark1Its();
+						else
+							pThread->DoMark1();
+					}
 					else
 					{
 						pThread->m_bDoneMk[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[1]"), pThread->m_bDoneMk[1]);
@@ -2867,7 +2872,12 @@ UINT CGvisR2R_PunchView::ThreadProc0(LPVOID lpContext)	// DoMark0(), DoMark1()
 				if (pThread->m_bTHREAD_MK[0])
 				{
 					if (pThread->m_nBufUpSerial[0] > 0)
-						pThread->DoMark0();
+					{
+						if (pDoc->GetTestMode() == MODE_OUTER)
+							pThread->DoMark0Its();
+						else
+							pThread->DoMark0();
+					}
 					else
 					{
 						pThread->m_bDoneMk[0] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[0]"), pThread->m_bDoneMk[0]);
@@ -5062,7 +5072,7 @@ int CGvisR2R_PunchView::GetAoiUpAutoStep()
 	}
 	else
 	{
-		sMsg.Format(_T("%s파일의 Auto에 nStep 정보가 없습니다."), sPath);
+		sMsg.Format(_T("%s파일의 Auto에 nStep 정보가 없습니다.\r\n상면 AOI가 꺼진 것 같습니다."), sPath);
 		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(sMsg);
@@ -5084,7 +5094,7 @@ void CGvisR2R_PunchView::SetAoiUpAutoStep(int nStep)
 	}
 	else
 	{
-		sMsg.Format(_T("%s파일의 Auto에 nStep 정보가 없습니다."), sPath);
+		sMsg.Format(_T("%s파일의 Auto에 nStep 정보가 없습니다.\r\n상면 AOI가 꺼진 것 같습니다."), sPath);
 		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(sMsg);
@@ -5152,7 +5162,7 @@ int CGvisR2R_PunchView::GetAoiDnAutoStep()
 	}
 	else
 	{
-		sMsg.Format(_T("%s파일의 Auto에 nStep 정보가 없습니다."), sPath);
+		sMsg.Format(_T("%s파일의 Auto에 nStep 정보가 없습니다.\r\n하면 AOI가 꺼진 것 같습니다."), sPath);
 		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(sMsg);
@@ -5175,7 +5185,7 @@ void CGvisR2R_PunchView::SetAoiDnAutoStep(int nStep)
 	}
 	else
 	{
-		sMsg.Format(_T("%s파일의 Auto에 nStep 정보가 없습니다."), sPath);
+		sMsg.Format(_T("%s파일의 Auto에 nStep 정보가 없습니다.\r\n하면 AOI가 꺼진 것 같습니다."), sPath);
 		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		AfxMessageBox(sMsg);
@@ -13165,7 +13175,7 @@ BOOL CGvisR2R_PunchView::GetAoiUpVsStatus()
 	}
 	else
 	{
-		sMsg.Format(_T("%s파일의 Infomation에 Current VS Status 정보가 없습니다."), sPath);
+		sMsg.Format(_T("%s파일의 Infomation에 Current VS Status 정보가 없습니다.\r\n상면 AOI가 꺼진 것 같습니다."), sPath);
 		pView->ClrDispMsg();
 		MsgBox(sMsg);
 		//AfxMessageBox(sMsg);
@@ -13220,7 +13230,7 @@ BOOL CGvisR2R_PunchView::GetAoiDnVsStatus()
 	}
 	else
 	{
-		sMsg.Format(_T("%s파일의 Infomation에 Current VS Status 정보가 없습니다."), sPath);
+		sMsg.Format(_T("%s파일의 Infomation에 Current VS Status 정보가 없습니다.\r\n하면 AOI가 꺼진 것 같습니다."), sPath);
 		pView->ClrDispMsg();
 		MsgBox(sMsg);
 		//AfxMessageBox(sMsg);
@@ -27403,9 +27413,12 @@ void CGvisR2R_PunchView::DoMark0Its()
 		m_nStepMk[0]++;
 		break;
 	case 2:
-
 		nSerial = m_nBufUpSerial[0]; // Cam0
-
+		if (m_nBufUpSerial[1] < m_nBufUpSerial[0])
+		{
+			sMsg.Format(_T("%d:%d"), nSerial, GetTotDefPcs0Its(nSerial));
+			pDoc->LogAuto(sMsg);
+		}
 		if (nSerial > 0)
 		{
 			if ((nErrCode = GetErrCode0Its(nSerial)) != 1)
@@ -27989,9 +28002,9 @@ void CGvisR2R_PunchView::DoMark1Its()
 		m_nStepMk[1]++;
 		break;
 	case 2:
-
 		nSerial = m_nBufUpSerial[1]; // Cam1
-
+		sMsg.Format(_T("%d:%d,%d:%d"), nSerial-1, GetTotDefPcs0Its(nSerial-1), nSerial, GetTotDefPcs1Its(nSerial));
+		pDoc->LogAuto(sMsg);
 		if (nSerial > 0)
 		{
 			if ((nErrCode = GetErrCode1Its(nSerial)) != 1)
