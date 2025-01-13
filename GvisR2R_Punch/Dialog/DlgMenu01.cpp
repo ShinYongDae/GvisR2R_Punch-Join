@@ -315,6 +315,31 @@ BOOL CDlgMenu01::OnInitDialog()
 
 	GetDlgItem(IDC_CHK_2LAYER)->ShowWindow(SW_HIDE);
 
+	GetDlgItem(IDC_HIDE_CAD_001)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_DEF_001)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_CAD_002)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_DEF_002)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_CAD_003)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_DEF_003)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_CAD_004)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_DEF_004)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_CAD_005)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_DEF_005)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_CAD_006)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_DEF_006)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_CAD_007)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_DEF_007)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_CAD_008)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_DEF_008)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_CAD_009)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_DEF_009)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_CAD_010)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_DEF_010)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_CAD_011)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_DEF_011)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_CAD_012)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_HIDE_DEF_012)->ShowWindow(SW_HIDE);
+
 	GetCtrlPos();
 
 	m_bTIM_DISP_MK_CNT = TRUE;
@@ -789,9 +814,10 @@ void CDlgMenu01::InitMkInfoUp()
 
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
 
-	HWND hW;
+	HWND hW, hWHide;
 	CRect rt;
 	int nCtrlIdCad, nCtrlIdDef;
+	int nCtrlIdCadHide, nCtrlIdDefHide;
 
 	if(bDualTest)
 	{
@@ -847,50 +873,74 @@ void CDlgMenu01::InitMkInfoUp()
 			case 0:
 				nCtrlIdCad = IDC_PIC_CAD_001;
 				nCtrlIdDef = IDC_PIC_DEF_001;
+				nCtrlIdCadHide = IDC_HIDE_CAD_001;
+				nCtrlIdDefHide = IDC_HIDE_DEF_001;
 				break;
 			case 1:
 				nCtrlIdCad = IDC_PIC_CAD_002;
 				nCtrlIdDef = IDC_PIC_DEF_002;
+				nCtrlIdCadHide = IDC_HIDE_CAD_002;
+				nCtrlIdDefHide = IDC_HIDE_DEF_002;
 				break;
 			case 2:
 				nCtrlIdCad = IDC_PIC_CAD_003;
 				nCtrlIdDef = IDC_PIC_DEF_003;
+				nCtrlIdCadHide = IDC_HIDE_CAD_003;
+				nCtrlIdDefHide = IDC_HIDE_DEF_003;
 				break;
 			case 3:
 				nCtrlIdCad = IDC_PIC_CAD_004;
+				nCtrlIdCadHide = IDC_HIDE_CAD_004;
+				nCtrlIdDefHide = IDC_HIDE_DEF_004;
 				nCtrlIdDef = IDC_PIC_DEF_004;
 				break;
 			case 4:
 				nCtrlIdCad = IDC_PIC_CAD_005;
 				nCtrlIdDef = IDC_PIC_DEF_005;
+				nCtrlIdCadHide = IDC_HIDE_CAD_005;
+				nCtrlIdDefHide = IDC_HIDE_DEF_005;
 				break;
 			case 5:
 				nCtrlIdCad = IDC_PIC_CAD_006;
 				nCtrlIdDef = IDC_PIC_DEF_006;
+				nCtrlIdCadHide = IDC_HIDE_CAD_006;
+				nCtrlIdDefHide = IDC_HIDE_DEF_006;
 				break;
 			case 6:
 				nCtrlIdCad = IDC_PIC_CAD_007;
 				nCtrlIdDef = IDC_PIC_DEF_007;
+				nCtrlIdCadHide = IDC_HIDE_CAD_007;
+				nCtrlIdDefHide = IDC_HIDE_DEF_007;
 				break;
 			case 7:
 				nCtrlIdCad = IDC_PIC_CAD_008;
 				nCtrlIdDef = IDC_PIC_DEF_008;
+				nCtrlIdCadHide = IDC_HIDE_CAD_008;
+				nCtrlIdDefHide = IDC_HIDE_DEF_008;
 				break;
 			case 8:
 				nCtrlIdCad = IDC_PIC_CAD_009;
 				nCtrlIdDef = IDC_PIC_DEF_009;
+				nCtrlIdCadHide = IDC_HIDE_CAD_009;
+				nCtrlIdDefHide = IDC_HIDE_DEF_009;
 				break;
 			case 9:
 				nCtrlIdCad = IDC_PIC_CAD_010;
 				nCtrlIdDef = IDC_PIC_DEF_010;
+				nCtrlIdCadHide = IDC_HIDE_CAD_010;
+				nCtrlIdDefHide = IDC_HIDE_DEF_010;
 				break;
 			case 10:
 				nCtrlIdCad = IDC_PIC_CAD_011;
 				nCtrlIdDef = IDC_PIC_DEF_011;
+				nCtrlIdCadHide = IDC_HIDE_CAD_011;
+				nCtrlIdDefHide = IDC_HIDE_DEF_011;
 				break;
 			case 11:
 				nCtrlIdCad = IDC_PIC_CAD_012;
 				nCtrlIdDef = IDC_PIC_DEF_012;
+				nCtrlIdCadHide = IDC_HIDE_CAD_012;
+				nCtrlIdDefHide = IDC_HIDE_DEF_012;
 				break;
 			}
 
@@ -900,9 +950,16 @@ void CDlgMenu01::InitMkInfoUp()
 			pView->m_pVision[0]->SelDispCad(hW, rt, nIdxMkInfo);
 			pView->m_pVision[0]->SetOvrCadFontSz(nIdxMkInfo);
 
+			hWHide = GetDlgItem(nCtrlIdCadHide)->GetSafeHwnd();
+			pView->m_pVision[1]->SelDispCad(hWHide, rt, nIdxMkInfo);
+			pView->m_pVision[1]->SetOvrCadFontSz(nIdxMkInfo);
+
 			hW = GetDlgItem(nCtrlIdDef)->GetSafeHwnd();
 			GetDlgItem(nCtrlIdDef)->GetWindowRect(&rt);
 			pView->m_pVision[0]->SelDispDef(hW, rt, nIdxMkInfo);
+
+			hWHide = GetDlgItem(nCtrlIdDefHide)->GetSafeHwnd();
+			pView->m_pVision[1]->SelDispDef(hWHide, rt, nIdxMkInfo);
 #endif
  		}
 	}

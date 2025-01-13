@@ -1310,13 +1310,21 @@ void CDlgMenu05::DisplayReelMapUser()
 
 	if(bDualTest)
 	{
-		sReelmapSrc.Format(_T("%s%s\\%s\\%s\\ReelMapDataAll.txt"), pDoc->WorkingInfo.System.sPathOldFile, 
-															   m_sModel, m_sLot, m_sLayer);
+		if (0)
+			sReelmapSrc.Format(_T("%s%s\\%s\\%s\\Reelmap\\ReelMap-TOTAL_SIDE.txt"), pDoc->WorkingInfo.System.sPathOldFile,
+				m_sModel, m_sLot, m_sLayer);
+		else
+			sReelmapSrc.Format(_T("%s%s\\%s\\%s\\ReelMapDataAll.txt"), pDoc->WorkingInfo.System.sPathOldFile,
+				m_sModel, m_sLot, m_sLayer);
 	}
 	else
 	{
-		sReelmapSrc.Format(_T("%s%s\\%s\\%s\\ReelMapDataUp.txt"), pDoc->WorkingInfo.System.sPathOldFile, 
-														   m_sModel, m_sLot, m_sLayer);
+		if (0)
+			sReelmapSrc.Format(_T("%s%s\\%s\\%s\\Reelmap\\ReelMap-TOP_SIDE.txt"), pDoc->WorkingInfo.System.sPathOldFile,
+				m_sModel, m_sLot, m_sLayer);
+		else
+			sReelmapSrc.Format(_T("%s%s\\%s\\%s\\ReelMapDataUp.txt"), pDoc->WorkingInfo.System.sPathOldFile,
+				m_sModel, m_sLot, m_sLayer);
 	}
 
 	if (0 < ::GetPrivateProfileString(_T("Info"), _T("¸ð      µ¨"), NULL, szData, sizeof(szData), sReelmapSrc))
@@ -1366,10 +1374,13 @@ void CDlgMenu05::DisplayReelMapUser()
 	sVal.Format(_T("On remaking Reelmap."));
 	dlg.Create(sVal);
 
-	pDoc->m_pReelMapUp->m_bThreadAliveRemakeReelmap = FALSE;
-	pDoc->m_pReelMapDn->m_bThreadAliveRemakeReelmap = FALSE;
-	pDoc->m_pReelMapAllUp->m_bThreadAliveRemakeReelmap = FALSE;
-	
+	if (pDoc->m_pReelMapUp)
+		pDoc->m_pReelMapUp->m_bThreadAliveRemakeReelmap = FALSE;
+	if (pDoc->m_pReelMapDn)
+		pDoc->m_pReelMapDn->m_bThreadAliveRemakeReelmap = FALSE;
+	if (pDoc->m_pReelMapAllUp)
+		pDoc->m_pReelMapAllUp->m_bThreadAliveRemakeReelmap = FALSE;
+
 	if (pDoc->m_pReelMapUp)
 		pDoc->m_pReelMapUp->StartThreadRemakeReelmap(); // RemakeReelmap(sReelmapSrc);
 
@@ -1382,34 +1393,50 @@ void CDlgMenu05::DisplayReelMapUser()
 	}
 
 	DWORD dwSt = GetTickCount();
-	do
+	if (bDualTest)
 	{
-		if(dlg.GetSafeHwnd())
+		do
 		{
-			if(bDualTest)	
+			if (dlg.GetSafeHwnd())
 			{
 				dRatio = pDoc->m_pReelMapAllUp->m_dProgressRatio + pDoc->m_pReelMapUp->m_dProgressRatio + pDoc->m_pReelMapDn->m_dProgressRatio;
 				dRatio = (dRatio / 3.0);
+
+				if (!(int(dRatio) % 10))
+					dlg.SetPos(int(dRatio));
 			}
-			else
+
+			if (GetTickCount() - dwSt > 1200000)
+				break;
+		} while (pDoc->m_pReelMapUp->m_bThreadAliveRemakeReelmap || pDoc->m_pReelMapDn->m_bThreadAliveRemakeReelmap || pDoc->m_pReelMapAllUp->m_bThreadAliveRemakeReelmap);
+	}
+	else
+	{
+		do
+		{
+			if (dlg.GetSafeHwnd())
+			{
 				dRatio = pDoc->m_pReelMapUp->m_dProgressRatio;
 
-			if(!(int(dRatio)%10))
-				dlg.SetPos(int(dRatio));
-		}	
+				if (!(int(dRatio) % 10))
+					dlg.SetPos(int(dRatio));
+			}
 
-		if(GetTickCount()-dwSt > 1200000)
-			break;
-	}while(pDoc->m_pReelMapUp->m_bThreadAliveRemakeReelmap || pDoc->m_pReelMapDn->m_bThreadAliveRemakeReelmap || pDoc->m_pReelMapAllUp->m_bThreadAliveRemakeReelmap);
-
+			if (GetTickCount() - dwSt > 1200000)
+				break;
+		} while (pDoc->m_pReelMapUp->m_bThreadAliveRemakeReelmap);
+	}
 
 	dlg.DestroyWindow();
 
 	if(bDualTest)
 	{
-		bSuccess[0] = pDoc->m_pReelMapUp->m_bRtnThreadRemakeReelmap;	
-		bSuccess[1] = pDoc->m_pReelMapDn->m_bRtnThreadRemakeReelmap;	
-		bSuccess[2] = pDoc->m_pReelMapAllUp->m_bRtnThreadRemakeReelmap;	
+		if (pDoc->m_pReelMapUp)
+			bSuccess[0] = pDoc->m_pReelMapUp->m_bRtnThreadRemakeReelmap;
+		if (pDoc->m_pReelMapDn)
+			bSuccess[1] = pDoc->m_pReelMapDn->m_bRtnThreadRemakeReelmap;
+		if (pDoc->m_pReelMapAllUp)
+			bSuccess[2] = pDoc->m_pReelMapAllUp->m_bRtnThreadRemakeReelmap;
 
 		if(!bSuccess[0] || !bSuccess[1] || !bSuccess[2])
 		{
@@ -1418,7 +1445,7 @@ void CDlgMenu05::DisplayReelMapUser()
 		}
 
 		strReelMapPath.Format(_T("%s%s\\%s\\%s\\ReelMap\\ReelMap-TOTAL_SIDE.txt"), pDoc->WorkingInfo.System.sPathOldFile,
-																			sModel, sLot, sLayer[0]);
+			sModel, sLot, sLayer[0]);
 	}
 	else
 	{
@@ -1428,8 +1455,8 @@ void CDlgMenu05::DisplayReelMapUser()
 			return;
 		}
 
-		strReelMapPath.Format(_T("%s%s\\%s\\%s\\ReelMapDataUp.txt"), pDoc->WorkingInfo.System.sPathOldFile,
-																			sModel, sLot, sLayer[0]);
+		strReelMapPath.Format(_T("%s%s\\%s\\%s\\ReelMap\\ReelMap-TOP_SIDE.txt"), pDoc->WorkingInfo.System.sPathOldFile,
+			sModel, sLot, sLayer[0]);
 	}
 
 	strReelMapData = LoadFile(strReelMapPath);

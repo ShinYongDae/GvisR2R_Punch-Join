@@ -17252,10 +17252,16 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 				return;
 			}
 
-			if (pDoc->m_ListBuf[0].nTot <= pDoc->m_ListBuf[1].nTot)
+			if (bDualTest)
 			{
-				UpdateReelmap(m_nShareUpS); // 시리얼파일의 정보로 릴맵을 만듬
+				if (pDoc->m_ListBuf[0].nTot <= pDoc->m_ListBuf[1].nTot)
+				{
+					UpdateReelmap(m_nShareUpS); // 시리얼파일의 정보로 릴맵을 만듬
+				}
 			}
+			else
+				UpdateReelmap(m_nShareUpS); // 시리얼파일의 정보로 릴맵을 만듬
+
 
 			if (!m_bLastProc)
 			{
@@ -18065,10 +18071,15 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 				return;
 			}
 
-			if (pDoc->m_ListBuf[0].nTot <= pDoc->m_ListBuf[1].nTot)
+			if (bDualTest)
 			{
-				UpdateReelmap(m_nShareUpS); // 시리얼파일의 정보로 릴맵을 만듬
+				if (pDoc->m_ListBuf[0].nTot <= pDoc->m_ListBuf[1].nTot)
+				{
+					UpdateReelmap(m_nShareUpS); // 시리얼파일의 정보로 릴맵을 만듬
+				}
 			}
+			else
+				UpdateReelmap(m_nShareUpS); // 시리얼파일의 정보로 릴맵을 만듬
 
 			if (!m_bLastProc)
 			{
