@@ -62,7 +62,6 @@ CDataFile::~CDataFile()
 
 BOOL CDataFile::Open(CString sFileName)	// BOOL CDataFile::Open(LPCTSTR lpszFileName)
 {
-	//if(!m_FilePath.Compare(lpszFileName)) return TRUE; // 이미 열려 있는 경우 TRUE를 리턴한다.
 	if(!m_FilePath.Compare(sFileName)) return TRUE; // 이미 열려 있는 경우 TRUE를 리턴한다.
 
 	TCHAR FileNCam[MAX_PATH];

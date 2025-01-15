@@ -230,24 +230,6 @@ BOOL CCamIRayple::OneshotGrab()
 {
 	CString sMsg;
 
-	//int ret = IMV_OK;
-	//IMV_HANDLE devHandle = (IMV_HANDLE)m_devHandle;
-	//IMV_Frame frame;
-
-	//if (NULL == devHandle)
-	//{
-	//	return FALSE;
-	//}
-
-	//// Get a frame image
-	//ret = IMV_GetFrame(devHandle, &frame, 500);
-	//if (IMV_OK != ret)
-	//{
-	//	sMsg.Format(_T("Get frame failed! ErrorCode[%d]\n"), ret);
-	//	AfxMessageBox(sMsg);
-	//	return FALSE;
-	//}
-
 	FrameBuffer* pConvertedImage = getConvertedImage();
 	if (NULL != pConvertedImage)
 	{
@@ -271,15 +253,6 @@ BOOL CCamIRayple::OneshotGrab()
 		AfxMessageBox(_T("Get frame failed!"));
 		return FALSE;
 	}
-
-	//// Free image buffer
-	//ret = IMV_ReleaseFrame(devHandle, &frame);
-	//if (IMV_OK != ret)
-	//{
-	//	sMsg.Format(_T("Release frame failed! ErrorCode[%d]\n"), ret);
-	//	AfxMessageBox(sMsg);
-	//	return FALSE;
-	//}
 
 	return TRUE;
 }
@@ -523,10 +496,6 @@ void CCamIRayple::Connect(BOOL bConnect)
 			m_devHandle = NULL;
 		}
 
-		//if (!UpdateData(TRUE))
-		//{
-		//	return;
-		//}
 
 		//std::string cameraKey = m_sCameraKey.GetBuffer(m_sCameraKey.GetLength());
 		//if (IMV_OK != IMV_CreateHandle(&m_devHandle, modeByCameraKey, (void*)cameraKey.c_str()))

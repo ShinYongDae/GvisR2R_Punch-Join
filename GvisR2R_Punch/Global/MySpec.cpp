@@ -75,7 +75,6 @@ BOOL CMySpec::MakeDir()
 	CFileFind finder;
 	CString sPath;
 #ifdef TEST_MODE
-	//if(!finder.FindFile(PATH_LOCAL_SPEC))
 	if (!pDoc->DirectoryExists(PATH_LOCAL_SPEC))
 		CreateDirectory(PATH_LOCAL_SPEC, NULL);
 
@@ -88,17 +87,14 @@ BOOL CMySpec::MakeDir()
 	}
 
 	sPath.Format(_T("%s\\%s"), PATH_LOCAL_SPEC, m_sModel);
-	//if(!finder.FindFile(sPath))
 	if (!pDoc->DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
 
 	sPath.Format(_T("%s\\%s\\%s"), PATH_LOCAL_SPEC, m_sModel, m_sLayer);
-	//if(!finder.FindFile(sPath))
 	if (!pDoc->DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
 #else
 	sPath.Format(_T("%s"), PATH_LOCAL_SPEC);
-	//if(!finder.FindFile(sPath))
 	if (!pDoc->DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
 
@@ -111,12 +107,10 @@ BOOL CMySpec::MakeDir()
 	}
 
 	sPath.Format(_T("%s\\%s"), PATH_LOCAL_SPEC, m_sModel);
-	//if(!finder.FindFile(sPath))
 	if (!pDoc->DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
 
 	sPath.Format(_T("%s\\%s\\%s"), PATH_LOCAL_SPEC, m_sModel, m_sLayer);
-	//if(!finder.FindFile(sPath))
 	if (!pDoc->DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
 #endif
@@ -129,7 +123,6 @@ BOOL CMySpec::MakeDir(CString sModel, CString sLayer)
 	CFileFind finder;
 	CString sPath;
 #ifdef TEST_MODE
-	//if(!finder.FindFile(PATH_LOCAL_SPEC))
 	if (!pDoc->DirectoryExists(PATH_LOCAL_SPEC))
 		CreateDirectory(PATH_LOCAL_SPEC, NULL);
 
@@ -142,17 +135,14 @@ BOOL CMySpec::MakeDir(CString sModel, CString sLayer)
 	}
 
 	sPath.Format(_T("%s\\%s"), PATH_LOCAL_SPEC, sModel);
-	//if(!finder.FindFile(sPath))
 	if (!pDoc->DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
 
 	sPath.Format(_T("%s\\%s\\%s"), PATH_LOCAL_SPEC, sModel, sLayer);
-	//if(!finder.FindFile(sPath))
 	if (!pDoc->DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
 #else
 	sPath.Format(_T("%s"), PATH_LOCAL_SPEC);
-	//if(!finder.FindFile(sPath))
 	if (!pDoc->DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
 
@@ -165,12 +155,10 @@ BOOL CMySpec::MakeDir(CString sModel, CString sLayer)
 	}
 
 	sPath.Format(_T("%s\\%s"), PATH_LOCAL_SPEC, sModel);
-	//if(!finder.FindFile(sPath))
 	if (!pDoc->DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
 
 	sPath.Format(_T("%s\\%s\\%s"), PATH_LOCAL_SPEC, sModel, sLayer);
-	//if(!finder.FindFile(sPath))
 	if (!pDoc->DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
 #endif

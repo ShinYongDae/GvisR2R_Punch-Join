@@ -3361,14 +3361,23 @@ void CDlgMenu01::UpdateRst() // Menu01 화면에서의 수율정보를 업데이트함.
 
 void CDlgMenu01::DispTotRatio()
 {
-	if (!pDoc->m_pReelMapUp || !pDoc->m_pReelMapDn)
-		return;
+	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
+
+	if (bDualTest)
+	{
+		if (!pDoc->m_pReelMapUp || !pDoc->m_pReelMapDn)
+			return;
+	}
+	else
+	{
+		if (!pDoc->m_pReelMapUp)
+			return;
+	}
 
 	CString str;
 	int nGood=0, nBad=0, nTot=0, nVal;
 	int nPnl = m_nSerial - 1;
 	double dRatio=0.0;
-	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
 
 	// < 전체 수율 >
 	// 상면

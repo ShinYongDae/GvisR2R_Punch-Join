@@ -89,6 +89,11 @@
 
 #define MAX_THREAD				49
 
+#define THICKNESS_0 _T("설정없음")
+#define THICKNESS_1 _T("얇은 두께")
+#define THICKNESS_2 _T("중간 두께")
+#define THICKNESS_3 _T("두꺼운 두께")
+
 namespace Read2dIdx
 {
 	typedef enum Index {
@@ -358,6 +363,8 @@ public:
 	CGvisR2R_PunchDoc* GetDocument() const;
 
 	stGuiRegister Plc;
+
+	double m_dMkTorqList[2]; // [0] : Left, [1] : Right
 
 	int m_nDebugStep; 	void DispThreadTick();
 
@@ -1306,6 +1313,13 @@ public:
 
 	BOOL SetMkPcs0(int nSerial, int nMkPcs); // pcr 시리얼, pcr 불량 피스 마킹 순서 인덱스
 	BOOL SetMkPcs1(int nSerial, int nMkPcs); // pcr 시리얼, pcr 불량 피스 마킹 순서 인덱스
+
+	BOOL ApplyListTorq();
+	BOOL ApplyTorq(double dTorqL, double dTorqR);
+	int GetModelThickness(CString sModel);
+	int SearchModel(CString sModel);
+	BOOL GetTorque(int nUnit, int nThick, double &dTorqL, double &dTorqR);
+	CString GetThicknessName(int nIdx); // 설정없음[0], 얇은 두께[1], 중간 두께[2], 두꺼운 두께[3]
 
 // 재정의입니다.
 public:

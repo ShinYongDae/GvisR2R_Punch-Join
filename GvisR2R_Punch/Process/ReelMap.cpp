@@ -493,70 +493,6 @@ BOOL CReelMap::Read(int nSerial)
 	TCHAR sep[] = { _T(",/;\r\n\t") };
 	TCHAR szData[MAX_PATH];
 
-	//CString sMsg, sPnl, sRow, sVal, sPath;
-	//int nLayer = RMAP_NONE;
-	//int nIdx = GetPcrIdx(nSerial);
-
-	//CFileFind cFile;
-	//if (m_nLayer == RMAP_INNER_UP || m_nLayer == RMAP_INNER_DN || m_nLayer == RMAP_INNER_ALLUP || m_nLayer == RMAP_INNER_ALLDN)
-	//{
-	//	CString sUpPath, sDnPath, sAllUpPath, sAllDnPath;
-	//	//if (!pDoc->GetInnerReelmapPath(nSerial, sUpPath, sDnPath, sAllUpPath, sAllDnPath))
-	//	if (!GetInnerReelmapPath(nSerial, sUpPath, sDnPath, sAllUpPath, sAllDnPath))
-	//	{
-	//		sMsg.Format(_T("GetInnerReelmapPath가 설정되지 않았습니다."));
-	//		pView->MsgBox(sMsg);
-	//		return FALSE;
-	//	}
-	//	switch (m_nLayer)
-	//	{
-	//	case RMAP_INNER_UP:
-	//		sPath = sUpPath;
-	//		break;
-	//	case RMAP_INNER_DN:
-	//		sPath = sDnPath;
-	//		break;
-	//	case RMAP_INNER_ALLUP:
-	//		sPath = sAllUpPath;
-	//		break;
-	//	case RMAP_INNER_ALLDN:
-	//		sPath = sAllDnPath;
-	//		break;
-	//	default:
-	//		;
-	//		break;
-	//	}
-	//}
-	//else
-	//{
-	//	sPath = GetRmapPath(m_nLayer);
-	//}
-	//if (!cFile.FindFile(sPath))
-	//{
-	//	sMsg.Format(_T("It is trouble to Read Reelmap.\r\n%s"), sPath);
-	//	pView->MsgBox(sMsg);
-	//	return FALSE;
-	//}
-
-	//if (m_nLayer == RMAP_UP || m_nLayer == RMAP_DN || m_nLayer == RMAP_ALLUP || m_nLayer == RMAP_ALLDN)
-	//{
-	//	nLayer = m_nLayer - RMAP_UP;
-	//}
-	//else if (m_nLayer == RMAP_INNER_UP || m_nLayer == RMAP_INNER_DN || m_nLayer == RMAP_INNER_ALLUP || m_nLayer == RMAP_INNER_ALLDN)
-	//{
-	//	nLayer = m_nLayer - RMAP_INNER_UP;
-	//}
-	//else if (m_nLayer == RMAP_ITS)
-	//{
-	//	;
-	//}
-	//else
-	//{
-	//	sMsg.Format(_T("It is trouble not to set layer of Reelmap."));
-	//	pView->MsgBox(sMsg);
-	//	return FALSE;
-	//}
-
 	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
 	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
 	int nStripY = pDoc->m_Master[0].m_pPcsRgn->m_nRow / MAX_STRIP; // Strip(1~4);
@@ -4609,15 +4545,6 @@ BOOL CReelMap::MakeDirIts()
 	if (!DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
 
-
-	//if (sItsPath.IsEmpty())
-
-	//int pos = sItsPath.ReverseFind('\\');
-	//if (pos != -1)
-	//	sItsPath.Delete(pos, sItsPath.GetLength() - pos);
-
-	//if (!DirectoryExists(sItsPath))
-	//	CreateDirectory(sItsPath, NULL);
 
 	if (sItsInnerPath.IsEmpty() || sItsOuterPath.IsEmpty())
 	{

@@ -815,183 +815,13 @@ BOOL CNmcDevice::Move(int nMotionId, double dTgtPos, double dSpd, double dAcc, d
 	return (GetAxis(nMotionId)->StartSCurveMove(dTgtPos, dSpd, dAcc, fJerk, bAbs, bWait));
 }
 
-//BOOL CNmcDevice::InitListMotion()
-//{
-//	m_dStartScanPos = 0.0;
-//	m_dStartFocusPos = 0.0;
-//
-//	if (!m_pBufferControl)
-//		m_pBufferControl = new CBufferControl(m_nBoardId, m_nGroupID_RTAF, SCAN_AXIS + m_nOffsetAxisID, FOCUS_AXIS + m_nOffsetAxisID);
-//
-//	if (IsListMotion())
-//		UnGroup2Ax(m_nBoardId, m_nGroupID_RTAF);
-//
-//	ClearUserBuffer();
-//	Grouping2Ax(m_nBoardId, m_nGroupID_RTAF, SCAN_AXIS, FOCUS_AXIS);
-//	return BufferInit();
-//}
-
-
-//void CNmcDevice::RestoreStartListMotionPos(double dStartScanPos, double dStartFocusPos)
-//{
-//	m_dStartScanPos = dStartScanPos;
-//	m_dStartFocusPos = dStartFocusPos;
-//}
-
-//void CNmcDevice::LoggingAddList(double dStartScanPos, double dStartFocusPos, double fScanVel, int nScanDir, CString sPath)
-//{
-//	CString strPath;
-//	strPath.Format(_T("%sAddList.txt"), pGlobalDoc->m_strSharedDir);
-//	if (nScanDir == FORWARD)
-//		m_sAddListLogTitle.Format(_T("Forward"));
-//	else
-//		m_sAddListLogTitle.Format(_T("BackWard"));
-//
-//	CFileFind finder;
-//	CFile file;
-//	if (finder.FindFile(strPath))
-//	{
-//		DeleteFile(strPath);
-//	}
-//
-//	if (!file.Open(strPath, CFile::modeCreate | CFile::modeWrite, nullptr))
-//	{
-//		m_bLogAddList = FALSE;
-//		AfxMessageBox(_T("Fail to create file."));
-//	}
-//	else
-//	{
-//		m_bLogAddList = TRUE;
-//		file.Close();
-//	}
-//
-//	if (m_bLogAddList)
-//	{
-//		CString strData, strIdx;
-//		strIdx.Format(_T("Index%03d"), GetAddListNum() - 1);
-//		strData.Format(_T("%.3f, %.3f, %.3f"), dStartScanPos, dStartFocusPos, fScanVel);
-//		::WritePrivateProfileString(m_sAddListLogTitle, strIdx, strData, strPath);
-//	}
-//
-//}
-
-//double CNmcDevice::GetStartListMotionPos(int nIndex)
-//{
-//	switch (nIndex)
-//	{
-//	case 0:
-//		if (m_dStartScanPos != 0.0)
-//			return m_dStartScanPos;
-//		else
-//			return GetActualPosition(SCAN_AXIS);
-//		break;
-//	case 1:
-//		if (m_dStartFocusPos != 0.0)
-//			return m_dStartFocusPos;
-//		else
-//			return GetActualPosition(FOCUS_AXIS);
-//		break;
-//	}
-//
-//	return 0.0;
-//}
-
-//void CNmcDevice::AddList(double fScanMotPos, double dFocusMotPos, double dScanSpeed)
-//{
-//	double dPos1, dPos2, dVel;
-//	dPos1 = m_pAxis[SCAN_AXIS]->LenToPulse(fScanMotPos);
-//	dPos2 = m_pAxis[FOCUS_AXIS]->LenToPulse(dFocusMotPos);
-//	dVel = m_pAxis[SCAN_AXIS]->LenToPulse(dScanSpeed);
-//
-//	m_pBufferControl->AddBufferMotion2Ax(dPos1, dPos2, dVel);
-//
-//	m_pBufferControl->m_nAddListIndex++;
-//	return;
-//}
-
-//void CNmcDevice::StartListMotion()
-//{
-//	m_pBufferControl->StartMotion();
-//	return;
-//}
-//
-//void CNmcDevice::StopListMotion()
-//{
-//	m_pBufferControl->StopMotion();
-//	return;
-//}
-
-//void CNmcDevice::ShutdownHomeThreadAll()
-//{
-//	m_bExit = TRUE;
-//#ifdef USE_ZMP
-//	int nTotMs = m_nTotalMotion;
-//	for (int i = 0; i < nTotMs; i++)
-//	{
-//		m_pMotion[i].StopHomeThread();
-//	}
-//#endif
-//	m_bExit = 0;
-//	//	return bAllHome;
-//}
-
-
 double CNmcDevice::GetActualVelocity(int nAxisId)
 {
 	if (nAxisId >= m_nTotalMotion)
 		return 0.0;
 
-//	return m_pAxis[nAxisId].GetActVel(); // [mm]
 	return 0.0;
 }
-
-//void CNmcDevice::ClearAutoFocusSmoothingData()	// 20151201 - syd
-//{
-//	m_dTempOffsetAf[0] = 0.0;
-//	m_dTempOffsetAf[1] = 0.0;
-//	m_dTempOffsetAf[2] = 0.0;
-//	m_dTempOffsetAf[4] = 0.0;
-//}
-
-//double CNmcDevice::SetAutoFocusSmoothing(double dFocusOffset)	// 20151201 - syd
-//{
-//	double dVal = 0.0;
-//	int nIdx = m_nSeqIdx % 4;
-//	m_dTempOffsetAf[nIdx] = dFocusOffset;
-//
-//	switch (m_nSeqIdx)
-//	{
-//	case 0:
-//		dVal = m_dTempOffsetAf[0];
-//		break;
-//	case 1:
-//		dVal = (m_dTempOffsetAf[0] + m_dTempOffsetAf[1]) / 2.0;
-//		break;
-//	case 2:
-//		dVal = (m_dTempOffsetAf[0] + m_dTempOffsetAf[1] + m_dTempOffsetAf[2]) / 3.0;
-//		break;
-//	default:
-//		dVal = (m_dTempOffsetAf[0] + m_dTempOffsetAf[1] + m_dTempOffsetAf[2] + m_dTempOffsetAf[3]) / 4.0;
-//		break;
-//	}
-//
-//	return dVal;
-//}
-
-//void CNmcDevice::StopSequence()
-//{
-//	ClearUserBuffer();
-//}
-
-//void CNmcDevice::ClearUserBuffer()
-//{
-//	int i = 0;
-//
-//	for (i = 0; i < 2048; i++)
-//	{
-//		m_dUserBuffer[i] = 0;
-//	}
-//}
 
 // 속도,가속도 지정.
 BOOL CNmcDevice::SetVMove(int nAxisID, double fVel, double fAcc)
@@ -1003,14 +833,7 @@ BOOL CNmcDevice::SetVMove(int nAxisID, double fVel, double fAcc)
 		return FALSE;
 
 	double dDelay = 0.0;
-	//m_Traj.velocity = m_pObjectMotor[nMotorID].Len2Pulse(fVel); // [mm/sec] -> [counts/sec]
-	//m_Traj.acceleration = m_pObjectMotor[nMotorID].Len2Pulse(fAcc); // [m/sec^2] -> [counts/sec^2]
-	//m_Traj.deceleration = m_pObjectMotor[nMotorID].Len2Pulse(fAcc); // [m/sec^2] -> [counts/sec^2]
-	//m_Traj.jerkPercent = 15.0;
-	//m_ParamVMove.velocity.trajectory = &m_Traj;
-	//m_ParamVMove.attributes.delay = &dDelay;
 
-	//GetAxis(nAxisID)->LenToPulse(fVel);
 	m_dVel[nAxisID] = fVel;
 	m_dAcc[nAxisID] = fAcc;
 
@@ -1045,7 +868,6 @@ void CNmcDevice::SetConfigure(UINT16 nBoardId, UINT16 nDevIdIoIn, UINT16 nDevIdI
 	m_nDevIdIoIn = nDevIdIoIn;
 	m_nDevIdIoOut = nDevIdIoOut;
 	m_nOffsetAxisID = nOffsetAxisID;
-//	m_nGroupID = nGroupID;
 
 	for (int nAxis = 0; nAxis < m_nTotalAxis; nAxis++)
 	{

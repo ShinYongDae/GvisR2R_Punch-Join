@@ -402,7 +402,7 @@ BOOL CFileOperation::DoDelete(CString sPath)
 	BOOL bRtn=FALSE;
 
 	CString sTemp=_T(""), strPath=_T("");
-	int nPos[3] = {-1};
+	int nPos[3] = {-1,-1,-1};
 
 	nPos[0] = sPath.ReverseFind(_T('\\'));
 	nPos[1] = sPath.Find(_T("*.*"), nPos[0]);
@@ -1118,26 +1118,10 @@ BOOL CFileOperation::DoCopy(CString destPath, BOOL bOverWrite, int nAttr, CStrin
 		}
 	}
 
-	//CString strPath=_T("");
-	//int nPos[3] = {-1};
-	//CFileFind ff;
-	//BOOL bFind;
-
-	//bFind = ff.FindFile(srcPath);
-
-	//nPos[0] = srcPath.ReverseFind(_T('\\'));
-	//nPos[1] = srcPath.Find(_T("*.*"), nPos[0]);
-	////nPos[2] = sPath.ReverseFind(_T('*'));
-	//if(nPos[0] < nPos[1]) // find "*.*"
-	//	strPath = srcPath.Left(nPos[0]);
-	//else // not find "*.*"
-	//	strPath = srcPath;
-
-
 	BOOL bRtn = FALSE;
 
 	CString sTemp=_T(""), strPath=_T("");
-	int nPos[3] = {-1};
+	int nPos[3] = {-1,-1,-1};
 	
 	nPos[0] = srcPath.ReverseFind(_T('\\'));
 	nPos[1] = srcPath.Find(_T("*.*"), nPos[0]);
@@ -1321,7 +1305,7 @@ BOOL CFileOperation::ApiCopyFile(CString srcPath, CString destPath, BOOL bOverWr
 		}
 	}
 
-	int pPos[3] = {-1};
+	int pPos[3] = {-1,-1,-1};
 	CFileFind finder;
 	BOOL bWorking = finder.FindFile(sFrom);
 
@@ -1558,10 +1542,6 @@ BOOL CFileOperation::IsFolderAttr(CString sPath, int nAttr)
 	if(!CheckPath(sPath))
 		return FALSE;
 
-	//CFileFind ff;
-	//if(!ff.FindFile(sPath))
-	//	return FALSE;
-
 	if(nAttr == Folder)
 		return TRUE;
 	else if(nAttr == File)
@@ -1570,19 +1550,6 @@ BOOL CFileOperation::IsFolderAttr(CString sPath, int nAttr)
 	{
 		if(GetAttribute(sPath) & Folder)
 			return TRUE;
-		//{
-		//	CString sTemp = _T("");
-		//	int pPos[3] = {0};
-		//	pPos[0] = sPath.ReverseFind(_T('\\'));
-		//	pPos[1] = sPath.Find(_T('*'), pPos[0]);
-		//	sTemp = sPath.Right(sPath.GetLength()-pPos[0]-1);
-		//	sTemp.Trim();
-		//	pPos[2] = sTemp.ReverseFind(_T('*'));
-
-		//	if(pPos[2] >= 0 && pPos[0] < pPos[1])
-		//		return FALSE;
-		//}
-		//return TRUE;
 	}
 
 	return FALSE;
@@ -1673,7 +1640,7 @@ BOOL CFileOperation::CanIfind(CString sPath)
 		return FALSE;
 
 	CString strPath=_T("");
-	int nPos[3] = {-1};
+	int nPos[3] = {-1,-1,-1};
 	CFileFind ff;
 	BOOL bFind;
 

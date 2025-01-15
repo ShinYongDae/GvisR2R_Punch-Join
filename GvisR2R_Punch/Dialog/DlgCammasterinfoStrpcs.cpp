@@ -867,7 +867,7 @@ BOOL CDlgCammasterinfoStrpcs::GetMkMatrix(int nPcsId, int &nC, int &nR)	// nC:0~
 void CDlgCammasterinfoStrpcs::InitOrederingMk()
 {
 	int nPcsIdx, nCol, nRow, nInc, nRrev;
-	int nArrangTable[MAX_PCE_ROW][MAX_PCE_COL] = { -1 };
+	int nArrangTable[MAX_PCE_ROW][MAX_PCE_COL] = { -1 }; // ? -1
 	//int nTotPcs = GetTotPcs();
 	int nTotPcs = PieceRgnNum;
 

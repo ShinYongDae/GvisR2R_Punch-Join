@@ -67,6 +67,9 @@ CGvisR2R_PunchView::CGvisR2R_PunchView()
 	m_nAoiDnAutoSerial = 0;
 	m_nAoiDnAutoSerialPrev = 0;
 
+	m_dMkTorqList[0] = 0.0;
+	m_dMkTorqList[1] = 0.0;
+
 	int nMsgID = 0, i;
 	for (nMsgID = 0; nMsgID < _SigInx::_EndIdx; nMsgID++)
 	{
@@ -742,6 +745,16 @@ void CGvisR2R_PunchView::OnInitialUpdate()
 		ExitProgram();
 		return;
 	}
+	sDir = pDoc->WorkingInfo.System.sPathTorqSpecDir;
+	sDir.Delete(sDir.GetLength() - 1, 1);
+	sDir.ReleaseBuffer();
+
+	if (!pDoc->DirectoryExists(sDir))
+	{
+		sMsg.Format(_T("캠마스터에 토크리스트 스펙폴더가 없습니다. : \n 1.Torque SpecFolder : %s"), sDir);
+		pView->ClrDispMsg();
+		AfxMessageBox(sMsg, MB_ICONSTOP | MB_OK);
+	}
 
 #endif
 
@@ -825,9 +838,6 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 			break;
 		case 4:
 			m_nStepInitView++;
- 			//if(m_pMotion)
- 			//	TowerLamp(RGB_YELLOW, TRUE, TRUE);
-
 			break;
 		case 5:
 			m_nStepInitView++;
@@ -892,8 +902,6 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 				{
 					if (pDoc->GetItsSerialInfo(0, bDualTestInner, sLot, sLayerUp, sLayerDn, 0))
 					{
-						//if (pDoc->GetTestMode() == MODE_OUTER)
-						//if (pDoc->m_MasterInner[0].IsMstSpec(pDoc->WorkingInfo.System.sPathCamSpecDir, pDoc->WorkingInfo.LastJob.sModelUp, sLayerUp))
 						if (pDoc->m_MasterInner[0].IsMstSpec(pDoc->WorkingInfo.System.sPathCamSpecDir, pDoc->m_sEngModel, sLayerUp))
 						{
 							if (m_pDlgMenu06)
@@ -1052,13 +1060,6 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 			}
 			else
 			{
-				//if (pDoc->m_pReelMap && bRtn)
-				//{
-				//	ReloadReelmap();
-				//	UpdateRst();
-				//	UpdateLotTime();
-				//}
-
 				if (pDoc->GetCurrentInfoEng())
 				{
 					if (pDoc->GetTestMode() == MODE_OUTER)
@@ -2378,9 +2379,6 @@ void CGvisR2R_PunchView::BuzzerFromThread(BOOL bOn, int nCh)
 
 void CGvisR2R_PunchView::Buzzer(BOOL bOn, int nCh)
 {
-	//if(bOn)
-	//	SetAlarmToPlc(UNIT_PUNCH);
-
 	return; // PLC제어
 
 	if (!m_pMpe)
@@ -9697,13 +9695,15 @@ BOOL CGvisR2R_PunchView::SetSerial(int nSerial, BOOL bDumy)
 	if (nPrevSerial == nSerial)
 		return TRUE;
 
-	BOOL bRtn[2] = {1};
+	BOOL bRtn[2] = {1,1};
 	bRtn[0] = m_pDlgMenu01->SetSerial(nSerial, bDumy);
 	if (pDoc->GetTestMode() == MODE_OUTER)
 	{
 		if (m_pDlgMenu06)
 			bRtn[1] = m_pDlgMenu06->SetSerial(nSerial, bDumy);
 	}
+	else
+		bRtn[1] = TRUE;
 
 	return (bRtn[0] && bRtn[1]);
 }
@@ -12272,6 +12272,8 @@ BOOL CGvisR2R_PunchView::LoadMstInfo()
 		else
 			m_pDlgMenu01->SelMap(UP);
 	}
+
+	ApplyListTorq();
 
 	return TRUE;
 }
@@ -22535,7 +22537,7 @@ BOOL CGvisR2R_PunchView::ReloadReelmapInner()
 
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTestInner;
 
-	BOOL bRtn[7] = { 1 };
+	BOOL bRtn[7] = { 1,1,1,1,1,1,1 };
 
 	if (GetLastBufferSerial(0) < 1)
 		return FALSE;
@@ -22543,13 +22545,11 @@ BOOL CGvisR2R_PunchView::ReloadReelmapInner()
 	if (pDoc->m_pReelMapInnerUp)
 	{
 		bRtn[1] = pDoc->m_pReelMapInnerUp->ReloadReelmapFromThread(GetLastBufferSerial(0));
-		//bRtn[1] = pDoc->m_pReelMapInnerUp->ReloadReelmap();
 	}
 
 	if (pDoc->m_pReelMapIts)
 	{
 		bRtn[2] = pDoc->m_pReelMapIts->ReloadReelmapFromThread(GetLastBufferSerial(1));
-		//bRtn[2] = pDoc->m_pReelMapIts->ReloadReelmap();
 	}
 
 	bRtn[3] = TRUE;
@@ -22559,18 +22559,21 @@ BOOL CGvisR2R_PunchView::ReloadReelmapInner()
 		if (pDoc->m_pReelMapInnerDn)
 		{
 			bRtn[4] = pDoc->m_pReelMapInnerDn->ReloadReelmapFromThread(GetLastBufferSerial(1));
-			//bRtn[4] = pDoc->m_pReelMapInnerDn->ReloadReelmap();
 		}
 		if (pDoc->m_pReelMapInnerAllUp)
 		{
 			bRtn[5] = pDoc->m_pReelMapInnerAllUp->ReloadReelmapFromThread(GetLastBufferSerial(1));
-			//bRtn[5] = pDoc->m_pReelMapInnerAllUp->ReloadReelmap();
 		}
 		if (pDoc->m_pReelMapInnerAllDn)
 		{
 			bRtn[6] = pDoc->m_pReelMapInnerAllDn->ReloadReelmapFromThread(GetLastBufferSerial(1));
-			//bRtn[6] = pDoc->m_pReelMapInnerAllDn->ReloadReelmap();
 		}
+	}
+	else
+	{
+		bRtn[4] = TRUE;
+		bRtn[5] = TRUE;
+		bRtn[6] = TRUE;
 	}
 
 	for (int i = 1; i < 7; i++)
@@ -22674,6 +22677,12 @@ BOOL CGvisR2R_PunchView::IsDoneReloadReelmap()
 		if (pDoc->m_pReelMapAllDn)
 			bRtn[4] = pDoc->m_pReelMapAllDn->m_bThreadAliveReloadReelmap;
 	}
+	else
+	{
+		bRtn[2] = FALSE;
+		bRtn[3] = FALSE;
+		bRtn[4] = FALSE;
+	}
 
 	if (bRtn[1] || bRtn[2] || bRtn[3] || bRtn[4])
 		return FALSE;
@@ -22691,30 +22700,28 @@ BOOL CGvisR2R_PunchView::ReloadReelmap()
 	if (nLastShot <= 0)
 		return TRUE;
 
-	BOOL bRtn[5] = { 1 };
+	BOOL bRtn[5] = { 1,1,1,1,1 };
 	int nSt = 0;
 
 	if (pDoc->m_pReelMapUp)
 		bRtn[1] = pDoc->m_pReelMapUp->ReloadReelmapFromThread(nLastShot);
-		//bRtn[1] = pDoc->m_pReelMapUp->ReloadReelmapFromThread(GetLastBufferSerial(0));
-		//bRtn[1] = pDoc->m_pReelMapUp->ReloadReelmap();
 
 	if (bDualTest)
 	{
 		if (pDoc->m_pReelMapDn)
 			bRtn[2] = pDoc->m_pReelMapDn->ReloadReelmapFromThread(nLastShot);
-			//bRtn[2] = pDoc->m_pReelMapDn->ReloadReelmapFromThread(GetLastBufferSerial(1));
-			//bRtn[2] = pDoc->m_pReelMapDn->ReloadReelmap();
 
 		if (pDoc->m_pReelMapAllUp)
 			bRtn[3] = pDoc->m_pReelMapAllUp->ReloadReelmapFromThread(nLastShot);
-			//bRtn[3] = pDoc->m_pReelMapAllUp->ReloadReelmapFromThread(GetLastBufferSerial(1));
-			//bRtn[3] = pDoc->m_pReelMapAllUp->ReloadReelmap();
 
 		if (pDoc->m_pReelMapAllDn)
 			bRtn[4] = pDoc->m_pReelMapAllDn->ReloadReelmapFromThread(nLastShot);
-			//bRtn[4] = pDoc->m_pReelMapAllDn->ReloadReelmapFromThread(GetLastBufferSerial(1));
-			//bRtn[4] = pDoc->m_pReelMapAllDn->ReloadReelmap();
+	}
+	else
+	{
+		bRtn[2] = TRUE;
+		bRtn[3] = TRUE;
+		bRtn[4] = TRUE;
 	}
 
 	if (pDoc->GetTestMode() == MODE_OUTER)
@@ -22728,7 +22735,6 @@ BOOL CGvisR2R_PunchView::ReloadReelmap()
 	{
 		if (!bRtn[i])
 		{
-			//pView->SetAlarmToPlc(UNIT_PUNCH);
 			pView->ClrDispMsg();
 			AfxMessageBox(_T("ReloadReelmap() is Failed."));
 			return FALSE;
@@ -22861,6 +22867,12 @@ BOOL CGvisR2R_PunchView::IsDoneReloadReelmap(int& nProc)
 		}
 		else
 			bDone[4] = TRUE;
+	}
+	else
+	{
+		bDone[2] = TRUE;
+		bDone[3] = TRUE; 
+		bDone[4] = TRUE;
 	}
 
 	nProc = nRatio[1] + nRatio[2] + nRatio[3] + nRatio[4];
@@ -24400,11 +24412,6 @@ BOOL CGvisR2R_PunchView::MoveAlign0(int nPos)
 		fLen = sqrt(((pPos[0] - dCurrX) * (pPos[0] - dCurrX)) + ((pPos[1] - dCurrY) * (pPos[1] - dCurrY)));
 		if (fLen > 0.001)
 		{
-			//if (pView->IsClampOff())
-			//{
-			//	return FALSE;
-			//}
-
 			pView->m_pMotion->GetSpeedProfile(TRAPEZOIDAL, AXIS_X0, fLen, fVel, fAcc, fJerk);
 			if (!pView->m_pMotion->Move(MS_X0Y0, pPos, fVel, fAcc, fAcc, ABS, NO_WAIT))
 			{
@@ -24456,11 +24463,6 @@ BOOL CGvisR2R_PunchView::MoveAlign1(int nPos)
 		fLen = sqrt(((pPos[0] - dCurrX) * (pPos[0] - dCurrX)) + ((pPos[1] - dCurrY) * (pPos[1] - dCurrY)));
 		if (fLen > 0.001)
 		{
-			//if (pView->IsClampOff())
-			//{
-			//	return FALSE;
-			//}
-
 			m_pMotion->GetSpeedProfile(TRAPEZOIDAL, AXIS_X1, fLen, fVel, fAcc, fJerk);
 			if (!m_pMotion->Move(MS_X1Y1, pPos, fVel, fAcc, fAcc, ABS, NO_WAIT))
 			{
@@ -29969,7 +29971,7 @@ BOOL CGvisR2R_PunchView::IsDoneRemakeReelmapInner()
 {
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTestInner;
 	BOOL bAlive[4] = { FALSE };
-	BOOL bSuccess[4] = { TRUE };
+	BOOL bSuccess[4] = { 1,1,1,1 };
 	BOOL bWait = TRUE;
 	DWORD dwSt = GetTickCount();
 
@@ -31264,248 +31266,6 @@ void CGvisR2R_PunchView::ChkRcvSig()
 		}
 	}
 }
-
-
-//BOOL CGvisR2R_PunchView::RemakeReelmapFromPcr(CString sModel, CString sLot, CString sLayerUp, CString sLayerDn)
-//{
-//	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
-//	CString sReelmapSrc, str, sMsg;
-//
-//	if (!pDoc->m_pReelMapUp)
-//	{
-//		sMsg.Format(_T("m_pReelMapUp이 Create되지않았습니다.\r\n%s"));
-//		MsgBox(sMsg);
-//		return FALSE;
-//	}
-//
-//
-//	pDoc->WorkingInfo.LastJob.sModel = sModel;
-//	pDoc->WorkingInfo.LastJob.sLot = sLot;
-//	pDoc->WorkingInfo.LastJob.sLayerUp = sLayerUp;
-//	pDoc->WorkingInfo.LastJob.sLayerDn = sLayerDn;
-//
-//	CString sPath = pDoc->m_pReelMapUp->GetRmapPath(RMAP_UP);
-//
-//	FILE *fp = NULL;
-//	char FileName[MAX_PATH];
-//	CString strFileName, strPathName;
-//	CFileFind findfile;
-//	int nStripNumY, nPieceNumPerStrip;
-//
-//	int i, nLastShot, nPnl, nRow, nCol, nDefCode, nCompletedShot;
-//	CString sPnl, sRow, sVal;
-//	TCHAR sep[] = { _T(",/;\r\n\t") };
-//	TCHAR szData[MAX_PATH];
-//
-//	if (!findfile.FindFile(sPath))
-//	{
-//		sMsg.Format(_T("Reelmap이 존재하지 않습니다.\r\n%s"), sPath);
-//		MsgBox(sMsg);
-//		return FALSE;
-//	}
-//
-//	CString sProcessCode, sEntireSpeed, sLotRun, sLotEnd;
-//	
-//	if (0 < ::GetPrivateProfileString(_T("Info"), _T("Completed Shot"), NULL, szData, sizeof(szData), sPath))
-//		nCompletedShot = _tstoi(szData);
-//	else
-//		nCompletedShot = 0; // Failed.
-//	
-//	if (0 < ::GetPrivateProfileString(_T("Info"), _T("Marked Shot"), NULL, szData, sizeof(szData), sPath))
-//		nLastShot = _tstoi(szData);
-//	else
-//	{
-//		nLastShot = 0; // Failed.
-//		MsgBox(_T("릴맵에 Marked Shot 정보가 없습니다."));
-//		return FALSE;
-//	}
-//
-//	// 공종코드
-//	if (0 < ::GetPrivateProfileString(_T("Info"), _T("Process Code"), NULL, szData, sizeof(szData), sPath))
-//		sProcessCode = CString(szData);
-//	else
-//		sProcessCode = _T("");
-//
-//	// 속도
-//	if (0 < ::GetPrivateProfileString(_T("Info"), _T("Entire Speed"), NULL, szData, sizeof(szData), sPath))
-//		sEntireSpeed = CString(szData);
-//	else
-//		sEntireSpeed = _T("0.0");
-//
-//	if (0 < ::GetPrivateProfileString(_T("Info"), _T("Lot Run"), NULL, szData, sizeof(szData), sPath))
-//		sLotRun = CString(szData);
-//	else
-//		sLotRun = _T("");
-//
-//	if (0 < ::GetPrivateProfileString(_T("Info"), _T("Lot End"), NULL, szData, sizeof(szData), sPath))
-//		sLotEnd = CString(szData);
-//	else
-//		sLotEnd = _T("");
-//
-//
-//	CString sFile = _T(""), sUpPath = _T(""), sDnPath = _T(""), sRmapUpPath = sPath, sRmapDnPath;
-//
-//	int nPos = sRmapUpPath.ReverseFind('\\');
-//	if (nPos != -1)
-//	{
-//		sFile = sRmapUpPath.Right(sRmapUpPath.GetLength() - nPos - 1);
-//		sRmapUpPath.Delete(nPos, sRmapUpPath.GetLength() - nPos);
-//	}
-//
-//
-//	DeleteFile(sPath);
-//	sPath = pDoc->m_pReelMapUp->GetYieldPath(RMAP_UP);
-//	DeleteFile(sPath);
-//	
-//	sPath = pDoc->m_pReelMapUp->GetRmapPath(RMAP_DN);
-//	if (findfile.FindFile(sPath))
-//	{
-//		bDualTest = TRUE;
-//		sRmapDnPath = sPath;
-//
-//		DeleteFile(sPath);
-//		sPath = pDoc->m_pReelMapUp->GetYieldPath(RMAP_DN);
-//		DeleteFile(sPath);
-//
-//		sPath = pDoc->m_pReelMapUp->GetRmapPath(RMAP_ALLUP);
-//		if (findfile.FindFile(sPath))
-//		{
-//			DeleteFile(sPath);
-//			sPath = pDoc->m_pReelMapUp->GetYieldPath(RMAP_ALLUP);
-//			DeleteFile(sPath);
-//		}
-//
-//		sPath = pDoc->m_pReelMapUp->GetRmapPath(RMAP_ALLDN);
-//		if (findfile.FindFile(sPath))
-//		{
-//			DeleteFile(sPath);
-//			sPath = pDoc->m_pReelMapUp->GetYieldPath(RMAP_ALLDN);
-//			DeleteFile(sPath);
-//		}
-//
-//		nPos = sRmapDnPath.ReverseFind('\\');
-//		if (nPos != -1)
-//		{
-//			sFile = sRmapDnPath.Right(sRmapDnPath.GetLength() - nPos - 1);
-//			sRmapDnPath.Delete(nPos, sRmapDnPath.GetLength() - nPos);
-//		}
-//
-//
-//		ResetMkInfo(2); // 0 : AOI-Up , 1 : AOI-Dn , 2 : AOI-UpDn
-//	}
-//	else
-//	{
-//		ResetMkInfo(0); // 0 : AOI-Up , 1 : AOI-Dn , 2 : AOI-UpDn
-//		bDualTest = FALSE;
-//	}
-//
-//	ClrDispMsg();
-//	double dProgressRatio = 0.0;
-//	int nProgress = 0, nSerial = 0;
-//	CDlgProgress dlg;
-//	sVal.Format(_T("On Remaking Reelmap from PCR."));
-//	dlg.Create(sVal);
-//	dlg.SetRange(0, 100);
-//	dlg.SetPos(1);
-//
-//	for (nPnl = 0; nPnl < nLastShot; nPnl++)
-//	{
-//		dProgressRatio = double(nPnl + 1) / double(nLastShot) * 100.0;
-//		nProgress = int(dProgressRatio);
-//		dlg.SetPos(nProgress);
-//
-//		nSerial = nPnl + 1;
-//		sUpPath.Format(_T("%s\\%04d.pcr"), sRmapUpPath, nSerial);
-//
-//		if (findfile.FindFile(sUpPath))
-//		{
-//			pDoc->LoadPcrUp(sUpPath);
-//
-//			if (bDualTest)
-//			{
-//				sDnPath.Format(_T("%s\\%04d.pcr"), sRmapDnPath, nSerial);
-//				if (findfile.FindFile(sDnPath))
-//				{
-//					pDoc->LoadPcrDn(sDnPath);
-//					pDoc->LoadPcrAllUp(sDnPath);
-//					//pDoc->LoadPcrAllDn(sDnPath);
-//
-//					// 시리얼파일의 정보로 릴맵을 만듬 
-//					if (pDoc->m_pReelMapUp)
-//						pDoc->m_pReelMapUp->Write(nSerial); // [0]:AOI-Up , [1]:AOI-Dn , [2]:AOI-AllUp , [3]:AOI-AllDn
-//					if (pDoc->m_pReelMapDn)
-//						pDoc->m_pReelMapDn->Write(nSerial); // [0]:AOI-Up , [1]:AOI-Dn , [2]:AOI-AllUp , [3]:AOI-AllDn
-//					if (pDoc->m_pReelMapAllUp)
-//						pDoc->m_pReelMapAllUp->Write(nSerial); // [0]:AOI-Up , [1]:AOI-Dn , [2]:AOI-AllUp , [3]:AOI-AllDn
-//
-//					pDoc->SetLastSerial(nSerial);
-//				}
-//				else
-//				{
-//					sMsg.Format(_T("하면의 PCR파일이 존재하지 않습니다.\r\n%s"), sDnPath);
-//					MsgBox(sMsg);
-//					return FALSE;
-//				}
-//			}
-//			else
-//			{
-//				if (pDoc->m_pReelMapUp)
-//					pDoc->m_pReelMapUp->Write(nSerial); // [0]:AOI-Up , [1]:AOI-Dn , [2]:AOI-AllUp , [3]:AOI-AllDn
-//
-//				pDoc->SetLastSerial(nSerial);
-//			}
-//		}
-//	}
-//
-//	sPath = pDoc->m_pReelMapUp->GetRmapPath(RMAP_UP);
-//	::WritePrivateProfileString(_T("Info"), _T("Process Code"), sProcessCode, sPath);
-//	::WritePrivateProfileString(_T("Info"), _T("Entire Speed"), sEntireSpeed, sPath);
-//	::WritePrivateProfileString(_T("Info"), _T("Lot Run"), sLotRun, sPath);
-//	::WritePrivateProfileString(_T("Info"), _T("Lot End"), sLotEnd, sPath);
-//	sVal.Format(_T("%d"), nLastShot);
-//	::WritePrivateProfileString(_T("Info"), _T("End Serial"), sVal, sPath);
-//
-//	if (bDualTest)
-//	{
-//		sPath = pDoc->m_pReelMapUp->GetRmapPath(RMAP_DN);
-//		::WritePrivateProfileString(_T("Info"), _T("Process Code"), sProcessCode, sPath);
-//		::WritePrivateProfileString(_T("Info"), _T("Entire Speed"), sEntireSpeed, sPath);
-//		::WritePrivateProfileString(_T("Info"), _T("Lot Run"), sLotRun, sPath);
-//		::WritePrivateProfileString(_T("Info"), _T("Lot End"), sLotEnd, sPath);
-//		sVal.Format(_T("%d"), nLastShot);
-//		::WritePrivateProfileString(_T("Info"), _T("End Serial"), sVal, sPath);
-//
-//		sPath = pDoc->m_pReelMapUp->GetRmapPath(RMAP_ALLUP);
-//		::WritePrivateProfileString(_T("Info"), _T("Process Code"), sProcessCode, sPath);
-//		::WritePrivateProfileString(_T("Info"), _T("Entire Speed"), sEntireSpeed, sPath);
-//		::WritePrivateProfileString(_T("Info"), _T("Lot Run"), sLotRun, sPath);
-//		::WritePrivateProfileString(_T("Info"), _T("Lot End"), sLotEnd, sPath);
-//		sVal.Format(_T("%d"), nLastShot);
-//		::WritePrivateProfileString(_T("Info"), _T("End Serial"), sVal, sPath);
-//
-//		sPath = pDoc->m_pReelMapUp->GetRmapPath(RMAP_ALLDN);
-//		::WritePrivateProfileString(_T("Info"), _T("Process Code"), sProcessCode, sPath);
-//		::WritePrivateProfileString(_T("Info"), _T("Entire Speed"), sEntireSpeed, sPath);
-//		::WritePrivateProfileString(_T("Info"), _T("Lot Run"), sLotRun, sPath);
-//		::WritePrivateProfileString(_T("Info"), _T("Lot End"), sLotEnd, sPath);
-//		sVal.Format(_T("%d"), nLastShot);
-//		::WritePrivateProfileString(_T("Info"), _T("End Serial"), sVal, sPath);
-//	}
-//
-//	dlg.SetPos(100);
-//	dlg.DestroyWindow();
-//
-//	if (m_pDlgMenu05)
-//	{
-//		int nIndex = m_pDlgMenu05->GetIdxTopLayer();
-//		if (nIndex > -1)
-//		{
-//			m_pDlgMenu05->SelchangeComboLayer(nIndex);
-//		}
-//	}
-//
-//	return TRUE;
-//}
 
 BOOL CGvisR2R_PunchView::MpeWrite(CString strRegAddr, long lData, BOOL bCheck)
 {
@@ -32937,6 +32697,12 @@ BOOL CGvisR2R_PunchView::IsDoneReloadYield()
 		bRtn[2] = m_bTHREAD_UPDATE_YIELD_ALLUP;
 		bRtn[3] = m_bTHREAD_UPDATE_YIELD_ALLDN;
 	}
+	else
+	{
+		bRtn[1] = FALSE;
+		bRtn[2] = FALSE;
+		bRtn[3] = FALSE;
+	}
 
 	if (pDoc->GetTestMode() == MODE_OUTER)
 	{
@@ -33108,3 +32874,216 @@ BOOL CGvisR2R_PunchView::SetMkPcs1(int nSerial, int nMkPcs) // pcr 시리얼, pcr �
 	return TRUE;
 }
 
+BOOL CGvisR2R_PunchView::ApplyListTorq()
+{
+	if (pDoc->WorkingInfo.System.sPathTorqSpecDir.IsEmpty())
+		return FALSE;
+
+	CString sPathList;
+	sPathList.Format(_T("%sPunchingTorqueList.ini"), pDoc->WorkingInfo.System.sPathTorqSpecDir);
+
+	CString sModel, sMsg;
+	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
+		sModel = pDoc->m_sEngModel;
+	else
+		sModel = pDoc->WorkingInfo.LastJob.sModel;
+
+	int nThick = GetModelThickness(sModel);
+	if (nThick < 1)
+	{
+		sMsg.Format(_T("캠마스터의 토크 리스트에 %s 모델의 토크값이 설정되지 않았습니다.\r\n%s"), sModel, sPathList);
+		MsgBox(sMsg);
+		return FALSE;
+	}
+
+	int nUnit = _tstoi(pDoc->WorkingInfo.System.sMcName.Right(2));
+	double dTorqL, dTorqR;
+	CString sVal;
+	if (!GetTorque(nUnit, nThick, dTorqL, dTorqR))
+	{
+		sMsg.Format(_T("캠마스터의 토크 리스트에 %s 설비의 %s 에대한 토크값이 설정되지 않았습니다.\r\n"), pDoc->WorkingInfo.System.sMcName, GetThicknessName(nThick));
+		MsgBox(sMsg);
+		return FALSE;
+	}
+	
+	if (dTorqL <= 0.0 || dTorqR <= 0.0)
+	{
+		sMsg.Format(_T("캠마스터의 토크 리스트에 %s 설비의 %s 에대한 토크값이 설정되지 않았습니다.\r\n좌측 토크 : %.3f, 우측 토크 : %.3f"), pDoc->WorkingInfo.System.sMcName, GetThicknessName(nThick), dTorqL, dTorqR);
+		MsgBox(sMsg);
+		return FALSE;
+	}
+
+	if(!ApplyTorq(dTorqL, dTorqR))
+	{
+		sMsg.Format(_T("%s 에대한 토크값이 %s 설비에 적용되지 않았습니다.\r\n - 토크값 적용 실패."), GetThicknessName(nThick), pDoc->WorkingInfo.System.sMcName);
+		MsgBox(sMsg);
+		return FALSE;
+	}
+
+	//if (m_pDlgMenu04)
+	//	m_pDlgMenu04->Disp();
+
+	return TRUE;
+}
+
+BOOL CGvisR2R_PunchView::ApplyTorq(double dTorqL, double dTorqR)
+{
+	pDoc->SetMarkingToq1(dTorqL);
+
+	if (pView->m_pVoiceCoil[0])
+		pView->m_pVoiceCoil[0]->SetMarkFinalData(0);
+
+#ifdef USE_ENGRAVE
+	if (pView && pView->m_pEngrave)
+		pView->m_pEngrave->SetMkFnlTqLf();	//_ItemInx::_MkFnlTqLf
+#endif
+	Sleep(100);
+
+	pDoc->SetMarkingToq2(dTorqR);
+
+	if (pView->m_pVoiceCoil[1])
+		pView->m_pVoiceCoil[1]->SetMarkFinalData(1);
+
+#ifdef USE_ENGRAVE
+	if (pView && pView->m_pEngrave)
+		pView->m_pEngrave->SetMkFnlTqRt();	//_ItemInx::_MkFnlTqRt
+#endif
+
+	return TRUE;
+}
+
+CString CGvisR2R_PunchView::GetThicknessName(int nIdx) // 설정없음[0], 얇은 두께[1], 중간 두께[2], 두꺼운 두께[3]
+{
+	CString sName = _T("");
+	switch (nIdx)
+	{
+	case 0:
+		sName = THICKNESS_0;
+		break;
+	case 1:
+		sName = THICKNESS_1;
+		break;
+	case 2:
+		sName = THICKNESS_2;
+		break;
+	case 3:
+		sName = THICKNESS_3;
+		break;
+	default:
+		sName = THICKNESS_0;
+		break;
+	}
+	return sName;
+}
+
+BOOL CGvisR2R_PunchView::GetTorque(int nUnit, int nThick, double &dTorqL, double &dTorqR)
+{
+	if (pDoc->WorkingInfo.System.sPathTorqSpecDir.IsEmpty())
+		return FALSE;
+
+	CString sPathList;
+	sPathList.Format(_T("%sPunchingTorqueList.ini"), pDoc->WorkingInfo.System.sPathTorqSpecDir);
+
+	int nTotalUnit;
+	TCHAR szData[MAX_PATH];
+	TCHAR sep[] = { _T(",;\r\n\t") };
+	TCHAR *token;
+
+	if (0 < ::GetPrivateProfileString(_T("Info"), _T("Total_Machines"), NULL, szData, sizeof(szData), sPathList))
+		 nTotalUnit = _ttoi(szData);
+	else
+	{
+		nTotalUnit = 0;
+		return FALSE;
+	}
+
+	CString sThickIdx, sUnitNum;
+	sThickIdx.Format(_T("%d"), nThick);
+
+	sUnitNum.Format(_T("%d"), nUnit);
+	if (0 < ::GetPrivateProfileString(sThickIdx, sUnitNum, NULL, szData, sizeof(szData), sPathList))
+	{
+		token = _tcstok(szData, sep);
+		dTorqL = _ttof(token);
+		token = _tcstok(NULL, sep);
+		dTorqR = _ttof(token);
+	}
+	else
+		return FALSE;
+
+	return TRUE;;
+}
+
+int CGvisR2R_PunchView::GetModelThickness(CString sModel)
+{
+	if (pDoc->WorkingInfo.System.sPathTorqSpecDir.IsEmpty())
+		return -1; // Not found.
+
+	CString sPathList;
+	sPathList.Format(_T("%sPunchingTorqueList.ini"), pDoc->WorkingInfo.System.sPathTorqSpecDir);
+
+	int nModelIdx, nThickness;
+	CString sModelIdx, sListModel;
+	TCHAR szData[MAX_PATH];
+	TCHAR *token;
+	TCHAR sep[] = { _T(",;\r\n\t") };
+
+	nModelIdx = SearchModel(sModel);
+	if (nModelIdx < 1)
+		return -1; // Not found.
+
+	sModelIdx.Format(_T("%d"), nModelIdx);
+	if (0 < ::GetPrivateProfileString(_T("Model"), sModelIdx, NULL, szData, sizeof(szData), sPathList))
+	{
+		token = _tcstok(szData, sep);
+		sListModel = CString(token);
+		token = _tcstok(NULL, sep);
+		nThickness = _ttoi(token);
+	}
+	else
+		return -1; // Not found.
+
+	return nThickness;
+}
+
+int CGvisR2R_PunchView::SearchModel(CString sModel)
+{
+	if (pDoc->WorkingInfo.System.sPathTorqSpecDir.IsEmpty())
+		return -1; // Not found.
+
+	CString sPathList;
+	sPathList.Format(_T("%sPunchingTorqueList.ini"), pDoc->WorkingInfo.System.sPathTorqSpecDir);
+
+	int nModelIdx, nThickness, nTotalModels;
+	CString sModelIdx, sListModel;
+	TCHAR szData[MAX_PATH];
+	TCHAR *token;
+	TCHAR sep[] = { _T(",;\r\n\t") };
+
+	if (0 < ::GetPrivateProfileString(_T("Info"), _T("Total_Models"), NULL, szData, sizeof(szData), sPathList))
+		nTotalModels = _ttoi(szData);
+	else
+		nTotalModels = 0;
+
+	if (nTotalModels < 1)
+		return -1; // Not found.
+
+	for (nModelIdx = 0; nModelIdx < nTotalModels; nModelIdx++)
+	{
+		sModelIdx.Format(_T("%d"), nModelIdx);
+		if (0 < ::GetPrivateProfileString(_T("Model"), sModelIdx, NULL, szData, sizeof(szData), sPathList))
+		{
+			token = _tcstok(szData, sep);
+			sListModel = CString(token);
+			token = _tcstok(NULL, sep);
+			nThickness = _ttoi(token);
+		}
+		else
+			sListModel = _T("");
+
+		if (sListModel == sModel)
+			return nModelIdx;
+	}
+
+	return -1; // Not Found
+}

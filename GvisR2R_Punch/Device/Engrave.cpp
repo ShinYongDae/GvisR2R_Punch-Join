@@ -138,11 +138,6 @@ void CEngrave::StopClient()
 {
 	if (m_pClient)
 	{
-		//if (!m_pClient->Stop()) // Called Destroy Function.
-		//{
-		//	Sleep(30);
-		//	delete m_pClient;
-		//}
 		m_pClient->Stop();
 		Sleep(10);
 		m_pClient->StopThread();

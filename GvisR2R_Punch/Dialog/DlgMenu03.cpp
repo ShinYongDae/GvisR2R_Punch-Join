@@ -3160,45 +3160,6 @@ BOOL CDlgMenu03::DoReset()
 		pView->m_bInit = bInit;
 
 		pView->ClearBuffer();
-		//CFileFind cFile;
-		//BOOL bExistSup, bExistBup, bExistSdn, bExistBdn;
-		//BOOL bExistSVsup, bExistBVsup, bExistSVsdn, bExistBVsdn;
-		//
-		//bExistSup = cFile.FindFile(pDoc->WorkingInfo.System.sPathVrsShareUp + _T("*.pcr"));
-		//bExistBup = cFile.FindFile(pDoc->WorkingInfo.System.sPathVrsBufUp + _T("*.pcr"));
-		//bExistSVsup = cFile.FindFile(pDoc->WorkingInfo.System.sPathVsShareUp + _T("*.pcr"));
-		//bExistBVsup = cFile.FindFile(pDoc->WorkingInfo.System.sPathVsDummyBufUp + _T("*.pcr"));
-		//if(bDualTest)
-		//{
-		//	bExistSdn = cFile.FindFile(pDoc->WorkingInfo.System.sPathVrsShareDn + _T("*.pcr"));
-		//	bExistBdn = cFile.FindFile(pDoc->WorkingInfo.System.sPathVrsBufDn + _T("*.pcr"));
-		//	bExistSVsdn = cFile.FindFile(pDoc->WorkingInfo.System.sPathVsShareDn + _T("*.pcr"));
-		//	bExistBVsdn = cFile.FindFile(pDoc->WorkingInfo.System.sPathVsDummyBufDn + _T("*.pcr"));
-		//	if(bExistSup || bExistSdn ||
-		//		bExistBup || bExistBdn ||
-		//		bExistSVsup || bExistSVsdn ||
-		//		bExistBVsup || bExistBVsdn)
-		//	{
-		//		pDoc->DelPcrAll();
-		//	}
-		//	else
-		//	{
-		//		pView->m_bIsBuf[0] = FALSE;
-		//		pView->m_bIsBuf[1] = FALSE;
-		//	}
-		//}
-		//else
-		//{
-		//	if(bExistSup || bExistBup || bExistSVsup || bExistBVsup)
-		//	{
-		//		pDoc->DelPcrAll();
-		//	}
-		//	else
-		//	{
-		//		pView->m_bIsBuf[0] = FALSE;
-		//		pView->m_bIsBuf[1] = FALSE;
-		//	}
-		//}
 
 		pView->TowerLamp(RGB_RED, TRUE, FALSE);
 		pView->DispMain(_T("Á¤ Áö"), RGB_RED);	

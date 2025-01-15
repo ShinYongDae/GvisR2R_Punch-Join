@@ -94,10 +94,7 @@ void CCamMaster::Init(CString sPathSpec, CString sModel, CString sLayer, CString
 	m_sPathCamSpecDir = sPathSpec;
 	m_sModel = sModel;
 	m_sLayer = sLayer;
-	//if(sLayerUp.IsEmpty())
-	//	m_sLayerUp = sLayer; // 하면 CamMaster정보에는 상면의 Align 이미지를 담아야 함.
-	//else
-		m_sLayerUp = sLayerUp; // 하면 CamMaster정보에는 상면의 Align 이미지를 담아야 함.
+	m_sLayerUp = sLayerUp; // 하면 CamMaster정보에는 상면의 Align 이미지를 담아야 함.
 }
 
 //BOOL CCamMaster::LoadMstInfo()
@@ -182,7 +179,6 @@ BOOL CCamMaster::LoadMasterSpec()
 	{
 		sMsg.Format(_T("캠마스터 스팩 파일이 없습니다.\r\n%s"), sPath);
 		pView->MsgBox(sMsg);
-// 		AfxMessageBox(sMsg);
 		return FALSE;
 	}
 
@@ -291,13 +287,11 @@ void CCamMaster::LoadPinImg()
 	//sprintf(FileNLoc, "C:\\R2RSet\\Pin");
 	wsprintf(FileNLoc, TEXT("%s"), _T("C:\\R2RSet\\Pin"));
 
-	//if(!PinFindFile.FindFile(FileNLoc))
 	if (!pDoc->DirectoryExists(FileNLoc))
 	{
 		if(!CreateDirectory(FileNLoc, NULL))
 		{
 			pView->MsgBox(_T("Can not Create Pin Directory"));
-// 			AfxMessageBox(_T("Can not Create CAD Directory"),MB_ICONSTOP|MB_OK);
 		}
 	}
 	else
@@ -432,9 +426,6 @@ BOOL CCamMaster::LoadCadMk2PntAlign(CString sPath)
 		if (nRet != nSzAlignMk)
 			return(FALSE);
 
-		//nRet = file.Read((void *) &m_lPcsNum, sizeof(long));
-		//if(nRet != sizeof(long))
-		//	return(FALSE);
 		nRet = file.Read((void *)&m_lPcsNum, sizeof(int));
 		if (nRet != sizeof(int))
 			return(FALSE);
@@ -485,9 +476,6 @@ BOOL CCamMaster::LoadCadMk4PntAlign(CString sPath)
 		if (nRet != nSzAlignMk)
 			return(FALSE);
 
-		//nRet = file.Read((void *) &m_lPcsNum, sizeof(long));
-		//if(nRet != sizeof(long))
-		//	return(FALSE);
 		nRet = file.Read((void *)&m_lPcsNum, sizeof(int));
 		if (nRet != sizeof(int))
 			return(FALSE);
@@ -928,9 +916,6 @@ BOOL CCamMaster::LoadStripPieceRegion_Binary()	//20121120-ndy for PairPanel
 		{
 			if (lTop == m_pPcsRgn->pPcs[i].top)
 				nCol++;
-
-			//if(m_pPcsRgn->pPcs[i].top == m_pPcsRgn->pPcs[i-1].top)
-			//	nCol++;
 		}
 		else
 			lTop = m_pPcsRgn->pPcs[i].top;
@@ -1140,7 +1125,6 @@ void CCamMaster::LoadPcsImg()
 
 	//sprintf(FileD, "C:\\R2RSet\\Pcs");
 	_stprintf(FileD, _T("C:\\R2RSet\\Pcs"));
-	//if(!PcsFindFile.FindFile(FileD))
 	if (!pDoc->DirectoryExists(FileD))
 	{
 		if (!CreateDirectory(FileD, NULL))
@@ -1157,8 +1141,6 @@ void CCamMaster::LoadPcsImg()
 
 #ifdef USE_CAM_MASTER
 	TCHAR FileS[MAX_PATH];
-	//sprintf(FileS,"%s%s\\%s\\Piece.tif", MasterInfo.strMasterLocation, m_sModel, m_sLayer);
-	//strcpy(FileD, PATH_PCS_IMG);
 	if (MasterInfo.strMasterLocation.Right(1) != "\\")
 		_stprintf(FileS, _T("%s\\%s\\%s\\Piece.tif"), MasterInfo.strMasterLocation, m_sModel, m_sLayer);
 	else
@@ -1211,13 +1193,11 @@ void CCamMaster::LoadCadImg()
 	//sprintf(FileNLoc, "C:\\R2RSet\\CAD");
 	_stprintf(FileNLoc, _T("%s"), _T("C:\\R2RSet\\CAD"));
 
-	//if(!CADFindFile.FindFile(FileNLoc))
 	if (!pDoc->DirectoryExists(FileNLoc))
 	{
 		if(!CreateDirectory(FileNLoc, NULL))
 		{
 			pView->MsgBox(_T("Can not Create CAD Directory"));
-// 			AfxMessageBox(_T("Can not Create CAD Directory"),MB_ICONSTOP|MB_OK);
 		}
 	}
 	else
@@ -1453,20 +1433,6 @@ BOOL CCamMaster::CADImgBufAlloc(TCHAR *strCADImg, int CellNum, BOOL bOppLayerF)
 
 void CCamMaster::LoadAlignImg()
 {
-/*
-	char FN[200];
-
-	sprintf(FN, "%s%s\\%s-md0.tif",strSpecPath,strModel,strLayer);
-	VicFileLoad(pGlobalView->m_pDlgSetPunchAlign->m_VisionFirst.m_MilAlign0PositionImg, FN);
-	
-	sprintf(FN, "%s%s\\%s-md1.tif",strSpecPath,strModel,strLayer);
-	VicFileLoad(pGlobalView->m_pDlgSetPunchAlign->m_VisionFirst.m_MilAlign1PositionImg, FN);
-
-	sprintf(FN, "c:\\test100.tif");
-	MbufSave(FN, pGlobalView->m_pDlgSetPunchAlign->m_VisionFirst.m_MilAlign0PositionImg);
-	sprintf(FN, "c:\\test200.tif");
-	MbufSave(FN, pGlobalView->m_pDlgSetPunchAlign->m_VisionFirst.m_MilAlign1PositionImg);
-*/
 	BOOL prcStopF = FALSE;
 	//char FileNAlign[MAX_PATH], FileNLoc[MAX_PATH];
 	TCHAR FileNLoc[MAX_PATH];
@@ -1480,13 +1446,11 @@ void CCamMaster::LoadAlignImg()
 	//sprintf(FileNLoc, "C:\\R2RSet\\Align");
 	_stprintf(FileNLoc, _T("%s"), _T("C:\\R2RSet\\Align"));
 
-	//if(!AlignFindFile.FindFile(FileNLoc))
 	if (!pDoc->DirectoryExists(FileNLoc))
 	{
 		if(!CreateDirectory(FileNLoc, NULL))
 		{
 			pView->MsgBox(_T("Can not Create Align Directory"));
-// 			AfxMessageBox(_T("Can not Create CAD Directory"),MB_ICONSTOP|MB_OK);
 		}
 	}
 	else
@@ -1991,9 +1955,6 @@ BOOL CCamMaster::LoadCad2PntAlignMkPos(CString sPath)
 			return(FALSE);
 		}
 
-		//nRet = file.Read((void *) &m_lPcsNum, sizeof(long));
-		//if(nRet != sizeof(long))
-		//	return(FALSE);
 		nRet = file.Read((void *)&m_lPcsNum, sizeof(int));
 		if (nRet != sizeof(int))
 		{
@@ -2053,9 +2014,6 @@ BOOL CCamMaster::LoadCad4PntAlignMkPos(CString sPath)
 			return(FALSE);
 		}
 
-		//nRet = file.Read((void *) &m_lPcsNum, sizeof(long));
-		//if(nRet != sizeof(long))
-		//	return(FALSE);
 		nRet = file.Read((void *)&m_lPcsNum, sizeof(int));
 		if (nRet != sizeof(int))
 		{
