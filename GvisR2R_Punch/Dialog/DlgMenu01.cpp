@@ -148,6 +148,8 @@ BEGIN_MESSAGE_MAP(CDlgMenu01, CDialog)
 	ON_STN_CLICKED(IDC_STC_TQ_DISP1_VAL_R, &CDlgMenu01::OnStnClickedStcTqDisp1ValR)
 	ON_STN_CLICKED(IDC_STC_TQ_DISP2_VAL_L, &CDlgMenu01::OnStnClickedStcTqDisp2ValL)
 	ON_STN_CLICKED(IDC_STC_TQ_DISP2_VAL_R, &CDlgMenu01::OnStnClickedStcTqDisp2ValR)
+	ON_STN_CLICKED(IDC_STC_TQ_DISP3_VAL_L, &CDlgMenu01::OnStnClickedStcTqDisp3ValL)
+	ON_STN_CLICKED(IDC_STC_TQ_DISP3_VAL_R, &CDlgMenu01::OnStnClickedStcTqDisp3ValR)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -340,6 +342,8 @@ BOOL CDlgMenu01::OnInitDialog()
 	GetDlgItem(IDC_HIDE_CAD_012)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_HIDE_DEF_012)->ShowWindow(SW_HIDE);
 
+	GetDlgItem(IDC_STC_TQ_R)->ShowWindow(SW_HIDE);
+
 	GetCtrlPos();
 
 	m_bTIM_DISP_MK_CNT = TRUE;
@@ -349,6 +353,8 @@ BOOL CDlgMenu01::OnInitDialog()
 	myStcData[88].SetText(pDoc->WorkingInfo.Marking[1].sMarkingDisp1Toq); // IDC_STC_TQ_DISP1_VAL_R
 	myStcData[89].SetText(pDoc->WorkingInfo.Marking[0].sMarkingDisp2Toq); // IDC_STC_TQ_DISP2_VAL_L
 	myStcData[90].SetText(pDoc->WorkingInfo.Marking[1].sMarkingDisp2Toq); // IDC_STC_TQ_DISP2_VAL_R
+	myStcData[93].SetText(pDoc->WorkingInfo.Marking[0].sMarkingDisp3Toq); // IDC_STC_TQ_DISP3_VAL_L
+	myStcData[94].SetText(pDoc->WorkingInfo.Marking[1].sMarkingDisp3Toq); // IDC_STC_TQ_DISP3_VAL_R
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 }
@@ -584,7 +590,7 @@ void CDlgMenu01::DispMkInfoUp()
 		if(pDoc->m_pPcr[0][nIdx])
 		{
 			m_nDef[0] = pDoc->m_pPcr[0][nIdx]->m_nTotDef; // m_nDef : m_nIdxMkInfo + Display Def Num.
-			pDoc->m_pPcr[0][nIdx]->m_nTotRealDef = 0;
+			//pDoc->m_pPcr[0][nIdx]->m_nTotRealDef = 0;
 		}
 	}
 #endif
@@ -620,7 +626,7 @@ void CDlgMenu01::DispMkInfoDn()
 		if(pDoc->m_pPcr[1][nIdx])
 		{
 			m_nDef[1] = pDoc->m_pPcr[1][nIdx]->m_nTotDef; // m_nDef : m_nIdxMkInfo + Display Def Num.
-			pDoc->m_pPcr[1][nIdx]->m_nTotRealDef = 0;
+			//pDoc->m_pPcr[1][nIdx]->m_nTotRealDef = 0;
 		}
 	}
 #endif
@@ -1487,7 +1493,7 @@ void CDlgMenu01::DispMkInfoUp(int nSerial)
 								SaveCadImgUp(nSerial, nIdxMkInfo, nDefImg);
 								m_nIdxMkInfo[0]++; // 화면의 IDC 인덱스
 								m_nIdxDef[0]++; // 화면에 표시할 불량피스 인덱스 ( 0 ~ TotalDef )
-								(pDoc->m_pPcr[0][nIdx]->m_nTotRealDef)++;
+								//(pDoc->m_pPcr[0][nIdx]->m_nTotRealDef)++;
 							}
 							else
 								m_nIdxMkInfo[0]++;
@@ -1528,7 +1534,7 @@ void CDlgMenu01::DispMkInfoUp(int nSerial)
 								SaveCadImgUp(nSerial, nIdxMkInfo, nDefImg);
 								m_nIdxMkInfo[0]++;
 								m_nIdxDef[0]++;
-								(pDoc->m_pPcr[0][nIdx]->m_nTotRealDef)++;
+								//(pDoc->m_pPcr[0][nIdx]->m_nTotRealDef)++;
 							}
 							else
 								m_nIdxMkInfo[0]++;
@@ -1583,7 +1589,7 @@ void CDlgMenu01::DispMkInfoDn(int nSerial)
 							SaveCadImgDn(nSerial, nIdxMkInfo, nDefImg);
 							m_nIdxMkInfo[1]++;
 							m_nIdxDef[1]++;
-							(pDoc->m_pPcr[1][nIdx]->m_nTotRealDef)++;
+							//(pDoc->m_pPcr[1][nIdx]->m_nTotRealDef)++;
 						}
 						else
 							m_nIdxMkInfo[1]++;
@@ -2250,6 +2256,9 @@ void CDlgMenu01::InitStcData()
 	myStcData[91].SubclassDlgItem(IDC_STC_ITS_CODE, this);
 	myStcData[92].SubclassDlgItem(IDC_STC_LOT_OFFSET, this);
 
+	myStcData[93].SubclassDlgItem(IDC_STC_TQ_DISP3_VAL_L, this);
+	myStcData[94].SubclassDlgItem(IDC_STC_TQ_DISP3_VAL_R, this);
+
 	for(int i=0; i<MAX_MENU01_STC_DATA; i++)
 	{
 		myStcData[i].SetFontName(_T("Arial"));
@@ -2487,7 +2496,9 @@ void CDlgMenu01::InitStcTitle()
 	myStcTitle[76].SetTextColor(RGB_WHITE);
 	myStcTitle[76].SetBkColor(RGB_DARKBLUE);
 
-	for (i = 65; i < MAX_MENU01_STC_TITLE - 1; i++)
+	myStcTitle[77].SubclassDlgItem(IDC_STC_TQ_DSIP3, this);
+
+	for (i = 65; i < MAX_MENU01_STC_TITLE; i++)
 	{
 		myStcTitle[i].SetFontName(_T("Arial"));
 		myStcTitle[i].SetFontSize(12);
@@ -2503,11 +2514,15 @@ void CDlgMenu01::InitStcTitle()
 			myStcTitle[i].SetBkColor(RGB_DARKGREEN);
 			myStcTitle[i].SetFontBold(TRUE);
 		}
-		else if (i == 73 || i == 74)
+		else if (i == 73 || i == 74 || i == 77)
 		{
 			myStcTitle[i].SetTextColor(RGB_NAVY);
 			myStcTitle[i].SetBkColor(RGB_LTGRAY);
 			myStcTitle[i].SetFontBold(FALSE);
+		}
+		else if (i == 76)
+		{
+			;
 		}
 		else
 		{
@@ -6046,4 +6061,47 @@ void CDlgMenu01::OnStnClickedStcTqDisp2ValR()
 
 	pDoc->WorkingInfo.Marking[1].sMarkingDisp2Toq = sData;
 	::WritePrivateProfileString(_T("Marking1"), _T("MARKING_DISP2_TOQ"), sData, PATH_WORKING_INFO);
+}
+
+void CDlgMenu01::OnStnClickedStcTqDisp3ValL()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	myStcData[93].SetBkColor(RGB_RED);
+	myStcData[93].RedrawWindow();
+
+	CPoint pt;	CRect rt;
+	GetDlgItem(IDC_STC_TQ_DISP3_VAL_L)->GetWindowRect(&rt);
+	pt.x = rt.right; pt.y = rt.bottom;
+	ShowKeypad(IDC_STC_TQ_DISP3_VAL_L, pt, TO_BOTTOM | TO_RIGHT);
+
+	myStcData[93].SetBkColor(RGB_WHITE);
+	myStcData[93].RedrawWindow();
+
+	CString sData;
+	GetDlgItem(IDC_STC_TQ_DISP3_VAL_L)->GetWindowText(sData);
+
+	pDoc->WorkingInfo.Marking[0].sMarkingDisp3Toq = sData;
+	::WritePrivateProfileString(_T("Marking0"), _T("MARKING_DISP3_TOQ"), sData, PATH_WORKING_INFO);
+}
+
+
+void CDlgMenu01::OnStnClickedStcTqDisp3ValR()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	myStcData[94].SetBkColor(RGB_RED);
+	myStcData[94].RedrawWindow();
+
+	CPoint pt;	CRect rt;
+	GetDlgItem(IDC_STC_TQ_DISP3_VAL_R)->GetWindowRect(&rt);
+	pt.x = rt.right; pt.y = rt.bottom;
+	ShowKeypad(IDC_STC_TQ_DISP3_VAL_R, pt, TO_BOTTOM | TO_RIGHT);
+
+	myStcData[94].SetBkColor(RGB_WHITE);
+	myStcData[94].RedrawWindow();
+
+	CString sData;
+	GetDlgItem(IDC_STC_TQ_DISP3_VAL_R)->GetWindowText(sData);
+
+	pDoc->WorkingInfo.Marking[1].sMarkingDisp3Toq = sData;
+	::WritePrivateProfileString(_T("Marking1"), _T("MARKING_DISP3_TOQ"), sData, PATH_WORKING_INFO);
 }

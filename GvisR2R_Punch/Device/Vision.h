@@ -104,6 +104,7 @@ class CVision : public CWnd
 	CLibMilDraw *m_pMilPinOverlay;
 	CLibMilDraw *m_pMilPinOverlayDelete;
 
+
 	CLibMilBuf *m_MilGrabModelPunch;
 	double m_dVerifyPunchScore;
 

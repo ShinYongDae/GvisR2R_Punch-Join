@@ -150,6 +150,7 @@ CReelMap::CReelMap(int nLayer, int nPnl, int nPcs, int nDir)
 	m_pPnlDefNum = NULL;
 	pPcsDef = NULL;
 	pMkedPcsDef = NULL;
+	pMkedPcsSerial = NULL;
 	pFrmRgn = NULL;
 	pPcsRgn = NULL;
 
@@ -268,6 +269,12 @@ CReelMap::~CReelMap()
 
 		delete[] pMkedPcsDef;
 		pMkedPcsDef = NULL;
+	}
+
+	if (pMkedPcsSerial)
+	{
+		delete[] pMkedPcsSerial;
+		pMkedPcsSerial = NULL;
 	}
 }
 
@@ -775,6 +782,13 @@ BOOL CReelMap::Write(int nSerial)
 	strData.Format(_T("%d"), nTotDefPcs - nTotVerifyed);
 	::WritePrivateProfileString(sPnl, _T("Total Defects"), strData, sPath);
 
+	if (m_nLayer == RMAP_UP || m_nLayer == RMAP_DN || m_nLayer == RMAP_ALLUP || m_nLayer == RMAP_ALLDN)
+		pDoc->m_pPcr[m_nLayer][nIdx]->m_nTotRealDef = nTotDefPcs - nTotVerifyed;
+	else if (m_nLayer == RMAP_INNER_UP || m_nLayer == RMAP_INNER_DN || m_nLayer == RMAP_INNER_ALLUP || m_nLayer == RMAP_INNER_ALLDN)
+		pDoc->m_pPcrInner[m_nLayer - RMAP_INNER_UP][nIdx]->m_nTotRealDef = nTotDefPcs - nTotVerifyed;
+	else if (m_nLayer == RMAP_ITS)
+		pDoc->m_pPcrIts[nIdx]->m_nTotRealDef = nTotDefPcs - nTotVerifyed;
+
 	sReelmapTable = _T("");
 	sReelmapVal = _T("");
 
@@ -996,6 +1010,13 @@ void CReelMap::InitPcs()
 					pMkedPcsDef[k][i] = FALSE;
 			}
 		}
+
+		if (!pMkedPcsSerial)
+		{
+			pMkedPcsSerial = new int[nTotPnl];
+			for (k = 0; k < nTotPnl; k++)
+				pMkedPcsSerial[k] = 0;
+		}
 	}
 	else
 	{
@@ -1020,7 +1041,7 @@ BOOL CReelMap::Disp(int nMkPnl, BOOL bDumy)
 {
 	if(!bDumy)
 	{
-		if(!pPcsDef || !pMkedPcsDef || !m_pPnlNum || !m_pPnlDefNum)
+		if(!pPcsDef || !pMkedPcsDef || !pMkedPcsSerial || !m_pPnlNum || !m_pPnlDefNum)
 		{
 			pView->MsgBox(_T("Reelmap Memory Error."));
 			return FALSE;
@@ -1197,14 +1218,19 @@ BOOL CReelMap::Disp(int nMkPnl, BOOL bDumy)
 				{
 					if (m_nLayer == RMAP_UP || m_nLayer == RMAP_DN || m_nLayer == RMAP_ALLUP || m_nLayer == RMAP_ALLDN)
 					{
-						m_pPnlDefNum[k] = pDoc->m_pPcr[m_nLayer][GetPcrIdx(nLoadPnl)]->m_nTotDef;
+						//m_pPnlDefNum[k] = pDoc->m_pPcr[m_nLayer][GetPcrIdx(nLoadPnl)]->m_nTotDef;
+						m_pPnlDefNum[k] = pDoc->m_pPcr[m_nLayer][GetPcrIdx(nLoadPnl)]->m_nTotRealDef;
 					}
 					else if (m_nLayer == RMAP_INNER_UP || m_nLayer == RMAP_INNER_DN || m_nLayer == RMAP_INNER_ALLUP || m_nLayer == RMAP_INNER_ALLDN)
 					{
-						m_pPnlDefNum[k] = pDoc->m_pPcrInner[m_nLayer - RMAP_INNER_UP][GetPcrIdx(nLoadPnl)]->m_nTotDef;
+						//m_pPnlDefNum[k] = pDoc->m_pPcrInner[m_nLayer - RMAP_INNER_UP][GetPcrIdx(nLoadPnl)]->m_nTotDef;
+						m_pPnlDefNum[k] = pDoc->m_pPcrInner[m_nLayer - RMAP_INNER_UP][GetPcrIdx(nLoadPnl)]->m_nTotRealDef;
 					}
 					else if (m_nLayer == RMAP_ITS)
-						m_pPnlDefNum[k] = pDoc->m_pPcrIts[GetPcrIdx(nLoadPnl)]->m_nTotDef;
+					{
+						//m_pPnlDefNum[k] = pDoc->m_pPcrIts[GetPcrIdx(nLoadPnl)]->m_nTotDef;
+						m_pPnlDefNum[k] = pDoc->m_pPcrIts[GetPcrIdx(nLoadPnl)]->m_nTotRealDef;
+					}
 					else
 						return 0;
 				}
@@ -1229,15 +1255,22 @@ BOOL CReelMap::Disp(int nMkPnl, BOOL bDumy)
 				{
 					if (m_nLayer == RMAP_UP || m_nLayer == RMAP_DN || m_nLayer == RMAP_ALLUP || m_nLayer == RMAP_ALLDN)
 					{
-						m_pPnlDefNum[k] = pDoc->m_pPcr[m_nLayer][GetPcrIdx(nLoadPnl)]->m_nTotDef;
+						//m_pPnlDefNum[k] = pDoc->m_pPcr[m_nLayer][GetPcrIdx(nLoadPnl)]->m_nTotDef;
+						m_pPnlDefNum[k] = pDoc->m_pPcr[m_nLayer][GetPcrIdx(nLoadPnl)]->m_nTotRealDef;
 					}
 					else if (m_nLayer == RMAP_INNER_UP || m_nLayer == RMAP_INNER_DN || m_nLayer == RMAP_INNER_ALLUP || m_nLayer == RMAP_INNER_ALLDN)
 					{
-						if(pDoc->m_pPcrInner)
-							m_pPnlDefNum[k] = pDoc->m_pPcrInner[m_nLayer - RMAP_INNER_UP][GetPcrIdx(nLoadPnl)]->m_nTotDef;
+						if (pDoc->m_pPcrInner)
+						{
+							//m_pPnlDefNum[k] = pDoc->m_pPcrInner[m_nLayer - RMAP_INNER_UP][GetPcrIdx(nLoadPnl)]->m_nTotDef;
+							m_pPnlDefNum[k] = pDoc->m_pPcrInner[m_nLayer - RMAP_INNER_UP][GetPcrIdx(nLoadPnl)]->m_nTotRealDef;
+						}
 					}
 					else if (m_nLayer == RMAP_ITS)
-						m_pPnlDefNum[k] = pDoc->m_pPcrIts[GetPcrIdx(nLoadPnl)]->m_nTotDef;
+					{
+						//m_pPnlDefNum[k] = pDoc->m_pPcrIts[GetPcrIdx(nLoadPnl)]->m_nTotDef;
+						m_pPnlDefNum[k] = pDoc->m_pPcrIts[GetPcrIdx(nLoadPnl)]->m_nTotRealDef;
+					}
 					else
 						return 0;
 				}
@@ -1492,7 +1525,9 @@ BOOL CReelMap::Disp(int nMkPnl, BOOL bDumy)
 		pDataFile = NULL;
 	}
 
-	ShiftMkedPcsDef();
+	//ShiftMkedPcsDef();
+	ShiftMkedPcsDef(nMkPnl);
+
 	return TRUE;
 }
 
@@ -7602,13 +7637,53 @@ BOOL CReelMap::SetPcsMkOut(int nCam, int nPcsIdx) // 0: Left Cam Or 1: Right Cam
 	if (nCam == 0)
 	{
 		pMkedPcsDef[m_nSelMarkingPnl+1][nPcsIdx] = TRUE; // FALSE: No mark, TRUE: mark
+		pMkedPcsSerial[m_nSelMarkingPnl + 1] = m_nSerial;
 	}
 	else if(nCam == 1)
 	{
 		pMkedPcsDef[m_nSelMarkingPnl][nPcsIdx] = TRUE; // FALSE: No mark, TRUE: mark
+		pMkedPcsSerial[m_nSelMarkingPnl] = m_nSerial;
 	}
 
 	return TRUE;
+}
+
+BOOL CReelMap::ShiftMkedPcsDef(int nSerial) // (피스인덱스는 CamMaster에서 정한 것을 기준으로 함.)
+{
+	if (!pMkedPcsDef)
+		return FALSE;
+
+
+	int nMkedPnl = m_nSelMarkingPnl+1;	// 3
+	int nPrevPnl = m_nSelMarkingPnl;	// 2
+
+	int nFromPnl = nSerial - nMkedPnl - 1;	// 4 - 3 - 1 = 0
+
+	int k, i, nLoadPnl, nInc = 0;;
+
+	for (k = nTotPnl - 1; k > 1; k--) // k : 5 <-- 4 <-- 3 <-- 2 <-- 1 ;
+	{
+		nInc++;
+		nLoadPnl = nInc + nFromPnl; // 1, 2, 3, 4, 5, 6
+
+		if (nLoadPnl > 0)
+		{
+			if (pMkedPcsSerial[nMkedPnl] == nLoadPnl)
+			{
+				for (i = 0; i < nTotPcs; i++) // i : 피스인덱스
+				{
+					pMkedPcsDef[k][i] = pMkedPcsDef[nMkedPnl][i];
+				}
+			}
+			else if (pMkedPcsSerial[nPrevPnl] == nLoadPnl)
+			{
+				for (i = 0; i < nTotPcs; i++) // i : 피스인덱스
+				{
+					pMkedPcsDef[k][i] = pMkedPcsDef[nPrevPnl][i];
+				}
+			}
+		}
+	}
 }
 
 BOOL CReelMap::ShiftMkedPcsDef() // (피스인덱스는 CamMaster에서 정한 것을 기준으로 함.)
@@ -7621,8 +7696,8 @@ BOOL CReelMap::ShiftMkedPcsDef() // (피스인덱스는 CamMaster에서 정한 것을 기준으
 	for (k = nTotPnl - 1; k > 1; k--) // k : 5 <-- 4 <-- 3 <-- 2 <-- 1 ;
 	{
 		for (i = 0; i < nTotPcs; i++) // i : 피스인덱스
-		{                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
-			pMkedPcsDef[k][i] = pMkedPcsDef[k-1][i];
+		{
+			pMkedPcsDef[k][i] = pMkedPcsDef[k - 1][i];
 		}
 	}
 }

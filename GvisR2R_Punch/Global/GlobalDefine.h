@@ -866,7 +866,7 @@ struct stMarking
 	CString sMarkingToqOffset;
 	CString sMeasurePosX[4], sMeasurePosY[4];
 	CString sAverDist;
-	CString sMarkingDisp1Toq, sMarkingDisp2Toq;
+	CString sMarkingDisp1Toq, sMarkingDisp2Toq, sMarkingDisp3Toq;
 	int nMkCnt;
 	int nMkLimit;
 
@@ -883,6 +883,7 @@ struct stMarking
 		sMarkingToqOffset = _T("");
 		sMarkingDisp1Toq = _T("");
 		sMarkingDisp2Toq = _T("");
+		sMarkingDisp3Toq = _T("");
 
 		for (int i = 0; i < 4; i++)
 		{

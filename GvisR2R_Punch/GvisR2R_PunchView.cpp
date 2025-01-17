@@ -3143,7 +3143,8 @@ void CGvisR2R_PunchView::DispThreadTick()
 		str.Format(_T("%.1f,%.1f"), dFPS[0], dFPS[1]);
 		pFrm->DispStatusBar(str, 6);
 #else
-		str.Format(_T("%d,%d,%d,%d"), m_nStepAuto, m_nSerialRmapUpdate, m_nShareUpS, m_nShareDnS);//pView->m_nLotEndAuto
+		//str.Format(_T("%d,%d,%d,%d"), m_nStepAuto, m_nSerialRmapUpdate, m_nShareUpS, m_nShareDnS);//pView->m_nLotEndAuto
+		str.Format(_T("%d,%d,%d,%d"), m_nStepAuto, m_nMkStAuto, m_nStepMk[0], m_nStepMk[1]);//pView->m_nLotEndAuto
 		pFrm->DispStatusBar(str, 6);
 #endif
 }
@@ -9730,6 +9731,9 @@ BOOL CGvisR2R_PunchView::SetSerialReelmap(int nSerial, BOOL bDumy)
 
 		m_pDlgMenu06->SetSerialReelmap(nSerial, bDumy);
 	}
+	
+	//if(pDoc->m_pReelMapDisp)
+	//	pDoc->m_pReelMapDisp->ShiftMkedPcsDef(nSerial);
 
 	return m_pDlgMenu01->SetSerialReelmap(nSerial, bDumy);
 }
@@ -19987,8 +19991,8 @@ void CGvisR2R_PunchView::Mk2PtDoMarking()
 			if (m_bInitAuto)
 			{
 				m_bInitAuto = FALSE; pDoc->SetStatus(_T("General"), _T("bInitAuto"), m_bInitAuto);
-				MsgBox(_T("마킹위치를 확인하세요."));
 				Stop();
+				MsgBox(_T("마킹위치를 확인하세요."));
 				TowerLamp(RGB_YELLOW, TRUE);
 				break;
 			}

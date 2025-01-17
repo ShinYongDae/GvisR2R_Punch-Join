@@ -3263,8 +3263,10 @@ void CDlgMenu03::SwStop()
 	pView->m_bSwReady = FALSE;
 	pView->m_bSwReset = FALSE;
 
+	pView->MpeWrite(_T("MB40003B"), 1);					// 마킹부 즉시 정지 스위치(PC가 On / PLC Off시킴)
+	Sleep(30);
 	pView->TowerLamp(RGB_RED, TRUE, FALSE);
-	pView->MpeWrite(pView->Plc.DlgMenu03.LampStop, 1); // 마킹부 정지 스위치 램프 ON(PC가 On/Off시킴)
+	pView->MpeWrite(pView->Plc.DlgMenu03.LampStop, 1);	// 마킹부 정지 스위치 램프 ON(PC가 On/Off시킴)
 	pView->ClrDispMsg();
 	pView->DispMain(_T("정 지"), RGB_RED);
 }

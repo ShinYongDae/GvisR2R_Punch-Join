@@ -747,7 +747,7 @@ void CDlgMenu06::DispMkInfoUp()
 		if(pDoc->m_pPcrInner[0][nIdx])
 		{
 			m_nDef[0] = pDoc->m_pPcrInner[0][nIdx]->m_nTotDef; // m_nDef : m_nIdxMkInfo + Display Def Num.
-			pDoc->m_pPcrInner[0][nIdx]->m_nTotRealDef = 0;
+			//pDoc->m_pPcrInner[0][nIdx]->m_nTotRealDef = 0;
 		}
 	}
 #endif
@@ -783,7 +783,7 @@ void CDlgMenu06::DispMkInfoDn()
 		if(pDoc->m_pPcrInner[1][nIdx])
 		{
 			m_nDef[1] = pDoc->m_pPcrInner[1][nIdx]->m_nTotDef; // m_nDef : m_nIdxMkInfo + Display Def Num.
-			pDoc->m_pPcrInner[1][nIdx]->m_nTotRealDef = 0;
+			//pDoc->m_pPcrInner[1][nIdx]->m_nTotRealDef = 0;
 		}
 	}
 #endif
@@ -1639,7 +1639,7 @@ void CDlgMenu06::DispMkInfoUp(int nSerial)
 								ShowDefInfoUp(nIdxMkInfo);
 								m_nIdxMkInfo[0]++;
 								m_nIdxDef[0]++;
-								(pDoc->m_pPcrInner[0][nIdx]->m_nTotRealDef)++;
+								//(pDoc->m_pPcrInner[0][nIdx]->m_nTotRealDef)++;
 							}
 							else
 								m_nIdxMkInfo[0]++;
@@ -1678,7 +1678,7 @@ void CDlgMenu06::DispMkInfoUp(int nSerial)
 								ShowDefInfoUp(nIdxMkInfo);
 								m_nIdxMkInfo[0]++;
 								m_nIdxDef[0]++;
-								(pDoc->m_pPcrInner[0][nIdx]->m_nTotRealDef)++;
+								//(pDoc->m_pPcrInner[0][nIdx]->m_nTotRealDef)++;
 							}
 							else
 								m_nIdxMkInfo[0]++;
@@ -1732,7 +1732,7 @@ void CDlgMenu06::DispMkInfoDn(int nSerial)
 							ShowDefInfoDn(nIdxMkInfo);
 							m_nIdxMkInfo[1]++;
 							m_nIdxDef[1]++;
-							(pDoc->m_pPcrInner[1][nIdx]->m_nTotRealDef)++;
+							//(pDoc->m_pPcrInner[1][nIdx]->m_nTotRealDef)++;
 						}
 						else
 							m_nIdxMkInfo[1]++;

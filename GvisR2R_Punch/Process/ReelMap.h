@@ -128,8 +128,9 @@ public:
 	CRect *pFrmRgn;
 	CRect **pPcsRgn;
 
-	int **pPcsDef;		// [DispPnlIdx][PcsID] : 불량코드.
-	BOOL **pMkedPcsDef;	// [DispPnlIdx][PcsID] : 마킹여부.
+	int **pPcsDef;			// [DispPnlIdx][PcsID]	: 불량코드.
+	BOOL **pMkedPcsDef;		// [DispPnlIdx][PcsID]	: 마킹여부.
+	int *pMkedPcsSerial;	// [DispPnlIdx]			: 마킹여부확인 시리얼.
 	CString m_sKorDef[MAX_DEF], m_sEngDef[MAX_DEF];
 	char m_cBigDef[MAX_DEF], m_cSmallDef[MAX_DEF];
 	COLORREF m_rgbDef[MAX_DEF];
@@ -300,6 +301,7 @@ public:
 
 	BOOL SetPcsMkOut(int nCam, int nPcsIdx); // 0: Left Cam Or 1: Right Cam , 불량 피스 인덱스 [ 0 ~ (Total Pcs - 1) ]
 	BOOL ShiftMkedPcsDef();
+	BOOL ShiftMkedPcsDef(int nSerial);
 
 // Overrides
 	// ClassWizard generated virtual function overrides

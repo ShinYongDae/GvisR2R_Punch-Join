@@ -3293,6 +3293,11 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	else
 		WorkingInfo.Marking[0].sMarkingDisp2Toq = CString(_T(""));
 
+	if (0 < ::GetPrivateProfileString(_T("Marking0"), _T("MARKING_DISP3_TOQ"), NULL, szData, sizeof(szData), sPath))
+		WorkingInfo.Marking[0].sMarkingDisp3Toq = CString(szData);
+	else
+		WorkingInfo.Marking[0].sMarkingDisp3Toq = CString(_T(""));
+
 	if (0 < ::GetPrivateProfileString(_T("Marking0"), _T("MARKING_MARKING_TOQ_OFFSET"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.Marking[0].sMarkingToqOffset = CString(szData);
 	else
@@ -3401,6 +3406,11 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 		WorkingInfo.Marking[1].sMarkingDisp2Toq = CString(szData);
 	else
 		WorkingInfo.Marking[1].sMarkingDisp2Toq = CString(_T(""));
+
+	if (0 < ::GetPrivateProfileString(_T("Marking1"), _T("MARKING_DISP3_TOQ"), NULL, szData, sizeof(szData), sPath))
+		WorkingInfo.Marking[1].sMarkingDisp3Toq = CString(szData);
+	else
+		WorkingInfo.Marking[1].sMarkingDisp3Toq = CString(_T(""));
 
 	if (0 < ::GetPrivateProfileString(_T("Marking1"), _T("MARKING_MARKING_TOQ_OFFSET"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.Marking[1].sMarkingToqOffset = CString(szData);

@@ -514,7 +514,7 @@ void CMyGL::Draw()
 	case IDC_STC_REELMAP_IMG:
 		DrawPnlDefNum();
 		DrawPnlNum();
-		//DrawMark();
+		DrawMark();
 		DrawRgn();
 		DrawBack();
 		break;
@@ -576,7 +576,7 @@ void CMyGL::DrawMark()
 	GVertex vtMarkPnt;
 	int i, k, nDef;
 	BOOL bMarked;
-	if (!m_pReelMap || !m_pFrmRgn || !m_pPcsPnt || !m_pPcsMarkPnt)//pDoc->
+	if (!m_pReelMap || !m_pFrmRgn || !m_pPcsPnt || !m_pPcsMarkPnt)
 		return;
 
 	BOOL bDualTest;
@@ -593,11 +593,11 @@ void CMyGL::DrawMark()
 			{
 				if (m_pPnlNum[k] <= 0)
 				{
-					GVGLDrawInit(GV_RECTF, 2, m_rgbWhite);
+					GVGLDrawInit(GV_LINE, 2, m_rgbWhite);
 				}
 				else
 				{
-					GVGLDrawInit(GV_RECTF, 2, m_rgbBlack);
+					GVGLDrawInit(GV_LINE, 2, m_rgbBlack);
 				}
 			}
 
@@ -622,7 +622,7 @@ void CMyGL::DrawMark()
 					nLength = int(dLengthX);
 
 				GVertexFill(&vtMarkPnt, (GLfloat)ptPnt.x, (GLfloat)ptPnt.y, 0.0f);
-				GVGLDrawCross(vtMarkPnt, nLength); // (CenterPoint, LineLength)
+				GVGLDrawCrossX(vtMarkPnt, nLength); // (CenterPoint, LineLength)
 				GVGLDrawShow();
 			}
 		}

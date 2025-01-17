@@ -948,6 +948,7 @@ void CVision::SelDispPin(HWND hDispCtrl, CRect rtDispCtrl, int nDisplayFitMode)
 			m_pMilDispPin = m_pMil->AllocDisp();
 			m_pMil->DisplaySelect(m_pMilDispPin, m_pMilBufPin, hDispCtrl, rtDispCtrl.Width(), rtDispCtrl.Height(), DISPLAY_FIT_MODE_CENTERVIEW);
 		}
+
 		// Create Overlay
 		if (m_pMilDispPin)
 		{
@@ -4368,12 +4369,16 @@ BOOL CVision::SaveMkImg(CString sPath)
 		return FALSE;
 	}
 
+	//CLibMilBuf*  MilOriginDisp = M_NULL;
 	//if (m_pMil)
-	//	MilOriginDisp = m_pMil->AllocBuf(PIN_IMG_DISP_SIZEX, PIN_IMG_DISP_SIZEY, 1L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
-	//MimResize(MilGrabImg->m_MilImage, MilOriginDisp->m_MilImage, (double)0.5, (double)0.5, M_DEFAULT);
+	//{
+	//	MilOriginDisp = m_pMil->AllocBuf(DEF_IMG_DISP_SIZEX, DEF_IMG_DISP_SIZEX, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
+	//	//MimResize(MilGrabImg->m_MilImage, MilOriginDisp->m_MilImage, (double)0.5, (double)0.5, M_DEFAULT);
+	//
+	//	//if(MilGrabImg && MilOriginDisp->m_MilImage)
+	//	//	MbufSave(sPath, MilOriginDisp->m_MilImage);
+	//}
 
-	//if(MilGrabImg && MilOriginDisp->m_MilImage)
-	//	MbufSave(sPath, MilOriginDisp->m_MilImage);
 	if (MilGrabImg && MilGrabImg->m_MilImage)
 	{
 		//MbufSave(sPath, MilGrabImg->m_MilImage);
@@ -4381,12 +4386,91 @@ BOOL CVision::SaveMkImg(CString sPath)
 		MIL_ID MilGrabImgCld = M_NULL;
 		MbufChild2d(MilGrabImg->m_MilImage, (640 - DEF_IMG_DISP_SIZEX) / 2, (480 - DEF_IMG_DISP_SIZEX) / 2, DEF_IMG_DISP_SIZEX, DEF_IMG_DISP_SIZEX, &MilGrabImgCld);
 
+
+		MgraColor(M_DEFAULT, M_COLOR_GREEN);
+		MgraLine(M_DEFAULT, MilGrabImgCld, 0, 50, 10, 50);
+		MgraLine(M_DEFAULT, MilGrabImgCld, 50, 0, 50, 100);
+
 		if (MilGrabImgCld)
 		{
 			MbufSave(sPath, MilGrabImgCld);
 			MbufFree(MilGrabImgCld);
 			MilGrabImgCld = M_NULL;
 		}
+
+		//CLibMilBuf*  MilOverlay = M_NULL;
+		//MilOverlay = m_pMil->AllocBuf(DEF_IMG_DISP_SIZEX, DEF_IMG_DISP_SIZEX, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
+
+		//MIL_ID MilOverlay = M_NULL;
+		//MbufAlloc2d(GetSystemID(), M_DEF_IMAGE_SIZE_X_MIN, M_DEF_IMAGE_SIZE_Y_MIN, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC, &MilOverlay);
+		//MbufClear(MilOverlay, 0L);
+		//MgraColor(M_DEFAULT, M_COLOR_GREEN);
+
+		////m_pMil->DrawCross(M_COLOR_GREEN, 50, 50, 100, 100, 0, 0);
+		//MgraLine(M_DEFAULT, MilOverlay, 0, 50, 10, 50);
+		//MgraLine(M_DEFAULT, MilOverlay, 50, 0, 50, 100);
+
+/*
+		// Buffer with the default dimensions to do graphics. 
+		MbufAlloc2d(MilSystem, M_DEF_IMAGE_SIZE_X_MIN,M_DEF_IMAGE_SIZE_Y_MIN, M_DEF_IMAGE_TYPE, M_IMAGE+M_DISP, &MilImage);
+
+		// Draw and display a circle 
+		MbufClear(MilImage, 0L);
+		MgraColor(M_DEFAULT, 255L);
+		MgraArcFill(M_DEFAULT, MilImage, 256L, 240L, 100L, 100L, 0.0, 360.0);
+		MgraText(M_DEFAULT, MilImage, 238L, 234L, " MIL ");
+
+		// Display the image buffer.
+		MdispSelect(MilDisplay, MilImage);
+
+		// Release image buffer.
+		MbufFree(MilImage);
+
+
+
+		CLibMilDisp *m_pMilDispMkImg;
+		CLibMilBuf *m_pMilBufMkImg;
+		CLibMilDraw *m_pMilMkImgOverlay;
+		CLibMilDraw *m_pMilMkImgOverlayDelete;
+
+		//m_pMilDispMkImg = NULL;
+
+		if (m_pMilDispMkImg == NULL)
+		{
+			m_pMilDispMkImg = m_pMil->AllocDisp();
+			m_pMil->DisplaySelect(m_pMilDispMkImg, m_pMilBufMkImg, NULL, 0, 0, DISPLAY_FIT_MODE_CENTERVIEW);
+		}
+
+		// Create Overlay
+		if (m_pMilDispMkImg)
+		{
+			m_pMil->CreateOverlay(m_pMilDispMkImg, M_COLOR_GREEN);
+			Sleep(30);
+		}
+
+		// Draw
+		if (!m_pMilMkImgOverlay)
+		{
+			m_pMilMkImgOverlay = m_pMil->AllocDraw(m_pMilDispMkImg);
+			m_pMilMkImgOverlay->SetDrawColor(M_COLOR_GREEN);
+			m_pMilMkImgOverlay->SetDrawBackColor(m_pMilDispMkImg->m_lOverlayColor);
+		}
+		if (!m_pMilMkImgOverlayDelete)
+		{
+			m_pMilMkImgOverlayDelete = m_pMil->AllocDraw(m_pMilDispMkImg);
+			m_pMilMkImgOverlayDelete->SetDrawColor(m_pMilDispMkImg->m_lOverlayColor);
+			m_pMilMkImgOverlayDelete->SetDrawBackColor(m_pMilDispMkImg->m_lOverlayColor);
+		}
+
+		//if(m_pMilDispMkImg)
+		//{
+		//	delete m_pMilDispMkImg;
+		//	m_pMilDispMkImg = NULL;
+		//}
+*/
+
+
+
 	}
 	else
 	{

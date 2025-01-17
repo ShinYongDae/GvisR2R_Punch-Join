@@ -880,11 +880,13 @@
 #define IDC_STC_UTIL04_13               1244
 #define IDC_STC_184                     1244
 #define IDC_STATIC_1008                 1244
+#define IDC_STC_TQ_DSIP3                1244
 #define IDC_STC_12_22                   1245
 #define IDC_STC_76                      1245
 #define IDC_STC_UTIL04_14               1245
 #define IDC_STC_34                      1245
 #define IDC_STATIC_1009                 1245
+#define IDC_STC_TQ_DISP3_VAL_L          1245
 #define IDC_CHK_18                      1246
 #define IDC_STC_77                      1246
 #define IDC_STC_UTIL04_15               1246
@@ -903,6 +905,8 @@
 #define IDC_STC_UTIL04_17               1248
 #define IDC_STC_41                      1248
 #define IDC_STATIC_1010                 1248
+#define IDC_STC_TQ_DISP2_VAL_R2         1248
+#define IDC_STC_TQ_DISP3_VAL_R          1248
 #define IDC_STC_12_25                   1249
 #define IDC_STC_80                      1249
 #define IDC_STC_UTIL04_18               1249
