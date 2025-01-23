@@ -125,6 +125,7 @@ public:
 	CString GetLayer();
 	CString GetModel();
 	CString GetMasterLocation();
+	int GetAlignMethode();	// FOUR_POINT , TWO_POINT
 
 // Overrides
 	// ClassWizard generated virtual function overrides

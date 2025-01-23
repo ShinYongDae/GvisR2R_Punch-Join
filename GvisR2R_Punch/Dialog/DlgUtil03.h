@@ -15,6 +15,8 @@
 #define MAX_SPREAD_ROW		11	
 #define MAX_UTIL03_BTN		7
 
+#define TIM_DISP_STS				450
+
 /////////////////////////////////////////////////////////////////////////////
 // CDlgUtil03 dialog
 
@@ -25,6 +27,7 @@ class CDlgUtil03 : public CDialog
 	CMyStatic myStcData[MAX_UTIL03_STC_DATA];
 	CMyBtn myBtn[MAX_UTIL03_BTN];
 	int nScrlV, nScrlH;
+	BOOL m_bTIM_DISP_STS;
 
 	void AtDlgShow();
 	void AtDlgHide();
@@ -42,6 +45,7 @@ public:
 
 	BOOL Create();
 	void Disp(int nDir);
+	void DispAlign(int nDir);
 	void SetScrlBarMax(int nMaxH, int nMaxV);
 	void SetScrlBar(int nCurH, int nCurV);
 // 	void DoDispenseTest();
@@ -155,6 +159,8 @@ protected:
 public:
 	afx_msg void OnBnClickedCheckPcs();
 	afx_msg void OnBnClickedCheckPcsDn();
+	afx_msg void OnBnClickedCheckAlign();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 
 //{{AFX_INSERT_LOCATION}}

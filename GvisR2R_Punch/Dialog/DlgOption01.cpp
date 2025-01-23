@@ -326,6 +326,118 @@ void CDlgOption01::DispStatus()
 	((CButton*)GetDlgItem(IDC_CHECK8))->SetCheck(pDoc->WorkingInfo.System.bDuplicateRmap);
 	((CButton*)GetDlgItem(IDC_CHECK9))->SetCheck(pDoc->WorkingInfo.System.bInsertPunchingToDts);
 	((CButton*)GetDlgItem(IDC_CHECK10))->SetCheck(pDoc->WorkingInfo.System.bDebugEngSig);
+
+	if (pView->m_pMotion)
+	{
+		int nAlignMethodeOnCamMst = pDoc->m_Master[0].GetAlignMethode();
+		int nAlignMethode = pDoc->WorkingInfo.LastJob.nAlignMethode;
+		BOOL b2PointAlign = nAlignMethodeOnCamMst & TWO_POINT;
+		BOOL b4PointAlign = nAlignMethodeOnCamMst & FOUR_POINT;
+
+		if (b4PointAlign)
+		{
+			str.Format(_T("%.3f,%.3f"), pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[0], pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[0]);
+			GetDlgItem(IDC_STATIC_ALIGN_L0)->SetWindowText(str);
+			str.Format(_T("%.3f,%.3f"), pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[0], pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[0]);
+			GetDlgItem(IDC_STATIC_ALIGN_L1)->SetWindowText(str);
+			str.Format(_T("%.3f,%.3f"), pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[0], pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[0]);
+			GetDlgItem(IDC_STATIC_ALIGN_L2)->SetWindowText(str);
+			str.Format(_T("%.3f,%.3f"), pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[0], pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[0]);
+			GetDlgItem(IDC_STATIC_ALIGN_L3)->SetWindowText(str);
+
+			str.Format(_T("%.3f,%.3f"), pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[1], pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[1]);
+			GetDlgItem(IDC_STATIC_ALIGN_R0)->SetWindowText(str);
+			str.Format(_T("%.3f,%.3f"), pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[1], pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[1]);
+			GetDlgItem(IDC_STATIC_ALIGN_R1)->SetWindowText(str);
+			str.Format(_T("%.3f,%.3f"), pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[1], pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[1]);
+			GetDlgItem(IDC_STATIC_ALIGN_R2)->SetWindowText(str);
+			str.Format(_T("%.3f,%.3f"), pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[1], pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[1]);
+			GetDlgItem(IDC_STATIC_ALIGN_R3)->SetWindowText(str);
+		}
+		else
+		{
+			str.Format(_T(""));
+			GetDlgItem(IDC_STATIC_ALIGN_L0)->SetWindowText(str);
+			str.Format(_T(""));
+			GetDlgItem(IDC_STATIC_ALIGN_L1)->SetWindowText(str);
+			str.Format(_T(""));
+			GetDlgItem(IDC_STATIC_ALIGN_L2)->SetWindowText(str);
+			str.Format(_T(""));
+			GetDlgItem(IDC_STATIC_ALIGN_L3)->SetWindowText(str);
+
+			str.Format(_T(""));
+			GetDlgItem(IDC_STATIC_ALIGN_R0)->SetWindowText(str);
+			str.Format(_T(""));
+			GetDlgItem(IDC_STATIC_ALIGN_R1)->SetWindowText(str);
+			str.Format(_T(""));
+			GetDlgItem(IDC_STATIC_ALIGN_R2)->SetWindowText(str);
+			str.Format(_T(""));
+			GetDlgItem(IDC_STATIC_ALIGN_R3)->SetWindowText(str);
+		}
+
+		if(b2PointAlign)
+		{
+			str.Format(_T("%.3f,%.3f"), pDoc->m_Master[0].m_stAlignMk.X0 + pView->m_pMotion->m_dPinPosX[0], pDoc->m_Master[0].m_stAlignMk.Y0 + pView->m_pMotion->m_dPinPosY[0]);
+			GetDlgItem(IDC_STATIC_ALIGN2_L0)->SetWindowText(str);
+			str.Format(_T("%.3f,%.3f"), pDoc->m_Master[0].m_stAlignMk.X1 + pView->m_pMotion->m_dPinPosX[0], pDoc->m_Master[0].m_stAlignMk.Y1 + pView->m_pMotion->m_dPinPosY[0]);
+			GetDlgItem(IDC_STATIC_ALIGN2_L1)->SetWindowText(str);
+
+			str.Format(_T("%.3f,%.3f"), pDoc->m_Master[0].m_stAlignMk.X0 + pView->m_pMotion->m_dPinPosX[1], pDoc->m_Master[0].m_stAlignMk.Y0 + pView->m_pMotion->m_dPinPosY[1]);
+			GetDlgItem(IDC_STATIC_ALIGN2_R0)->SetWindowText(str);
+			str.Format(_T("%.3f,%.3f"), pDoc->m_Master[0].m_stAlignMk.X1 + pView->m_pMotion->m_dPinPosX[1], pDoc->m_Master[0].m_stAlignMk.Y1 + pView->m_pMotion->m_dPinPosY[1]);
+			GetDlgItem(IDC_STATIC_ALIGN2_R1)->SetWindowText(str);
+		}
+		else
+		{
+			str.Format(_T(""));
+			GetDlgItem(IDC_STATIC_ALIGN2_L0)->SetWindowText(str);
+			str.Format(_T(""));
+			GetDlgItem(IDC_STATIC_ALIGN2_L1)->SetWindowText(str);
+
+			str.Format(_T(""));
+			GetDlgItem(IDC_STATIC_ALIGN2_R0)->SetWindowText(str);
+			str.Format(_T(""));
+			GetDlgItem(IDC_STATIC_ALIGN2_R1)->SetWindowText(str);
+		}
+	}
+
+	// 마킹 금지 구역 - Left
+	str.Format(_T("%.3f"), pDoc->m_pntNoMkLeft[0][0]); // LT
+	GetDlgItem(IDC_EDIT_NO_MK_L0_LT_X)->SetWindowText(str);
+	str.Format(_T("%.3f"), pDoc->m_pntNoMkLeft[0][1]); // LB
+	GetDlgItem(IDC_EDIT_NO_MK_L0_LB_X)->SetWindowText(str);
+	str.Format(_T("%.3f"), pDoc->m_pntNoMkLeft[0][2]); // RB
+	GetDlgItem(IDC_EDIT_NO_MK_L0_RB_X)->SetWindowText(str);
+	str.Format(_T("%.3f"), pDoc->m_pntNoMkLeft[0][3]); // RT
+	GetDlgItem(IDC_EDIT_NO_MK_L0_RT_X)->SetWindowText(str);
+
+	str.Format(_T("%.3f"), pDoc->m_pntNoMkLeft[1][0]); // LT
+	GetDlgItem(IDC_EDIT_NO_MK_L1_LT_X)->SetWindowText(str);
+	str.Format(_T("%.3f"), pDoc->m_pntNoMkLeft[1][1]); // LB
+	GetDlgItem(IDC_EDIT_NO_MK_L1_LB_X)->SetWindowText(str);
+	str.Format(_T("%.3f"), pDoc->m_pntNoMkLeft[1][2]); // RB
+	GetDlgItem(IDC_EDIT_NO_MK_L1_RB_X)->SetWindowText(str);
+	str.Format(_T("%.3f"), pDoc->m_pntNoMkLeft[1][3]); // RT
+	GetDlgItem(IDC_EDIT_NO_MK_L1_RT_X)->SetWindowText(str);
+
+	// 마킹 금지 구역 - Right
+	str.Format(_T("%.3f"), pDoc->m_pntNoMkRight[0][0]); // LT
+	GetDlgItem(IDC_EDIT_NO_MK_R0_LT_X)->SetWindowText(str);
+	str.Format(_T("%.3f"), pDoc->m_pntNoMkRight[0][1]); // LB
+	GetDlgItem(IDC_EDIT_NO_MK_R0_LB_X)->SetWindowText(str);
+	str.Format(_T("%.3f"), pDoc->m_pntNoMkRight[0][2]); // RB
+	GetDlgItem(IDC_EDIT_NO_MK_R0_RB_X)->SetWindowText(str);
+	str.Format(_T("%.3f"), pDoc->m_pntNoMkRight[0][3]); // RT
+	GetDlgItem(IDC_EDIT_NO_MK_R0_RT_X)->SetWindowText(str);
+
+	str.Format(_T("%.3f"), pDoc->m_pntNoMkRight[1][0]); // LT
+	GetDlgItem(IDC_EDIT_NO_MK_R1_LT_X)->SetWindowText(str);
+	str.Format(_T("%.3f"), pDoc->m_pntNoMkRight[1][1]); // LB
+	GetDlgItem(IDC_EDIT_NO_MK_R1_LB_X)->SetWindowText(str);
+	str.Format(_T("%.3f"), pDoc->m_pntNoMkRight[1][2]); // RB
+	GetDlgItem(IDC_EDIT_NO_MK_R1_RB_X)->SetWindowText(str);
+	str.Format(_T("%.3f"), pDoc->m_pntNoMkRight[1][3]); // RT
+	GetDlgItem(IDC_EDIT_NO_MK_R1_RT_X)->SetWindowText(str);
 }
 
 
@@ -364,3 +476,4 @@ void CDlgOption01::OnBnClickedCheck10()
 	if(pView->m_pDlgMenu02)
 		pView->m_pDlgMenu02->ShowDebugEngSig();
 }
+

@@ -2195,7 +2195,8 @@ struct stDlgInfoReg
 		TwoMetal = _T("MB400020");
 		OneMetal = _T("MB400021");
 		SampleTest = _T("MB400022");
-		SampleTestShotNum = _T("MW41111");
+		SampleTestShotNum = _T("ML41112");
+		//SampleTestShotNum = _T("MW41111");
 		ModeInner = _T("MB400023");
 		ModeOutter = _T("MB400024");
 		FeedCcwRecoiler = _T("MB400051");

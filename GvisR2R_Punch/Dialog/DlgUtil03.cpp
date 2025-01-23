@@ -33,10 +33,13 @@ CDlgUtil03::CDlgUtil03(CWnd* pParent /*=NULL*/)
 	nScrlV = 0;
 	nScrlH = 0;
 	m_bLoadImg = FALSE;
+	m_bTIM_DISP_STS = FALSE;
 }
 
 CDlgUtil03::~CDlgUtil03()
 {
+	m_bTIM_DISP_STS = FALSE;
+
 	if(m_pRect)
 	{
 		delete m_pRect;
@@ -144,6 +147,8 @@ BEGIN_MESSAGE_MAP(CDlgUtil03, CDialog)
 	ON_MESSAGE(WM_MYBTN_UP, OnMyBtnUp)
 	ON_BN_CLICKED(IDC_CHECK_PCS, &CDlgUtil03::OnBnClickedCheckPcs)
 	ON_BN_CLICKED(IDC_CHECK_PCS_DN, &CDlgUtil03::OnBnClickedCheckPcsDn)
+	ON_BN_CLICKED(IDC_CHECK_ALIGN, &CDlgUtil03::OnBnClickedCheckAlign)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -188,6 +193,7 @@ void CDlgUtil03::OnShowWindow(BOOL bShow, UINT nStatus)
 		m_pRect->left = 3;
 		m_pRect->right += 3;
 		this->MoveWindow(m_pRect, TRUE);
+		this->SetForegroundWindow();
 	}
 
 	if(bShow)
@@ -209,10 +215,15 @@ void CDlgUtil03::AtDlgShow()
 	
 	LoadImg();
 	Disp(ROT_NONE);
+	((CButton*)GetDlgItem(IDC_CHECK_ALIGN))->SetCheck(FALSE);
+
+	m_bTIM_DISP_STS = TRUE;
+	SetTimer(TIM_DISP_STS, 100, NULL);
 }
 
 void CDlgUtil03::AtDlgHide()
 {
+	m_bTIM_DISP_STS = FALSE;
 	DelImg();
 }
 
@@ -508,18 +519,29 @@ void CDlgUtil03::MoveMkPos(int nStcId)
 	double pPos[2];
 	double fLen, fVel, fAcc, fJerk;
 
-	BOOL bOn0 = myBtn[3].GetCheck();
-	BOOL bOn1 = myBtn[4].GetCheck();
+	BOOL bOn0 = myBtn[3].GetCheck();	// IDC_CHK_LEFT
+	BOOL bOn1 = myBtn[4].GetCheck();	// IDC_CHK_RIGHT
 
 	myStcData[nStcId].SetBkColor(RGB_PINK);
+
+	BOOL bCheckAlign = ((CButton*)GetDlgItem(IDC_CHECK_ALIGN))->GetCheck();
 
 	if(bOn0 && !bOn1)
 	{
 		str = myStcData[nStcId].GetText();
 		nPos = str.Find('(', 0);
 		nPcsId = _tstoi(str.Left(nPos));
-		if(pDoc->m_Master[0].m_pPcsRgn)
-			ptPnt = pDoc->m_Master[0].m_pPcsRgn->GetMkPnt0(nPcsId);
+
+		if (!bCheckAlign)
+		{
+			if (pDoc->m_Master[0].m_pPcsRgn)
+				ptPnt = pDoc->m_Master[0].m_pPcsRgn->GetMkPnt0(nPcsId);
+		}
+		else
+		{
+			if (pDoc->m_Master[0].m_pPcsRgn)
+				ptPnt = pDoc->m_Master[0].m_pPcsRgn->pMkPnt[0][nPcsId];
+		}
 
 		dCurrX = pView->m_dEnc[AXIS_X0]; // pView->m_pMotion->GetActualPosition(AXIS_X);
 		dCurrY = pView->m_dEnc[AXIS_Y0]; // pView->m_pMotion->GetActualPosition(AXIS_Y);
@@ -544,8 +566,17 @@ void CDlgUtil03::MoveMkPos(int nStcId)
 		str = myStcData[nStcId].GetText();
 		nPos = str.Find('(', 0);
 		nPcsId = _tstoi(str.Left(nPos));
-		if(pDoc->m_Master[0].m_pPcsRgn)
-			ptPnt = pDoc->m_Master[0].m_pPcsRgn->GetMkPnt1(nPcsId);
+
+		if (!bCheckAlign)
+		{
+			if (pDoc->m_Master[0].m_pPcsRgn)
+				ptPnt = pDoc->m_Master[0].m_pPcsRgn->GetMkPnt1(nPcsId);
+		}
+		else
+		{
+			if (pDoc->m_Master[0].m_pPcsRgn)
+				ptPnt = pDoc->m_Master[0].m_pPcsRgn->pMkPnt[1][nPcsId];
+		}
 
 		dCurrX = pView->m_dEnc[AXIS_X1]; // pView->m_pMotion->GetActualPosition(AXIS_X);
 		dCurrY = pView->m_dEnc[AXIS_Y1]; // pView->m_pMotion->GetActualPosition(AXIS_Y);
@@ -570,8 +601,17 @@ void CDlgUtil03::MoveMkPos(int nStcId)
 		str = myStcData[nStcId].GetText();
 		nPos = str.Find('(', 0);
 		nPcsId = _tstoi(str.Left(nPos));
-		if(pDoc->m_Master[0].m_pPcsRgn)
-			ptPnt = pDoc->m_Master[0].m_pPcsRgn->GetMkPnt0(nPcsId);
+
+		if (!bCheckAlign)
+		{
+			if (pDoc->m_Master[0].m_pPcsRgn)
+				ptPnt = pDoc->m_Master[0].m_pPcsRgn->GetMkPnt0(nPcsId);
+		}
+		else
+		{
+			if (pDoc->m_Master[0].m_pPcsRgn)
+				ptPnt = pDoc->m_Master[0].m_pPcsRgn->pMkPnt[0][nPcsId];
+		}
 
 		dCurrX = pView->m_dEnc[AXIS_X0]; // pView->m_pMotion->GetActualPosition(AXIS_X);
 		dCurrY = pView->m_dEnc[AXIS_Y0]; // pView->m_pMotion->GetActualPosition(AXIS_Y);
@@ -593,8 +633,17 @@ void CDlgUtil03::MoveMkPos(int nStcId)
 
 		nPos = str.Find('(', 0);
 		nPcsId = _tstoi(str.Left(nPos));
-		if(pDoc->m_Master[0].m_pPcsRgn)
-			ptPnt = pDoc->m_Master[0].m_pPcsRgn->GetMkPnt1(nPcsId);
+
+		if (!bCheckAlign)
+		{
+			if (pDoc->m_Master[0].m_pPcsRgn)
+				ptPnt = pDoc->m_Master[0].m_pPcsRgn->GetMkPnt1(nPcsId);
+		}
+		else
+		{
+			if (pDoc->m_Master[0].m_pPcsRgn)
+				ptPnt = pDoc->m_Master[0].m_pPcsRgn->pMkPnt[1][nPcsId];
+		}
 
 		dCurrX = pView->m_dEnc[AXIS_X1]; // pView->m_pMotion->GetActualPosition(AXIS_X);
 		dCurrY = pView->m_dEnc[AXIS_Y1]; // pView->m_pMotion->GetActualPosition(AXIS_Y);
@@ -733,6 +782,7 @@ void CDlgUtil03::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	}
 
 	Disp(ROT_NONE);
+	((CButton*)GetDlgItem(IDC_CHECK_ALIGN))->SetCheck(FALSE);
 // 	Disp(ROT_CCW_90);
 	
 	CDialog::OnHScroll(nSBCode, nPos, pScrollBar);
@@ -805,6 +855,7 @@ void CDlgUtil03::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	}
 	
 	Disp(ROT_NONE);
+	((CButton*)GetDlgItem(IDC_CHECK_ALIGN))->SetCheck(FALSE);
 
 	CDialog::OnVScroll(nSBCode, nPos, pScrollBar);
 }
@@ -1408,6 +1459,7 @@ void CDlgUtil03::OnBnClickedCheckPcs()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	Disp(ROT_NONE);
+	((CButton*)GetDlgItem(IDC_CHECK_ALIGN))->SetCheck(FALSE);
 
 	BOOL bChk = ((CButton*)GetDlgItem(IDC_CHECK_PCS))->GetCheck();
 
@@ -1422,4 +1474,118 @@ void CDlgUtil03::OnBnClickedCheckPcsDn()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	Disp(ROT_NONE);
+	((CButton*)GetDlgItem(IDC_CHECK_ALIGN))->SetCheck(FALSE);
+}
+
+
+void CDlgUtil03::OnBnClickedCheckAlign()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	BOOL bCheck = ((CButton*)GetDlgItem(IDC_CHECK_ALIGN))->GetCheck();
+	if (bCheck)
+	{
+		DispAlign(ROT_NONE);
+	}
+	else
+	{
+		Disp(ROT_NONE);
+	}
+}
+
+
+void CDlgUtil03::DispAlign(int nDir)
+{
+	if (!pDoc->m_Master[0].m_pPcsRgn)
+		return;
+
+	int nScrlH = m_scrollH.GetScrollPos();
+	int nScrlV = m_scrollV.GetScrollPos();
+
+	CString str;
+	int nC = 0, nR = 0, nP = 0, nStc = 0;
+	CfPoint ptMk;
+	CRect ptRect;
+
+	BOOL bChk = ((CButton*)GetDlgItem(IDC_CHECK_PCS))->GetCheck();
+	BOOL bChk2 = ((CButton*)GetDlgItem(IDC_CHECK_PCS_DN))->GetCheck();
+
+	switch (nDir)
+	{
+	case ROT_NONE:
+		for (nC = 0; nC < MAX_SPREAD_COL; nC++)			// nC, nR : Cam(or Reelmap) 기준
+		{
+			for (nR = 0; nR < MAX_SPREAD_ROW; nR++)
+			{
+				if (!bChk2) // 상면 PCS
+				{
+					if (pDoc->m_Master[0].m_pPcsRgn)
+						pDoc->m_Master[0].m_pPcsRgn->GetPcsRgn(nC + nScrlH, nR + nScrlV, nP, ptRect);
+				}
+				else		// 하면 PCS
+				{
+					if (pDoc->m_Master[1].m_pPcsRgn)
+						pDoc->m_Master[1].m_pPcsRgn->GetPcsRgn(nC + nScrlH, nR + nScrlV, nP, ptRect);
+				}
+
+				if (!bChk)
+				{
+					//if (pDoc->m_Master[0].m_pPcsRgn)
+					//	pDoc->m_Master[0].m_pPcsRgn->GetMkPnt(nC + nScrlH, nR + nScrlV, nP, ptMk);
+					if (pDoc->m_Master[0].m_pPcsRgn)
+						ptMk = pDoc->m_Master[0].m_pPcsRgn->pMkPnt[0][nP]; // Aligned Position
+					str = _T("");
+					if (nP >= 0)
+					{
+						str.Format(_T("%03d(%03d,%03d)"), nP, (int)ptMk.y, (int)ptMk.x);
+					}
+				}
+				else
+				{
+					str = _T("");
+					if (nP >= 0)
+					{
+						str.Format(_T("%03d(%03d,%03d)"), nP, (int)((ptRect.left + ptRect.right) / 2), (int)((ptRect.top + ptRect.bottom) / 2));
+					}
+				}
+				myStcData[nStc++].SetText(str);
+			}
+		}
+		break;
+	case ROT_CCW_90:
+		// 		for(int nC=0; nC<MAX_SPREAD_COL; nC++)			// nC, nR : Cam(or Reelmap) 기준
+		// 		{
+		// 			for(int nR=0; nR<MAX_SPREAD_ROW; nR++)
+		// 			{
+		// 				pDoc->m_pPcsRgn->GetMkPnt(nC+nScrlV, nR+nScrlH, nP, ptMk);
+		// 				str = _T("");
+		// 				if(nP >= 0)
+		// 				{
+		//  					str.Format(_T("%03d(%03d,%03d)", nP, (int)ptMk.y, (int)ptMk.x);
+		// 				}
+		// 				myStcData[nStc++].SetText(str);
+		// 			}
+		// 		}
+		break;
+	}
+
+}
+
+
+
+void CDlgUtil03::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	//if (this->IsWindowVisible())
+	//{
+	//	m_bTIM_DISP_STS = FALSE;
+	//}
+	//else
+	//{
+	//	this->ShowWindow(SW_SHOW);
+	//}
+	//if (m_bTIM_DISP_STS)
+	//	SetTimer(TIM_DISP_STS, 100, NULL);
+
+
+	CDialog::OnTimer(nIDEvent);
 }

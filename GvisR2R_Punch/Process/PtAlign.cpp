@@ -62,8 +62,10 @@ void CPtAlign::SetAlignData(double Rx1,double Ry1,double Rx2,double Ry2,double T
 	m_fTgtX[0] = Tx1;	m_fTgtY[0] = Ty1;
 	m_fTgtX[1] = Tx2;	m_fTgtY[1] = Ty2;
 
-	double fRefTheta = atan2(Ry2-Ry1,Rx2-Rx1);	
-	double fTgtTheta = atan2(Ty2-Ty1,Tx2-Tx1);
+	//double fRefTheta = atan2((Ry2-Ry1)*-1.0,Rx2-Rx1);	
+	//double fTgtTheta = atan2((Ty2-Ty1)*-1.0,Tx2-Tx1);
+	double fRefTheta = atan2(Ry2 - Ry1, Rx2 - Rx1);
+	double fTgtTheta = atan2(Ty2 - Ty1, Tx2 - Tx1);
 	double fTheta = fTgtTheta-fRefTheta;
 	
 	double fSinTheta = sin(fTheta);
@@ -76,6 +78,8 @@ void CPtAlign::SetAlignData(double Rx1,double Ry1,double Rx2,double Ry2,double T
 
 	m_pMatrix = m_Matrix.linear_matrix(fSinTheta,fCosTheta,fScale,fScale,fOffsetX,fOffsetY);
 
+	m_dScale = fScale;
+	m_dTheta = fTheta;
 }
 
 /////////////////////////////////////////////////
@@ -200,8 +204,8 @@ BOOL CPtAlign::LinearAlignment(CfPoint fptRef,CfPoint &fptTgt)
 	if(!m_pMatrix)
 		return FALSE;
 
-	double x = fptRef.x - m_fRefX[0];
-	double y = fptRef.y - m_fRefY[0];
+	double x = fptRef.x - m_fRefX[0]; // 캠마스터의 펀칭위치 - 캠마스터의 정렬위치
+	double y = fptRef.y - m_fRefY[0]; // 캠마스터의 펀칭위치 - 캠마스터의 정렬위치
 
 	fptTgt.x = m_pMatrix->data[0][0]*x + m_pMatrix->data[0][1]*y + m_pMatrix->data[0][2]; 
 	fptTgt.y = m_pMatrix->data[1][0]*x + m_pMatrix->data[1][1]*y + m_pMatrix->data[1][2]; 
@@ -308,16 +312,16 @@ BOOL CPtAlign::GetBilinearPointOnTgt(CfPoint &fpt1,CfPoint &fpt2,CfPoint &fpt3,C
 // &Rx0,&Ry0           : Allignment하고자 하는 Point의 X,Y 위치
 /////////////////////////////////////////////////////////////////
 BOOL CPtAlign::BilinearAlignment(
-	double Rx1,double Ry1,double Tx1,double Ty1,
-	double Rx2,double Ry2,double Tx2,double Ty2,
-	double Rx3,double Ry3,double Tx3,double Ty3,
-	double Rx4,double Ry4,double Tx4,double Ty4,
+	double Rx1, double Ry1, double Tx1, double Ty1,		// LT
+	double Rx2,double Ry2,double Tx2,double Ty2,		// RT
+	double Rx3,double Ry3,double Tx3,double Ty3,		// RB
+	double Rx4,double Ry4,double Tx4,double Ty4,		// LB
 	double Rx,double Ry,double *Tx,double *Ty) 
 {
 	CfPoint fptTgt;
 	
-	CfQuad QuadRef(CfPoint(Rx4,Ry4),CfPoint(Rx3,Ry3),CfPoint(Rx2,Ry2),CfPoint(Rx1,Ry1));
-	CfQuad QuadTgt(CfPoint(Tx4,Ty4),CfPoint(Tx3,Ty3),CfPoint(Tx2,Ty2),CfPoint(Tx1,Ty1));
+	CfQuad QuadRef(CfPoint(Rx4, Ry4), CfPoint(Rx3, Ry3), CfPoint(Rx2, Ry2), CfPoint(Rx1, Ry1));		// LB, RB, RT, LT
+	CfQuad QuadTgt(CfPoint(Tx4,Ty4),CfPoint(Tx3,Ty3),CfPoint(Tx2,Ty2),CfPoint(Tx1,Ty1));			// LB, RB, RT, LT
 
 	BilinearAlignment(QuadRef,QuadTgt,CfPoint(Rx,Ry),fptTgt);
 	*Tx = fptTgt.x;
@@ -635,5 +639,15 @@ BOOL CPtAlign::BilinearAlignment(CfQuad3D fQuadRef,CfQuad3D fQuadTgt,CfPoint3D f
 	fptTgt.x = m_fptTgtBLPt.x + t * (m_fptTgtTLPt.x-m_fptTgtBLPt.x);							
 	fptTgt.y = m_fptTgtBLPt.y + t * (m_fptTgtTLPt.y-m_fptTgtBLPt.y);							
 
+	return TRUE;
+}
+
+BOOL CPtAlign::GetResult(double &dRotation, double &dScale)
+{
+	dRotation = m_dTheta;
+	dScale = m_dScale;
+
+	if (m_dTheta == 0.0 && m_dScale == 0.0)
+		return FALSE;
 	return TRUE;
 }

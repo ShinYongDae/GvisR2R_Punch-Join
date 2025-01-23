@@ -1525,8 +1525,8 @@ BOOL CReelMap::Disp(int nMkPnl, BOOL bDumy)
 		pDataFile = NULL;
 	}
 
-	//ShiftMkedPcsDef();
-	ShiftMkedPcsDef(nMkPnl);
+	ShiftMkedPcsDef();
+	//ShiftMkedPcsDef(nMkPnl);
 
 	return TRUE;
 }
@@ -7636,7 +7636,7 @@ BOOL CReelMap::SetPcsMkOut(int nCam, int nPcsIdx) // 0: Left Cam Or 1: Right Cam
 {
 	if (nCam == 0)
 	{
-		pMkedPcsDef[m_nSelMarkingPnl+1][nPcsIdx] = TRUE; // FALSE: No mark, TRUE: mark
+		pMkedPcsDef[m_nSelMarkingPnl + 1][nPcsIdx] = TRUE; // FALSE: No mark, TRUE: mark
 		pMkedPcsSerial[m_nSelMarkingPnl + 1] = m_nSerial;
 	}
 	else if(nCam == 1)
@@ -7654,10 +7654,10 @@ BOOL CReelMap::ShiftMkedPcsDef(int nSerial) // (피스인덱스는 CamMaster에서 정한 
 		return FALSE;
 
 
-	int nMkedPnl = m_nSelMarkingPnl+1;	// 3
-	int nPrevPnl = m_nSelMarkingPnl;	// 2
+	int nMkPnlL = m_nSelMarkingPnl+1;	// 3
+	int nMkPnlR = m_nSelMarkingPnl;		// 2
 
-	int nFromPnl = nSerial - nMkedPnl - 1;	// 4 - 3 - 1 = 0
+	int nFromPnl = nSerial - nMkPnlL - 1;	// 4 - 3 - 1 = 0
 
 	int k, i, nLoadPnl, nInc = 0;;
 
@@ -7668,18 +7668,18 @@ BOOL CReelMap::ShiftMkedPcsDef(int nSerial) // (피스인덱스는 CamMaster에서 정한 
 
 		if (nLoadPnl > 0)
 		{
-			if (pMkedPcsSerial[nMkedPnl] == nLoadPnl)
+			if (pMkedPcsSerial[nMkPnlL] == nLoadPnl)
 			{
 				for (i = 0; i < nTotPcs; i++) // i : 피스인덱스
 				{
-					pMkedPcsDef[k][i] = pMkedPcsDef[nMkedPnl][i];
+					pMkedPcsDef[k][i] = pMkedPcsDef[nMkPnlL][i];
 				}
 			}
-			else if (pMkedPcsSerial[nPrevPnl] == nLoadPnl)
+			else if (pMkedPcsSerial[nMkPnlR] == nLoadPnl)
 			{
 				for (i = 0; i < nTotPcs; i++) // i : 피스인덱스
 				{
-					pMkedPcsDef[k][i] = pMkedPcsDef[nPrevPnl][i];
+					pMkedPcsDef[k][i] = pMkedPcsDef[nMkPnlR][i];
 				}
 			}
 		}
@@ -7693,11 +7693,36 @@ BOOL CReelMap::ShiftMkedPcsDef() // (피스인덱스는 CamMaster에서 정한 것을 기준으
 
 	int k, i;
 
-	for (k = nTotPnl - 1; k > 1; k--) // k : 5 <-- 4 <-- 3 <-- 2 <-- 1 ;
+	if (pView->m_bSerialDecrese)
 	{
-		for (i = 0; i < nTotPcs; i++) // i : 피스인덱스
+		if (pMkedPcsSerial[m_nSelMarkingPnl] > m_nSerial)
 		{
-			pMkedPcsDef[k][i] = pMkedPcsDef[k - 1][i];
+			pMkedPcsSerial[m_nSelMarkingPnl + 1] = pMkedPcsSerial[m_nSelMarkingPnl];
+			pMkedPcsSerial[m_nSelMarkingPnl] = m_nSerial;
+
+			for (k = nTotPnl - 1; k > 1; k--) // k : 5 <-- 4 <-- 3 <-- 2 <-- 1 ;
+			{
+				for (i = 0; i < nTotPcs; i++) // i : 피스인덱스
+				{
+					pMkedPcsDef[k][i] = pMkedPcsDef[k - 1][i];
+				}
+			}
+		}
+	}
+	else
+	{
+		if (pMkedPcsSerial[m_nSelMarkingPnl] < m_nSerial)
+		{
+			pMkedPcsSerial[m_nSelMarkingPnl + 1] = pMkedPcsSerial[m_nSelMarkingPnl];
+			pMkedPcsSerial[m_nSelMarkingPnl] = m_nSerial;
+
+			for (k = nTotPnl - 1; k > 1; k--) // k : 5 <-- 4 <-- 3 <-- 2 <-- 1 ;
+			{
+				for (i = 0; i < nTotPcs; i++) // i : 피스인덱스
+				{
+					pMkedPcsDef[k][i] = pMkedPcsDef[k - 1][i];
+				}
+			}
 		}
 	}
 }

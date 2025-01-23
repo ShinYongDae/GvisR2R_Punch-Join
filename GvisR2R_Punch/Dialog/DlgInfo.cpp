@@ -184,9 +184,9 @@ BOOL CDlgInfo::OnInitDialog()
 	InitStatic();
 	InitBtn();
 
-	GetDlgItem(IDC_STC_65)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_CHK_2_POINT_ALIGN)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_CHK_4_POINT_ALIGN)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_STC_65)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_CHK_2_POINT_ALIGN)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_CHK_4_POINT_ALIGN)->ShowWindow(SW_HIDE);
 
 	GetDlgItem(IDC_STC_40)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_STC_41)->ShowWindow(SW_HIDE);
@@ -215,11 +215,11 @@ BOOL CDlgInfo::OnInitDialog()
 // 	GetDlgItem(IDC_STC_0046)->ShowWindow(SW_HIDE);
 // 	GetDlgItem(IDC_CHK_011)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_CHK_USE_AOI_MIDDLE)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_CHK_SAMPLE_TEST)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_STC_64)->ShowWindow(SW_HIDE);
+//	GetDlgItem(IDC_CHK_SAMPLE_TEST)->ShowWindow(SW_HIDE);
+//	GetDlgItem(IDC_STC_64)->ShowWindow(SW_HIDE);
 
-	GetDlgItem(IDC_STC_181)->ShowWindow(SW_HIDE);
-	//GetDlgItem(IDC_STC_181)->SetWindowText(_T("")); // 샘플검사 Shot수
+//	GetDlgItem(IDC_STC_181)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STC_181)->SetWindowText(_T("")); // 샘플검사 Shot수
 	
 	m_bTIM_DISP_STS = TRUE;
 	SetTimer(TIM_DISP_STS, 100, NULL);
@@ -356,7 +356,7 @@ void CDlgInfo::InitBtn()
 			myBtn[i].SetFont(_T("돋움체"),22,TRUE);
 		}
 
-		if (0 != i && 12 != i && 13 != i && 14 != i && 15 != i && 16 != i && 23 != i && 24 != i && 25 != i)
+		if (0 != i && 12 != i && 13 != i && 14 != i && 15 != i && 16 != i  && 17 != i && 18 != i && 23 != i && 24 != i && 25 != i)
 		{
 			myBtn[i].SetFont(_T("굴림체"),16,TRUE);
 			myBtn[i].SetTextColor(RGB_BLACK);
@@ -593,7 +593,7 @@ BOOL CDlgInfo::ShowKeypad(int nCtlID, CPoint ptSt, int nDir)
 
 void CDlgInfo::Disp()
 {
-	CString str;
+	CString str, sMsg;
 
 	myStcData[0].SetText(pDoc->WorkingInfo.LastJob.sSelUserName);
 	myStcData[1].SetText(pDoc->WorkingInfo.LastJob.sReelTotLen);
@@ -822,6 +822,50 @@ void CDlgInfo::Disp()
 	else
 		myBtn[27].SetCheck(FALSE);
 
+
+	int nAlignMethodeOnCamMst = pDoc->m_Master[0].GetAlignMethode();
+	int nAlignMethode = pDoc->WorkingInfo.LastJob.nAlignMethode;
+	BOOL b2PointAlign = nAlignMethodeOnCamMst & TWO_POINT;
+	BOOL b4PointAlign = nAlignMethodeOnCamMst & FOUR_POINT;
+
+	if (b4PointAlign && b2PointAlign)
+	{
+		if (pDoc->WorkingInfo.LastJob.nAlignMethode == FOUR_POINT)
+		{
+			myBtn[17].SetCheck(FALSE);
+			myBtn[18].SetCheck(TRUE);
+		}
+		else if (pDoc->WorkingInfo.LastJob.nAlignMethode == TWO_POINT)
+		{
+			myBtn[17].SetCheck(TRUE);
+			myBtn[18].SetCheck(FALSE);
+		}
+		else
+		{
+			pDoc->WorkingInfo.LastJob.nAlignMethode == FOUR_POINT;
+			myBtn[17].SetCheck(FALSE);
+			myBtn[18].SetCheck(TRUE);
+		}
+	}
+	else if (b4PointAlign)
+	{
+		pDoc->WorkingInfo.LastJob.nAlignMethode == FOUR_POINT;
+		myBtn[17].SetCheck(FALSE);
+		myBtn[18].SetCheck(TRUE);
+	}
+	else if (b2PointAlign)
+	{
+		pDoc->WorkingInfo.LastJob.nAlignMethode == TWO_POINT;
+		myBtn[17].SetCheck(TRUE);
+		myBtn[18].SetCheck(FALSE);
+	}
+	else
+	{
+		myBtn[17].SetCheck(FALSE);
+		myBtn[18].SetCheck(FALSE);
+		sMsg.Format(_T("캠마스터에 %s 모델의 Align 설정이 없습니다."), pDoc->WorkingInfo.LastJob.sModel);
+		pView->MsgBox(sMsg);
+	}
 }
 
 int CDlgInfo::GetTestModeFromPlc()
@@ -1884,9 +1928,24 @@ void CDlgInfo::OnStc181()
 void CDlgInfo::OnBnClickedChk2PointAlign()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	BOOL bChk = myBtn[17].GetCheck();
+	CString sMsg;
+
+	int nAlignMethodeOnCamMst = pDoc->m_Master[0].GetAlignMethode();
+	if (bChk)
+	{
+		if ( !(nAlignMethodeOnCamMst & TWO_POINT) )
+		{
+			myBtn[17].SetCheck(FALSE);
+			sMsg.Format(_T("%s 모델의 Align 설정이 2PointAlign 이 아닙니다."), pDoc->WorkingInfo.LastJob.sModel);
+			pView->MsgBox(sMsg);
+			return;
+		}
+	}
+
 	myBtn[18].SetCheck(FALSE);
 
-	if (myBtn[17].GetCheck())
+	if (bChk)
 	{
 		CString sVal;
 		pDoc->WorkingInfo.LastJob.nAlignMethode = TWO_POINT;
@@ -1924,9 +1983,24 @@ void CDlgInfo::OnBnClickedChk2PointAlign()
 void CDlgInfo::OnBnClickedChk4PointAlign()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	BOOL bChk = myBtn[18].GetCheck();
+	CString sMsg;
+
+	int nAlignMethodeOnCamMst = pDoc->m_Master[0].GetAlignMethode();
+	if (bChk)
+	{
+		if ( !(nAlignMethodeOnCamMst & FOUR_POINT))
+		{
+			myBtn[18].SetCheck(FALSE);
+			sMsg.Format(_T("%s 모델의 Align 설정이 4PointAlign 이 아닙니다."), pDoc->WorkingInfo.LastJob.sModel);
+			pView->MsgBox(sMsg);
+			return;
+		}
+	}
+
 	myBtn[17].SetCheck(FALSE);
 
-	if (myBtn[18].GetCheck())
+	if (bChk)
 	{
 		CString sVal;
 		pDoc->WorkingInfo.LastJob.nAlignMethode = FOUR_POINT;

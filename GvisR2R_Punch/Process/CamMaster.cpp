@@ -1859,6 +1859,9 @@ void CCamMaster::SetMasterPanelInfo()
 // CamMaster Marking Index, Align Position Data. ========================
 BOOL CCamMaster::LoadCadAlignMkPos()
 {
+	if (!m_sLayerUp.IsEmpty()) // 하면에서
+		return TRUE;
+
 #ifdef USE_CAM_MASTER
 	BOOL bRtn = TRUE;
 	BOOL b2PointAlign = FALSE;
@@ -2162,4 +2165,43 @@ CString CCamMaster::GetModel()
 CString CCamMaster::GetMasterLocation()
 {
 	return MasterInfo.strMasterLocation;
+}
+
+int CCamMaster::GetAlignMethode() // FOUR_POINT , TWO_POINT
+{
+	int nAlignMethode = 0;
+	BOOL b2PointAlign = FALSE;
+	BOOL b4PointAlign = FALSE;
+
+	CFileFind findfile;
+	CString sPath2, sPath;
+
+	if (m_sPathCamSpecDir.Right(1) != "\\")
+		sPath2.Format(_T("%s\\%s\\%s.pch2"), m_sPathCamSpecDir, m_sModel, m_sLayer);
+	else
+		sPath2.Format(_T("%s%s\\%s.pch2"), m_sPathCamSpecDir, m_sModel, m_sLayer);
+
+	if (findfile.FindFile(sPath2)) // find 4PointAlign file.
+	{
+		b4PointAlign = TRUE;
+	}
+
+	if (m_sPathCamSpecDir.Right(1) != "\\")
+		sPath.Format(_T("%s\\%s\\%s.pch"), m_sPathCamSpecDir, m_sModel, m_sLayer);
+	else
+		sPath.Format(_T("%s%s\\%s.pch"), m_sPathCamSpecDir, m_sModel, m_sLayer);
+
+	if (findfile.FindFile(sPath)) // find 2PointAlign file.
+	{
+		b2PointAlign = TRUE;
+	}
+
+	if (b4PointAlign && b2PointAlign)
+		nAlignMethode = FOUR_POINT + TWO_POINT;
+	else if (b4PointAlign)
+		nAlignMethode = FOUR_POINT;
+	else if (b2PointAlign)
+		nAlignMethode = TWO_POINT;
+
+	return nAlignMethode;
 }

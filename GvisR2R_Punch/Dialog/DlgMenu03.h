@@ -11,7 +11,7 @@
 #include "MyLabel.h"
 #include "MyGroup.h"
 
-#define MAX_MENU03_STC				128
+#define MAX_MENU03_STC				138
 #define MAX_MENU03_BTN				119
 #define MAX_MENU03_GRP				11
 #define MAX_MENU03_LABEL			5
@@ -182,6 +182,8 @@ public:
 	void UpdateSignal();
 
 	void SetLed(int nIdx, BOOL bOn = TRUE);
+	void DispAlignRangeL(int* pAlignX, int* pAlignY);
+	void DispAlignRangeR(int* pAlignX, int* pAlignY);
 
 // Dialog Data
 	//{{AFX_DATA(CDlgMenu03)

@@ -1320,6 +1320,7 @@ public:
 	int SearchModel(CString sModel);
 	BOOL GetTorque(int nUnit, int nThick, double &dTorqL, double &dTorqR);
 	CString GetThicknessName(int nIdx); // 설정없음[0], 얇은 두께[1], 중간 두께[2], 두꺼운 두께[3]
+	void Mk4PtShift2Mk();
 
 // 재정의입니다.
 public:

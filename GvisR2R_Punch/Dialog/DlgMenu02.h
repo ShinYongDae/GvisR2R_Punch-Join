@@ -18,8 +18,8 @@
 
 #include "../Device/Vision.h"
 
-#define MAX_MENU02_STC				23
-#define MAX_MENU02_STC_DATA			17
+#define MAX_MENU02_STC				27
+#define MAX_MENU02_STC_DATA			21
 #define MAX_MENU02_BTN				35
 
 #define MAX_MENU02_STC_DUO			15
@@ -67,7 +67,7 @@ class CDlgMenu02 : public CDialog
 	int m_nSelectCam0Pos, m_nSelectCam1Pos;
 	int m_nSpd;
 	unsigned long m_lChk;
-	int m_nMoveAlign[2];
+	int m_nMoveAlign[2]; // [0] Left , [1] Right
 
 	ULONGLONG m_stTime;
 
@@ -85,7 +85,7 @@ class CDlgMenu02 : public CDialog
 	void DispCenterMark();
 	void MarkingOff();
 	void MarkingOff2();
-	CfPoint GetPcsCenterOffset(CPoint pt);
+	//CfPoint GetPcsCenterOffset(CPoint pt);
 	void MsClr(int nMsId);
 	void ChkElecTest();
 	void ChkMarkingTest2();
@@ -196,6 +196,10 @@ public:
 
 	void ShowDebugEngSig();
 	BOOL SetModelMarkImage();
+	void ResetBtn(int nID);
+	void ApplyRngMargin(int* pAlignX, int* pAlignY);
+	void DispAlignRangeL(int* pAlignX, int* pAlignY);
+	void DispAlignRangeR(int* pAlignX, int* pAlignY);
 
 	// ITS
 #ifdef USE_MIL

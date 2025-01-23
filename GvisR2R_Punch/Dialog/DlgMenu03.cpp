@@ -1282,6 +1282,18 @@ void CDlgMenu03::InitStatic()
 	myStcTitle[126].SubclassDlgItem(IDC_STATIC_DN_DONE_TEST, this);		// 하면 검사완료
 	myStcTitle[127].SubclassDlgItem(IDC_STATIC_PUNCH_DONE, this);		// 마킹 작업완료
 
+	myStcTitle[128].SubclassDlgItem(IDC_STATIC_L, this);
+	myStcTitle[129].SubclassDlgItem(IDC_STATIC_L_LT, this);
+	myStcTitle[130].SubclassDlgItem(IDC_STATIC_L_LB, this);
+	myStcTitle[131].SubclassDlgItem(IDC_STATIC_L_RB, this);
+	myStcTitle[132].SubclassDlgItem(IDC_STATIC_L_RT, this);
+
+	myStcTitle[133].SubclassDlgItem(IDC_STATIC_R, this);
+	myStcTitle[134].SubclassDlgItem(IDC_STATIC_R_LT, this);
+	myStcTitle[135].SubclassDlgItem(IDC_STATIC_R_LB, this);
+	myStcTitle[136].SubclassDlgItem(IDC_STATIC_R_RB, this);
+	myStcTitle[137].SubclassDlgItem(IDC_STATIC_R_RT, this);
+
 	for (int i = 0; i < MAX_MENU03_STC; i++)
 	{
 		if(i == 12 || i == 20 || i == 29 || i == 42 || i == 56 || i == 64 || i == 72 || i == 73 || i == 82 || i == 98 || i == 112 || i == 113)
@@ -3264,6 +3276,7 @@ void CDlgMenu03::SwStop()
 	pView->m_bSwReset = FALSE;
 
 	pView->MpeWrite(_T("MB40003B"), 1);					// 마킹부 즉시 정지 스위치(PC가 On / PLC Off시킴)
+	pView->PlcAlm(0, TRUE);
 	Sleep(30);
 	pView->TowerLamp(RGB_RED, TRUE, FALSE);
 	pView->MpeWrite(pView->Plc.DlgMenu03.LampStop, 1);	// 마킹부 정지 스위치 램프 ON(PC가 On/Off시킴)
@@ -3768,3 +3781,30 @@ void CDlgMenu03::SetLed(int nIdx, BOOL bOn)
 		myLabel[nIdx].SetImageBk(LBL_IMG_UP);
 }
 
+void CDlgMenu03::DispAlignRangeL(int* pAlignX, int* pAlignY)
+{
+	CString sVal;
+
+	sVal.Format(_T("%d , %d"), pAlignX[0], pAlignY[0]);
+	GetDlgItem(IDC_STATIC_ALIGN_L_LT)->SetWindowText(sVal);
+	sVal.Format(_T("%d , %d"), pAlignX[1], pAlignY[1]);
+	GetDlgItem(IDC_STATIC_ALIGN_L_LB)->SetWindowText(sVal);
+	sVal.Format(_T("%d , %d"), pAlignX[2], pAlignY[2]);
+	GetDlgItem(IDC_STATIC_ALIGN_L_RB)->SetWindowText(sVal);
+	sVal.Format(_T("%d , %d"), pAlignX[3], pAlignY[3]);
+	GetDlgItem(IDC_STATIC_ALIGN_L_RT)->SetWindowText(sVal);
+}
+
+void CDlgMenu03::DispAlignRangeR(int* pAlignX, int* pAlignY)
+{
+	CString sVal;
+
+	sVal.Format(_T("%d , %d"), pAlignX[0], pAlignY[0]);
+	GetDlgItem(IDC_STATIC_ALIGN_R_LT)->SetWindowText(sVal);
+	sVal.Format(_T("%d , %d"), pAlignX[1], pAlignY[1]);
+	GetDlgItem(IDC_STATIC_ALIGN_R_LB)->SetWindowText(sVal);
+	sVal.Format(_T("%d , %d"), pAlignX[2], pAlignY[2]);
+	GetDlgItem(IDC_STATIC_ALIGN_R_RB)->SetWindowText(sVal);
+	sVal.Format(_T("%d , %d"), pAlignX[3], pAlignY[3]);
+	GetDlgItem(IDC_STATIC_ALIGN_R_RT)->SetWindowText(sVal);
+}

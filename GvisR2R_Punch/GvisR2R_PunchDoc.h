@@ -35,6 +35,7 @@ protected: // serialization에서만 만들어집니다.
 
 // 특성입니다.
 public:
+	CfPoint m_pntNoMkLeft[2][4], m_pntNoMkRight[2][4]; // LT, LB, RB, RT
 	BOOL m_bVsStatusUp, m_bVsStatusDn;
 	BOOL m_bOffLogAuto, m_bOffLogPLC;
 	int m_nDelayShow;

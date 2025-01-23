@@ -16,6 +16,9 @@
 
 class CPtAlign  
 {
+	double m_dScale;
+	double m_dTheta;
+
 public:
 	CPtAlign();
 	virtual ~CPtAlign();
@@ -65,6 +68,8 @@ public:
 	// for debug
 	BOOL GetBilinearPointOnRef(CfPoint &fpt1,CfPoint &fpt2,CfPoint &fpt3,CfPoint &fpt4);
 	BOOL GetBilinearPointOnTgt(CfPoint &fpt1,CfPoint &fpt2,CfPoint &fpt3,CfPoint &fpt4);
+
+	BOOL GetResult(double &dRotation, double &dScale);
 
 };
 

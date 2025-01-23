@@ -1642,6 +1642,173 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	else
 		m_nDelayShow = 500;
 
+	// 마킹 금지 구역 - Left
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkLeft0_Lt_X"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkLeft[0][0].x = _ttof(szData);
+	else
+		m_pntNoMkLeft[0][0].x = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkLeft0_Lb_X"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkLeft[0][1].x = _ttof(szData);
+	else
+		m_pntNoMkLeft[0][1].x = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkLeft0_Rb_X"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkLeft[0][2].x = _ttof(szData);
+	else
+		m_pntNoMkLeft[0][2].x = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkLeft0_Rt_X"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkLeft[0][3].x = _ttof(szData);
+	else
+		m_pntNoMkLeft[0][3].x = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkLeft0_Lt_Y"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkLeft[0][0].y = _ttof(szData);
+	else
+		m_pntNoMkLeft[0][0].y = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkLeft0_Lb_Y"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkLeft[0][1].y = _ttof(szData);
+	else
+		m_pntNoMkLeft[0][1].y = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkLeft0_Rb_Y"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkLeft[0][2].y = _ttof(szData);
+	else
+		m_pntNoMkLeft[0][2].y = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkLeft0_Rt_Y"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkLeft[0][3].y = _ttof(szData);
+	else
+		m_pntNoMkLeft[0][3].y = 0.0;
+
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkLeft1_Lt_X"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkLeft[1][0].x = _ttof(szData);
+	else
+		m_pntNoMkLeft[1][0].x = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkLeft1_Lb_X"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkLeft[1][1].x = _ttof(szData);
+	else
+		m_pntNoMkLeft[1][1].x = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkLeft1_Rb_X"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkLeft[1][2].x = _ttof(szData);
+	else
+		m_pntNoMkLeft[1][2].x = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkLeft1_Rt_X"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkLeft[1][3].x = _ttof(szData);
+	else
+		m_pntNoMkLeft[1][3].x = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkLeft1_Lt_Y"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkLeft[1][0].y = _ttof(szData);
+	else
+		m_pntNoMkLeft[1][0].y = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkLeft1_Lb_Y"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkLeft[1][1].y = _ttof(szData);
+	else
+		m_pntNoMkLeft[1][1].y = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkLeft1_Rb_Y"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkLeft[1][2].y = _ttof(szData);
+	else
+		m_pntNoMkLeft[1][2].y = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkLeft1_Rt_Y"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkLeft[1][3].y = _ttof(szData);
+	else
+		m_pntNoMkLeft[1][3].y = 0.0;
+
+
+	// 마킹 금지 구역 - Right
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkRight0_Lt_X"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkRight[0][0].x = _ttof(szData);
+	else
+		m_pntNoMkRight[0][0].x = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkRight0_Lb_X"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkRight[0][1].x = _ttof(szData);
+	else
+		m_pntNoMkRight[0][1].x = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkRight0_Rb_X"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkRight[0][2].x = _ttof(szData);
+	else
+		m_pntNoMkRight[0][2].x = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkRight0_Rt_X"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkRight[0][3].x = _ttof(szData);
+	else
+		m_pntNoMkRight[0][3].x = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkRight0_Lt_Y"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkRight[0][0].y = _ttof(szData);
+	else
+		m_pntNoMkRight[0][0].y = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkRight0_Lb_Y"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkRight[0][1].y = _ttof(szData);
+	else
+		m_pntNoMkRight[0][1].y = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkRight0_Rb_Y"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkRight[0][2].y = _ttof(szData);
+	else
+		m_pntNoMkRight[0][2].y = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkRight0_Rt_Y"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkRight[0][3].y = _ttof(szData);
+	else
+		m_pntNoMkRight[0][3].y = 0.0;
+
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkRight1_Lt_X"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkRight[1][0].x = _ttof(szData);
+	else
+		m_pntNoMkRight[1][0].x = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkRight1_Lb_X"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkRight[1][1].x = _ttof(szData);
+	else
+		m_pntNoMkRight[1][1].x = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkRight1_Rb_X"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkRight[1][2].x = _ttof(szData);
+	else
+		m_pntNoMkRight[1][2].x = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkRight1_Rt_X"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkRight[1][3].x = _ttof(szData);
+	else
+		m_pntNoMkRight[1][3].x = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkRight1_Lt_Y"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkRight[1][0].y = _ttof(szData);
+	else
+		m_pntNoMkRight[1][0].y = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkRight1_Lb_Y"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkRight[1][1].y = _ttof(szData);
+	else
+		m_pntNoMkRight[1][1].y = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkRight1_Rb_Y"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkRight[1][2].y = _ttof(szData);
+	else
+		m_pntNoMkRight[1][2].y = 0.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkRight1_Rt_Y"), NULL, szData, sizeof(szData), sPath))
+		m_pntNoMkRight[1][3].y = _ttof(szData);
+	else
+		m_pntNoMkRight[1][3].y = 0.0;
+
+
+
 	// [Last Job]
 	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("MkSt0"), NULL, szData, sizeof(szData), sPath))
 		pView->m_bMkSt[0] = _ttoi(szData) > 0 ? TRUE : FALSE;
@@ -4959,30 +5126,32 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoUp(int nSerial, int *pNewLot, BOOL bFromBuf) /
 		WorkingInfo.LastJob.sModel = Status.PcrShare[0].sModel;
 		WorkingInfo.LastJob.sLayerUp = Status.PcrShare[0].sLayer;
 
-		if (m_bBufEmptyF[0])
+		if (pView->m_bInitAutoLoadMstInfo)
 		{
-			if (!m_bBufEmpty[0])
-			{
-				m_bBufEmptyF[0] = FALSE; pDoc->SetStatus(_T("General"), _T("bBufEmptyF[0]"), m_bBufEmptyF[0]);
-			}
+			pView->m_bInitAutoLoadMstInfo = FALSE; pDoc->SetStatus(_T("General"), _T("bInitAutoLoadMstInfo"), pView->m_bInitAutoLoadMstInfo);
+			return TRUE;
+		}
+	}
+
+	if (m_bBufEmptyF[0])
+	{
+		if (!m_bBufEmpty[0]) // 상부 AOI 버퍼에 처음으로 시리얼이 들어올 때
+		{
+			bUpdate = TRUE;
+			m_bBufEmptyF[0] = FALSE; pDoc->SetStatus(_T("General"), _T("bBufEmptyF[0]"), m_bBufEmptyF[0]);
 
 			m_nAoiCamInfoStrPcs[0] = GetAoiUpCamMstInfo(); pDoc->SetStatusInt(_T("General"), _T("nAoiCamInfoStrPcs[0]"), m_nAoiCamInfoStrPcs[0]);
 			if (m_nAoiCamInfoStrPcs[0] > -1)
 			{
 				if ((m_nAoiCamInfoStrPcs[0] == 1 ? TRUE : FALSE) != WorkingInfo.System.bStripPcsRgnBin)
 				{
+					pView->MsgBox(_T("WorkingInfo.ini 파일의 StripPcsRgnBin정보와 상부 AOI CamMst정보가 다릅니다."));
 					return FALSE;
 				}
 			}
 
 			pView->m_bInitAutoLoadMstInfo = FALSE; pDoc->SetStatus(_T("General"), _T("bInitAutoLoadMstInfo"), pView->m_bInitAutoLoadMstInfo);
-			return TRUE;
-		}
-
-		if (pView->m_bInitAutoLoadMstInfo)
-		{
-			pView->m_bInitAutoLoadMstInfo = FALSE; pDoc->SetStatus(_T("General"), _T("bInitAutoLoadMstInfo"), pView->m_bInitAutoLoadMstInfo);
-			return TRUE;
+			//return TRUE;
 		}
 	}
 
@@ -5142,24 +5311,25 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoDn(int nSerial, int *pNewLot, BOOL bFromBuf) /
 		bUpdate = TRUE;
 		WorkingInfo.LastJob.sModel = Status.PcrShare[1].sModel;
 		WorkingInfo.LastJob.sLayerDn = Status.PcrShare[1].sLayer;
+	}
 
-		if (m_bBufEmptyF[1])
+	if (m_bBufEmptyF[1])
+	{
+		if (!m_bBufEmpty[1]) // 하부 AOI 버퍼에 처음으로 시리얼이 들어올 때
 		{
-			if (!m_bBufEmpty[1])
-			{
-				m_bBufEmptyF[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bBufEmptyF[1]"), m_bBufEmptyF[1]);
-			}
+			bUpdate = TRUE;
+			m_bBufEmptyF[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bBufEmptyF[1]"), m_bBufEmptyF[1]);
 
 			m_nAoiCamInfoStrPcs[1] = GetAoiDnCamMstInfo(); pDoc->SetStatusInt(_T("General"), _T("nAoiCamInfoStrPcs[1]"), m_nAoiCamInfoStrPcs[1]);
 			if (m_nAoiCamInfoStrPcs[1] > -1)
 			{
 				if ((m_nAoiCamInfoStrPcs[1] == 1 ? TRUE : FALSE) != WorkingInfo.System.bStripPcsRgnBin)
 				{
+					pView->MsgBox(_T("WorkingInfo.ini 파일의 StripPcsRgnBin정보와 하부 AOI CamMst정보가 다릅니다."));
 					return FALSE;
 				}
 			}
-
-			return TRUE;
+			//return TRUE;
 		}
 	}
 

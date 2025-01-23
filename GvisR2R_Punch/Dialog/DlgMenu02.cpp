@@ -270,11 +270,11 @@ void CDlgMenu02::AtDlgShow()
 		m_lChk = 1;
 		SetTimer(TIM_SHOW_MK_TEST, 50, NULL);
 	}
-	if(myBtn[16].GetCheck())
-	{
-		m_lChk = 2;
-		SetTimer(TIM_SHOW_ELEC_TEST, 50, NULL);
-	}
+	//if(myBtn[16].GetCheck())
+	//{
+	//	m_lChk = 2;
+	//	SetTimer(TIM_SHOW_ELEC_TEST, 50, NULL);
+	//}
 
 	SetJogSpd();
 	SetJogSpd2();
@@ -536,6 +536,7 @@ BOOL CDlgMenu02::OnInitDialog()
 
 	
 	ShowDlg(IDD_DLG_UTIL_03);
+	
 #ifdef USE_FLUCK
 	ShowDlg(IDD_DLG_UTIL_06);
 #endif
@@ -915,12 +916,18 @@ void CDlgMenu02::InitStcTitle()
 	myStcTitle[21].SubclassDlgItem(IDC_STC_ALN_SCR2, this);
 	myStcTitle[22].SubclassDlgItem(IDC_STC_ALN3, this);
 
+	myStcTitle[23].SubclassDlgItem(IDC_STC_ALN_ROTATION, this);
+	myStcTitle[24].SubclassDlgItem(IDC_STC_ALN_SCALE, this);
+	myStcTitle[25].SubclassDlgItem(IDC_STC_ALN_ROTATION2, this);
+	myStcTitle[26].SubclassDlgItem(IDC_STC_ALN_SCALE2, this);
+
+
 	for(int i=0; i<MAX_MENU02_STC; i++)
 	{
 		if(i!=0 && i!=1 && i!=2 && i!=6 && i!=7 && i!=18 && i!=19 && i!=20)
 		{
 			myStcTitle[i].SetFontName(_T("Arial"));
-			myStcTitle[i].SetFontSize(14);
+			myStcTitle[i].SetFontSize(12);
 			myStcTitle[i].SetFontBold(TRUE);
 			myStcTitle[i].SetTextColor(RGB_NAVY);
 			myStcTitle[i].SetBkColor(RGB_DLG_FRM);
@@ -977,6 +984,12 @@ void CDlgMenu02::InitStcData()
 	myStcData[15].SubclassDlgItem(IDC_STC_MK_POS1_3, this);
 	myStcData[16].SubclassDlgItem(IDC_STC_MK_POS1_4, this);
 
+
+	myStcData[17].SubclassDlgItem(IDC_STC_ALIGN_ROTATION, this);
+	myStcData[18].SubclassDlgItem(IDC_STC_ALIGN_SCALE, this);
+	myStcData[19].SubclassDlgItem(IDC_STC_ALIGN_ROTATION2, this);
+	myStcData[20].SubclassDlgItem(IDC_STC_ALIGN_SCALE2, this);
+
 	for(int i=0; i<MAX_MENU02_STC_DATA; i++)
 	{
 		if(i!=0 && i!=1 && i!=11)
@@ -985,7 +998,7 @@ void CDlgMenu02::InitStcData()
 			if(i==2)
 				myStcData[i].SetFontSize(22);
 			else
-				myStcData[i].SetFontSize(14);
+				myStcData[i].SetFontSize(12);
 			myStcData[i].SetFontBold(TRUE);
 			myStcData[i].SetTextColor(RGB_BLACK);
 			myStcData[i].SetBkColor(RGB_WHITE);
@@ -1760,15 +1773,15 @@ void CDlgMenu02::OnTimer(UINT_PTR nIDEvent)//(UINT nIDEvent)
 			MarkingOff2();
 			break;
 		case TIM_SHOW_MK_TEST:
-	//		KillTimer(TIM_SHOW_MK_TEST);
-			if(m_lChk == 1)
+			KillTimer(TIM_SHOW_MK_TEST);
+			//if(m_lChk == 1)
 			{
-				if(myBtn[16].GetCheck())
-				{
-					myBtn[16].SetCheck(FALSE);
-					//((CButton*)GetDlgItem(IDC_CHK_MARKING_TEST2))->SetCheck(FALSE);	
-					ChkElecTest();
-				}
+				//if(myBtn[16].GetCheck())
+				//{
+				//	myBtn[16].SetCheck(FALSE);
+				//	//((CButton*)GetDlgItem(IDC_CHK_MARKING_TEST2))->SetCheck(FALSE);	
+				//	ChkElecTest();
+				//}
 				ChkMarkingTest2();
 			}
 			break;
@@ -2296,7 +2309,7 @@ BOOL CDlgMenu02::Move4PntAlign1(int nPos)
 		else if (nPos == 1)
 		{
 			pPos[0] = pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[1];
-			pPos[1] = pDoc->m_Master[0].m_stAlignMk.Y1 + pView->m_pMotion->m_dPinPosY[1];
+			pPos[1] = pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[1];
 		}
 		else if (nPos == 2)
 		{
@@ -2835,26 +2848,55 @@ void CDlgMenu02::OnChkMkOffsetEd2()
 void CDlgMenu02::OnBtnAlignMove() 
 {
 	// TODO: Add your control notification handler code here
-	if(m_nMoveAlign[0] == 0)
+	if (pDoc->WorkingInfo.LastJob.nAlignMethode == FOUR_POINT)
 	{
-		MoveAlign0(0);
-		m_nMoveAlign[0] = 1;
+		if (m_nMoveAlign[0] == 0)
+		{
+			MoveAlign0(0);
+			m_nMoveAlign[0] = 1;
+		}
+		else if(m_nMoveAlign[0] == 1)
+		{
+			MoveAlign0(1);
+			m_nMoveAlign[0] = 2;
+		}
+		else if (m_nMoveAlign[0] == 2)
+		{
+			MoveAlign0(2);
+			m_nMoveAlign[0] = 3;
+		}
+		else if (m_nMoveAlign[0] == 3)
+		{
+			MoveAlign0(3);
+			m_nMoveAlign[0] = 0;
+		}
 	}
 	else
 	{
-		MoveAlign0(1);
-		m_nMoveAlign[0] = 0;
-	}
-	
+		if (m_nMoveAlign[0] == 0)
+		{
+			MoveAlign0(0);
+			m_nMoveAlign[0] = 1;
+		}
+		else
+		{
+			MoveAlign0(1);
+			m_nMoveAlign[0] = 0;
+		}
+	}	
 }
 
 void CDlgMenu02::OnBtnGrab() 
 {
 	// TODO: Add your control notification handler code here
 	if (pDoc->WorkingInfo.LastJob.nAlignMethode == FOUR_POINT)
+	{
 		Grab4PntAlign();
+	}
 	else
+	{
 		Grab2PntAlign();
+	}
 }
 
 void CDlgMenu02::Grab2PntAlign()
@@ -2888,7 +2930,8 @@ void CDlgMenu02::Grab2PntAlign()
 #ifdef USE_VISION
 	if (pView->m_pVision[0]->Grab(nPos))
 	{
-		GetPmRst0(dX, dY, dAgl, dScr);
+		GetPmRst0(dX, dY, dAgl, dScr); // Left
+
 		str.Format(_T("%.1f"), dX);
 		pDoc->WorkingInfo.Motion.sAlignResultPosX[0][nPos] = str;
 		myStcData[7].SetText(str);
@@ -2911,6 +2954,82 @@ void CDlgMenu02::Grab2PntAlign()
 		myStcData[8].SetText(_T(""));
 		myStcData[9].SetText(_T(""));
 		myStcData[10].SetText(_T(""));
+		return;
+	}
+
+
+	int nCamSzX, nCamSzY;
+	pView->m_pVision[0]->GetCameraSize(nCamSzX, nCamSzY);
+
+	double dResX, dResY, dResCam;
+
+	dResX = _tstof(pDoc->WorkingInfo.Vision[0].sResX);
+	dResY = _tstof(pDoc->WorkingInfo.Vision[0].sResY);
+	dResCam = _tstof(pDoc->WorkingInfo.Vision[0].sCamPxlRes) / 10000.0;
+
+	GetPmRst0(dX, dY, dAgl, dScr); // Left
+
+	if (nPos == 0)
+	{
+		m_dMkFdOffsetX[0][0] = (double(nCamSzX / 2) - dX) * dResX; // -: Á¦Ç° ´ú¿È, +: Á¦Ç° ´õ¿È.
+		m_dMkFdOffsetY[0][0] = (double(nCamSzY / 2) - dY) * dResY; // -: Á¦Ç° ³ª¿È, +: Á¦Ç° µé¾î°¨.
+
+		pView->MpeWrite(pView->Plc.DlgFrameHigh.FeedOffsetPunch, (long)(-1.0 * m_dMkFdOffsetX[0][0] * 1000.0));	// ¸¶Å·ºÎ Feeding ·Ñ·¯ Offset(*1000, +:´õ º¸³¿, -´ú º¸³¿)
+	}
+
+	if (nPos == 1)
+	{
+		double dMkFdOffsetX = (double(nCamSzX / 2) - dX) * dResX; // -: Á¦Ç° ´ú¿È, +: Á¦Ç° ´õ¿È.
+		double dMkFdOffsetY = (double(nCamSzY / 2) - dY) * dResY; // -: Á¦Ç° ³ª¿È, +: Á¦Ç° µé¾î°¨.
+		m_dMkFdOffsetX[0][1] = dMkFdOffsetX;
+		m_dMkFdOffsetY[0][1] = dMkFdOffsetY;
+
+		// CamÀÇ ¿øÁ¡ ±âÁØÀÇ Marking ÀÌ¹ÌÁö ÁÂÇ¥.
+		double dRefAlignX0 = pDoc->m_Master[0].m_stAlignMk.X0 + pView->m_pMotion->m_dPinPosX[0]; // PCBÁÂÇ¥
+		double dRefAlignY0 = pDoc->m_Master[0].m_stAlignMk.Y0 + pView->m_pMotion->m_dPinPosY[0]; // PCBÁÂÇ¥
+		double dRefAlignX1 = pDoc->m_Master[0].m_stAlignMk.X1 + pView->m_pMotion->m_dPinPosX[0]; // PCBÁÂÇ¥
+		double dRefAlignY1 = pDoc->m_Master[0].m_stAlignMk.Y1 + pView->m_pMotion->m_dPinPosY[0]; // PCBÁÂÇ¥
+
+																								 // PCB»óÀÇ ¿øÁ¡ ±âÁØÀÇ Marking ÀÌ¹ÌÁö ÁÂÇ¥.
+		double dTgtAlignX0 = (pDoc->m_Master[0].m_stAlignMk.X0 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][0];
+		double dTgtAlignY0 = (pDoc->m_Master[0].m_stAlignMk.Y0 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][0];
+		double dTgtAlignX1 = (pDoc->m_Master[0].m_stAlignMk.X1 + pView->m_pMotion->m_dPinPosX[0]) - dMkFdOffsetX;
+		double dTgtAlignY1 = (pDoc->m_Master[0].m_stAlignMk.Y1 + pView->m_pMotion->m_dPinPosY[0]) - dMkFdOffsetY;
+
+		int nNodeX = 0, nNodeY = 0;
+		if (pDoc->m_Master[0].m_pPcsRgn)
+		{
+			nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+			nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
+		}
+
+		pView->m_Align[0].SetAlignData(dRefAlignX0, dRefAlignY0, dRefAlignX1, dRefAlignY1, dTgtAlignX0, dTgtAlignY0, dTgtAlignX1, dTgtAlignY1);
+
+		CfPoint ptRef, ptTgt;
+		int nCol, nRow, idx = 0;
+		for (nCol = 0; nCol < nNodeX; nCol++)
+		{
+			for (nRow = 0; nRow < nNodeY; nRow++)
+			{
+				ptRef.x = pDoc->m_Master[0].m_stPcsMk[idx].X + pView->m_pMotion->m_dPinPosX[0];
+				ptRef.y = pDoc->m_Master[0].m_stPcsMk[idx].Y + pView->m_pMotion->m_dPinPosY[0];
+				pView->m_Align[0].LinearAlignment(ptRef, ptTgt);
+				if (pDoc->m_Master[0].m_pPcsRgn)
+				{
+					pDoc->m_Master[0].m_pPcsRgn->pMkPnt[0][idx].x = ptTgt.x;
+					pDoc->m_Master[0].m_pPcsRgn->pMkPnt[0][idx].y = ptTgt.y;
+				}
+				idx++;
+			}
+		}
+
+		double dRotation, dScale;
+		pView->m_Align[0].GetResult(dRotation, dScale);
+		str.Format(_T("%.3f"), dRotation);
+		myStcData[17].SetText(str);
+		str.Format(_T("%.3f"), dScale);
+		myStcData[18].SetText(str);
+
 	}
 #endif
 }
@@ -2940,7 +3059,7 @@ void CDlgMenu02::Grab4PntAlign()
 	else if ((dCurrX > pPos[2] - 0.1 && dCurrX < pPos[2] + 0.1) && (dCurrY > pPos[3] - 0.1 && dCurrY < pPos[3] + 0.1))
 		nPos = 1;
 	else if ((dCurrX > pPos[4] - 0.1 && dCurrX < pPos[4] + 0.1) && (dCurrY > pPos[5] - 0.1 && dCurrY < pPos[5] + 0.1))
-			nPos = 2;
+		nPos = 2;
 	else if ((dCurrX > pPos[6] - 0.1 && dCurrX < pPos[6] + 0.1) && (dCurrY > pPos[7] - 0.1 && dCurrY < pPos[7] + 0.1))
 		nPos = 3;
 
@@ -2978,7 +3097,230 @@ void CDlgMenu02::Grab4PntAlign()
 		myStcData[8].SetText(_T(""));
 		myStcData[9].SetText(_T(""));
 		myStcData[10].SetText(_T(""));
+		return;
 	}
+
+
+
+
+	int nCamSzX, nCamSzY;
+	pView->m_pVision[0]->GetCameraSize(nCamSzX, nCamSzY);
+
+	int i, k;
+	double dResX, dResY, dResCam;
+	dResX = _tstof(pDoc->WorkingInfo.Vision[0].sResX);
+	dResY = _tstof(pDoc->WorkingInfo.Vision[0].sResY);
+	dResCam = _tstof(pDoc->WorkingInfo.Vision[0].sCamPxlRes) / 10000.0;
+
+	GetPmRst0(dX, dY, dAgl, dScr);
+
+	if (nPos == 0)
+	{
+		m_dMkFdOffsetX[0][0] = (double(nCamSzX / 2) - dX) * dResX; // -: Á¦Ç° ´ú¿È, +: Á¦Ç° ´õ¿È.
+		m_dMkFdOffsetY[0][0] = (double(nCamSzY / 2) - dY) * dResY; // -: Á¦Ç° ³ª¿È, +: Á¦Ç° µé¾î°¨.
+		//pView->MpeWrite(pView->Plc.DlgFrameHigh.FeedOffsetPunch, (long)(-1.0 * m_dMkFdOffsetX[0][0] * 1000.0));	// ¸¶Å·ºÎ Feeding ·Ñ·¯ Offset(*1000, +:´õ º¸³¿, -´ú º¸³¿)
+	}
+	else if (nPos == 1)
+	{
+		m_dMkFdOffsetX[0][1] = (double(nCamSzX / 2) - dX) * dResX; // -: Á¦Ç° ´ú¿È, +: Á¦Ç° ´õ¿È.
+		m_dMkFdOffsetY[0][1] = (double(nCamSzY / 2) - dY) * dResY; // -: Á¦Ç° ³ª¿È, +: Á¦Ç° µé¾î°¨.
+	}
+	else if (nPos == 2)
+	{
+		m_dMkFdOffsetX[0][2] = (double(nCamSzX / 2) - dX) * dResX; // -: Á¦Ç° ´ú¿È, +: Á¦Ç° ´õ¿È.
+		m_dMkFdOffsetY[0][2] = (double(nCamSzY / 2) - dY) * dResY; // -: Á¦Ç° ³ª¿È, +: Á¦Ç° µé¾î°¨.
+	}
+	else if (nPos == 3)
+	{
+		double dMkFdOffsetX = (double(nCamSzX / 2) - dX) * dResX; // -: Á¦Ç° ´ú¿È, +: Á¦Ç° ´õ¿È.
+		double dMkFdOffsetY = (double(nCamSzY / 2) - dY) * dResY; // -: Á¦Ç° ³ª¿È, +: Á¦Ç° µé¾î°¨.
+		m_dMkFdOffsetX[0][3] = dMkFdOffsetX;
+		m_dMkFdOffsetY[0][3] = dMkFdOffsetY;
+
+		// CamÀÇ ¿øÁ¡ ±âÁØÀÇ Marking ÀÌ¹ÌÁö ÁÂÇ¥.
+		double dRefAlignX[4], dRefAlignY[4];
+		dRefAlignX[0] = pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[0]; // PCBÁÂÇ¥
+		dRefAlignY[0] = pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[0]; // PCBÁÂÇ¥
+		dRefAlignX[1] = pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[0]; // PCBÁÂÇ¥
+		dRefAlignY[1] = pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[0]; // PCBÁÂÇ¥
+		dRefAlignX[2] = pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[0]; // PCBÁÂÇ¥
+		dRefAlignY[2] = pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[0]; // PCBÁÂÇ¥
+		dRefAlignX[3] = pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[0]; // PCBÁÂÇ¥
+		dRefAlignY[3] = pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[0]; // PCBÁÂÇ¥
+		int nRefAlignX[4], nRefAlignY[4];
+		nRefAlignX[0] = int(pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[0]); // PCBÁÂÇ¥
+		nRefAlignY[0] = int(pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[0]); // PCBÁÂÇ¥
+		nRefAlignX[1] = int(pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[0]); // PCBÁÂÇ¥
+		nRefAlignY[1] = int(pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[0]); // PCBÁÂÇ¥
+		nRefAlignX[2] = int(pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[0]); // PCBÁÂÇ¥
+		nRefAlignY[2] = int(pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[0]); // PCBÁÂÇ¥
+		nRefAlignX[3] = int(pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[0]); // PCBÁÂÇ¥
+		nRefAlignY[3] = int(pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[0]); // PCBÁÂÇ¥
+
+		ApplyRngMargin(nRefAlignX, nRefAlignY);
+
+		double dRefLTx, dRefLTy;		// (0, 0)
+		double dRefRTx, dRefRTy;		// (100, 10)
+		double dRefRBx, dRefRBy;		// (100, 100)
+		double dRefLBx, dRefLBy;		// (0, 100)
+
+		for (i = 0; i < 3; i++)
+		{
+			for (k = i + 1; k < 4; k++)
+			{
+				if (nRefAlignX[i] < nRefAlignX[k] && nRefAlignY[i] < nRefAlignY[k])
+				{
+					dRefLTx = dRefAlignX[i]; dRefLTy = dRefAlignY[i];
+					dRefRBx = dRefAlignX[k]; dRefRBy = dRefAlignY[k];
+				}
+				else if (nRefAlignX[i] > nRefAlignX[k] && nRefAlignY[i] > nRefAlignY[k])
+				{
+					dRefRBx = dRefAlignX[i]; dRefRBy = dRefAlignY[i];
+					dRefLTx = dRefAlignX[k]; dRefLTy = dRefAlignY[k];
+				}
+				else if (nRefAlignX[i] > nRefAlignX[k] && nRefAlignY[i] < nRefAlignY[k])
+				{
+					dRefRTx = dRefAlignX[i]; dRefRTy = dRefAlignY[i];
+					dRefLBx = dRefAlignX[k]; dRefLBy = dRefAlignY[k];
+				}
+				else if (nRefAlignX[i] < nRefAlignX[k] && nRefAlignY[i] > nRefAlignY[k])
+				{
+					dRefLBx = dRefAlignX[i]; dRefLBy = dRefAlignY[i];
+					dRefRTx = dRefAlignX[k]; dRefRTy = dRefAlignY[k];
+				}
+			}
+		}
+
+
+		// PCB»óÀÇ ¿øÁ¡ ±âÁØÀÇ Marking ÀÌ¹ÌÁö ÁÂÇ¥.
+		double dTgtAlignX[4], dTgtAlignY[4];
+		dTgtAlignX[0] = (pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][0];
+		dTgtAlignY[0] = (pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][0];
+		dTgtAlignX[1] = (pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][1];
+		dTgtAlignY[1] = (pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][1];
+		dTgtAlignX[2] = (pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][2];
+		dTgtAlignY[2] = (pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][2];
+		dTgtAlignX[3] = (pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][3];
+		dTgtAlignY[3] = (pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][3];
+		int nTgtAlignX[4], nTgtAlignY[4];
+		nTgtAlignX[0] = int((pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][0]);
+		nTgtAlignY[0] = int((pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][0]);
+		nTgtAlignX[1] = int((pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][1]);
+		nTgtAlignY[1] = int((pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][1]);
+		nTgtAlignX[2] = int((pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][2]);
+		nTgtAlignY[2] = int((pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][2]);
+		nTgtAlignX[3] = int((pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][3]);
+		nTgtAlignY[3] = int((pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][3]);
+
+		ApplyRngMargin(nTgtAlignX, nTgtAlignY);
+
+		double dTgtLTx, dTgtLTy;		// (0, 0)
+		double dTgtRTx, dTgtRTy;		// (100, 0)
+		double dTgtRBx, dTgtRBy;		// (100, 100)
+		double dTgtLBx, dTgtLBy;		// (0, 100)
+
+		for (i = 0; i < 3; i++)
+		{
+			for (k = i + 1; k < 4; k++)
+			{
+				if (nTgtAlignX[i] < nTgtAlignX[k] && nTgtAlignY[i] < nTgtAlignY[k])
+				{
+					dTgtLTx = dTgtAlignX[i]; dTgtLTy = dTgtAlignY[i];
+					dTgtRBx = dTgtAlignX[k]; dTgtRBy = dTgtAlignY[k];
+				}
+				else if (nTgtAlignX[i] > nTgtAlignX[k] && nTgtAlignY[i] > nTgtAlignY[k])
+				{
+					dTgtRBx = dTgtAlignX[i]; dTgtRBy = dTgtAlignY[i];
+					dTgtLTx = dTgtAlignX[k]; dTgtLTy = dTgtAlignY[k];
+				}
+				else if (nTgtAlignX[i] > nTgtAlignX[k] && nTgtAlignY[i] < nTgtAlignY[k])
+				{
+					dTgtRTx = dTgtAlignX[i]; dTgtRTy = dTgtAlignY[i];
+					dTgtLBx = dTgtAlignX[k]; dTgtLBy = dTgtAlignY[k];
+				}
+				else if (nTgtAlignX[i] < nTgtAlignX[k] && nTgtAlignY[i] > nTgtAlignY[k])
+				{
+					dTgtLBx = dTgtAlignX[i]; dTgtLBy = dTgtAlignY[i];
+					dTgtRTx = dTgtAlignX[k]; dTgtRTy = dTgtAlignY[k];
+				}
+			}
+		}
+
+		int nTgtRngX[4], nTgtRngY[4];			// LT, LB, RB, RT
+		nTgtRngX[0] = int(dTgtLTx);	nTgtRngY[0] = int(dTgtLTy);
+		nTgtRngX[1] = int(dTgtLBx);	nTgtRngY[1] = int(dTgtLBy);
+		nTgtRngX[2] = int(dTgtRBx);	nTgtRngY[2] = int(dTgtRBy);
+		nTgtRngX[3] = int(dTgtRTx);	nTgtRngY[3] = int(dTgtRTy);
+		DispAlignRangeL(nTgtRngX, nTgtRngY);	// LT, LB, RB, RT
+
+		int nNodeX = 0, nNodeY = 0;
+		if (pDoc->m_Master[0].m_pPcsRgn)
+		{
+			nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+			nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
+		}
+
+		CfPoint fptRefFid[4], fptTgtFid[4];
+		CfPoint fptRef, fptTgt;
+
+		fptRefFid[0].x = dRefLBx;
+		fptRefFid[0].y = dRefLBy;
+		fptRefFid[1].x = dRefRBx;
+		fptRefFid[1].y = dRefRBy;
+		fptRefFid[2].x = dRefRTx;
+		fptRefFid[2].y = dRefRTy;
+		fptRefFid[3].x = dRefLTx;
+		fptRefFid[3].y = dRefLTy;
+
+		fptTgtFid[0].x = dTgtLBx;
+		fptTgtFid[0].y = dTgtLBy;
+		fptTgtFid[1].x = dTgtRBx;
+		fptTgtFid[1].y = dTgtRBy;
+		fptTgtFid[2].x = dTgtRTx;
+		fptTgtFid[2].y = dTgtRTy;
+		fptTgtFid[3].x = dTgtLTx;
+		fptTgtFid[3].y = dTgtLTy;
+
+		//CfPoint ptRef, ptTgt;
+		int nCol, nRow, idx = 0;
+		for (nCol = 0; nCol < nNodeX; nCol++)
+		{
+			for (nRow = 0; nRow < nNodeY; nRow++)
+			{
+				fptRef.x = pDoc->m_Master[0].m_stPcsMk[idx].X + pView->m_pMotion->m_dPinPosX[0];
+				fptRef.y = pDoc->m_Master[0].m_stPcsMk[idx].Y + pView->m_pMotion->m_dPinPosY[0];
+				pView->m_Align[0].BilinearAlignment(fptRefFid[0], fptRefFid[1], fptRefFid[2], fptRefFid[3], fptTgtFid[0], fptTgtFid[1], fptTgtFid[2], fptTgtFid[3], fptRef, fptTgt); // LB, RB, RT, LT
+
+				//ptRef.x = pDoc->m_Master[0].m_stPcsMk[idx].X + pView->m_pMotion->m_dPinPosX[0];
+				//ptRef.y = pDoc->m_Master[0].m_stPcsMk[idx].Y + pView->m_pMotion->m_dPinPosY[0];
+				//pView->m_Align[0].BilinearAlignment(dRefLTx, dRefLTy, dTgtLTx, dTgtLTy,
+				//									dRefRTx, dRefRTy, dTgtRTx, dTgtRTy,
+				//									dRefRBx, dRefRBy, dTgtRBx, dTgtRBy,
+				//									dRefLBx, dRefLBy, dTgtLBx, dTgtLBy,
+				//									ptRef.x, ptRef.y,
+				//									&ptTgt.x, &ptTgt.y);
+				//pView->m_Align[0].BilinearAlignment(dRefAlignX0, dRefAlignY0, dTgtAlignX0, dTgtAlignY0,		// LT
+				//									dRefAlignX1, dRefAlignY1, dTgtAlignX1, dTgtAlignY1,		// RT
+				//									dRefAlignX2, dRefAlignY2, dTgtAlignX2, dTgtAlignY2,		// RB
+				//									dRefAlignX3, dRefAlignY3, dTgtAlignX3, dTgtAlignY3,		// LB												
+				//									ptRef.x, ptRef.y,										// CAD DATA
+				//									&ptTgt.x, &ptTgt.y);									// TARGET DATA
+				//pView->m_Align[0].BilinearAlignment(dRefAlignX0, dRefAlignY0, dRefAlignX1, dRefAlignY1, dRefAlignX2, dRefAlignY2, dRefAlignX3, dRefAlignY3,
+				//									dTgtAlignX0, dTgtAlignY0, dTgtAlignX1, dTgtAlignY1, dTgtAlignX2, dTgtAlignY2, dTgtAlignX3, dTgtAlignY3, 
+				//									ptRef.x, ptRef.y, &ptTgt.x, &ptTgt.y);
+				if (pDoc->m_Master[0].m_pPcsRgn)
+				{
+					pDoc->m_Master[0].m_pPcsRgn->pMkPnt[0][idx].x = fptTgt.x;
+					pDoc->m_Master[0].m_pPcsRgn->pMkPnt[0][idx].y = fptTgt.y;
+					//pDoc->m_Master[0].m_pPcsRgn->pMkPnt[0][idx].x = ptTgt.x;
+					//pDoc->m_Master[0].m_pPcsRgn->pMkPnt[0][idx].y = ptTgt.y;
+				}
+				idx++;
+			}
+		}
+
+	}
+
 #endif
 }
 
@@ -3061,10 +3403,14 @@ BOOL CDlgMenu02::Grab(int nPos, BOOL bMove)
 void CDlgMenu02::OnChkMarkingTest2() 
 {
 	// TODO: Add your control notification handler code here
-	m_lChk = 1;
-	SetTimer(TIM_SHOW_MK_TEST, 30, NULL);
+	//if (myBtn2[16].GetCheck())
+	//	m_lChk = 1;
+	//else
+	//	m_lChk = 0;
+	//	
+	//SetTimer(TIM_SHOW_MK_TEST, 30, NULL);
 
-	//ChkMarkingTest2();
+	ChkMarkingTest2();
 }
 
 void CDlgMenu02::ChkMarkingTest2() 
@@ -4023,15 +4369,41 @@ void CDlgMenu02::OnBtnMk1PosMeas()
 void CDlgMenu02::OnBtnAlignMove2() 
 {
 	// TODO: Add your control notification handler code here
-	if(m_nMoveAlign[1] == 0)
+	if (pDoc->WorkingInfo.LastJob.nAlignMethode == FOUR_POINT)
 	{
-		MoveAlign1(0);
-		m_nMoveAlign[1] = 1;
+		if (m_nMoveAlign[1] == 0)
+		{
+			MoveAlign1(0);
+			m_nMoveAlign[1] = 1;
+		}
+		else if(m_nMoveAlign[1] == 1)
+		{
+			MoveAlign1(1);
+			m_nMoveAlign[1] = 2;
+		}
+		else if (m_nMoveAlign[1] == 2)
+		{
+			MoveAlign1(2);
+			m_nMoveAlign[1] = 3;
+		}
+		else if (m_nMoveAlign[1] == 3)
+		{
+			MoveAlign1(3);
+			m_nMoveAlign[1] = 0;
+		}
 	}
 	else
 	{
-		MoveAlign1(1);
-		m_nMoveAlign[1] = 0;
+		if (m_nMoveAlign[1] == 0)
+		{
+			MoveAlign1(0);
+			m_nMoveAlign[1] = 1;
+		}
+		else
+		{
+			MoveAlign1(1);
+			m_nMoveAlign[1] = 0;
+		}
 	}
 }
 
@@ -4075,7 +4447,7 @@ void CDlgMenu02::Grab2PntAlign2()
 #ifdef USE_VISION
 	if (pView->m_pVision[1]->Grab(nPos))
 	{
-		GetPmRst1(dX, dY, dAgl, dScr);
+		GetPmRst1(dX, dY, dAgl, dScr);	// Right
 		str.Format(_T("%.1f"), dX);
 		pDoc->WorkingInfo.Motion.sAlignResultPosX[0][nPos] = str;
 		myStcData2[7].SetText(str);
@@ -4098,7 +4470,85 @@ void CDlgMenu02::Grab2PntAlign2()
 		myStcData2[8].SetText(_T(""));
 		myStcData2[9].SetText(_T(""));
 		myStcData2[10].SetText(_T(""));
+		return;
 	}
+
+
+	int nCamSzX, nCamSzY;
+	pView->m_pVision[1]->GetCameraSize(nCamSzX, nCamSzY);
+
+	double dResX, dResY, dResCam;
+
+	dResX = _tstof(pDoc->WorkingInfo.Vision[1].sResX);
+	dResY = _tstof(pDoc->WorkingInfo.Vision[1].sResY);
+	dResCam = _tstof(pDoc->WorkingInfo.Vision[1].sCamPxlRes) / 10000.0;
+
+	GetPmRst1(dX, dY, dAgl, dScr);	// Right
+
+	if (nPos == 0)
+	{
+		m_dMkFdOffsetX[1][0] = (double(nCamSzX / 2) - dX) * dResX; // -: Á¦Ç° ´ú¿È, +: Á¦Ç° ´õ¿È.
+		m_dMkFdOffsetY[1][0] = (double(nCamSzY / 2) - dY) * dResY; // -: Á¦Ç° ³ª¿È, +: Á¦Ç° µé¾î°¨.
+
+		//pView->MpeWrite(pView->Plc.DlgFrameHigh.FeedOffsetPunch, (long)(-1.0 * m_dMkFdOffsetX[1][0] * 1000.0));	// ¸¶Å·ºÎ Feeding ·Ñ·¯ Offset(*1000, +:´õ º¸³¿, -´ú º¸³¿)
+	}
+
+	if (nPos == 1)
+	{
+		double dMkFdOffsetX = (double(nCamSzX / 2) - dX) * dResX; // -: Á¦Ç° ´ú¿È, +: Á¦Ç° ´õ¿È.
+		double dMkFdOffsetY = (double(nCamSzY / 2) - dY) * dResY; // -: Á¦Ç° ³ª¿È, +: Á¦Ç° µé¾î°¨.
+		m_dMkFdOffsetX[1][1] = dMkFdOffsetX;
+		m_dMkFdOffsetY[1][1] = dMkFdOffsetY;
+
+		// CamÀÇ ¿øÁ¡ ±âÁØÀÇ Marking ÀÌ¹ÌÁö ÁÂÇ¥.
+		double dRefAlignX0 = pDoc->m_Master[0].m_stAlignMk.X0 + pView->m_pMotion->m_dPinPosX[1]; // PCBÁÂÇ¥
+		double dRefAlignY0 = pDoc->m_Master[0].m_stAlignMk.Y0 + pView->m_pMotion->m_dPinPosY[1]; // PCBÁÂÇ¥
+		double dRefAlignX1 = pDoc->m_Master[0].m_stAlignMk.X1 + pView->m_pMotion->m_dPinPosX[1]; // PCBÁÂÇ¥
+		double dRefAlignY1 = pDoc->m_Master[0].m_stAlignMk.Y1 + pView->m_pMotion->m_dPinPosY[1]; // PCBÁÂÇ¥
+
+																								 // PCB»óÀÇ ¿øÁ¡ ±âÁØÀÇ Marking ÀÌ¹ÌÁö ÁÂÇ¥.
+		double dTgtAlignX0 = (pDoc->m_Master[0].m_stAlignMk.X0 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][0];
+		double dTgtAlignY0 = (pDoc->m_Master[0].m_stAlignMk.Y0 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][0];
+		double dTgtAlignX1 = (pDoc->m_Master[0].m_stAlignMk.X1 + pView->m_pMotion->m_dPinPosX[1]) - dMkFdOffsetX;
+		double dTgtAlignY1 = (pDoc->m_Master[0].m_stAlignMk.Y1 + pView->m_pMotion->m_dPinPosY[1]) - dMkFdOffsetY;
+
+		int nNodeX = 0, nNodeY = 0;
+		if (pDoc->m_Master[0].m_pPcsRgn)
+		{
+			nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+			nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
+		}
+
+		pView->m_Align[1].SetAlignData(dRefAlignX0, dRefAlignY0, dRefAlignX1, dRefAlignY1, dTgtAlignX0, dTgtAlignY0, dTgtAlignX1, dTgtAlignY1);
+
+		CfPoint ptRef, ptTgt;
+		int nCol, nRow, idx = 0;
+		for (nCol = 0; nCol < nNodeX; nCol++)
+		{
+			for (nRow = 0; nRow < nNodeY; nRow++)
+			{
+				ptRef.x = pDoc->m_Master[0].m_stPcsMk[idx].X + pView->m_pMotion->m_dPinPosX[1];
+				ptRef.y = pDoc->m_Master[0].m_stPcsMk[idx].Y + pView->m_pMotion->m_dPinPosY[1];
+				pView->m_Align[1].LinearAlignment(ptRef, ptTgt);
+				if (pDoc->m_Master[0].m_pPcsRgn)
+				{
+					pDoc->m_Master[0].m_pPcsRgn->pMkPnt[1][idx].x = ptTgt.x;
+					pDoc->m_Master[0].m_pPcsRgn->pMkPnt[1][idx].y = ptTgt.y;
+				}
+				idx++;
+			}
+		}
+
+
+		double dRotation, dScale;
+		pView->m_Align[1].GetResult(dRotation, dScale);
+		str.Format(_T("%.3f"), dRotation);
+		myStcData[19].SetText(str);
+		str.Format(_T("%.3f"), dScale);
+		myStcData[20].SetText(str);
+
+	}
+
 #endif
 }
 
@@ -4128,9 +4578,10 @@ void CDlgMenu02::Grab4PntAlign2()
 	else if ((dCurrX > pPos[2] - 0.1 && dCurrX < pPos[2] + 0.1) && (dCurrY > pPos[3] - 0.1 && dCurrY < pPos[3] + 0.1))
 		nPos = 1;
 	else if ((dCurrX > pPos[4] - 0.1 && dCurrX < pPos[4] + 0.1) && (dCurrY > pPos[5] - 0.1 && dCurrY < pPos[5] + 0.1))
-		nPos = 0;
+		nPos = 2;
 	else if ((dCurrX > pPos[6] - 0.1 && dCurrX < pPos[6] + 0.1) && (dCurrY > pPos[7] - 0.1 && dCurrY < pPos[7] + 0.1))
-		nPos = 1;
+		nPos = 3;
+
 
 	if (nPos == -1)
 	{
@@ -4166,7 +4617,228 @@ void CDlgMenu02::Grab4PntAlign2()
 		myStcData2[8].SetText(_T(""));
 		myStcData2[9].SetText(_T(""));
 		myStcData2[10].SetText(_T(""));
+		return;
 	}
+
+
+	int nCamSzX, nCamSzY;
+	pView->m_pVision[1]->GetCameraSize(nCamSzX, nCamSzY);
+
+	int i, k;
+	double dResX, dResY, dResCam;
+	dResX = _tstof(pDoc->WorkingInfo.Vision[1].sResX);
+	dResY = _tstof(pDoc->WorkingInfo.Vision[1].sResY);
+	dResCam = _tstof(pDoc->WorkingInfo.Vision[1].sCamPxlRes) / 10000.0;
+
+	GetPmRst1(dX, dY, dAgl, dScr);
+
+	if (nPos == 0)
+	{
+		m_dMkFdOffsetX[1][0] = (double(nCamSzX / 2) - dX) * dResX; // -: Á¦Ç° ´ú¿È, +: Á¦Ç° ´õ¿È.
+		m_dMkFdOffsetY[1][0] = (double(nCamSzY / 2) - dY) * dResY; // -: Á¦Ç° ³ª¿È, +: Á¦Ç° µé¾î°¨.
+		pView->MpeWrite(pView->Plc.DlgFrameHigh.FeedOffsetPunch, (long)(-1.0 * m_dMkFdOffsetX[1][0] * 1000.0));	// ¸¶Å·ºÎ Feeding ·Ñ·¯ Offset(*1000, +:´õ º¸³¿, -´ú º¸³¿)
+	}
+	else if (nPos == 1)
+	{
+		m_dMkFdOffsetX[1][1] = (double(nCamSzX / 2) - dX) * dResX; // -: Á¦Ç° ´ú¿È, +: Á¦Ç° ´õ¿È.
+		m_dMkFdOffsetY[1][1] = (double(nCamSzY / 2) - dY) * dResY; // -: Á¦Ç° ³ª¿È, +: Á¦Ç° µé¾î°¨.
+	}
+	else if (nPos == 2)
+	{
+		m_dMkFdOffsetX[1][2] = (double(nCamSzX / 2) - dX) * dResX; // -: Á¦Ç° ´ú¿È, +: Á¦Ç° ´õ¿È.
+		m_dMkFdOffsetY[1][2] = (double(nCamSzY / 2) - dY) * dResY; // -: Á¦Ç° ³ª¿È, +: Á¦Ç° µé¾î°¨.
+	}
+	else if (nPos == 3)
+	{
+		double dMkFdOffsetX = (double(nCamSzX / 2) - dX) * dResX; // -: Á¦Ç° ´ú¿È, +: Á¦Ç° ´õ¿È.
+		double dMkFdOffsetY = (double(nCamSzY / 2) - dY) * dResY; // -: Á¦Ç° ³ª¿È, +: Á¦Ç° µé¾î°¨.
+		m_dMkFdOffsetX[1][3] = dMkFdOffsetX;
+		m_dMkFdOffsetY[1][3] = dMkFdOffsetY;
+
+		// CamÀÇ ¿øÁ¡ ±âÁØÀÇ Marking ÀÌ¹ÌÁö ÁÂÇ¥.
+		double dRefAlignX[4], dRefAlignY[4];
+		dRefAlignX[0] = pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[1]; // PCBÁÂÇ¥
+		dRefAlignY[0] = pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[1]; // PCBÁÂÇ¥
+		dRefAlignX[1] = pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[1]; // PCBÁÂÇ¥
+		dRefAlignY[1] = pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[1]; // PCBÁÂÇ¥
+		dRefAlignX[2] = pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[1]; // PCBÁÂÇ¥
+		dRefAlignY[2] = pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[1]; // PCBÁÂÇ¥
+		dRefAlignX[3] = pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[1]; // PCBÁÂÇ¥
+		dRefAlignY[3] = pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[1]; // PCBÁÂÇ¥
+		int nRefAlignX[4], nRefAlignY[4];
+		nRefAlignX[0] = int(pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[1]); // PCBÁÂÇ¥
+		nRefAlignY[0] = int(pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[1]); // PCBÁÂÇ¥
+		nRefAlignX[1] = int(pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[1]); // PCBÁÂÇ¥
+		nRefAlignY[1] = int(pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[1]); // PCBÁÂÇ¥
+		nRefAlignX[2] = int(pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[1]); // PCBÁÂÇ¥
+		nRefAlignY[2] = int(pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[1]); // PCBÁÂÇ¥
+		nRefAlignX[3] = int(pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[1]); // PCBÁÂÇ¥
+		nRefAlignY[3] = int(pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[1]); // PCBÁÂÇ¥
+
+		ApplyRngMargin(nRefAlignX, nRefAlignY);
+
+		double dRefLTx, dRefLTy;		// (0, 0)
+		double dRefRTx, dRefRTy;		// (100, 0)
+		double dRefRBx, dRefRBy;		// (100, 100)
+		double dRefLBx, dRefLBy;		// (0, 100)
+
+		for (i = 0; i < 3; i++)
+		{
+			for (k = i + 1; k < 4; k++)
+			{
+				if (nRefAlignX[i] < nRefAlignX[k] && nRefAlignY[i] < nRefAlignY[k])
+				{
+					dRefLTx = dRefAlignX[i]; dRefLTy = dRefAlignY[i];
+					dRefRBx = dRefAlignX[k]; dRefRBy = dRefAlignY[k];
+				}
+				else if (nRefAlignX[i] > nRefAlignX[k] && nRefAlignY[i] > nRefAlignY[k])
+				{
+					dRefRBx = dRefAlignX[i]; dRefRBy = dRefAlignY[i];
+					dRefLTx = dRefAlignX[k]; dRefLTy = dRefAlignY[k];
+				}
+				else if (nRefAlignX[i] > nRefAlignX[k] && nRefAlignY[i] < nRefAlignY[k])
+				{
+					dRefRTx = dRefAlignX[i]; dRefRTy = dRefAlignY[i];
+					dRefLBx = dRefAlignX[k]; dRefLBy = dRefAlignY[k];
+				}
+				else if (nRefAlignX[i] < nRefAlignX[k] && nRefAlignY[i] > nRefAlignY[k])
+				{
+					dRefLBx = dRefAlignX[i]; dRefLBy = dRefAlignY[i];
+					dRefRTx = dRefAlignX[k]; dRefRTy = dRefAlignY[k];
+				}
+			}
+		}
+
+		// PCB»óÀÇ ¿øÁ¡ ±âÁØÀÇ Marking ÀÌ¹ÌÁö ÁÂÇ¥.
+		double dTgtAlignX[4], dTgtAlignY[4];
+		dTgtAlignX[0] = (pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][0];
+		dTgtAlignY[0] = (pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][0];
+		dTgtAlignX[1] = (pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][1];
+		dTgtAlignY[1] = (pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][1];
+		dTgtAlignX[2] = (pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][2];
+		dTgtAlignY[2] = (pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][2];
+		dTgtAlignX[3] = (pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][3];
+		dTgtAlignY[3] = (pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][3];
+		int nTgtAlignX[4], nTgtAlignY[4];
+		nTgtAlignX[0] = int((pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][0]);
+		nTgtAlignY[0] = int((pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][0]);
+		nTgtAlignX[1] = int((pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][1]);
+		nTgtAlignY[1] = int((pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][1]);
+		nTgtAlignX[2] = int((pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][2]);
+		nTgtAlignY[2] = int((pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][2]);
+		nTgtAlignX[3] = int((pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][3]);
+		nTgtAlignY[3] = int((pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][3]);
+
+		ApplyRngMargin(nTgtAlignX, nTgtAlignY);
+
+		double dTgtLTx, dTgtLTy;		// (0, 0)
+		double dTgtRTx, dTgtRTy;		// (100, 0)
+		double dTgtRBx, dTgtRBy;		// (100, 100)
+		double dTgtLBx, dTgtLBy;		// (0, 100)
+
+		for (i = 0; i < 3; i++)
+		{
+			for (k = i + 1; k < 4; k++)
+			{
+				if (nTgtAlignX[i] < nTgtAlignX[k] && nTgtAlignY[i] < nTgtAlignY[k])
+				{
+					dTgtLTx = dTgtAlignX[i]; dTgtLTy = dTgtAlignY[i];
+					dTgtRBx = dTgtAlignX[k]; dTgtRBy = dTgtAlignY[k];
+				}
+				else if (nTgtAlignX[i] > nTgtAlignX[k] && nTgtAlignY[i] > nTgtAlignY[k])
+				{
+					dTgtRBx = dTgtAlignX[i]; dTgtRBy = dTgtAlignY[i];
+					dTgtLTx = dTgtAlignX[k]; dTgtLTy = dTgtAlignY[k];
+				}
+				else if (nTgtAlignX[i] > nTgtAlignX[k] && nTgtAlignY[i] < nTgtAlignY[k])
+				{
+					dTgtRTx = dTgtAlignX[i]; dTgtRTy = dTgtAlignY[i];
+					dTgtLBx = dTgtAlignX[k]; dTgtLBy = dTgtAlignY[k];
+				}
+				else if (nTgtAlignX[i] < nTgtAlignX[k] && nTgtAlignY[i] > nTgtAlignY[k])
+				{
+					dTgtLBx = dTgtAlignX[i]; dTgtLBy = dTgtAlignY[i];
+					dTgtRTx = dTgtAlignX[k]; dTgtRTy = dTgtAlignY[k];
+				}
+			}
+		}
+
+		int nTgtRngX[4], nTgtRngY[4];			// LT, LB, RB, RT
+		nTgtRngX[0] = int(dTgtLTx);	nTgtRngY[0] = int(dTgtLTy);
+		nTgtRngX[1] = int(dTgtLBx);	nTgtRngY[1] = int(dTgtLBy);
+		nTgtRngX[2] = int(dTgtRBx);	nTgtRngY[2] = int(dTgtRBy);
+		nTgtRngX[3] = int(dTgtRTx);	nTgtRngY[3] = int(dTgtRTy);
+		DispAlignRangeR(nTgtRngX, nTgtRngY);	// LT, LB, RB, RT
+
+		int nNodeX = 0, nNodeY = 0;
+		if (pDoc->m_Master[0].m_pPcsRgn)
+		{
+			nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
+			nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
+		}
+
+
+		CfPoint fptRefFid[4], fptTgtFid[4];
+		CfPoint fptRef, fptTgt;
+
+		fptRefFid[0].x = dRefLBx;
+		fptRefFid[0].y = dRefLBy;
+		fptRefFid[1].x = dRefRBx;
+		fptRefFid[1].y = dRefRBy;
+		fptRefFid[2].x = dRefRTx;
+		fptRefFid[2].y = dRefRTy;
+		fptRefFid[3].x = dRefLTx;
+		fptRefFid[3].y = dRefLTy;
+
+		fptTgtFid[0].x = dTgtLBx;
+		fptTgtFid[0].y = dTgtLBy;
+		fptTgtFid[1].x = dTgtRBx;
+		fptTgtFid[1].y = dTgtRBy;
+		fptTgtFid[2].x = dTgtRTx;
+		fptTgtFid[2].y = dTgtRTy;
+		fptTgtFid[3].x = dTgtLTx;
+		fptTgtFid[3].y = dTgtLTy;
+
+
+		//CfPoint ptRef, ptTgt;
+		int nCol, nRow, idx = 0;
+		for (nCol = 0; nCol < nNodeX; nCol++)
+		{
+			for (nRow = 0; nRow < nNodeY; nRow++)
+			{
+				fptRef.x = pDoc->m_Master[0].m_stPcsMk[idx].X + pView->m_pMotion->m_dPinPosX[1];
+				fptRef.y = pDoc->m_Master[0].m_stPcsMk[idx].Y + pView->m_pMotion->m_dPinPosY[1];
+				pView->m_Align[1].BilinearAlignment(fptRefFid[0], fptRefFid[1], fptRefFid[2], fptRefFid[3], fptTgtFid[0], fptTgtFid[1], fptTgtFid[2], fptTgtFid[3], fptRef, fptTgt); // LB, RB, RT, LT
+
+				//ptRef.x = pDoc->m_Master[0].m_stPcsMk[idx].X + pView->m_pMotion->m_dPinPosX[1];
+				//ptRef.y = pDoc->m_Master[0].m_stPcsMk[idx].Y + pView->m_pMotion->m_dPinPosY[1];
+				//pView->m_Align[1].BilinearAlignment(dRefLTx, dRefLTy, dTgtLTx, dTgtLTy,
+				//	dRefRTx, dRefRTy, dTgtRTx, dTgtRTy,
+				//	dRefRBx, dRefRBy, dTgtRBx, dTgtRBy,
+				//	dRefLBx, dRefLBy, dTgtLBx, dTgtLBy,
+				//	ptRef.x, ptRef.y,
+				//	&ptTgt.x, &ptTgt.y);
+				//pView->m_Align[1].BilinearAlignment(dRefAlignX0, dRefAlignY0, dTgtAlignX0, dTgtAlignY0,		// LT
+				//									dRefAlignX1, dRefAlignY1, dTgtAlignX1, dTgtAlignY1,		// RT
+				//									dRefAlignX2, dRefAlignY2, dTgtAlignX2, dTgtAlignY2,		// RB
+				//									dRefAlignX3, dRefAlignY3, dTgtAlignX3, dTgtAlignY3,		// LB												
+				//									ptRef.x, ptRef.y,										// CAD DATA	
+				//									&ptTgt.x, &ptTgt.y);									// TARGET DATA
+				//pView->m_Align[1].BilinearAlignment(dRefAlignX0, dRefAlignY0, dRefAlignX1, dRefAlignY1, dRefAlignX2, dRefAlignY2, dRefAlignX3, dRefAlignY3,
+				//									dTgtAlignX0, dTgtAlignY0, dTgtAlignX1, dTgtAlignY1, dTgtAlignX2, dTgtAlignY2, dTgtAlignX3, dTgtAlignY3,
+				//									ptRef.x, ptRef.y, &ptTgt.x, &ptTgt.y);
+				if (pDoc->m_Master[0].m_pPcsRgn)
+				{
+					pDoc->m_Master[0].m_pPcsRgn->pMkPnt[1][idx].x = fptTgt.x;
+					pDoc->m_Master[0].m_pPcsRgn->pMkPnt[1][idx].y = fptTgt.y;
+					//pDoc->m_Master[0].m_pPcsRgn->pMkPnt[1][idx].x = ptTgt.x;
+					//pDoc->m_Master[0].m_pPcsRgn->pMkPnt[1][idx].y = ptTgt.y;
+				}
+				idx++;
+			}
+		}
+	}
+
 #endif
 }
 
@@ -4816,6 +5488,7 @@ BOOL CDlgMenu02::Do4PtAlign0(int nPos, BOOL bDraw)
 	double pPos[2];
 	CfPoint ptPnt;
 	double dX, dY, dAgl, dScr;
+	int i, k;
 
 	if (pView->m_pVision[0]->Grab(nPos, bDraw))
 	{
@@ -4902,24 +5575,120 @@ BOOL CDlgMenu02::Do4PtAlign0(int nPos, BOOL bDraw)
 		m_dMkFdOffsetY[0][3] = dMkFdOffsetY;
 
 		// CamÀÇ ¿øÁ¡ ±âÁØÀÇ Marking ÀÌ¹ÌÁö ÁÂÇ¥.
-		double dRefAlignX0 = pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[0]; // PCBÁÂÇ¥
-		double dRefAlignY0 = pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[0]; // PCBÁÂÇ¥
-		double dRefAlignX1 = pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[0]; // PCBÁÂÇ¥
-		double dRefAlignY1 = pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[0]; // PCBÁÂÇ¥
-		double dRefAlignX2 = pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[0]; // PCBÁÂÇ¥
-		double dRefAlignY2 = pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[0]; // PCBÁÂÇ¥
-		double dRefAlignX3 = pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[0]; // PCBÁÂÇ¥
-		double dRefAlignY3 = pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[0]; // PCBÁÂÇ¥
+		double dRefAlignX[4], dRefAlignY[4];
+		dRefAlignX[0] = pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[0]; // PCBÁÂÇ¥
+		dRefAlignY[0] = pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[0]; // PCBÁÂÇ¥
+		dRefAlignX[1] = pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[0]; // PCBÁÂÇ¥
+		dRefAlignY[1] = pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[0]; // PCBÁÂÇ¥
+		dRefAlignX[2] = pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[0]; // PCBÁÂÇ¥
+		dRefAlignY[2] = pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[0]; // PCBÁÂÇ¥
+		dRefAlignX[3] = pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[0]; // PCBÁÂÇ¥
+		dRefAlignY[3] = pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[0]; // PCBÁÂÇ¥
+		int nRefAlignX[4], nRefAlignY[4];
+		nRefAlignX[0] = int(pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[0]); // PCBÁÂÇ¥
+		nRefAlignY[0] = int(pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[0]); // PCBÁÂÇ¥
+		nRefAlignX[1] = int(pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[0]); // PCBÁÂÇ¥
+		nRefAlignY[1] = int(pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[0]); // PCBÁÂÇ¥
+		nRefAlignX[2] = int(pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[0]); // PCBÁÂÇ¥
+		nRefAlignY[2] = int(pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[0]); // PCBÁÂÇ¥
+		nRefAlignX[3] = int(pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[0]); // PCBÁÂÇ¥
+		nRefAlignY[3] = int(pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[0]); // PCBÁÂÇ¥
+
+		ApplyRngMargin(nRefAlignX, nRefAlignY);
+
+		double dRefLTx, dRefLTy;		// (0, 0)
+		double dRefRTx, dRefRTy;		// (100, 0)
+		double dRefRBx, dRefRBy;		// (100, 100)
+		double dRefLBx, dRefLBy;		// (0, 100)
+
+		for (i = 0; i < 3; i++)
+		{
+			for (k = i + 1; k < 4; k++)
+			{
+				if (nRefAlignX[i] < nRefAlignX[k] && nRefAlignY[i] < nRefAlignY[k])
+				{
+					dRefLTx = dRefAlignX[i]; dRefLTy = dRefAlignY[i];
+					dRefRBx = dRefAlignX[k]; dRefRBy = dRefAlignY[k];
+				}
+				else if (nRefAlignX[i] > nRefAlignX[k] && nRefAlignY[i] > nRefAlignY[k])
+				{
+					dRefRBx = dRefAlignX[i]; dRefRBy = dRefAlignY[i];
+					dRefLTx = dRefAlignX[k]; dRefLTy = dRefAlignY[k];
+				}
+				else if (nRefAlignX[i] > nRefAlignX[k] && nRefAlignY[i] < nRefAlignY[k])
+				{
+					dRefRTx = dRefAlignX[i]; dRefRTy = dRefAlignY[i];
+					dRefLBx = dRefAlignX[k]; dRefLBy = dRefAlignY[k];
+				}
+				else if (nRefAlignX[i] < nRefAlignX[k] && nRefAlignY[i] > nRefAlignY[k])
+				{
+					dRefLBx = dRefAlignX[i]; dRefLBy = dRefAlignY[i];
+					dRefRTx = dRefAlignX[k]; dRefRTy = dRefAlignY[k];
+				}
+			}
+		}
+
 
 		// PCB»óÀÇ ¿øÁ¡ ±âÁØÀÇ Marking ÀÌ¹ÌÁö ÁÂÇ¥.
-		double dTgtAlignX0 = (pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][0];
-		double dTgtAlignY0 = (pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][0];
-		double dTgtAlignX1 = (pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][1];
-		double dTgtAlignY1 = (pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][1];
-		double dTgtAlignX2 = (pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][2];
-		double dTgtAlignY2 = (pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][2];
-		double dTgtAlignX3 = (pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][3];
-		double dTgtAlignY3 = (pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][3];
+		double dTgtAlignX[4], dTgtAlignY[4];
+		dTgtAlignX[0] = (pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][0];
+		dTgtAlignY[0] = (pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][0];
+		dTgtAlignX[1] = (pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][1];
+		dTgtAlignY[1] = (pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][1];
+		dTgtAlignX[2] = (pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][2];
+		dTgtAlignY[2] = (pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][2];
+		dTgtAlignX[3] = (pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][3];
+		dTgtAlignY[3] = (pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][3];
+		int nTgtAlignX[4], nTgtAlignY[4];
+		nTgtAlignX[0] = int((pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][0]);
+		nTgtAlignY[0] = int((pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][0]);
+		nTgtAlignX[1] = int((pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][1]);
+		nTgtAlignY[1] = int((pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][1]);
+		nTgtAlignX[2] = int((pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][2]);
+		nTgtAlignY[2] = int((pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][2]);
+		nTgtAlignX[3] = int((pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[0]) - m_dMkFdOffsetX[0][3]);
+		nTgtAlignY[3] = int((pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[0]) - m_dMkFdOffsetY[0][3]);
+
+		ApplyRngMargin(nTgtAlignX, nTgtAlignY);
+
+		double dTgtLTx, dTgtLTy;		// (0, 0)
+		double dTgtRTx, dTgtRTy;		// (100, 0)
+		double dTgtRBx, dTgtRBy;		// (100, 100)
+		double dTgtLBx, dTgtLBy;		// (0, 100)
+
+		for (i = 0; i < 3; i++)
+		{
+			for (k = i + 1; k < 4; k++)
+			{
+				if (nTgtAlignX[i] < nTgtAlignX[k] && nTgtAlignY[i] < nTgtAlignY[k])
+				{
+					dTgtLTx = dTgtAlignX[i]; dTgtLTy = dTgtAlignY[i];
+					dTgtRBx = dTgtAlignX[k]; dTgtRBy = dTgtAlignY[k];
+				}
+				else if (nTgtAlignX[i] > nTgtAlignX[k] && nTgtAlignY[i] > nTgtAlignY[k])
+				{
+					dTgtRBx = dTgtAlignX[i]; dTgtRBy = dTgtAlignY[i];
+					dTgtLTx = dTgtAlignX[k]; dTgtLTy = dTgtAlignY[k];
+				}
+				else if (nTgtAlignX[i] > nTgtAlignX[k] && nTgtAlignY[i] < nTgtAlignY[k])
+				{
+					dTgtRTx = dTgtAlignX[i]; dTgtRTy = dTgtAlignY[i];
+					dTgtLBx = dTgtAlignX[k]; dTgtLBy = dTgtAlignY[k];
+				}
+				else if (nTgtAlignX[i] < nTgtAlignX[k] && nTgtAlignY[i] > nTgtAlignY[k])
+				{
+					dTgtLBx = dTgtAlignX[i]; dTgtLBy = dTgtAlignY[i];
+					dTgtRTx = dTgtAlignX[k]; dTgtRTy = dTgtAlignY[k];
+				}
+			}
+		}
+
+		int nTgtRngX[4], nTgtRngY[4];			// LT, LB, RB, RT
+		nTgtRngX[0] = int(dTgtLTx);	nTgtRngY[0] = int(dTgtLTy);
+		nTgtRngX[1] = int(dTgtLBx);	nTgtRngY[1] = int(dTgtLBy);
+		nTgtRngX[2] = int(dTgtRBx);	nTgtRngY[2] = int(dTgtRBy);
+		nTgtRngX[3] = int(dTgtRTx);	nTgtRngY[3] = int(dTgtRTy);
+		DispAlignRangeL(nTgtRngX, nTgtRngY);	// LT, LB, RB, RT
 
 		int nNodeX = 0, nNodeY = 0;
 		if (pDoc->m_Master[0].m_pPcsRgn)
@@ -4928,22 +5697,60 @@ BOOL CDlgMenu02::Do4PtAlign0(int nPos, BOOL bDraw)
 			nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
 		}
 
+		CfPoint fptRefFid[4], fptTgtFid[4];
+		CfPoint fptRef, fptTgt;
 
-		CfPoint ptRef, ptTgt;
+		fptRefFid[0].x = dRefLBx;
+		fptRefFid[0].y = dRefLBy;
+		fptRefFid[1].x = dRefRBx;
+		fptRefFid[1].y = dRefRBy;
+		fptRefFid[2].x = dRefRTx;
+		fptRefFid[2].y = dRefRTy;
+		fptRefFid[3].x = dRefLTx;
+		fptRefFid[3].y = dRefLTy;
+
+		fptTgtFid[0].x = dTgtLBx;
+		fptTgtFid[0].y = dTgtLBy;
+		fptTgtFid[1].x = dTgtRBx;
+		fptTgtFid[1].y = dTgtRBy;
+		fptTgtFid[2].x = dTgtRTx;
+		fptTgtFid[2].y = dTgtRTy;
+		fptTgtFid[3].x = dTgtLTx;
+		fptTgtFid[3].y = dTgtLTy;
+
+		//CfPoint ptRef, ptTgt;
 		int nCol, nRow, idx = 0;
 		for (nCol = 0; nCol < nNodeX; nCol++)
 		{
 			for (nRow = 0; nRow < nNodeY; nRow++)
 			{
-				ptRef.x = pDoc->m_Master[0].m_stPcsMk[idx].X + pView->m_pMotion->m_dPinPosX[0];
-				ptRef.y = pDoc->m_Master[0].m_stPcsMk[idx].Y + pView->m_pMotion->m_dPinPosY[0];
-				pView->m_Align[0].BilinearAlignment(dRefAlignX0, dRefAlignY0, dRefAlignX1, dRefAlignY1, dRefAlignX2, dRefAlignY2, dRefAlignX3, dRefAlignY3,
-													dTgtAlignX0, dTgtAlignY0, dTgtAlignX1, dTgtAlignY1, dTgtAlignX2, dTgtAlignY2, dTgtAlignX3, dTgtAlignY3, 
-													ptRef.x, ptRef.y, &ptTgt.x, &ptTgt.y);
+				fptRef.x = pDoc->m_Master[0].m_stPcsMk[idx].X + pView->m_pMotion->m_dPinPosX[0];
+				fptRef.y = pDoc->m_Master[0].m_stPcsMk[idx].Y + pView->m_pMotion->m_dPinPosY[0];
+				pView->m_Align[0].BilinearAlignment(fptRefFid[0], fptRefFid[1], fptRefFid[2], fptRefFid[3], fptTgtFid[0], fptTgtFid[1], fptTgtFid[2], fptTgtFid[3], fptRef, fptTgt); // LB, RB, RT, LT
+
+				//ptRef.x = pDoc->m_Master[0].m_stPcsMk[idx].X + pView->m_pMotion->m_dPinPosX[0];
+				//ptRef.y = pDoc->m_Master[0].m_stPcsMk[idx].Y + pView->m_pMotion->m_dPinPosY[0];
+				//pView->m_Align[0].BilinearAlignment(dRefLTx, dRefLTy, dTgtLTx, dTgtLTy,
+				//									dRefRTx, dRefRTy, dTgtRTx, dTgtRTy,
+				//									dRefRBx, dRefRBy, dTgtRBx, dTgtRBy,
+				//									dRefLBx, dRefLBy, dTgtLBx, dTgtLBy,
+				//									ptRef.x, ptRef.y,
+				//									&ptTgt.x, &ptTgt.y);
+				//pView->m_Align[0].BilinearAlignment(dRefAlignX0, dRefAlignY0, dTgtAlignX0, dTgtAlignY0,		// LT
+				//									dRefAlignX1, dRefAlignY1, dTgtAlignX1, dTgtAlignY1,		// RT
+				//									dRefAlignX2, dRefAlignY2, dTgtAlignX2, dTgtAlignY2,		// RB
+				//									dRefAlignX3, dRefAlignY3, dTgtAlignX3, dTgtAlignY3,		// LB												
+				//									ptRef.x, ptRef.y,										// CAD DATA
+				//									&ptTgt.x, &ptTgt.y);									// TARGET DATA
+				//pView->m_Align[0].BilinearAlignment(dRefAlignX0, dRefAlignY0, dRefAlignX1, dRefAlignY1, dRefAlignX2, dRefAlignY2, dRefAlignX3, dRefAlignY3,
+				//									dTgtAlignX0, dTgtAlignY0, dTgtAlignX1, dTgtAlignY1, dTgtAlignX2, dTgtAlignY2, dTgtAlignX3, dTgtAlignY3, 
+				//									ptRef.x, ptRef.y, &ptTgt.x, &ptTgt.y);
 				if (pDoc->m_Master[0].m_pPcsRgn)
 				{
-					pDoc->m_Master[0].m_pPcsRgn->pMkPnt[0][idx].x = ptTgt.x;
-					pDoc->m_Master[0].m_pPcsRgn->pMkPnt[0][idx].y = ptTgt.y;
+					pDoc->m_Master[0].m_pPcsRgn->pMkPnt[0][idx].x = fptTgt.x;
+					pDoc->m_Master[0].m_pPcsRgn->pMkPnt[0][idx].y = fptTgt.y;
+					//pDoc->m_Master[0].m_pPcsRgn->pMkPnt[0][idx].x = ptTgt.x;
+					//pDoc->m_Master[0].m_pPcsRgn->pMkPnt[0][idx].y = ptTgt.y;
 				}
 				idx++;
 			}
@@ -4982,6 +5789,7 @@ BOOL CDlgMenu02::Do4PtAlign1(int nPos, BOOL bDraw)
 	double pPos[2];
 	CfPoint ptPnt;
 	double dX, dY, dAgl, dScr;
+	int i, k;
 
 	if (pView->m_pVision[1]->Grab(nPos, bDraw))
 	{
@@ -5068,24 +5876,119 @@ BOOL CDlgMenu02::Do4PtAlign1(int nPos, BOOL bDraw)
 		m_dMkFdOffsetY[1][3] = dMkFdOffsetY;
 
 		// CamÀÇ ¿øÁ¡ ±âÁØÀÇ Marking ÀÌ¹ÌÁö ÁÂÇ¥.
-		double dRefAlignX0 = pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[1]; // PCBÁÂÇ¥
-		double dRefAlignY0 = pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[1]; // PCBÁÂÇ¥
-		double dRefAlignX1 = pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[1]; // PCBÁÂÇ¥
-		double dRefAlignY1 = pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[1]; // PCBÁÂÇ¥
-		double dRefAlignX2 = pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[1]; // PCBÁÂÇ¥
-		double dRefAlignY2 = pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[1]; // PCBÁÂÇ¥
-		double dRefAlignX3 = pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[1]; // PCBÁÂÇ¥
-		double dRefAlignY3 = pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[1]; // PCBÁÂÇ¥
+		double dRefAlignX[4], dRefAlignY[4];
+		dRefAlignX[0] = pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[1]; // PCBÁÂÇ¥
+		dRefAlignY[0] = pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[1]; // PCBÁÂÇ¥
+		dRefAlignX[1] = pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[1]; // PCBÁÂÇ¥
+		dRefAlignY[1] = pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[1]; // PCBÁÂÇ¥
+		dRefAlignX[2] = pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[1]; // PCBÁÂÇ¥
+		dRefAlignY[2] = pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[1]; // PCBÁÂÇ¥
+		dRefAlignX[3] = pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[1]; // PCBÁÂÇ¥
+		dRefAlignY[3] = pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[1]; // PCBÁÂÇ¥
+		int nRefAlignX[4], nRefAlignY[4];
+		nRefAlignX[0] = int(pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[1]); // PCBÁÂÇ¥
+		nRefAlignY[0] = int(pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[1]); // PCBÁÂÇ¥
+		nRefAlignX[1] = int(pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[1]); // PCBÁÂÇ¥
+		nRefAlignY[1] = int(pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[1]); // PCBÁÂÇ¥
+		nRefAlignX[2] = int(pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[1]); // PCBÁÂÇ¥
+		nRefAlignY[2] = int(pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[1]); // PCBÁÂÇ¥
+		nRefAlignX[3] = int(pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[1]); // PCBÁÂÇ¥
+		nRefAlignY[3] = int(pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[1]); // PCBÁÂÇ¥
+
+		ApplyRngMargin(nRefAlignX, nRefAlignY);
+
+		double dRefLTx, dRefLTy;		// (0, 0)
+		double dRefRTx, dRefRTy;		// (100, 0)
+		double dRefRBx, dRefRBy;		// (100, 100)
+		double dRefLBx, dRefLBy;		// (0, 100)
+
+		for (i = 0; i < 3; i++)
+		{
+			for (k = i + 1; k < 4; k++)
+			{
+				if (nRefAlignX[i] < nRefAlignX[k] && nRefAlignY[i] < nRefAlignY[k])
+				{
+					dRefLTx = dRefAlignX[i]; dRefLTy = dRefAlignY[i];
+					dRefRBx = dRefAlignX[k]; dRefRBy = dRefAlignY[k];
+				}
+				else if (nRefAlignX[i] > nRefAlignX[k] && nRefAlignY[i] > nRefAlignY[k])
+				{
+					dRefRBx = dRefAlignX[i]; dRefRBy = dRefAlignY[i];
+					dRefLTx = dRefAlignX[k]; dRefLTy = dRefAlignY[k];
+				}
+				else if (nRefAlignX[i] > nRefAlignX[k] && nRefAlignY[i] < nRefAlignY[k])
+				{
+					dRefRTx = dRefAlignX[i]; dRefRTy = dRefAlignY[i];
+					dRefLBx = dRefAlignX[k]; dRefLBy = dRefAlignY[k];
+				}
+				else if (nRefAlignX[i] < nRefAlignX[k] && nRefAlignY[i] > nRefAlignY[k])
+				{
+					dRefLBx = dRefAlignX[i]; dRefLBy = dRefAlignY[i];
+					dRefRTx = dRefAlignX[k]; dRefRTy = dRefAlignY[k];
+				}
+			}
+		}
 
 		// PCB»óÀÇ ¿øÁ¡ ±âÁØÀÇ Marking ÀÌ¹ÌÁö ÁÂÇ¥.
-		double dTgtAlignX0 = (pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][0];
-		double dTgtAlignY0 = (pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][0];
-		double dTgtAlignX1 = (pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][1];
-		double dTgtAlignY1 = (pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][1];
-		double dTgtAlignX2 = (pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][2];
-		double dTgtAlignY2 = (pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][2];
-		double dTgtAlignX3 = (pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][3];
-		double dTgtAlignY3 = (pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][3];
+		double dTgtAlignX[4], dTgtAlignY[4];
+		dTgtAlignX[0] = (pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][0];
+		dTgtAlignY[0] = (pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][0];
+		dTgtAlignX[1] = (pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][1];
+		dTgtAlignY[1] = (pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][1];
+		dTgtAlignX[2] = (pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][2];
+		dTgtAlignY[2] = (pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][2];
+		dTgtAlignX[3] = (pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][3];
+		dTgtAlignY[3] = (pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][3];
+		int nTgtAlignX[4], nTgtAlignY[4];
+		nTgtAlignX[0] = int((pDoc->m_Master[0].m_stAlignMk2.X0 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][0]);
+		nTgtAlignY[0] = int((pDoc->m_Master[0].m_stAlignMk2.Y0 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][0]);
+		nTgtAlignX[1] = int((pDoc->m_Master[0].m_stAlignMk2.X1 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][1]);
+		nTgtAlignY[1] = int((pDoc->m_Master[0].m_stAlignMk2.Y1 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][1]);
+		nTgtAlignX[2] = int((pDoc->m_Master[0].m_stAlignMk2.X2 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][2]);
+		nTgtAlignY[2] = int((pDoc->m_Master[0].m_stAlignMk2.Y2 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][2]);
+		nTgtAlignX[3] = int((pDoc->m_Master[0].m_stAlignMk2.X3 + pView->m_pMotion->m_dPinPosX[1]) - m_dMkFdOffsetX[1][3]);
+		nTgtAlignY[3] = int((pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[1]) - m_dMkFdOffsetY[1][3]);
+
+		ApplyRngMargin(nTgtAlignX, nTgtAlignY);
+
+		double dTgtLTx, dTgtLTy;		// (0, 0)
+		double dTgtRTx, dTgtRTy;		// (100, 0)
+		double dTgtRBx, dTgtRBy;		// (100, 100)
+		double dTgtLBx, dTgtLBy;		// (0, 100)
+
+		for (i = 0; i < 3; i++)
+		{
+			for (k = i + 1; k < 4; k++)
+			{
+				if (nTgtAlignX[i] < nTgtAlignX[k] && nTgtAlignY[i] < nTgtAlignY[k])
+				{
+					dTgtLTx = dTgtAlignX[i]; dTgtLTy = dTgtAlignY[i];
+					dTgtRBx = dTgtAlignX[k]; dTgtRBy = dTgtAlignY[k];
+				}
+				else if (nTgtAlignX[i] > nTgtAlignX[k] && nTgtAlignY[i] > nTgtAlignY[k])
+				{
+					dTgtRBx = dTgtAlignX[i]; dTgtRBy = dTgtAlignY[i];
+					dTgtLTx = dTgtAlignX[k]; dTgtLTy = dTgtAlignY[k];
+				}
+				else if (nTgtAlignX[i] > nTgtAlignX[k] && nTgtAlignY[i] < nTgtAlignY[k])
+				{
+					dTgtRTx = dTgtAlignX[i]; dTgtRTy = dTgtAlignY[i];
+					dTgtLBx = dTgtAlignX[k]; dTgtLBy = dTgtAlignY[k];
+				}
+				else if (nTgtAlignX[i] < nTgtAlignX[k] && nTgtAlignY[i] > nTgtAlignY[k])
+				{
+					dTgtLBx = dTgtAlignX[i]; dTgtLBy = dTgtAlignY[i];
+					dTgtRTx = dTgtAlignX[k]; dTgtRTy = dTgtAlignY[k];
+				}
+			}
+		}
+
+		int nTgtRngX[4], nTgtRngY[4];			// LT, LB, RB, RT
+		nTgtRngX[0] = int(dTgtLTx);	nTgtRngY[0] = int(dTgtLTy);
+		nTgtRngX[1] = int(dTgtLBx);	nTgtRngY[1] = int(dTgtLBy);
+		nTgtRngX[2] = int(dTgtRBx);	nTgtRngY[2] = int(dTgtRBy);
+		nTgtRngX[3] = int(dTgtRTx);	nTgtRngY[3] = int(dTgtRTy);
+		DispAlignRangeR(nTgtRngX, nTgtRngY);	// LT, LB, RB, RT
 
 		int nNodeX = 0, nNodeY = 0;
 		if (pDoc->m_Master[0].m_pPcsRgn)
@@ -5094,37 +5997,64 @@ BOOL CDlgMenu02::Do4PtAlign1(int nPos, BOOL bDraw)
 			nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
 		}
 
+		CfPoint fptRefFid[4], fptTgtFid[4];
+		CfPoint fptRef, fptTgt;
 
-		CfPoint ptRef, ptTgt;
+		fptRefFid[0].x = dRefLBx;
+		fptRefFid[0].y = dRefLBy;
+		fptRefFid[1].x = dRefRBx;
+		fptRefFid[1].y = dRefRBy;
+		fptRefFid[2].x = dRefRTx;
+		fptRefFid[2].y = dRefRTy;
+		fptRefFid[3].x = dRefLTx;
+		fptRefFid[3].y = dRefLTy;
+
+		fptTgtFid[0].x = dTgtLBx;
+		fptTgtFid[0].y = dTgtLBy;
+		fptTgtFid[1].x = dTgtRBx;
+		fptTgtFid[1].y = dTgtRBy;
+		fptTgtFid[2].x = dTgtRTx;
+		fptTgtFid[2].y = dTgtRTy;
+		fptTgtFid[3].x = dTgtLTx;
+		fptTgtFid[3].y = dTgtLTy;
+
+		//CfPoint ptRef, ptTgt;
 		int nCol, nRow, idx = 0;
 		for (nCol = 0; nCol < nNodeX; nCol++)
 		{
 			for (nRow = 0; nRow < nNodeY; nRow++)
 			{
-				ptRef.x = pDoc->m_Master[0].m_stPcsMk[idx].X + pView->m_pMotion->m_dPinPosX[1];
-				ptRef.y = pDoc->m_Master[0].m_stPcsMk[idx].Y + pView->m_pMotion->m_dPinPosY[1];
-				pView->m_Align[0].BilinearAlignment(dRefAlignX0, dRefAlignY0, dRefAlignX1, dRefAlignY1, dRefAlignX2, dRefAlignY2, dRefAlignX3, dRefAlignY3,
-													dTgtAlignX0, dTgtAlignY0, dTgtAlignX1, dTgtAlignY1, dTgtAlignX2, dTgtAlignY2, dTgtAlignX3, dTgtAlignY3,
-													ptRef.x, ptRef.y, &ptTgt.x, &ptTgt.y);
+				fptRef.x = pDoc->m_Master[0].m_stPcsMk[idx].X + pView->m_pMotion->m_dPinPosX[1];
+				fptRef.y = pDoc->m_Master[0].m_stPcsMk[idx].Y + pView->m_pMotion->m_dPinPosY[1];
+				pView->m_Align[1].BilinearAlignment(fptRefFid[0], fptRefFid[1], fptRefFid[2], fptRefFid[3], fptTgtFid[0], fptTgtFid[1], fptTgtFid[2], fptTgtFid[3], fptRef, fptTgt); // LB, RB, RT, LT
+
+				//ptRef.x = pDoc->m_Master[0].m_stPcsMk[idx].X + pView->m_pMotion->m_dPinPosX[1];
+				//ptRef.y = pDoc->m_Master[0].m_stPcsMk[idx].Y + pView->m_pMotion->m_dPinPosY[1];
+				//pView->m_Align[1].BilinearAlignment(dRefLTx, dRefLTy, dTgtLTx, dTgtLTy,
+				//									dRefRTx, dRefRTy, dTgtRTx, dTgtRTy,
+				//									dRefRBx, dRefRBy, dTgtRBx, dTgtRBy,
+				//									dRefLBx, dRefLBy, dTgtLBx, dTgtLBy,
+				//									ptRef.x, ptRef.y,
+				//									&ptTgt.x, &ptTgt.y);
+				//pView->m_Align[1].BilinearAlignment(dRefAlignX0, dRefAlignY0, dTgtAlignX0, dTgtAlignY0,		// LT
+				//									dRefAlignX1, dRefAlignY1, dTgtAlignX1, dTgtAlignY1,		// RT
+				//									dRefAlignX2, dRefAlignY2, dTgtAlignX2, dTgtAlignY2,		// RB
+				//									dRefAlignX3, dRefAlignY3, dTgtAlignX3, dTgtAlignY3,		// LB												
+				//									ptRef.x, ptRef.y,										// CAD DATA	
+				//									&ptTgt.x, &ptTgt.y);									// TARGET DATA
+				//pView->m_Align[1].BilinearAlignment(dRefAlignX0, dRefAlignY0, dRefAlignX1, dRefAlignY1, dRefAlignX2, dRefAlignY2, dRefAlignX3, dRefAlignY3,
+				//									dTgtAlignX0, dTgtAlignY0, dTgtAlignX1, dTgtAlignY1, dTgtAlignX2, dTgtAlignY2, dTgtAlignX3, dTgtAlignY3,
+				//									ptRef.x, ptRef.y, &ptTgt.x, &ptTgt.y);
 				if (pDoc->m_Master[0].m_pPcsRgn)
 				{
-					pDoc->m_Master[0].m_pPcsRgn->pMkPnt[1][idx].x = ptTgt.x;
-					pDoc->m_Master[0].m_pPcsRgn->pMkPnt[1][idx].y = ptTgt.y;
+					pDoc->m_Master[0].m_pPcsRgn->pMkPnt[1][idx].x = fptTgt.x;
+					pDoc->m_Master[0].m_pPcsRgn->pMkPnt[1][idx].y = fptTgt.y;
+					//pDoc->m_Master[0].m_pPcsRgn->pMkPnt[1][idx].x = ptTgt.x;
+					//pDoc->m_Master[0].m_pPcsRgn->pMkPnt[1][idx].y = ptTgt.y;
 				}
 				idx++;
 			}
 		}
-
-#ifdef USE_FLUCK
-		// for Elec Check Point
-		ptRef.x = _tstof(pDoc->WorkingInfo.Probing[1].sMeasurePosX);
-		ptRef.y = _tstof(pDoc->WorkingInfo.Probing[1].sMeasurePosY);
-		pView->m_Align[0].BilinearAlignment(dRefAlignX0, dRefAlignY0, dRefAlignX1, dRefAlignY1, dRefAlignX2, dRefAlignY2, dRefAlignX3, dRefAlignY3,
-											dTgtAlignX0, dTgtAlignY0, dTgtAlignX1, dTgtAlignY1, dTgtAlignX2, dTgtAlignY2, dTgtAlignX3, dTgtAlignY3,
-											ptRef.x, ptRef.y, &ptTgt.x, &ptTgt.y);
-		pDoc->WorkingInfo.Fluck.dMeasPosX[1] = ptTgt.x;
-		pDoc->WorkingInfo.Fluck.dMeasPosY[1] = ptTgt.y;
-#endif
 	}
 #endif
 	return TRUE;
@@ -5162,4 +6092,50 @@ BOOL CDlgMenu02::SetModelMarkImage()
 	// 11. ÀÚµ¿ ¼³Á¤µÈ °ªÀ» ÀÛ¾÷ÀÚ°¡ ¼öÁ¤ÇÒ ¼ö ÀÖµµ·Ï ÇÔ.
 
 	// 12. ÁÂÃø Ä«¸Þ¶ó¸¦ ÃÊ±â À§Ä¡·Î º¸³¿
+}
+
+void CDlgMenu02::ResetBtn(int nID)
+{
+	if (nID == IDC_CHK_MARKING_TEST2)
+	{
+		if (myBtn2[16].GetCheck())
+			myBtn2[16].SetCheck(FALSE);
+	}
+}
+
+void CDlgMenu02::ApplyRngMargin(int* pRefAlignX, int* pRefAlignY)
+{
+	int i, k, nDiff, nRangeMargin = 20; // [mm]
+
+	for (i = 0; i < 3; i++)
+	{
+		for (k = i + 1; k < 4; k++)
+		{
+			nDiff = abs(pRefAlignX[i] - pRefAlignX[k]);
+			if (nDiff < nRangeMargin && nDiff != 0)
+			{
+				pRefAlignX[i] = (pRefAlignX[i] + pRefAlignX[k]) / 2;
+				pRefAlignX[k] = pRefAlignX[i];
+			}
+
+			nDiff = abs(pRefAlignY[i] - pRefAlignY[k]);
+			if (nDiff < nRangeMargin && nDiff != 0)
+			{
+				pRefAlignY[i] = (pRefAlignY[i] + pRefAlignY[k]) / 2;
+				pRefAlignY[k] = pRefAlignY[i];
+			}
+		}
+	}
+}
+
+void CDlgMenu02::DispAlignRangeL(int* pAlignX, int* pAlignY)
+{
+	if (pView->m_pDlgMenu03)
+		pView->m_pDlgMenu03->DispAlignRangeL(pAlignX, pAlignY);
+}
+
+void CDlgMenu02::DispAlignRangeR(int* pAlignX, int* pAlignY)
+{
+	if (pView->m_pDlgMenu03)
+		pView->m_pDlgMenu03->DispAlignRangeR(pAlignX, pAlignY);
 }
