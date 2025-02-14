@@ -19,7 +19,7 @@
 
 class CGvisR2R_PunchDoc : public CDocument
 {
-	double m_dVerifyPunchScore;
+	//double m_dVerifyPunchScore;
 
 	int GetIdxPcrBuf(int nSerial);
 	int GetIdxPcrBufUp(int nSerial);
@@ -140,6 +140,7 @@ public:
 	BOOL MakeDirRmap(int nRmap);
 	double GetVerifyPunchScore();
 	void SetVerifyPunchScore(double dScore);
+
 	void LogAuto(CString strMsg, int nType = 0);
 	void LogPLC(CString strMsg, int nType = 0);
 	CString GetProcessNum();

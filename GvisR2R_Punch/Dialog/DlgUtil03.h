@@ -51,6 +51,10 @@ public:
 // 	void DoDispenseTest();
 // 	void SetFurge();
 
+	void InitCadImg(); // for RejectImg
+	void DispResultBlob();
+	void DispResultPtScore(int nCam);
+
 	afx_msg LRESULT OnMyBtnDown(WPARAM wPara, LPARAM lPara);
 	afx_msg LRESULT OnMyBtnUp(WPARAM wPara, LPARAM lPara);
 

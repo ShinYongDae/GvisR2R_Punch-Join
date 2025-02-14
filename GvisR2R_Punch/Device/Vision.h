@@ -58,10 +58,28 @@
 #define CAMERA_WIDTH	640
 #define CAMERA_HEIGHT	480
 
+/* Minimum and maximum area of blobs. */
+// Grab Image Size 100 x 100
+#define BLOB_AREA_MIN			100L			// 10 x 10
+#define BLOB_AREA_MAX			8100L			// 90 x 90
+#define BLOB_CENTER_OFFSET		20L			
+
+#define MIN_BLOB_SIZE_X       2L			
+#define MIN_BLOB_SIZE_Y       2L			
+
 typedef struct stPtMtRst
 {
 	double dX, dY, dAngle, dScore;
 } PT_MT_RST;
+
+
+typedef struct stBlobRst
+{
+	int nBlobTotal;
+	int nBoxArea;
+	double dCenterX, dCenterY;
+	int nBoxLeft, nBoxRight, nBoxTop, nBoxBottom;
+} BLOB_RST;
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -99,10 +117,11 @@ class CVision : public CWnd
 	CLibMilDraw *m_pMilOvrCad[DEF_VIEW_IMG_NUMBER], *m_pMilOvrDef[DEF_VIEW_IMG_NUMBER];
 	CLibMilDraw *m_pMilDelOvrCad[DEF_VIEW_IMG_NUMBER], *m_pMilDelOvrDef[DEF_VIEW_IMG_NUMBER];
 
-	CLibMilDisp *m_pMilDispPin;// , *m_pMilDispAlign;//, *m_pMilDispPcs;
-	CLibMilBuf *m_pMilBufPin, *m_pMilBufAlign;//, *m_pMilBufPcs;
-	CLibMilDraw *m_pMilPinOverlay;
-	CLibMilDraw *m_pMilPinOverlayDelete;
+	CLibMilDisp *m_pMilDispPin, *m_pMilDispReject;// , *m_pMilDispAlign;//, *m_pMilDispPcs;
+	CLibMilBuf *m_pMilBufPin, *m_pMilBufAlign, *m_pMilBufReject;//, *m_pMilBufPcs;
+	CLibMilBuf *m_pMilBufRejectRz, *m_pMilBufModel; // 100 x 100 pattern matching model
+	CLibMilDraw *m_pMilPinOverlay, *m_pMilRejectOverlay;
+	CLibMilDraw *m_pMilPinOverlayDelete, *m_pMilRejectOverlayDelete;
 
 
 	CLibMilBuf *m_MilGrabModelPunch;
@@ -112,6 +131,8 @@ class CVision : public CWnd
 	MIL_ID MilBufPinTemp, MilPinImgBuf;
 	//MIL_ID MilBufAlignTemp[2], MilAlignImgBuf[2];	// 2 points
 	MIL_ID MilBufAlignTemp[4], MilAlignImgBuf[4];	// 4 points
+
+	MIL_ID MilBufRejectTemp, MilRejectImgBuf;
 
 	int m_nCenterMarkLineLength;
 	int m_nDisplayCenterX;
@@ -123,6 +144,7 @@ class CVision : public CWnd
 	double m_dFontSizePixelX, m_dFontSizePixelY;
 
 	int m_nPinCtrX, m_nPinCtrY, m_nPinCrsLen;
+	int m_nRejectCtrX, m_nRejectCtrY, m_nRejectCrsLen;
 
 
 	void DrawCross(int nCenterX, int nCenterY, int nLineLength);
@@ -142,6 +164,7 @@ public:
 public:
 	CLibMil *m_pMil;
 	stPtMtRst PtMtRst;
+	stBlobRst BlobRst;
 
 // Operations
 public:
@@ -168,6 +191,7 @@ public:
 	void FreeDispDef(HWND hDispCtrl, CRect rtDispCtrl, int nIdx, int nDisplayFitMode = DISPLAY_FIT_MODE_CENTERVIEW);
 	void SelDispPin(HWND hDispCtrl, CRect rtDispCtrl, int nDisplayFitMode);
 	void SelDispAlign(HWND hDispCtrl, CRect rtDispCtrl, int nDisplayFitMode);
+	void SelDispReject(HWND hDispCtrl, CRect rtDispCtrl, int nDisplayFitMode);
 
 	void SetOvrCadFontSz(int nIdxMkInfo);
 	void InitCADBuf(int nLayer);
@@ -216,9 +240,21 @@ public:
 	BOOL SaveMkImg(CString sPath);
 	void SaveCadImg(int nIdxMkInfo, CString sPath); // (화면의 IDC 인덱스, 저장할 파일 Path)
 
+	BOOL m_bMkJudge; // TRUE : Mked, FALSE : NoMked
 	BOOL PrepareVerifyPunching();
-	BOOL CheckVerifyPunching(); // TRUE : Miss punching, FALSE : Punched
 	void SetVerifyPunchScore(double dScore);
+	double GetVerifyPunchScore();
+	BOOL CheckVerifyPunching(MIL_ID &GrabImgId);
+	BOOL Judge(MIL_ID &GrabImgId, stPtMtRst &stRst);
+
+	void ShowDispReject();
+	void InitRejectBuf();
+	void LoadRejectBuf();
+	void DrawCrossOnReject(int nCenterX, int nCenterY, int nLineLength);
+	BOOL ClearRejectCenterMarkArea(int nCenterX, int nCenterY, int nLineLength);
+	BOOL FitSizeBlobModel();
+	BOOL BlobRejectModel();
+
 	// ITS
 	//CLibMilBuf *m_pMilBufCad[DEF_VIEW_IMG_NUMBER], *m_pMilBufDef[DEF_VIEW_IMG_NUMBER];
 	//CLibMilDisp *m_pMilDispCad[DEF_VIEW_IMG_NUMBER], *m_pMilDispDef[DEF_VIEW_IMG_NUMBER];

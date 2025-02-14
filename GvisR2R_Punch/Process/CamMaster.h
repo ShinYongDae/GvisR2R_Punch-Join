@@ -51,11 +51,12 @@ class CCamMaster : public CWnd
 	void FreePolygonRgnData();
 
 	CString m_sPathCamSpecDir, m_sModel, m_sLayer, m_sLayerUp;
-	long m_PinFileSize, m_PcsFileSize, m_AlignFileSize[4];
+	long m_PinFileSize, m_PcsFileSize, m_AlignFileSize[4], m_RejectFileSize;
 
 	BOOL LoadMasterSpec();
 	void LoadPinImg();
 	void LoadAlignImg();
+	BOOL LoadRejMkImg();
  	CString GetCamPxlRes();
 	BOOL LoadStripRgnFromCam();
 	BOOL LoadPcsRgnFromCam();
@@ -69,6 +70,8 @@ class CCamMaster : public CWnd
 
 	BOOL PinImgBufAlloc(TCHAR *strCADImg, BOOL bOppLayerF);
 	void PinImgFree();
+	BOOL RejectImgBufAlloc(TCHAR *strCADImg);
+	void RejectImgFree();
 	void DeleteFileInFolder(CString sPathDir);
 	int CheckPath(CString strPath);
 	void PcsImgFree();
@@ -90,7 +93,7 @@ public:
 	stMasterInfo MasterInfo;
 	REGION_STRIP* m_pCellRgn;
 	CPcsRgn* m_pPcsRgn;
-	UCHAR *m_pPinImg, *m_pPcsImg, *m_pAlignImg[4];
+	UCHAR *m_pPinImg, *m_pPcsImg, *m_pAlignImg[4], *m_pRejectImg;
 
 	UCHAR *m_pCADCellImg[MAX_CELL_NUM];
 	long m_CADFileSize[MAX_CELL_NUM];

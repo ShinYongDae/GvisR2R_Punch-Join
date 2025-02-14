@@ -61,6 +61,12 @@ END_MESSAGE_MAP()
 
 void CLibMilBuf::Clear()
 {
+	if (m_MilImageChild)
+	{
+		MbufFree(m_MilImageChild);
+		m_MilImageChild = M_NULL;
+	}
+
 	if(m_MilImage)
 		MbufClear(m_MilImage, M_NULL);
 }

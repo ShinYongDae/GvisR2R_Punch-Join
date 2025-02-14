@@ -94,6 +94,7 @@
 //	#define	USE_XMP
 
 	#define PATH_PIN_IMG			_T("C:\\R2RSet\\Pin\\Pin.TIF")
+	#define PATH_REJECT_IMG			_T("C:\\R2RSet\\Reject\\Reject.TIF")
 	#define PATH_ALIGN0_IMG			_T("C:\\R2RSet\\Align\\Align0.TIF")
 	#define PATH_ALIGN1_IMG			_T("C:\\R2RSet\\Align\\Align1.TIF")
 	#define PATH_ALIGN2_IMG			_T("C:\\R2RSet\\Align\\Align2.TIF")
@@ -101,6 +102,7 @@
 	#define PATH_PCS_IMG			_T("C:\\R2RSet\\Pcs\\Piece.tif")
 
 	#define PATH_PIN_IMG_			_T("C:\\R2RSet\\Test\\Pin-330.tif")
+	#define PATH_REJECT_IMG_		_T("C:\\R2RSet\\Test\\Reject.TIF")
 	#define PATH_CELL_RGN			_T("C:\\R2RSet\\Test\\Cell.rgn")			// CAM PCS Region
 	#define PATH_CELL_MST			_T("C:\\R2RSet\\Test\\1STRIP-2-050.mst")	// CAM Cell Img Region Data
 	#define PATH_PCS_IMG_			_T("C:\\R2RSet\\Test\\Piece.tif")
@@ -793,6 +795,8 @@ struct stLastJob
 	CString sCurrentShotNum, sSettingShotNum;
 	int nAlarmTimePunch, nAlarmTimeAoi;
 	BOOL bDispContRun, bDispLotEnd;
+	BOOL bUseJudgeMk;
+	int nJudgeMkRatio;
 
 	stLastJob()
 	{
@@ -851,6 +855,8 @@ struct stLastJob
 
 		nAlarmTimePunch = 10800; nAlarmTimeAoi = 10800;
 		bDispContRun = FALSE; bDispLotEnd = FALSE;
+		bUseJudgeMk = TRUE;
+		nJudgeMkRatio = 85;
 	}
 };
 

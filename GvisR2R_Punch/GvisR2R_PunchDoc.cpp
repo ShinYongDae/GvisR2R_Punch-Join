@@ -51,7 +51,7 @@ CGvisR2R_PunchDoc::CGvisR2R_PunchDoc()
 	int i, k;
 	pDoc = this;
 
-	m_dVerifyPunchScore = 80.0;
+	//m_dVerifyPunchScore = 80.0;
 
 	m_sEngAlarm = _T("");
 
@@ -1040,10 +1040,10 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 
 	// [System]
 
-	if (0 < ::GetPrivateProfileString(_T("System"), _T("VerifyPunchScore"), NULL, szData, sizeof(szData), PATH_WORKING_INFO))
-		m_dVerifyPunchScore = _ttof(szData);
-	else
-		m_dVerifyPunchScore = 80.0;
+	//if (0 < ::GetPrivateProfileString(_T("System"), _T("VerifyPunchScore"), NULL, szData, sizeof(szData), PATH_WORKING_INFO))
+	//	m_dVerifyPunchScore = _ttof(szData);
+	//else
+	//	m_dVerifyPunchScore = 80.0;
 
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("OffLogAuto"), NULL, szData, sizeof(szData), PATH_WORKING_INFO))
 		m_bOffLogAuto = _ttoi(szData) ? TRUE : FALSE;
@@ -2051,6 +2051,16 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("연속 고정불량 판정 발생 판넬수가 설정되어 있지 않습니다."), MB_ICONWARNING | MB_OK);
 		WorkingInfo.LastJob.sNumContFixDef = CString(_T(""));
 	}
+
+	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Use Judge Marking"), NULL, szData, sizeof(szData), sPath))
+		WorkingInfo.LastJob.bUseJudgeMk = _ttoi(szData) ? TRUE : FALSE;
+	else
+		WorkingInfo.LastJob.bUseJudgeMk = TRUE;
+
+	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Judge Marking Ratio"), NULL, szData, sizeof(szData), sPath))
+		WorkingInfo.LastJob.nJudgeMkRatio = _ttoi(szData);
+	else
+		WorkingInfo.LastJob.nJudgeMkRatio = 85;
 
 	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Ultra Sonic Cleanner Start Time"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.LastJob.sUltraSonicCleannerStTim = CString(szData);
@@ -4882,8 +4892,8 @@ CString CGvisR2R_PunchDoc::GetCamPxlRes()
 		nPos = sRes.ReverseFind('.');
 		if (nPos > 0)
 			sRes = sRes.Left(nPos);
-		WorkingInfo.Vision[0].sCamPxlRes = sRes;
-		WorkingInfo.Vision[1].sCamPxlRes = sRes;
+		WorkingInfo.Vision[0].sCamPxlRes = sRes; // CamMaster Pixel Resolution.
+		WorkingInfo.Vision[1].sCamPxlRes = sRes; // CamMaster Pixel Resolution.
 	}
 	return sRes;
 }
@@ -5371,7 +5381,7 @@ int CGvisR2R_PunchDoc::LoadPCR0(int nSerial, BOOL bFromShare)	// return : 2(Fail
 		return nRtn[0];
 	if (pDoc->m_bVsStatusUp)
 	{
-		if (pDoc->m_ListBuf[0].nTot <= pDoc->m_ListBuf[1].nTot)
+		if (pDoc->m_ListBuf[0].nTot < pDoc->m_ListBuf[1].nTot)
 		{
 			nRtn[1] = LoadPCRAllDn(nSerial, bFromShare);
 			if (nRtn[1] != 1)
@@ -5471,7 +5481,7 @@ int CGvisR2R_PunchDoc::LoadPCR1(int nSerial, BOOL bFromShare)	// return : 2(Fail
 
 	if (pDoc->m_bVsStatusDn)
 	{
-		if (pDoc->m_ListBuf[1].nTot <= pDoc->m_ListBuf[0].nTot)
+		if (pDoc->m_ListBuf[1].nTot < pDoc->m_ListBuf[0].nTot)
 		{
 			nRtn[1] = LoadPCRAllDn(nSerial, bFromShare);
 			if (nRtn[1] != 1)
@@ -15059,15 +15069,19 @@ CString CGvisR2R_PunchDoc::GetYieldPath(int nRmap)
 
 double CGvisR2R_PunchDoc::GetVerifyPunchScore()
 {
-	return m_dVerifyPunchScore;
+	//return m_dVerifyPunchScore;
+	double dVerifyPunchScore = 85.0;
+	if (pView->m_pVision[0])
+		dVerifyPunchScore = pView->m_pVision[0]->GetVerifyPunchScore();
+	return dVerifyPunchScore;
 }
 
 void CGvisR2R_PunchDoc::SetVerifyPunchScore(double dScore)
 {
-	m_dVerifyPunchScore = dScore;
-	CString sData;
-	sData.Format(_T("%d"), m_dVerifyPunchScore);
-	::WritePrivateProfileString(_T("System"), _T("VerifyPunchScore"), sData, PATH_WORKING_INFO);
+	//m_dVerifyPunchScore = dScore;
+	//CString sData;
+	//sData.Format(_T("%d"), int(m_dVerifyPunchScore));
+	//::WritePrivateProfileString(_T("System"), _T("VerifyPunchScore"), sData, PATH_WORKING_INFO);
 	if (pView->m_pVision[0])
 		pView->m_pVision[0]->SetVerifyPunchScore(dScore);
 	if (pView->m_pVision[1])

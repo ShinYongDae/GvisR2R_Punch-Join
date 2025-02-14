@@ -72,6 +72,7 @@ BEGIN_MESSAGE_MAP(CDlgInfo, CDialog)
 	ON_BN_CLICKED(IDC_CHK_009, OnChk009)
 	ON_BN_CLICKED(IDC_CHK_010, OnChk010)
 	ON_BN_CLICKED(IDC_CHK_011, OnChk011)
+	ON_BN_CLICKED(IDC_CHK_26, OnChk26)
 	ON_BN_CLICKED(IDC_STC_0012, OnStc0012)
 	ON_BN_CLICKED(IDC_STC_0016, OnStc0016)
 	ON_BN_CLICKED(IDC_STC_0020, OnStc0020)
@@ -109,6 +110,7 @@ BEGIN_MESSAGE_MAP(CDlgInfo, CDialog)
 	ON_STN_CLICKED(IDC_STC_43, &CDlgInfo::OnStnClickedStc43)
 	ON_STN_CLICKED(IDC_STC_82, &CDlgInfo::OnStnClickedStc82)
 	ON_STN_CLICKED(IDC_STC_83, &CDlgInfo::OnStnClickedStc83)
+	ON_STN_CLICKED(IDC_STC_187, &CDlgInfo::OnStnClickedStc187)
 	ON_BN_CLICKED(IDC_CHK_USE_AOI_MIDDLE, &CDlgInfo::OnBnClickedChkUseAoiMiddle)
 	ON_WM_TIMER()
 END_MESSAGE_MAP()
@@ -342,6 +344,10 @@ void CDlgInfo::InitBtn()
 	myBtn[27].SetHwnd(this->GetSafeHwnd(), IDC_CHK_23);
 	myBtn[27].SetBtnType(BTN_TYPE_CHECK);
 
+	myBtn[28].SubclassDlgItem(IDC_CHK_26, this);
+	myBtn[28].SetHwnd(this->GetSafeHwnd(), IDC_CHK_26);
+	myBtn[28].SetBtnType(BTN_TYPE_CHECK);
+
 	int i;
 	for(i=0; i<MAX_INFO_BTN; i++)
 	{
@@ -455,6 +461,12 @@ void CDlgInfo::InitStcTitle()
 	myStcTitle[67].SubclassDlgItem(IDC_STC_44, this); // 340mm
 	myStcTitle[68].SubclassDlgItem(IDC_STC_47, this); // 346mm
 
+	myStcTitle[69].SubclassDlgItem(IDC_STC_103, this);
+	myStcTitle[70].SubclassDlgItem(IDC_STC_87, this);
+	myStcTitle[71].SubclassDlgItem(IDC_STC_19, this);
+	myStcTitle[72].SubclassDlgItem(IDC_STC_22, this);
+	myStcTitle[73].SubclassDlgItem(IDC_STC_188, this);
+
 
 	for(int i=0; i<MAX_INFO_STC; i++)
 	{
@@ -474,6 +486,7 @@ void CDlgInfo::InitStcTitle()
 		case 64:
 		case 65:
 		case 66:
+		case 69:
 			myStcTitle[i].SetTextColor(RGB_NAVY);
 			myStcTitle[i].SetBkColor(RGB_LTDKORANGE);
 			myStcTitle[i].SetFontBold(TRUE);
@@ -482,6 +495,7 @@ void CDlgInfo::InitStcTitle()
 		case 4:
 		case 21:
 		case 47:
+		case 70:
 			myStcTitle[i].SetTextColor(RGB_WHITE);
 			myStcTitle[i].SetBkColor(RGB_DARKGREEN);
 			myStcTitle[i].SetFontBold(TRUE);
@@ -501,6 +515,8 @@ void CDlgInfo::InitStcTitle()
 		case 40:
 		case 55:
 		case 58:
+		case 61:
+		case 73:
 			myStcTitle[i].SetTextColor(RGB_NAVY);
 			myStcTitle[i].SetBkColor(RGB_WHITE);
 			myStcTitle[i].SetFontBold(TRUE);
@@ -541,6 +557,8 @@ void CDlgInfo::InitStcData()
 
 	myStcData[19].SubclassDlgItem(IDC_STC_82, this); // 검사부 AOI 상하면 재작업 알람 시간
 	myStcData[20].SubclassDlgItem(IDC_STC_83, this); // 마킹부 재작업 알람 시간
+
+	myStcData[21].SubclassDlgItem(IDC_STC_187, this); // 마킹부 마킹여부 확인 미마킹일치율
 
 	for(int i=0; i<MAX_INFO_STC_DATA; i++)
 	{
@@ -634,6 +652,14 @@ void CDlgInfo::Disp()
 		myBtn[3].SetCheck(TRUE);
 	else
 		myBtn[3].SetCheck(FALSE);
+
+	if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+		myBtn[28].SetCheck(TRUE);
+	else
+		myBtn[28].SetCheck(FALSE);
+
+	str.Format(_T("%d"), pDoc->WorkingInfo.LastJob.nJudgeMkRatio);
+	myStcData[21].SetText(str);
 
 	pDoc->WorkingInfo.LastJob.bRclDrSen = pView->MpeRead(pView->Plc.DlgInfo.LampDoorSensorRecoiler) ? TRUE : FALSE;
 	if(pDoc->WorkingInfo.LastJob.bRclDrSen)
@@ -2252,4 +2278,61 @@ void CDlgInfo::OnTimer(UINT_PTR nIDEvent)
 	}
 
 	CDialog::OnTimer(nIDEvent);
+}
+
+void CDlgInfo::OnChk26()
+{
+	// TODO: Add your control notification handler code here
+	CString strFileNReject, strTemp;
+	CString sPathCamSpecDir = pDoc->WorkingInfo.System.sPathCamSpecDir;
+	CString sModel = pDoc->WorkingInfo.LastJob.sModel;
+	CString sLayer = pDoc->WorkingInfo.LastJob.sLayerUp;
+
+	if (myBtn[28].GetCheck())
+	{
+		if (sPathCamSpecDir.Right(1) != "\\")
+			strFileNReject.Format(_T("%s\\%s\\%s_RejectMark.TIF"), sPathCamSpecDir, sModel, sLayer);
+		else
+			strFileNReject.Format(_T("%s%s\\%s_RejectMark.TIF"), sPathCamSpecDir, sModel, sLayer);
+
+		CFileFind finder;
+		if (!finder.FindFile(strFileNReject))
+		{
+			strTemp.Format(_T("%s \r\n: Reject 마크 이미지가 없습니다."), strFileNReject);
+			pView->MsgBox(strTemp);
+			myBtn[28].SetCheck(FALSE);
+			return;
+		}
+
+		pDoc->WorkingInfo.LastJob.bUseJudgeMk = TRUE;
+	}
+	else
+		pDoc->WorkingInfo.LastJob.bUseJudgeMk = FALSE;
+
+	CString sData = pDoc->WorkingInfo.LastJob.bUseJudgeMk ? _T("1") : _T("0");
+	::WritePrivateProfileString(_T("Last Job"), _T("Use Judge Marking"), sData, PATH_WORKING_INFO);
+	//pDoc->SetMkInfo(_T("Signal"), _T("JudgeMk"), pDoc->WorkingInfo.LastJob.bUseJudgeMk);
+}
+
+void CDlgInfo::OnStnClickedStc187()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	myStcData[21].SetBkColor(RGB_RED);
+	myStcData[21].RedrawWindow();
+
+	CPoint pt;	CRect rt;
+	GetDlgItem(IDC_STC_187)->GetWindowRect(&rt);
+	pt.x = rt.right; pt.y = rt.bottom;
+	ShowKeypad(IDC_STC_187, pt, TO_BOTTOM | TO_RIGHT);
+
+	myStcData[21].SetBkColor(RGB_WHITE);
+	myStcData[21].RedrawWindow();
+
+	CString sVal;
+	GetDlgItem(IDC_STC_187)->GetWindowText(sVal);
+	pDoc->WorkingInfo.LastJob.nJudgeMkRatio = _ttoi(sVal);
+	pDoc->SetVerifyPunchScore(_ttof(sVal));
+
+	::WritePrivateProfileString(_T("Last Job"), _T("Judge Marking Ratio"), sVal, PATH_WORKING_INFO);
+
 }

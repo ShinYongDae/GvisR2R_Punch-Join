@@ -7254,8 +7254,6 @@ BOOL CReelMap::UpdateYieldOffline(int nSerial)
 			m_nBeforeSerialOffline = _tstoi(szData);
 	}
 
-	int nPnl = m_nBeforeSerialOffline;
-
 	if (pView->m_bSerialDecrese)
 	{
 		if (nSerial >= m_nBeforeSerialOffline)
@@ -7270,6 +7268,8 @@ BOOL CReelMap::UpdateYieldOffline(int nSerial)
 			m_nBeforeSerialOffline = nSerial - 1;
 		}
 	}
+
+	int nPnl = m_nBeforeSerialOffline;
 
 	if (bExist && nPnl > 0)
 		ReadYieldOffline(nPnl, sPath);

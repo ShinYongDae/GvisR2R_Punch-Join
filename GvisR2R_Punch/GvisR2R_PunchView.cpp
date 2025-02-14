@@ -837,6 +837,7 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 			ThreadInit();
 			break;
 		case 4:
+			pDoc->GetCamPxlRes();
 			m_nStepInitView++;
 			break;
 		case 5:
@@ -9842,20 +9843,27 @@ void CGvisR2R_PunchView::InitAuto(BOOL bInit)
 	m_nBufDnSerial[1] = 0; pDoc->SetStatusInt(_T("General"), _T("nBufDnSerial[1]"), m_nBufDnSerial[1]);
 	m_nBufDnCnt = 0;
 
-	for (nCam = 0; nCam < 2; nCam++)
+	if (m_pDlgMenu02)
 	{
-		for (nPoint = 0; nPoint < 4; nPoint++)
+		for (nCam = 0; nCam < 2; nCam++)
 		{
-			m_pDlgMenu02->m_dMkFdOffsetX[nCam][nPoint] = 0.0;
-			m_pDlgMenu02->m_dMkFdOffsetY[nCam][nPoint] = 0.0;
+			for (nPoint = 0; nPoint < 4; nPoint++)
+			{
+				m_pDlgMenu02->m_dMkFdOffsetX[nCam][nPoint] = 0.0;
+				m_pDlgMenu02->m_dMkFdOffsetY[nCam][nPoint] = 0.0;
+			}
 		}
+
+
+		m_pDlgMenu02->m_dAoiUpFdOffsetX = 0.0;
+		m_pDlgMenu02->m_dAoiUpFdOffsetY = 0.0;
+		m_pDlgMenu02->m_dAoiDnFdOffsetX = 0.0;
+		m_pDlgMenu02->m_dAoiDnFdOffsetY = 0.0;
+
+		m_pDlgMenu02->InitMkPmRst();
+		m_pDlgMenu02->DispMkPmScore(0);
+		m_pDlgMenu02->DispMkPmScore(1);
 	}
-
-
-	m_pDlgMenu02->m_dAoiUpFdOffsetX = 0.0;
-	m_pDlgMenu02->m_dAoiUpFdOffsetY = 0.0;
-	m_pDlgMenu02->m_dAoiDnFdOffsetX = 0.0;
-	m_pDlgMenu02->m_dAoiDnFdOffsetY = 0.0;
 
 	m_bReAlign[0][0] = FALSE; pDoc->SetStatus(_T("General"), _T("bReAlign[0][0]"), m_bReAlign[0][0]);	// [nCam][nPos]
 	m_bReAlign[0][1] = FALSE; pDoc->SetStatus(_T("General"), _T("bReAlign[0][1]"), m_bReAlign[0][1]);	// [nCam][nPos]
@@ -9924,6 +9932,7 @@ void CGvisR2R_PunchView::InitAuto(BOOL bInit)
 	if (MODE_INNER != pDoc->GetTestMode())
 	{
 		m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
+		pView->m_bWaitPcr[0] = FALSE;
 	}
 	else
 	{
@@ -9984,6 +9993,7 @@ void CGvisR2R_PunchView::InitAuto(BOOL bInit)
 		if (MODE_INNER != pDoc->GetTestMode())
 		{
 			m_pDlgMenu01->m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_pDlgMenu01->m_bLastProcFromUp);
+			pView->m_bWaitPcr[0] = FALSE;
 		}
 		else
 		{
@@ -11688,7 +11698,7 @@ int CGvisR2R_PunchView::GetMkStripIdx1(int nSerial, int nMkPcs) // 0 : Fail , 1~
 	return nStripIdx;
 }
 
-void CGvisR2R_PunchView::Move0(CfPoint pt, BOOL bCam)
+void CGvisR2R_PunchView::Move0(CfPoint pt, BOOL bCam, BOOL bWait)
 {
 	//if (pView->IsClampOff())
 	//{
@@ -11747,11 +11757,11 @@ void CGvisR2R_PunchView::Move0(CfPoint pt, BOOL bCam)
 	if (fLen > 0.001)
 	{
 		m_pMotion->GetSpeedProfile0(TRAPEZOIDAL, AXIS_X0, fLen, fVel, fAcc, fJerk);
-		m_pMotion->Move0(MS_X0Y0, pPos, fVel, fAcc, fAcc, ABS, NO_WAIT);
+		m_pMotion->Move0(MS_X0Y0, pPos, fVel, fAcc, fAcc, ABS, bWait);
 	}
 }
 
-void CGvisR2R_PunchView::Move1(CfPoint pt, BOOL bCam)
+void CGvisR2R_PunchView::Move1(CfPoint pt, BOOL bCam, BOOL bWait)
 {
 	//if (pView->IsClampOff())
 	//{
@@ -11810,7 +11820,7 @@ void CGvisR2R_PunchView::Move1(CfPoint pt, BOOL bCam)
 	if (fLen > 0.001)
 	{
 		m_pMotion->GetSpeedProfile1(TRAPEZOIDAL, AXIS_X1, fLen, fVel, fAcc, fJerk);
-		m_pMotion->Move1(MS_X1Y1, pPos, fVel, fAcc, fAcc, ABS, NO_WAIT);
+		m_pMotion->Move1(MS_X1Y1, pPos, fVel, fAcc, fAcc, ABS, bWait);
 	}
 }
 
@@ -14572,18 +14582,44 @@ void CGvisR2R_PunchView::DoMark0()
 			m_dwStMkDn[0] = GetTickCount();
 			Mk0();
 			nSerial = m_nBufUpSerial[0]; // Cam0
-			SetMkPcs0(nSerial, m_nMarkingOrder[0]);
+			SetMkPcs0(nSerial, m_nMarkingOrder[0]); // Draw Mked Point On Reelmap Screen.
 		}
 		else
 		{
 			// Verify - Mk0
 			InsertPunchingData(CAM_LF);
 			SetDelay0(pDoc->m_nDelayShow, 1);		// [mSec]
+
+			if (m_pDlgMenu02)
+				m_pDlgMenu02->InitMkPmRst(0);
+
 			if(!SaveMk0Img(m_nMkPcs[0]))
 			{
-				pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->ClrDispMsg();
-				AfxMessageBox(_T("Error-SaveMk0Img()"));
+				//AfxMessageBox(_T("Error-SaveMk0Img()"));
+				if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+				{
+					if (!m_pVision[0]->m_bMkJudge)
+					{
+						nRtn = MsgBox(_T("좌측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+						if (IDYES == nRtn)
+						{
+							ptPnt.x = m_dTarget[AXIS_X0];
+							ptPnt.y = m_dTarget[AXIS_Y0];
+
+							Move0(ptPnt, FALSE, WAIT);
+							Sleep(30);
+							Mk0();
+							Sleep(100);
+							Move0(ptPnt, TRUE, WAIT);
+							m_nMkPcs[0]--; // Repeat Current Position Verify.
+							m_nStepMk[0] = 8; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);
+							Stop();
+							break;
+						}
+
+					}
+				}
 			}
 		}
 		m_nStepMk[0]++;
@@ -14926,7 +14962,15 @@ BOOL CGvisR2R_PunchView::SaveMk0Img(int nMkPcsIdx) // Cam0
 
 #ifdef USE_VISION
 		if (m_pVision[0])
-			return m_pVision[0]->SaveMkImg(sPath);
+		{
+			BOOL bRtn = m_pVision[0]->SaveMkImg(sPath);
+			//if (bRtn)
+			{
+				if(m_pDlgMenu02)
+					m_pDlgMenu02->DispMkPmScore(0);
+			}
+			return bRtn;
+		}
 #endif
 	}
 	else
@@ -15232,11 +15276,37 @@ void CGvisR2R_PunchView::DoMark1()
 			// Verify - Mk1
 			InsertPunchingData(CAM_RT);
 			SetDelay1(pDoc->m_nDelayShow, 6);		// [mSec]
+
+			if (m_pDlgMenu02)
+				m_pDlgMenu02->InitMkPmRst(1);
+
 			if(!SaveMk1Img(m_nMkPcs[1]))
 			{
-				pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->ClrDispMsg();
-				AfxMessageBox(_T("Error-SaveMk1Img()"));
+				//AfxMessageBox(_T("Error-SaveMk1Img()"));
+				if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+				{
+					if (!m_pVision[1]->m_bMkJudge)
+					{
+						nRtn = MsgBox(_T("우측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+						if (IDYES == nRtn)
+						{
+							ptPnt.x = m_dTarget[AXIS_X1];
+							ptPnt.y = m_dTarget[AXIS_Y1];
+
+							Move1(ptPnt, FALSE, WAIT);
+							Sleep(30);
+							Mk1();
+							Sleep(100);
+							Move1(ptPnt, TRUE, WAIT);
+							m_nMkPcs[1]--; // Repeat Current Position Verify.
+							m_nStepMk[1] = 8; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);
+							Stop();
+							break;
+						}
+
+					}
+				}
 			}
 		}
 		m_nStepMk[1]++;
@@ -15580,7 +15650,15 @@ BOOL CGvisR2R_PunchView::SaveMk1Img(int nMkPcsIdx) // Cam1
 
 #ifdef USE_VISION
 		if (m_pVision[1])
-			return m_pVision[1]->SaveMkImg(sPath);
+		{
+			BOOL bRtn = m_pVision[1]->SaveMkImg(sPath);
+			//if (bRtn)
+			{
+				if (m_pDlgMenu02)
+					m_pDlgMenu02->DispMkPmScore(1);
+			}
+			return bRtn;
+		}
 #endif
 	}
 	else
@@ -28233,11 +28311,37 @@ void CGvisR2R_PunchView::DoMark0Its()
 		{
 			// Verify - Mk0
 			SetDelay0(pDoc->m_nDelayShow, 1);		// [mSec]
+
+			if (m_pDlgMenu02)
+				m_pDlgMenu02->InitMkPmRst(0);
+
 			if (!SaveMk0Img(m_nMkPcs[0]))
 			{
-				pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->ClrDispMsg();
-				AfxMessageBox(_T("Error-SaveMk0Img()"));
+				//AfxMessageBox(_T("Error-SaveMk0Img()"));
+				if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+				{
+					if (!m_pVision[0]->m_bMkJudge)
+					{
+						nRtn = MsgBox(_T("좌측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+						if (IDYES == nRtn)
+						{
+							ptPnt.x = m_dTarget[AXIS_X0];
+							ptPnt.y = m_dTarget[AXIS_Y0];
+
+							Move0(ptPnt, FALSE, WAIT);
+							Sleep(30);
+							Mk0();
+							Sleep(100);
+							Move0(ptPnt, TRUE, WAIT);
+							m_nMkPcs[0]--; // Repeat Current Position Verify.
+							m_nStepMk[0] = 8; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);
+							Stop();
+							break;
+						}
+
+					}
+				}
 			}
 		}
 		m_nStepMk[0]++;
@@ -28837,11 +28941,37 @@ void CGvisR2R_PunchView::DoMark1Its()
 		{
 			// Verify - Mk1
 			SetDelay1(pDoc->m_nDelayShow, 6);		// [mSec]
+
+			if (m_pDlgMenu02)
+				m_pDlgMenu02->InitMkPmRst(1);
+
 			if (!SaveMk1Img(m_nMkPcs[1]))
 			{
-				pView->SetAlarmToPlc(UNIT_PUNCH);
 				pView->ClrDispMsg();
-				AfxMessageBox(_T("Error-SaveMk1Img()"));
+				//AfxMessageBox(_T("Error-SaveMk1Img()"));
+				if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+				{
+					if (!m_pVision[1]->m_bMkJudge)
+					{
+						nRtn = MsgBox(_T("우측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+						if (IDYES == nRtn)
+						{
+							ptPnt.x = m_dTarget[AXIS_X1];
+							ptPnt.y = m_dTarget[AXIS_Y1];
+
+							Move1(ptPnt, FALSE, WAIT);
+							Sleep(30);
+							Mk1();
+							Sleep(100);
+							Move1(ptPnt, TRUE, WAIT);
+							m_nMkPcs[1]--; // Repeat Current Position Verify.
+							m_nStepMk[1] = 8; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);
+							Stop();
+							break;
+						}
+
+					}
+				}
 			}
 		}
 		m_nStepMk[1]++;

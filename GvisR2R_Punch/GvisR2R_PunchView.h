@@ -922,8 +922,8 @@ public:
 	CfPoint GetMkPnt1(int nSerial, int nMkPcs);		// pcr 시리얼, pcr 불량 피스 읽은 순서 인덱스
 
 	// 	void Move(CfPoint pt, BOOL bCam=FALSE);
-	void Move0(CfPoint pt, BOOL bCam = FALSE);
-	void Move1(CfPoint pt, BOOL bCam = FALSE);
+	void Move0(CfPoint pt, BOOL bCam = FALSE, BOOL bWait = NO_WAIT);
+	void Move1(CfPoint pt, BOOL bCam = FALSE, BOOL bWait = NO_WAIT);
 	BOOL IsMoveDone();
 	BOOL IsMoveDone0();
 	BOOL IsMoveDone1();

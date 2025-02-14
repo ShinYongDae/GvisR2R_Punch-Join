@@ -10,9 +10,9 @@
 #include "MyBtn.h"
 #include "MyStatic.h"
 
-#define MAX_INFO_STC				69
-#define MAX_INFO_STC_DATA			21
-#define MAX_INFO_BTN				28
+#define MAX_INFO_STC				74
+#define MAX_INFO_STC_DATA			22
+#define MAX_INFO_BTN				29
 
 #define TIM_DISP_STS				450
 
@@ -89,6 +89,7 @@ protected:
 	afx_msg void OnChk009();
 	afx_msg void OnChk010();
 	afx_msg void OnChk011();
+	afx_msg void OnChk26();
 	afx_msg void OnStc0012();
 	afx_msg void OnStc0016();
 	afx_msg void OnStc0020();
@@ -128,6 +129,7 @@ public:
 	afx_msg void OnStnClickedStc43();
 	afx_msg void OnStnClickedStc82();
 	afx_msg void OnStnClickedStc83();
+	afx_msg void OnStnClickedStc187();
 	afx_msg void OnBnClickedChkUseAoiMiddle();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

@@ -201,6 +201,9 @@ public:
 	void DispAlignRangeL(int* pAlignX, int* pAlignY);
 	void DispAlignRangeR(int* pAlignX, int* pAlignY);
 
+	void DispMkPmScore(int nCam);
+	void InitMkPmRst(int nCam = 2);
+
 	// ITS
 #ifdef USE_MIL
 	MIL_ID m_MilSys;

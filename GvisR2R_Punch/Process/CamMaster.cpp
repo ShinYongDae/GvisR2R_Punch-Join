@@ -28,6 +28,8 @@ CCamMaster::CCamMaster()
 
 	m_pPinImg = NULL;
 	m_PinFileSize = 0;
+	m_pRejectImg = NULL;
+	m_RejectFileSize = 0;
 	m_pAlignImg[0] = NULL;
 	m_pAlignImg[1] = NULL;
 	m_pAlignImg[2] = NULL;
@@ -61,6 +63,7 @@ CCamMaster::CCamMaster()
 CCamMaster::~CCamMaster()
 {
 	FreePolygonRgnData();
+	RejectImgFree();
 	PinImgFree();
 	AlignImgFree();
 	PcsImgFree();
@@ -154,8 +157,15 @@ BOOL CCamMaster::LoadMstInfo()
 	else
 		return FALSE;
 
-	LoadPinImg();
-	LoadAlignImg();
+	if (m_sLayerUp == m_sLayer || m_sLayerUp.IsEmpty())
+	{
+		LoadPinImg();
+		LoadAlignImg();
+		if (!LoadRejMkImg())
+		{
+			pDoc->WorkingInfo.LastJob.bUseJudgeMk = FALSE;
+		}
+	}
 
 	return TRUE;
 }
@@ -345,6 +355,88 @@ void CCamMaster::LoadPinImg()
 //	pView->ClrDispMsg();
 }
 
+BOOL CCamMaster::LoadRejMkImg()
+{
+	BOOL prcStopF = FALSE;
+	TCHAR FileNLoc[MAX_PATH];
+	CString StrDirectoryPath;
+	CFileFind RejectFindFile;
+	CString strFileNReject, strTemp;
+
+	DWORD dwMilliseconds = 10;
+
+	pView->DispMsg(_T("Reject 이미지를 다운로드 중입니다."), _T("Reject 이미지"), RGB_GREEN, DELAY_TIME_MSG);
+
+	wsprintf(FileNLoc, TEXT("%s"), _T("C:\\R2RSet\\Reject"));
+
+	if (!pDoc->DirectoryExists(FileNLoc))
+	{
+		if(!CreateDirectory(FileNLoc, NULL))
+		{
+			pView->MsgBox(_T("Can not Create Reject Directory"));
+		}
+	}
+	else
+	{
+		StrDirectoryPath.Format(_T("%s"), FileNLoc);
+		DeleteFileInFolder(FileNLoc);
+	}
+	RejectImgFree();
+
+#ifdef USE_CAM_MASTER
+	int Cell;
+	int i;
+	TCHAR FileNReject[MAX_PATH];
+
+	// CAM-Master File Copy and Local File Load
+	wsprintf(FileNLoc, TEXT("%s"), PATH_REJECT_IMG);
+	if (m_sPathCamSpecDir.Right(1) != "\\")
+		strFileNReject.Format(_T("%s\\%s\\%s_RejectMark.TIF"), m_sPathCamSpecDir, m_sModel, m_sLayer);
+	else
+		strFileNReject.Format(_T("%s%s\\%s_RejectMark.TIF"), m_sPathCamSpecDir, m_sModel, m_sLayer);
+	wsprintf(FileNReject, TEXT("%s"), strFileNReject);
+
+	CFileFind finder;
+	if (!finder.FindFile(strFileNReject))
+	{
+		strTemp.Format(_T("%s \r\n: Reject 마크 이미지가 없습니다."), strFileNReject);
+		pView->MsgBox(strTemp);
+		return FALSE;
+	}
+
+	if(!CopyFile((LPCTSTR)FileNReject, (LPCTSTR)FileNLoc, FALSE))
+	{
+		if(!CopyFile((LPCTSTR)FileNReject, (LPCTSTR)FileNLoc, FALSE))
+		{
+			if(!CopyFile((LPCTSTR)FileNReject, (LPCTSTR)FileNLoc, FALSE))
+			{
+				prcStopF = TRUE;
+			}
+		}
+	}
+
+
+	if (!prcStopF)
+	{
+		RejectImgBufAlloc(FileNLoc);
+		//pView->m_pVision[0]->ShowDispReject();
+		//pView->m_pVision[0]->RejectImgCrop();
+ 		//pView->DispStsBar("Reject 이미지 다운로드를 완료하였습니다.", 0);
+	}
+	else
+	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
+		pView->DispMsg(_T("Reject 이미지 다운로드를 실패하였습니다."), _T("경고"), RGB_GREEN, DELAY_TIME_MSG);
+		return FALSE;
+	}
+#else
+	RejectImgBufAlloc(PATH_REJECT_IMG_);
+#endif
+
+//	pView->ClrDispMsg();
+	return TRUE;
+}
+
 BOOL CCamMaster::LoadCadMk()
 {
 #ifdef USE_CAM_MASTER
@@ -512,8 +604,8 @@ CString CCamMaster::GetCamPxlRes()
 		nPos = sRes.ReverseFind('.');
 		if (nPos > 0)
 			sRes = sRes.Left(nPos);
-		pDoc->WorkingInfo.Vision[0].sCamPxlRes = sRes;
-		pDoc->WorkingInfo.Vision[1].sCamPxlRes = sRes;
+		pDoc->WorkingInfo.Vision[0].sCamPxlRes = sRes; // CamMaster Pixel Resolution.
+		pDoc->WorkingInfo.Vision[1].sCamPxlRes = sRes; // CamMaster Pixel Resolution.
 	}
 	return sRes;
 }
@@ -1299,6 +1391,39 @@ BOOL CCamMaster::PinImgBufAlloc(TCHAR *strPinImg, BOOL bOppLayerF)
 	return TRUE;
 }
 
+BOOL CCamMaster::RejectImgBufAlloc(TCHAR *strRejectImg)
+{
+	CFile file;
+	int RSize;
+
+	if (!file.Open(strRejectImg, CFile::modeRead | CFile::typeBinary))
+	{
+		if (!file.Open(strRejectImg, CFile::modeRead | CFile::typeBinary))
+		{
+			return(FALSE);
+		}
+	}
+
+	m_RejectFileSize = file.GetLength();
+	if (m_RejectFileSize != 0)
+	{
+		if (m_pRejectImg)
+			RejectImgFree();
+
+		m_pRejectImg = (UCHAR *)GlobalAllocPtr(GMEM_MOVEABLE, m_RejectFileSize);
+	}
+
+	RSize = file.Read((void *)m_pRejectImg, m_RejectFileSize);
+	if (RSize != m_RejectFileSize)
+	{
+		file.Close();
+		return(FALSE);
+	}
+
+	file.Close();
+	return TRUE;
+}
+
 void CCamMaster::DeleteFileInFolder(CString sPathDir)
 {
 	BOOL bRes;
@@ -1353,6 +1478,15 @@ void CCamMaster::PinImgFree()
 	{
 		GlobalFreePtr(m_pPinImg);
 		m_pPinImg = NULL;
+	}
+}
+
+void CCamMaster::RejectImgFree()
+{
+	if (m_pRejectImg != NULL)
+	{
+		GlobalFreePtr(m_pRejectImg);
+		m_pRejectImg = NULL;
 	}
 }
 

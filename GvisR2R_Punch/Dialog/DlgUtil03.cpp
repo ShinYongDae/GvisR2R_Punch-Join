@@ -210,7 +210,7 @@ void CDlgUtil03::AtDlgShow()
 {
 	if(pDoc->m_Master[0].m_pPcsRgn)
 		SetScrlBarMax(pDoc->m_Master[0].m_pPcsRgn->m_nCol, pDoc->m_Master[0].m_pPcsRgn->m_nRow); // ROT_NONE
-// 	SetScrlBarMax(pDoc->m_pPcsRgn->nRow, pDoc->m_pPcsRgn->nCol); // ROT_CCW_90
+ 		//SetScrlBarMax(pDoc->m_pPcsRgn->nRow, pDoc->m_pPcsRgn->nCol); // ROT_CCW_90
 	SetScrlBar(0,0);
 	
 	LoadImg();
@@ -282,6 +282,10 @@ BOOL CDlgUtil03::OnInitDialog()
 
 	strRatio.Format(_T("%3.2f"), pDoc->m_dShiftAdjustRatio);
 	GetDlgItem(IDC_EDIT_YSHIFT_RATIO)->SetWindowText(strRatio);
+
+	InitCadImg();
+
+	//GetDlgItem(IDC_STC_REJECT_IMG2)->ShowWindow(SW_HIDE);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
@@ -1570,8 +1574,6 @@ void CDlgUtil03::DispAlign(int nDir)
 
 }
 
-
-
 void CDlgUtil03::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
@@ -1589,3 +1591,65 @@ void CDlgUtil03::OnTimer(UINT_PTR nIDEvent)
 
 	CDialog::OnTimer(nIDEvent);
 }
+
+
+void CDlgUtil03::InitCadImg()
+{
+	HWND hWin;
+	CRect rect;
+
+#ifdef USE_VISION
+	if (pView->m_pVision[0])
+	{
+		hWin = GetDlgItem(IDC_STC_REJECT_IMG)->GetSafeHwnd();
+		GetDlgItem(IDC_STC_REJECT_IMG)->GetWindowRect(&rect);
+		pView->m_pVision[0]->SelDispReject(hWin, rect, 0);
+		pView->m_pVision[0]->ShowDispReject(); // First draw overlay 
+
+		hWin = GetDlgItem(IDC_STC_REJECT_IMG2)->GetSafeHwnd();
+		GetDlgItem(IDC_STC_REJECT_IMG2)->GetWindowRect(&rect);
+		pView->m_pVision[1]->SelDispReject(hWin, rect, 0);
+		pView->m_pVision[1]->ShowDispReject(); // First draw overlay
+
+	}
+#endif
+}
+
+
+void CDlgUtil03::DispResultBlob()
+{
+	CString sVal;
+
+#ifdef USE_VISION
+	if (pView->m_pVision[0])
+	{
+		sVal.Format(_T("%d"), pView->m_pVision[0]->BlobRst.nBoxRight - pView->m_pVision[0]->BlobRst.nBoxLeft);
+		GetDlgItem(IDC_STC_BLOB_SIZE_X)->SetWindowText(sVal);
+		sVal.Format(_T("%d"), pView->m_pVision[0]->BlobRst.nBoxBottom - pView->m_pVision[0]->BlobRst.nBoxTop);
+		GetDlgItem(IDC_STC_BLOB_SIZE_Y)->SetWindowText(sVal);
+	}
+#endif
+}
+
+void CDlgUtil03::DispResultPtScore(int nCam)
+{
+	CString sVal;
+
+#ifdef USE_VISION
+	if (nCam == 0)
+	{
+		if (pView->m_pVision[0])
+		{
+			sVal.Format(_T("%d"), pView->m_pVision[0]->PtMtRst.dScore);
+			GetDlgItem(IDC_STC_REJECT_SCR)->SetWindowText(sVal);
+		}
+	}
+	else if(nCam == 1)
+	if (pView->m_pVision[1])
+	{
+		sVal.Format(_T("%d"), pView->m_pVision[1]->PtMtRst.dScore);
+		GetDlgItem(IDC_STC_REJECT_SCR2)->SetWindowText(sVal);
+	}
+#endif
+}
+

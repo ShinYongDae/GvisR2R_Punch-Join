@@ -500,6 +500,10 @@ BOOL CDlgMenu02::OnInitDialog()
 		pView->m_pVision[1]->ClearOverlay();
 		pView->m_pVision[1]->DrawCenterMark();
 	}
+
+
+	pDoc->SetVerifyPunchScore(double(pDoc->WorkingInfo.LastJob.nJudgeMkRatio));
+
 #endif
 
 	InitStatic();
@@ -534,6 +538,20 @@ BOOL CDlgMenu02::OnInitDialog()
 	GetDlgItem(IDC_BTN_BUFF_INIT_SAVE)->ShowWindow(SW_HIDE);
  	//GetDlgItem(IDC_CHK_ELEC_TEST)->ShowWindow(SW_HIDE);
 
+	//GetDlgItem(IDC_STATIC_1001)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_STATIC_ENG_RD_ST)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_STATIC_1002)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_STATIC_ENG_RD)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_STATIC_1003)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_STATIC_ENG_RD_DONE)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_STATIC_1004)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_STATIC_ENG_MK_ST)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_STATIC_1005)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_STATIC_ENG_MK)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_STATIC_1006)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_STATIC_ENG_MK_DONE)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_STATIC_1006)->ShowWindow(SW_HIDE);
+	//GetDlgItem(IDC_STATIC_ENG_MK_DONE)->ShowWindow(SW_HIDE);
 	
 	ShowDlg(IDD_DLG_UTIL_03);
 	
@@ -595,6 +613,9 @@ void CDlgMenu02::InitCadImg()
 		pView->m_pVision[1]->SetDispAxisPos();
 	}
 #endif
+
+	if (m_pDlgUtil03)
+		m_pDlgUtil03->InitCadImg();
 }
 
 void CDlgMenu02::InitSlider()
@@ -2965,7 +2986,7 @@ void CDlgMenu02::Grab2PntAlign()
 
 	dResX = _tstof(pDoc->WorkingInfo.Vision[0].sResX);
 	dResY = _tstof(pDoc->WorkingInfo.Vision[0].sResY);
-	dResCam = _tstof(pDoc->WorkingInfo.Vision[0].sCamPxlRes) / 10000.0;
+	dResCam = _tstof(pDoc->WorkingInfo.Vision[0].sCamPxlRes) / 10000.0; // CamMaster Pixel Resolution.
 
 	GetPmRst0(dX, dY, dAgl, dScr); // Left
 
@@ -3110,7 +3131,7 @@ void CDlgMenu02::Grab4PntAlign()
 	double dResX, dResY, dResCam;
 	dResX = _tstof(pDoc->WorkingInfo.Vision[0].sResX);
 	dResY = _tstof(pDoc->WorkingInfo.Vision[0].sResY);
-	dResCam = _tstof(pDoc->WorkingInfo.Vision[0].sCamPxlRes) / 10000.0;
+	dResCam = _tstof(pDoc->WorkingInfo.Vision[0].sCamPxlRes) / 10000.0; // CamMaster Pixel Resolution.
 
 	GetPmRst0(dX, dY, dAgl, dScr);
 
@@ -3862,12 +3883,16 @@ void CDlgMenu02::ChgModel()
 // 		pView->m_pVision[0]->ShowDispPcs(nLayer);
  		pView->m_pVision[0]->ShowDispPin(0);
 		pView->m_pVision[0]->ShowDispAlign();
+		pView->m_pVision[0]->ShowDispReject();
+		if (m_pDlgUtil03)
+			m_pDlgUtil03->DispResultBlob();
 	}
 
 	if(pView->m_pVision[1])
 	{
  		pView->m_pVision[1]->ShowDispPin(0);
 		pView->m_pVision[1]->ShowDispAlign();
+		pView->m_pVision[1]->ShowDispReject();
 	}
 #endif
 }
@@ -3879,7 +3904,12 @@ void CDlgMenu02::ChgModelUp()
 	{
  		pView->m_pVision[0]->ShowDispPin(0);
 		pView->m_pVision[0]->ShowDispAlign();
+		pView->m_pVision[0]->ShowDispReject();
+		if (m_pDlgUtil03)
+			m_pDlgUtil03->DispResultBlob();
 	}
+	if (pView->m_pVision[1])
+		pView->m_pVision[1]->ShowDispReject();
 #endif
 }
 
@@ -3890,6 +3920,7 @@ void CDlgMenu02::ChgModelDn()
 	{
  		pView->m_pVision[1]->ShowDispPin(0);
 		pView->m_pVision[1]->ShowDispAlign();
+		//pView->m_pVision[1]->ShowDispReject();
 	}
 #endif
 }
@@ -4481,7 +4512,7 @@ void CDlgMenu02::Grab2PntAlign2()
 
 	dResX = _tstof(pDoc->WorkingInfo.Vision[1].sResX);
 	dResY = _tstof(pDoc->WorkingInfo.Vision[1].sResY);
-	dResCam = _tstof(pDoc->WorkingInfo.Vision[1].sCamPxlRes) / 10000.0;
+	dResCam = _tstof(pDoc->WorkingInfo.Vision[1].sCamPxlRes) / 10000.0; // CamMaster Pixel Resolution.
 
 	GetPmRst1(dX, dY, dAgl, dScr);	// Right
 
@@ -4628,7 +4659,7 @@ void CDlgMenu02::Grab4PntAlign2()
 	double dResX, dResY, dResCam;
 	dResX = _tstof(pDoc->WorkingInfo.Vision[1].sResX);
 	dResY = _tstof(pDoc->WorkingInfo.Vision[1].sResY);
-	dResCam = _tstof(pDoc->WorkingInfo.Vision[1].sCamPxlRes) / 10000.0;
+	dResCam = _tstof(pDoc->WorkingInfo.Vision[1].sCamPxlRes) / 10000.0; // CamMaster Pixel Resolution.
 
 	GetPmRst1(dX, dY, dAgl, dScr);
 
@@ -4988,7 +5019,7 @@ BOOL CDlgMenu02::OnePointAlign(CfPoint &ptPnt)
 
 	dResX = _tstof(pDoc->WorkingInfo.Vision[0].sResX);
 	dResY = _tstof(pDoc->WorkingInfo.Vision[0].sResY);
-	dResCam = _tstof(pDoc->WorkingInfo.Vision[0].sCamPxlRes) / 10000.0;
+	dResCam = _tstof(pDoc->WorkingInfo.Vision[0].sCamPxlRes) / 10000.0; // CamMaster Pixel Resolution.
 
 	dRefPinX = (double)pDoc->m_Master[0].m_pCellRgn->nCADPinPosPixX * dResCam;
 	dRefPinY = (double)pDoc->m_Master[0].m_pCellRgn->nCADPinPosPixY * dResCam;
@@ -5052,7 +5083,7 @@ BOOL CDlgMenu02::OnePointAlign2(CfPoint &ptPnt)
 
 	dResX = _tstof(pDoc->WorkingInfo.Vision[1].sResX);
 	dResY = _tstof(pDoc->WorkingInfo.Vision[1].sResY);
-	dResCam = _tstof(pDoc->WorkingInfo.Vision[1].sCamPxlRes) / 10000.0;
+	dResCam = _tstof(pDoc->WorkingInfo.Vision[1].sCamPxlRes) / 10000.0; // CamMaster Pixel Resolution.
 
 	dRefPinX = (double)pDoc->m_Master[0].m_pCellRgn->nCADPinPosPixX * dResCam;
 	dRefPinY = (double)pDoc->m_Master[0].m_pCellRgn->nCADPinPosPixY * dResCam;
@@ -5169,7 +5200,7 @@ BOOL CDlgMenu02::Do2PtAlign0(int nPos, BOOL bDraw)
 
 	dResX = _tstof(pDoc->WorkingInfo.Vision[0].sResX);
 	dResY = _tstof(pDoc->WorkingInfo.Vision[0].sResY);
-	dResCam = _tstof(pDoc->WorkingInfo.Vision[0].sCamPxlRes) / 10000.0;
+	dResCam = _tstof(pDoc->WorkingInfo.Vision[0].sCamPxlRes) / 10000.0; // CamMaster Pixel Resolution.
 
 	GetPmRst0(dX, dY, dAgl, dScr);
 
@@ -5318,7 +5349,7 @@ BOOL CDlgMenu02::Do2PtAlign1(int nPos, BOOL bDraw)
 
 	dResX = _tstof(pDoc->WorkingInfo.Vision[1].sResX);
 	dResY = _tstof(pDoc->WorkingInfo.Vision[1].sResY);
-	dResCam = _tstof(pDoc->WorkingInfo.Vision[1].sCamPxlRes) / 10000.0;
+	dResCam = _tstof(pDoc->WorkingInfo.Vision[1].sCamPxlRes) / 10000.0; // CamMaster Pixel Resolution.
 
 	GetPmRst1(dX, dY, dAgl, dScr);
 
@@ -5392,6 +5423,11 @@ void CDlgMenu02::ShowDebugEngSig()
 {
 	if (pDoc->WorkingInfo.System.bDebugEngSig)
 	{
+		GetDlgItem(IDC_STATIC_1011)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_MK_PM_SCORE)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_MK_PM_SCORE2)->ShowWindow(SW_HIDE);
+		//GetDlgItem(IDC_STATIC_1012)->ShowWindow(SW_HIDE);
+
 		GetDlgItem(IDC_STATIC_1001)->ShowWindow(SW_SHOW);
 		GetDlgItem(IDC_STATIC_ENG_RD_ST)->ShowWindow(SW_SHOW);
 
@@ -5418,9 +5454,17 @@ void CDlgMenu02::ShowDebugEngSig()
 
 		GetDlgItem(IDC_STATIC_1009)->ShowWindow(SW_SHOW);
 		GetDlgItem(IDC_STATIC_ENG_FD_DONE)->ShowWindow(SW_SHOW);
+
+		GetDlgItem(IDC_STATIC_1010)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_READ_SN)->ShowWindow(SW_SHOW);
 	}
 	else
 	{
+		GetDlgItem(IDC_STATIC_1011)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_MK_PM_SCORE)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_MK_PM_SCORE2)->ShowWindow(SW_SHOW);
+		//GetDlgItem(IDC_STATIC_1012)->ShowWindow(SW_SHOW);
+
 		GetDlgItem(IDC_STATIC_1001)->ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_STATIC_ENG_RD_ST)->ShowWindow(SW_HIDE);
 
@@ -5447,6 +5491,9 @@ void CDlgMenu02::ShowDebugEngSig()
 
 		GetDlgItem(IDC_STATIC_1009)->ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_STATIC_ENG_FD_DONE)->ShowWindow(SW_HIDE);
+
+		GetDlgItem(IDC_STATIC_1010)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_READ_SN)->ShowWindow(SW_HIDE);
 	}
 
 }
@@ -5547,7 +5594,7 @@ BOOL CDlgMenu02::Do4PtAlign0(int nPos, BOOL bDraw)
 
 	dResX = _tstof(pDoc->WorkingInfo.Vision[0].sResX);
 	dResY = _tstof(pDoc->WorkingInfo.Vision[0].sResY);
-	dResCam = _tstof(pDoc->WorkingInfo.Vision[0].sCamPxlRes) / 10000.0;
+	dResCam = _tstof(pDoc->WorkingInfo.Vision[0].sCamPxlRes) / 10000.0; // CamMaster Pixel Resolution.
 
 	GetPmRst0(dX, dY, dAgl, dScr);
 
@@ -5848,7 +5895,7 @@ BOOL CDlgMenu02::Do4PtAlign1(int nPos, BOOL bDraw)
 
 	dResX = _tstof(pDoc->WorkingInfo.Vision[1].sResX);
 	dResY = _tstof(pDoc->WorkingInfo.Vision[1].sResY);
-	dResCam = _tstof(pDoc->WorkingInfo.Vision[1].sCamPxlRes) / 10000.0;
+	dResCam = _tstof(pDoc->WorkingInfo.Vision[1].sCamPxlRes) / 10000.0; // CamMaster Pixel Resolution.
 
 	GetPmRst1(dX, dY, dAgl, dScr);
 
@@ -6138,4 +6185,38 @@ void CDlgMenu02::DispAlignRangeR(int* pAlignX, int* pAlignY)
 {
 	if (pView->m_pDlgMenu03)
 		pView->m_pDlgMenu03->DispAlignRangeR(pAlignX, pAlignY);
+}
+
+void CDlgMenu02::DispMkPmScore(int nCam)
+{
+	CString sVal;
+
+	if (nCam == 0 && pView->m_pVision[0])
+	{
+		sVal.Format(_T("%d"), pView->m_pVision[0]->PtMtRst.dScore);
+		GetDlgItem(IDC_STATIC_MK_PM_SCORE)->SetWindowText(sVal);
+	}
+	else if (nCam == 1 && pView->m_pVision[1])
+	{
+		sVal.Format(_T("%d"), pView->m_pVision[1]->PtMtRst.dScore);
+		GetDlgItem(IDC_STATIC_MK_PM_SCORE2)->SetWindowText(sVal);
+	}
+	if (m_pDlgUtil03)
+		m_pDlgUtil03->DispResultPtScore(nCam);
+}
+
+void CDlgMenu02::InitMkPmRst(int nCam)
+{
+	if (nCam == 2)
+	{
+		if (pView->m_pVision[0])
+			pView->m_pVision[0]->PtMtRst.dScore = 0.0;
+		if (pView->m_pVision[1])
+			pView->m_pVision[1]->PtMtRst.dScore = 0.0;
+	}
+	else
+	{
+		if (pView->m_pVision[nCam])
+			pView->m_pVision[nCam]->PtMtRst.dScore = 0.0;
+	}
 }
