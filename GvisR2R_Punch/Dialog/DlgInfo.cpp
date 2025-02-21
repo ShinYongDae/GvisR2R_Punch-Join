@@ -36,7 +36,23 @@ CDlgInfo::CDlgInfo(CWnd* pParent /*=NULL*/)
 
 CDlgInfo::~CDlgInfo()
 {
+	CString sData;
+
 	m_bTIM_DISP_STS = FALSE;
+
+	sData.Format(_T("%d"), pDoc->WorkingInfo.System.bUseDevicePartial ? 1 : 0);
+	::WritePrivateProfileString(_T("System"), _T("UseDevicePartial"), sData, PATH_WORKING_INFO);
+	sData.Format(_T("%d"), pDoc->WorkingInfo.System.bUseEngrave ? 1 : 0);
+	::WritePrivateProfileString(_T("System"), _T("UseEngrave"), sData, PATH_WORKING_INFO);
+	sData.Format(_T("%d"), pDoc->WorkingInfo.System.bUseAoiUp ? 1 : 0);
+	::WritePrivateProfileString(_T("System"), _T("UseAoiUp"), sData, PATH_WORKING_INFO);
+	sData.Format(_T("%d"), pDoc->WorkingInfo.System.bUseAoiDn ? 1 : 0);
+	::WritePrivateProfileString(_T("System"), _T("UseAoiDn"), sData, PATH_WORKING_INFO);
+	sData.Format(_T("%d"), pDoc->WorkingInfo.System.bUsePunch ? 1 : 0);
+	::WritePrivateProfileString(_T("System"), _T("UsePunch"), sData, PATH_WORKING_INFO);
+	sData.Format(_T("%d"), pDoc->WorkingInfo.System.bUsePunchOnly ? 1 : 0);
+	::WritePrivateProfileString(_T("System"), _T("UsePunchOnly"), sData, PATH_WORKING_INFO);
+
 	if (pView->m_pDlgMenu01)
 		pView->m_pDlgMenu01->UpdateData();
 }
@@ -104,6 +120,11 @@ BEGIN_MESSAGE_MAP(CDlgInfo, CDialog)
 	ON_BN_CLICKED(IDC_CHK_85, &CDlgInfo::OnBnClickedChk85)
 	ON_BN_CLICKED(IDC_CHK_1187, &CDlgInfo::OnBnClickedChk1187)
 	ON_BN_CLICKED(IDC_CHK_1188, &CDlgInfo::OnBnClickedChk1188)
+	ON_BN_CLICKED(IDC_CHK_USE_ENGRAVE, OnChkUseEngrave)
+	ON_BN_CLICKED(IDC_CHK_USE_AOI_UP, OnChkUseAoiUp)
+	ON_BN_CLICKED(IDC_CHK_USE_AOI_DN, OnChkUseAoiDn)
+	ON_BN_CLICKED(IDC_CHK_USE_PUNCH, OnChkUsePunch)
+	ON_BN_CLICKED(IDC_CHK_USE_PUNCH_ONLY, OnChkUsePunchOnly)
 	ON_STN_CLICKED(IDC_STC_36, &CDlgInfo::OnStnClickedStc36)
 	ON_STN_CLICKED(IDC_STC_17, &CDlgInfo::OnStnClickedStc17)
 	ON_STN_CLICKED(IDC_STC_41, &CDlgInfo::OnStnClickedStc41)
@@ -348,6 +369,38 @@ void CDlgInfo::InitBtn()
 	myBtn[28].SetHwnd(this->GetSafeHwnd(), IDC_CHK_26);
 	myBtn[28].SetBtnType(BTN_TYPE_CHECK);
 
+
+	myBtn[29].SubclassDlgItem(IDC_CHK_USE_ENGRAVE, this);
+	myBtn[29].SetHwnd(this->GetSafeHwnd(), IDC_CHK_USE_ENGRAVE);
+	myBtn[29].SetBtnType(BTN_TYPE_CHECK);
+	myBtn[29].SetTextColor(RGB_BLUE);
+	myBtn[29].SetFont(_T("굴림체"), 14, TRUE);
+
+	myBtn[30].SubclassDlgItem(IDC_CHK_USE_AOI_UP, this);
+	myBtn[30].SetHwnd(this->GetSafeHwnd(), IDC_CHK_USE_AOI_UP);
+	myBtn[30].SetBtnType(BTN_TYPE_CHECK);
+	myBtn[30].SetTextColor(RGB_BLUE);
+	myBtn[30].SetFont(_T("굴림체"), 14, TRUE);
+
+	myBtn[31].SubclassDlgItem(IDC_CHK_USE_AOI_DN, this);
+	myBtn[31].SetHwnd(this->GetSafeHwnd(), IDC_CHK_USE_AOI_DN);
+	myBtn[31].SetBtnType(BTN_TYPE_CHECK);
+	myBtn[31].SetTextColor(RGB_BLUE);
+	myBtn[31].SetFont(_T("굴림체"), 14, TRUE);
+
+	myBtn[32].SubclassDlgItem(IDC_CHK_USE_PUNCH, this);
+	myBtn[32].SetHwnd(this->GetSafeHwnd(), IDC_CHK_USE_PUNCH);
+	myBtn[32].SetBtnType(BTN_TYPE_CHECK);
+	myBtn[32].SetTextColor(RGB_BLUE);
+	myBtn[32].SetFont(_T("굴림체"), 14, TRUE);
+
+	myBtn[33].SubclassDlgItem(IDC_CHK_USE_PUNCH_ONLY, this);
+	myBtn[33].SetHwnd(this->GetSafeHwnd(), IDC_CHK_USE_PUNCH_ONLY);
+	myBtn[33].SetBtnType(BTN_TYPE_CHECK);
+	myBtn[33].SetTextColor(RGB_BLUE);
+	myBtn[33].SetFont(_T("굴림체"), 14, TRUE);
+	
+
 	int i;
 	for(i=0; i<MAX_INFO_BTN; i++)
 	{
@@ -362,7 +415,8 @@ void CDlgInfo::InitBtn()
 			myBtn[i].SetFont(_T("돋움체"),22,TRUE);
 		}
 
-		if (0 != i && 12 != i && 13 != i && 14 != i && 15 != i && 16 != i  && 17 != i && 18 != i && 23 != i && 24 != i && 25 != i)
+		if (0 != i && 12 != i && 13 != i && 14 != i && 15 != i && 16 != i  && 17 != i && 18 != i && 23 != i && 24 != i && 25 != i
+			&& 29 != i && 30 != i && 31 != i && 32 != i && 33 != i)
 		{
 			myBtn[i].SetFont(_T("굴림체"),16,TRUE);
 			myBtn[i].SetTextColor(RGB_BLACK);
@@ -853,6 +907,10 @@ void CDlgInfo::Disp()
 	int nAlignMethode = pDoc->WorkingInfo.LastJob.nAlignMethode;
 	BOOL b2PointAlign = nAlignMethodeOnCamMst & TWO_POINT;
 	BOOL b4PointAlign = nAlignMethodeOnCamMst & FOUR_POINT;
+#ifdef TEST_MODE
+	b2PointAlign = TRUE;
+	b4PointAlign = FALSE;
+#endif
 
 	if (b4PointAlign && b2PointAlign)
 	{
@@ -892,6 +950,8 @@ void CDlgInfo::Disp()
 		sMsg.Format(_T("캠마스터에 %s 모델의 Align 설정이 없습니다."), pDoc->WorkingInfo.LastJob.sModel);
 		pView->MsgBox(sMsg);
 	}
+
+	DispDevicePartial();
 }
 
 int CDlgInfo::GetTestModeFromPlc()
@@ -1700,6 +1760,7 @@ void CDlgInfo::SetDualTest(BOOL bOn)
 	if (pView && pView->m_pEngrave)
 		pView->m_pEngrave->SetDualTest();	//_stSigInx::_DualTest
 #endif
+	DispDevicePartial();
 }
 
 void CDlgInfo::SetFeedDir(int nUnit)
@@ -1789,6 +1850,8 @@ void CDlgInfo::OnChkUseAoiInner()
 		SetTestMode(MODE_OUTER);
 	else
 		SetTestMode(MODE_NONE);
+
+	DispDevicePartial();
 }
 
 void CDlgInfo::OnChkUseAoiOuter() 
@@ -1814,6 +1877,8 @@ void CDlgInfo::OnChkUseAoiOuter()
 		SetTestMode(MODE_OUTER);
 	else
 		SetTestMode(MODE_NONE);
+
+	DispDevicePartial();
 }
 
 void CDlgInfo::OnChkUseAoiDual() 
@@ -2335,4 +2400,215 @@ void CDlgInfo::OnStnClickedStc187()
 
 	::WritePrivateProfileString(_T("Last Job"), _T("Judge Marking Ratio"), sVal, PATH_WORKING_INFO);
 
+}
+
+void CDlgInfo::DispDevicePartial()
+{
+	CString sMsg;
+	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
+#ifdef USE_MPE
+	bDualTest = pView->MpeRead(pView->Plc.DlgInfo.TwoMetal) > 0 ? TRUE : FALSE;
+#endif
+
+	if (!pDoc->WorkingInfo.LastJob.nTestMode && bDualTest)
+	{
+		pDoc->WorkingInfo.System.bUseDevicePartial = TRUE;
+		GetDlgItem(IDC_CHK_USE_ENGRAVE)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_CHK_USE_AOI_UP)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_CHK_USE_AOI_DN)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_CHK_USE_PUNCH)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_CHK_USE_PUNCH_ONLY)->ShowWindow(SW_SHOW);
+	}
+	else
+	{
+		pDoc->WorkingInfo.System.bUseDevicePartial = FALSE;
+		GetDlgItem(IDC_CHK_USE_ENGRAVE)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_CHK_USE_AOI_UP)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_CHK_USE_AOI_DN)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_CHK_USE_PUNCH)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_CHK_USE_PUNCH_ONLY)->ShowWindow(SW_HIDE);
+	}
+	if (pDoc->WorkingInfo.LastJob.bDualTest != bDualTest)
+	{
+		sMsg.Format(_T("PLC 양면모드: %d , PC 양면모드: %d \r\n설정 오류입니다."), bDualTest ? 1 : 0, pDoc->WorkingInfo.LastJob.bDualTest ? 1 : 0);
+		pView->MsgBox(sMsg);
+	}
+
+	BOOL bOn;
+	if (pDoc->WorkingInfo.System.bUseDevicePartial)
+	{
+		bOn = pDoc->WorkingInfo.System.bUsePunchOnly;
+		if (bOn)
+		{
+			pDoc->WorkingInfo.System.bUseEngrave = FALSE;
+			pDoc->WorkingInfo.System.bUseAoiUp = FALSE;
+			pDoc->WorkingInfo.System.bUseAoiDn = FALSE;
+			pDoc->WorkingInfo.System.bUsePunch = TRUE;
+		}
+
+		if (pDoc->WorkingInfo.System.bUseEngrave)
+		{
+			myBtn[29].SetCheck(TRUE);
+			myBtn[29].SetTextColor(RGB_BLACK);
+			myBtn[29].SetWindowText(_T("각인부\r사용"));
+			pDoc->SetMkInfo(_T("Signal"), _T("UseEngrave"), TRUE);
+			pView->MpeWrite(pView->Plc.DlgInfo.UseEngrave, 1);
+		}
+		else
+		{
+			myBtn[29].SetCheck(FALSE);
+			myBtn[29].SetTextColor(RGB_BLUE);
+			myBtn[29].SetWindowText(_T("각인부\r미사용"));
+			pDoc->SetMkInfo(_T("Signal"), _T("UseEngrave"), FALSE);
+			pView->MpeWrite(pView->Plc.DlgInfo.UseEngrave, 0);
+		}
+
+		if (pDoc->WorkingInfo.System.bUseAoiUp)
+		{
+			myBtn[30].SetCheck(TRUE);
+			myBtn[30].SetTextColor(RGB_BLACK);
+			myBtn[30].SetWindowText(_T("상부AOI\r사용"));
+			pDoc->SetMkInfo(_T("Signal"), _T("UseAoiUp"), TRUE);
+			pView->MpeWrite(pView->Plc.DlgInfo.UseAoiUp, 1);
+		}
+		else
+		{
+			myBtn[30].SetCheck(FALSE);
+			myBtn[30].SetTextColor(RGB_BLUE);
+			myBtn[30].SetWindowText(_T("상부AOI\r미사용"));
+			pDoc->SetMkInfo(_T("Signal"), _T("UseAoiUp"), FALSE);
+			pView->MpeWrite(pView->Plc.DlgInfo.UseAoiUp, 0);
+		}
+
+		if (pDoc->WorkingInfo.System.bUseAoiDn)
+		{
+			myBtn[31].SetCheck(TRUE);
+			myBtn[31].SetTextColor(RGB_BLACK);
+			myBtn[31].SetWindowText(_T("하부AOI\r사용"));
+			pDoc->SetMkInfo(_T("Signal"), _T("UseAoiDn"), TRUE);
+			pView->MpeWrite(pView->Plc.DlgInfo.UseAoiDn, 1);
+		}
+		else
+		{
+			myBtn[31].SetCheck(FALSE);
+			myBtn[31].SetTextColor(RGB_BLUE);
+			myBtn[31].SetWindowText(_T("하부AOI\r미사용"));
+			pDoc->SetMkInfo(_T("Signal"), _T("UseAoiDn"), FALSE);
+			pView->MpeWrite(pView->Plc.DlgInfo.UseAoiDn, 0);
+		}
+
+		if (pDoc->WorkingInfo.System.bUsePunch)
+		{
+			myBtn[32].SetCheck(TRUE);
+			myBtn[32].SetTextColor(RGB_BLACK);
+			myBtn[32].SetWindowText(_T("펀칭부\r사용"));
+			pDoc->SetMkInfo(_T("Signal"), _T("UsePunch"), TRUE);
+			pView->MpeWrite(pView->Plc.DlgInfo.UsePunch, 1);
+		}
+		else
+		{
+			myBtn[32].SetCheck(FALSE);
+			myBtn[32].SetTextColor(RGB_BLUE);
+			myBtn[32].SetWindowText(_T("펀칭부\r미사용"));
+			pDoc->SetMkInfo(_T("Signal"), _T("UsePunch"), FALSE);
+			pView->MpeWrite(pView->Plc.DlgInfo.UsePunch, 0);
+		}
+
+		if (pDoc->WorkingInfo.System.bUsePunchOnly)
+		{
+			myBtn[33].SetCheck(TRUE);
+			myBtn[33].SetTextColor(RGB_BLACK);
+			myBtn[33].SetWindowText(_T("펀칭부만\r사용On"));
+			pDoc->SetMkInfo(_T("Signal"), _T("UsePunchOnly"), TRUE);
+			pView->MpeWrite(pView->Plc.DlgInfo.UsePunchOnly, 1);
+		}
+		else
+		{
+			myBtn[33].SetCheck(FALSE);
+			myBtn[33].SetTextColor(RGB_BLUE);
+			myBtn[33].SetWindowText(_T("펀칭부만\r사용Off"));
+			pDoc->SetMkInfo(_T("Signal"), _T("UsePunchOnly"), FALSE);
+			pView->MpeWrite(pView->Plc.DlgInfo.UsePunchOnly, 0);
+		}
+	}
+}
+
+void CDlgInfo::OnChkUseEngrave()
+{
+	// TODO: Add your control notification handler code here
+	BOOL bOn = myBtn[29].GetCheck();
+	if (bOn)
+		pDoc->WorkingInfo.System.bUseEngrave = TRUE;
+	else
+		pDoc->WorkingInfo.System.bUseEngrave = FALSE;
+
+	CString sData = pDoc->WorkingInfo.System.bUseEngrave ? _T("1") : _T("0");
+	::WritePrivateProfileString(_T("System"), _T("UseEngrave"), sData, PATH_WORKING_INFO);
+	pDoc->SetMkInfo(_T("Signal"), _T("UseEngrave"), pDoc->WorkingInfo.System.bUseEngrave);			// 각인부\r미사용
+	pView->MpeWrite(pView->Plc.DlgInfo.UseEngrave, pDoc->WorkingInfo.System.bUseEngrave ? 1 : 0);	// 각인부\r미사용
+	DispDevicePartial();
+}
+
+void CDlgInfo::OnChkUseAoiUp()
+{
+	// TODO: Add your control notification handler code here
+	BOOL bOn = myBtn[30].GetCheck();
+	if (bOn)
+		pDoc->WorkingInfo.System.bUseAoiUp = TRUE;
+	else
+		pDoc->WorkingInfo.System.bUseAoiUp = FALSE;
+
+	CString sData = pDoc->WorkingInfo.System.bUseAoiUp ? _T("1") : _T("0");
+	::WritePrivateProfileString(_T("System"), _T("UseAoiUp"), sData, PATH_WORKING_INFO);
+	pDoc->SetMkInfo(_T("Signal"), _T("UseAoiUp"), pDoc->WorkingInfo.System.bUseAoiUp);			// 상부AOI\r미사용
+	pView->MpeWrite(pView->Plc.DlgInfo.UseAoiUp, pDoc->WorkingInfo.System.bUseAoiUp ? 1 : 0);	// 상부AOI\r미사용
+	DispDevicePartial();
+}
+
+void CDlgInfo::OnChkUseAoiDn()
+{
+	// TODO: Add your control notification handler code here
+	BOOL bOn = myBtn[31].GetCheck();
+	if (bOn)
+		pDoc->WorkingInfo.System.bUseAoiDn = TRUE;
+	else
+		pDoc->WorkingInfo.System.bUseAoiDn = FALSE;
+
+	CString sData = pDoc->WorkingInfo.System.bUseAoiDn ? _T("1") : _T("0");
+	::WritePrivateProfileString(_T("System"), _T("UseAoiDn"), sData, PATH_WORKING_INFO);
+	pDoc->SetMkInfo(_T("Signal"), _T("UseAoiDn"), pDoc->WorkingInfo.System.bUseAoiDn);			// 하부AOI\r미사용
+	pView->MpeWrite(pView->Plc.DlgInfo.UseAoiDn, pDoc->WorkingInfo.System.bUseAoiDn ? 1 : 0);	// 하부AOI\r미사용
+	DispDevicePartial();
+}
+
+void CDlgInfo::OnChkUsePunch()
+{
+	// TODO: Add your control notification handler code here
+	BOOL bOn = myBtn[32].GetCheck();
+	if (bOn)
+		pDoc->WorkingInfo.System.bUsePunch = TRUE;
+	else
+		pDoc->WorkingInfo.System.bUsePunch = FALSE;
+
+	CString sData = pDoc->WorkingInfo.System.bUsePunch ? _T("1") : _T("0");
+	::WritePrivateProfileString(_T("System"), _T("UsePunch"), sData, PATH_WORKING_INFO);
+	pDoc->SetMkInfo(_T("Signal"), _T("UsePunch"), pDoc->WorkingInfo.System.bUsePunch);			// 펀칭부\r미사용
+	pView->MpeWrite(pView->Plc.DlgInfo.UsePunch, pDoc->WorkingInfo.System.bUsePunch ? 1 : 0);	// 펀칭부\r미사용
+	DispDevicePartial();
+}
+
+void CDlgInfo::OnChkUsePunchOnly()
+{
+	// TODO: Add your control notification handler code here
+	BOOL bOn = myBtn[33].GetCheck();
+	if (bOn)
+		pDoc->WorkingInfo.System.bUsePunchOnly = TRUE;
+	else
+		pDoc->WorkingInfo.System.bUsePunchOnly = FALSE;
+
+	CString sData = pDoc->WorkingInfo.System.bUsePunchOnly ? _T("1") : _T("0");
+	::WritePrivateProfileString(_T("System"), _T("UsePunchOnly"), sData, PATH_WORKING_INFO);
+	pDoc->SetMkInfo(_T("Signal"), _T("UsePunchOnly"), pDoc->WorkingInfo.System.bUsePunchOnly);			// 펀칭부만\r사용Off
+	pView->MpeWrite(pView->Plc.DlgInfo.UsePunchOnly, pDoc->WorkingInfo.System.bUsePunchOnly ? 1 : 0);	// 펀칭부만\r사용Off
+	DispDevicePartial();
 }

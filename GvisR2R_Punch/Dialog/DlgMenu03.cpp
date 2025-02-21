@@ -3119,6 +3119,15 @@ BOOL CDlgMenu03::DoReset()
 
 	if(pDoc->Status.bManual)
 	{
+		if (pDoc->GetTestMode() == MODE_INNER || pDoc->WorkingInfo.System.bUseEngrave)
+		{
+			if (!pView->IsConnectedEng())
+			{
+				pView->MsgBox(_T("각인부 프로그램이 연결되지 않았습니다."));
+				return FALSE;
+			}
+		}
+
 		BOOL bInit=TRUE;
 
 		if(m_bTIM_CHK_DONE_READY)

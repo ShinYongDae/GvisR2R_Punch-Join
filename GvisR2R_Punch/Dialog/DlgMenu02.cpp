@@ -2436,11 +2436,6 @@ void CDlgMenu02::OnBtnPinSave()
 			return;
 		}
 	}
-
-	//if (pView->IsSetPinPos())
-	//{
-	//	SetModelMarkImage();
-	//}
 }
 
 void CDlgMenu02::OnBtnPinSave2() 
@@ -2476,11 +2471,6 @@ void CDlgMenu02::OnBtnPinSave2()
 			return;
 		}
 	}
-
-	//if (pView->IsSetPinPos())
-	//{
-	//	SetModelMarkImage();
-	//}
 
 	if (pView->m_nMkStAuto > MK_ST + 11 && pView->m_nMkStAuto < MK_ST + 29)
 	{
@@ -6189,6 +6179,7 @@ void CDlgMenu02::DispAlignRangeR(int* pAlignX, int* pAlignY)
 
 void CDlgMenu02::DispMkPmScore(int nCam)
 {
+#ifdef USE_VISION
 	CString sVal;
 
 	if (nCam == 0 && pView->m_pVision[0])
@@ -6203,10 +6194,12 @@ void CDlgMenu02::DispMkPmScore(int nCam)
 	}
 	if (m_pDlgUtil03)
 		m_pDlgUtil03->DispResultPtScore(nCam);
+#endif
 }
 
 void CDlgMenu02::InitMkPmRst(int nCam)
 {
+#ifdef USE_VISION
 	if (nCam == 2)
 	{
 		if (pView->m_pVision[0])
@@ -6219,4 +6212,5 @@ void CDlgMenu02::InitMkPmRst(int nCam)
 		if (pView->m_pVision[nCam])
 			pView->m_pVision[nCam]->PtMtRst.dScore = 0.0;
 	}
+#endif
 }

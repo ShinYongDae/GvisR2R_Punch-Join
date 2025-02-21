@@ -12,7 +12,7 @@
 
 #define MAX_INFO_STC				74
 #define MAX_INFO_STC_DATA			22
-#define MAX_INFO_BTN				29
+#define MAX_INFO_BTN				34
 
 #define TIM_DISP_STS				450
 
@@ -54,6 +54,7 @@ public:
 	void AtDlgHide();
 
 	void UpdateData();
+	void DispDevicePartial();
 
 // Dialog Data
 	//{{AFX_DATA(CDlgInfo)
@@ -114,6 +115,11 @@ protected:
 	afx_msg void OnStc183();
 	afx_msg void OnChk19();
 	afx_msg void OnChk23();
+	afx_msg void OnChkUseEngrave();
+	afx_msg void OnChkUseAoiUp();
+	afx_msg void OnChkUseAoiDn();
+	afx_msg void OnChkUsePunch();
+	afx_msg void OnChkUsePunchOnly();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:

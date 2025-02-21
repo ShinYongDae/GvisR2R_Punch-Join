@@ -9931,8 +9931,15 @@ void CGvisR2R_PunchView::InitAuto(BOOL bInit)
 	m_bLastProc = FALSE; pDoc->SetStatus(_T("General"), _T("bLastProc"), m_bLastProc);
 	if (MODE_INNER != pDoc->GetTestMode())
 	{
-		m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
-		pView->m_bWaitPcr[0] = FALSE;
+		if (!pDoc->WorkingInfo.System.bUseEngrave)
+		{
+			m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
+			pView->m_bWaitPcr[0] = FALSE;
+		}
+		else
+		{
+			m_bLastProcFromEng = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromEng"), m_bLastProcFromEng);
+		}
 	}
 	else
 	{
@@ -9992,8 +9999,15 @@ void CGvisR2R_PunchView::InitAuto(BOOL bInit)
 
 		if (MODE_INNER != pDoc->GetTestMode())
 		{
-			m_pDlgMenu01->m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_pDlgMenu01->m_bLastProcFromUp);
-			pView->m_bWaitPcr[0] = FALSE;
+			if (!pDoc->WorkingInfo.System.bUseEngrave)
+			{
+				m_pDlgMenu01->m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_pDlgMenu01->m_bLastProcFromUp);
+				pView->m_bWaitPcr[0] = FALSE;
+			}
+			else
+			{
+				m_pDlgMenu01->m_bLastProcFromEng = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromEng"), m_bLastProcFromEng);
+			}
 		}
 		else
 		{
@@ -10123,7 +10137,7 @@ void CGvisR2R_PunchView::InitAuto(BOOL bInit)
 	}
 	else
 	{
-		if (pDoc->GetTestMode() == MODE_INNER && pDoc->WorkingInfo.LastJob.bDispLotEnd)
+		if ((pDoc->GetTestMode() == MODE_INNER || pDoc->WorkingInfo.System.bUseEngrave) && pDoc->WorkingInfo.LastJob.bDispLotEnd)
 		{
 			if (IDYES == MsgBox(_T("각인부에서 레이저 각인부터 시작하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, FALSE))
 			{
@@ -10141,7 +10155,7 @@ void CGvisR2R_PunchView::InitAuto(BOOL bInit)
 				}
 			}
 		}
-		else if (pDoc->GetTestMode() == MODE_INNER && !pDoc->WorkingInfo.LastJob.bDispLotEnd)
+		else if ((pDoc->GetTestMode() == MODE_INNER || pDoc->WorkingInfo.System.bUseEngrave) && !pDoc->WorkingInfo.LastJob.bDispLotEnd)
 		{
 			if (IDYES == MsgBox(_T("각인부에서 2D 코드를 읽고 난 후 Last Shot을 확인하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, FALSE))
 			{
@@ -14599,6 +14613,7 @@ void CGvisR2R_PunchView::DoMark0()
 				//AfxMessageBox(_T("Error-SaveMk0Img()"));
 				if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
 				{
+#ifdef USE_VISION
 					if (!m_pVision[0]->m_bMkJudge)
 					{
 						nRtn = MsgBox(_T("좌측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
@@ -14617,8 +14632,8 @@ void CGvisR2R_PunchView::DoMark0()
 							Stop();
 							break;
 						}
-
 					}
+#endif
 				}
 			}
 		}
@@ -15286,6 +15301,7 @@ void CGvisR2R_PunchView::DoMark1()
 				//AfxMessageBox(_T("Error-SaveMk1Img()"));
 				if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
 				{
+#ifdef USE_VISION
 					if (!m_pVision[1]->m_bMkJudge)
 					{
 						nRtn = MsgBox(_T("우측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
@@ -15304,8 +15320,8 @@ void CGvisR2R_PunchView::DoMark1()
 							Stop();
 							break;
 						}
-
 					}
+#endif
 				}
 			}
 		}
@@ -16448,7 +16464,7 @@ void CGvisR2R_PunchView::DoAutoSetFdOffset()
 		}
 	}
 
-	if (pDoc->GetTestMode() == MODE_INNER)
+	if (pDoc->GetTestMode() == MODE_INNER || pDoc->WorkingInfo.System.bUseEngrave)
 	{
 		CfPoint OfStEng;
 
@@ -16968,7 +16984,7 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 
 				SetListBuf();
 
-				if (MODE_INNER == pDoc->GetTestMode() || MODE_OUTER == pDoc->GetTestMode()) // Please modify for outer mode.-20221226
+				if (MODE_INNER == pDoc->GetTestMode() || MODE_OUTER == pDoc->GetTestMode() || pDoc->WorkingInfo.System.bUseEngrave) // Please modify for outer mode.-20221226
 				{
 					GetCurrentInfoEng();
 					if (m_pDlgMenu01)
@@ -17103,7 +17119,7 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 				m_nStepAuto++;
 			}
 
-			if (MODE_INNER == pDoc->GetTestMode())
+			if (MODE_INNER == pDoc->GetTestMode() || pDoc->WorkingInfo.System.bUseEngrave)
 			{
 				if (IsSetLotEnd())
 					nSerial = GetLotEndSerial();
@@ -17806,7 +17822,7 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 
 				SetListBuf();
 
-				if (MODE_INNER == pDoc->GetTestMode() || MODE_OUTER == pDoc->GetTestMode()) // Please modify for outer mode.-20221226
+				if (MODE_INNER == pDoc->GetTestMode() || MODE_OUTER == pDoc->GetTestMode() || pDoc->WorkingInfo.System.bUseEngrave) // Please modify for outer mode.-20221226
 				{
 					GetCurrentInfoEng();
 					if (m_pDlgMenu01)
@@ -17899,7 +17915,7 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 				m_nStepAuto++;
 			}
 			
-			if (MODE_INNER == pDoc->GetTestMode())
+			if (MODE_INNER == pDoc->GetTestMode() || pDoc->WorkingInfo.System.bUseEngrave)
 			{
 				if (IsSetLotEnd())
 					nSerial = GetLotEndSerial();
@@ -24041,6 +24057,11 @@ void CGvisR2R_PunchView::InitPLC()
 	MpeWrite(Plc.DlgInfo.Laser380mm, (pDoc->WorkingInfo.LastJob.bUse380mm) ? 1 : 0);
 	MpeWrite(Plc.DlgInfo.Laser346mm, (pDoc->WorkingInfo.LastJob.bUse346mm) ? 1 : 0);
 	MpeWrite(Plc.DlgInfo.Laser340mm, (pDoc->WorkingInfo.LastJob.bUse340mm) ? 1 : 0);
+	MpeWrite(Plc.DlgInfo.UseEngrave, (pDoc->WorkingInfo.System.bUseEngrave) ? 1 : 0);
+	MpeWrite(Plc.DlgInfo.UseAoiUp, (pDoc->WorkingInfo.System.bUseAoiUp) ? 1 : 0);
+	MpeWrite(Plc.DlgInfo.UseAoiDn, (pDoc->WorkingInfo.System.bUseAoiDn) ? 1 : 0);
+	MpeWrite(Plc.DlgInfo.UsePunch, (pDoc->WorkingInfo.System.bUsePunch) ? 1 : 0);
+	MpeWrite(Plc.DlgInfo.UsePunchOnly, (pDoc->WorkingInfo.System.bUsePunchOnly) ? 1 : 0);
 }
 
 BOOL CGvisR2R_PunchView::SetCollision(double dCollisionMargin)
@@ -26839,7 +26860,7 @@ void CGvisR2R_PunchView::DoShift2Mk()
 
 void CGvisR2R_PunchView::DoAutoEng()
 {
-	if (!IsAuto() || (MODE_INNER != pDoc->GetTestMode()))
+	if (!IsAuto() || (MODE_INNER != pDoc->GetTestMode() && !pDoc->WorkingInfo.System.bUseEngrave))
 		return;
 
 	// 각인부 마킹시작 신호를 확인
@@ -27005,12 +27026,11 @@ void CGvisR2R_PunchView::DoAutoMarkingEngrave()
 	// 각인부 마킹중 ON (PC가 ON, OFF)
 	CString sVal;
 	BOOL bChk = MpeRead(Plc.DlgMenu01.MarkingOnEngrave); // PLC 각인기 작업 중 _T("MB40023B")
-	//if ( pDoc->BtnStatus.EngAuto.IsOnMking && !(pDoc->m_pMpeSignal[10] & (0x01 << 11)) ) // 각인부 마킹중 ON (PC가 ON, OFF)
+
 	if ( pDoc->BtnStatus.EngAuto.IsOnMking && !bChk ) // 각인부 마킹중 ON (PC가 ON, OFF)
 	{
 		MpeWrite(Plc.DlgMenu01.MarkingOnEngrave, 1); // B400104 : 2D(GUI) 각인 동작Running신호(PC On->PC Off)
 		pDoc->SetCurrentInfoSignal(_SigInx::_EngAutoSeqOnMkIng, TRUE);
-		//CheckCurrentInfoSignal();
 		pDoc->LogAuto(_T("PC: 2D(GUI) 각인 동작Running신호 ON (PC On->PC Off)"));
 		if (m_pDlgMenu02)
 		{
@@ -27022,7 +27042,6 @@ void CGvisR2R_PunchView::DoAutoMarkingEngrave()
 	{
 		MpeWrite(Plc.DlgMenu01.MarkingOnEngrave, 0); // 2D(GUI) 각인 동작Running신호(PC On->PC Off)
 		pDoc->SetCurrentInfoSignal(_SigInx::_EngAutoSeqOnMkIng, FALSE);
-		//CheckCurrentInfoSignal();
 		pDoc->LogAuto(_T("PC: 2D(GUI) 각인 동작Running신호 OFF (PC On->PC Off)"));
 		if (m_pDlgMenu02)
 		{
@@ -27033,14 +27052,11 @@ void CGvisR2R_PunchView::DoAutoMarkingEngrave()
 
 	// 각인부 마킹완료 ON (PC가 ON, OFF)
 	bChk = MpeRead(Plc.DlgMenu01.MarkingDoneEngrave); // PLC 각인기 마킹 작업 완료 _T("MB400245")
-	//if (pDoc->BtnStatus.EngAuto.IsMkDone && !(pDoc->m_pMpeSignal[4] & (0x01 << 5))) // 각인부 작업완료.(PC가 On, PLC가 확인 후 Off)
-	//if (pDoc->BtnStatus.EngAuto.IsMkDone && !bChk) // 각인부 작업완료.(PC가 On, PLC가 확인 후 Off)
 	if (pDoc->BtnStatus.EngAuto.MkDone && !bChk) // 각인부 작업완료.(PC가 On, PLC가 확인 후 Off)
 	{
 		pDoc->BtnStatus.EngAuto.MkDone = FALSE;
 		MpeWrite(Plc.DlgMenu01.MarkingDoneEngrave, 1); // 각인부 작업완료.(PC가 On, PLC가 확인 후 Off)
 		pDoc->SetCurrentInfoSignal(_SigInx::_IsEngAutoSeqMkDone, TRUE);
-		//CheckCurrentInfoSignal();
 		pDoc->LogAuto(_T("PC: 각인부 작업완료 ON (PC가 On, PLC가 확인 후 Off)"));
 
 		long nSerialEng = (long)pDoc->GetCurrentInfoEngShotNum();
@@ -27061,11 +27077,8 @@ void CGvisR2R_PunchView::DoAutoMarkingEngrave()
 			m_pDlgMenu02->GetDlgItem(IDC_STATIC_ENG_FD)->SetWindowText(sVal);
 		}
 	}
-	//else if (!pDoc->BtnStatus.EngAuto.IsMkDone && bChk) // 각인부 작업완료.(PC가 On, PLC가 확인 후 Off)
 	else if (!pDoc->BtnStatus.EngAuto.MkDone && bChk) // 각인부 작업완료.(PC가 On, PLC가 확인 후 Off)
 	{
-		//pDoc->SetCurrentInfoSignal(_SigInx::_EngAutoSeqMkDone, FALSE);
-		//CheckCurrentInfoSignal();
 		if (m_pDlgMenu02)
 		{
 			sVal.Format(_T("%d"), 0);
@@ -27077,12 +27090,10 @@ void CGvisR2R_PunchView::DoAutoMarkingEngrave()
 
 	// 각인부 2D 리더 작업중 신호
 	bChk = MpeRead(Plc.DlgMenu01.Reading2dOnEngrave); // GUI 각인기 리딩 중 _T("MB400034")
-	//if (pDoc->BtnStatus.EngAuto.IsOnRead2d && !(pDoc->m_pMpeSignal[23] & (0x01 << 4))) // 각인부 2D 리더 작업중 신호(PC On->PC Off)
 	if (pDoc->BtnStatus.EngAuto.IsOnRead2d && !bChk) // 각인부 2D 리더 작업중 신호(PC On->PC Off)
 	{
 		MpeWrite(Plc.DlgMenu01.Reading2dOnEngrave, 1); // 각인부 2D 리더 작업중 신호(PC On->PC Off)
 		pDoc->SetCurrentInfoSignal(_SigInx::_EngAutoSeqOnReading2d, TRUE);
-		//CheckCurrentInfoSignal();
 		pDoc->LogAuto(_T("PC: 각인부 2D 리더 작업중 신호 ON (PC On->PC Off)"));
 		if (m_pDlgMenu02)
 		{
@@ -27093,7 +27104,6 @@ void CGvisR2R_PunchView::DoAutoMarkingEngrave()
 	else if (!pDoc->BtnStatus.EngAuto.IsOnRead2d && bChk)
 	{
 		pDoc->SetCurrentInfoSignal(_SigInx::_EngAutoSeqOnReading2d, FALSE);
-		//CheckCurrentInfoSignal();
 		pDoc->LogAuto(_T("PC: 각인부 2D 리더 작업중 신호 OFF (PC On->PC Off)"));
 		MpeWrite(Plc.DlgMenu01.Reading2dOnEngrave, 0); // 각인부 2D 리더 작업중 신호(PC On->PC Off)
 		if (m_pDlgMenu02)
@@ -27105,20 +27115,12 @@ void CGvisR2R_PunchView::DoAutoMarkingEngrave()
 
 	// 각인부 2D 리더 작업완료 신호
 	bChk = MpeRead(Plc.DlgMenu01.Reading2dDoneEngrave); // GUI 각인기 리딩 완료(PLC Off) _T("MB400035")
-	//if (pDoc->BtnStatus.EngAuto.IsRead2dDone && !(pDoc->m_pMpeSignal[23] & (0x01 << 5))) // 각인부 2D 리더 작업완료 신호.(PC가 On, PLC가 확인 후 Off)
-	//if (pDoc->BtnStatus.EngAuto.IsRead2dDone && !bChk) // 각인부 2D 리더 작업완료 신호.(PC가 On, PLC가 확인 후 Off)
 	if (pDoc->BtnStatus.EngAuto.Read2dDone && !bChk) // 각인부 2D 리더 작업완료 신호.(PC가 On, PLC가 확인 후 Off)
 	{
 		pDoc->BtnStatus.EngAuto.Read2dDone = FALSE;
 
-		//long nSerialEng = (long)pDoc->GetCurrentInfoReadShotNum();
-		//MpeWrite(_T("ML41122"), nSerialEng); // 각인부 읽은 시리얼
-		//MpeWrite(Plc.DlgMenu03.FeedingReadyEngrave, 1); // 각인부 피딩가능 신호.(PC가 On, PLC가 확인 후 Off)
-
 		MpeWrite(Plc.DlgMenu01.Reading2dDoneEngrave, 1); // 각인부 2D 리더 작업완료 신호.(PC가 On, PLC가 확인 후 Off)
 		pDoc->SetCurrentInfoSignal(_SigInx::_IsEngAutoSeq2dReadDone, TRUE);
-		//pDoc->SetCurrentInfoSignal(_SigInx::_EngAutoSeq2dReadDone, TRUE);
-		//CheckCurrentInfoSignal();
 		pDoc->LogAuto(_T("PC: 각인부 2D 리더 작업완료 신호 ON (PC가 On, PLC가 확인 후 Off)"));
 		if (m_pDlgMenu02)
 		{
@@ -27126,11 +27128,8 @@ void CGvisR2R_PunchView::DoAutoMarkingEngrave()
 			m_pDlgMenu02->GetDlgItem(IDC_STATIC_ENG_RD_DONE)->SetWindowText(sVal);
 		}
 	}
-	//else if (!pDoc->BtnStatus.EngAuto.IsRead2dDone && bChk)
 	else if (!pDoc->BtnStatus.EngAuto.Read2dDone && bChk)
 	{
-		//pDoc->SetCurrentInfoSignal(_SigInx::_EngAutoSeq2dReadDone, FALSE);
-		//CheckCurrentInfoSignal();
 		if (m_pDlgMenu02)
 		{
 			sVal.Format(_T("%d"), 0);
@@ -27139,39 +27138,6 @@ void CGvisR2R_PunchView::DoAutoMarkingEngrave()
 	}
 
 }
-
-//void CGvisR2R_PunchView::SetEngFd()
-//{
-//	CfPoint OfSt;
-//	if (GetEngOffset(OfSt))
-//	{
-//		if (m_pDlgMenu02)
-//		{
-//			m_pDlgMenu02->m_dEngFdOffsetX = OfSt.x;
-//			m_pDlgMenu02->m_dEngFdOffsetY = OfSt.y;
-//		}
-//	}
-//
-//	MoveEng(-1.0*OfSt.x);
-//	if (m_pDlgMenu03)
-//		m_pDlgMenu03->ChkDoneEngrave();
-//
-//	if (!pDoc->WorkingInfo.LastJob.bAoiOnePnl)
-//	{
-//		MpeWrite(pView->Plc.DlgMenu03.FeedOnePanel, 1);	// 한판넬 이송상태 ON (PC가 ON, OFF)
-//		CString sData, sPath = PATH_WORKING_INFO;
-//		pDoc->WorkingInfo.LastJob.bMkOnePnl = pDoc->WorkingInfo.LastJob.bAoiOnePnl = pDoc->WorkingInfo.LastJob.bEngraveOnePnl = TRUE;
-//		sData.Format(_T("%d"), pDoc->WorkingInfo.LastJob.bMkOnePnl ? 1 : 0);
-//		::WritePrivateProfileString(_T("Last Job"), _T("Marking One Pannel Move On"), sData, sPath);
-//		::WritePrivateProfileString(_T("Last Job"), _T("AOI One Pannel Move On"), sData, sPath);
-//		::WritePrivateProfileString(_T("Last Job"), _T("Engrave One Pannel Move On"), sData, sPath);
-//	}
-//}
-
-//BOOL CGvisR2R_PunchView::GetEngOffset(CfPoint &OfSt)
-//{
-//	return pDoc->GetEngOffset(OfSt);
-//}
 
 
 void CGvisR2R_PunchView::MoveEng(double dOffset)
@@ -28321,6 +28287,7 @@ void CGvisR2R_PunchView::DoMark0Its()
 				//AfxMessageBox(_T("Error-SaveMk0Img()"));
 				if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
 				{
+#ifdef USE_VISION
 					if (!m_pVision[0]->m_bMkJudge)
 					{
 						nRtn = MsgBox(_T("좌측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
@@ -28339,8 +28306,8 @@ void CGvisR2R_PunchView::DoMark0Its()
 							Stop();
 							break;
 						}
-
 					}
+#endif
 				}
 			}
 		}
@@ -28951,6 +28918,7 @@ void CGvisR2R_PunchView::DoMark1Its()
 				//AfxMessageBox(_T("Error-SaveMk1Img()"));
 				if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
 				{
+#ifdef USE_VISION
 					if (!m_pVision[1]->m_bMkJudge)
 					{
 						nRtn = MsgBox(_T("우측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
@@ -28969,8 +28937,8 @@ void CGvisR2R_PunchView::DoMark1Its()
 							Stop();
 							break;
 						}
-
 					}
+#endif
 				}
 			}
 		}

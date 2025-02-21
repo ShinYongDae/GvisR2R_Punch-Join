@@ -2998,8 +2998,15 @@ void CDlgMenu06::ResetSerial()
 		myBtn[3].SetCheck(FALSE);
 		if (MODE_INNER != pDoc->GetTestMode())
 		{
-			m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
-			pView->m_bWaitPcr[0] = FALSE;
+			if (!pDoc->WorkingInfo.System.bUseEngrave)
+			{
+				m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
+				pView->m_bWaitPcr[0] = FALSE;
+			}
+			else
+			{
+				m_bLastProcFromEng = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromEng"), m_bLastProcFromEng);
+			}
 		}
 		else
 		{
@@ -3867,8 +3874,15 @@ void CDlgMenu06::LotEnd()
 	{
 		if (MODE_INNER != pDoc->GetTestMode())
 		{
-			m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
-			pView->m_bWaitPcr[0] = FALSE;
+			if (!pDoc->WorkingInfo.System.bUseEngrave)
+			{
+				m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
+				pView->m_bWaitPcr[0] = FALSE;
+			}
+			else
+			{
+				m_bLastProcFromEng = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromEng"), m_bLastProcFromEng);
+			}
 		}
 		else
 		{
@@ -3899,8 +3913,15 @@ void CDlgMenu06::SetLastProc()
 	{
 		if (MODE_INNER != pDoc->GetTestMode())
 		{
-			m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
-			pView->m_bWaitPcr[0] = FALSE;
+			if (!pDoc->WorkingInfo.System.bUseEngrave)
+			{
+				m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
+				pView->m_bWaitPcr[0] = FALSE;
+			}
+			else
+			{
+				m_bLastProcFromEng = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromEng"), m_bLastProcFromEng);
+			}
 		}
 		else
 		{

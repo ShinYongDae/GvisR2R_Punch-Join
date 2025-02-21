@@ -7,10 +7,12 @@
 // DlgMenu01.h : header file
 //
 
+#include "MyLabel.h"
 #include "MyStatic.h"
 #include "MyBtn.h"
 #include "MyGL.h"
 
+#define MAX_MENU01_LABEL			4
 #define MAX_MENU01_STC_DEFINFO		12
 
 #define MAX_MENU01_STC_TITLE		78
@@ -33,6 +35,7 @@ class CDlgMenu01 : public CDialog
 	CMyStatic myStcTitle[MAX_MENU01_STC_TITLE];
 	CMyStatic myStcData[MAX_MENU01_STC_DATA];
 	CMyBtn myBtn[MAX_MENU01_BTN];
+	CMyLabel myLabel[MAX_MENU01_LABEL];
 
 	CRect m_RectTitle[2];
 	CRect m_RectCAD[12];
@@ -61,6 +64,7 @@ class CDlgMenu01 : public CDialog
 	void InitStcDefInf();
 	void InitStcTitle();
 	void InitStcData();
+	void InitLabel();
 	void InitBtn();
 	void InitMkInfo();
 	void InitMkInfoUp();
@@ -213,6 +217,7 @@ public:
 	void DispReelmapDisp();					// 20130321
 
 	void ResetJoinContinue();
+	void DispDevicePartial();
 
 // Dialog Data
 	//{{AFX_DATA(CDlgMenu01)
