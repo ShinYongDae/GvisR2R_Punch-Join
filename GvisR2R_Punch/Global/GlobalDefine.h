@@ -12,7 +12,7 @@
 #include "../Device/MotionParam.h"
 
 
-#define TEST_MODE		1
+//#define TEST_MODE		1
 
 #ifndef MAX_STRIP
 	#define MAX_STRIP				4
@@ -51,10 +51,9 @@
 	#define PATH_PCS_IMG			_T("C:\\R2RSet\\Test\\Piece.tif")
 	#define PATH_ORDERING_Mk		_T("C:\\R2RSet\\Test\\WriteOrderingMkRotate90ccw.txt")
 	#define PATH_ORDERING_Mk_MIRROR	_T("C:\\R2RSet\\Test\\WriteOrderingMkRotate90ccwMirror.txt")
-	#define PATH_REJECT_IMG_		_T("C:\\R2RSet\\Test\\Reject.TIF")
 
-	//#define	USE_MIL
-	//#define	USE_VISION
+	#define	USE_MIL
+	#define	USE_VISION
 
 	//#define USE_TCPIP
 	//#define USE_ENGRAVE
@@ -330,9 +329,6 @@ typedef enum {KOREAN=0, ENGLISH=1, JAPANESE=2} LANG;
 #define IMG_BTN_UP_DlgMenu01			_T("C:\\R2RSet\\Pic\\DlgMenu01\\Btn_Bk_Up.bmp")
 #define NI_BTN_DN_DlgMenu01				_T("C:\\R2RSet\\Pic\\DlgMenu01\\Ni_Bk_Dn2.bmp")
 #define NI_BTN_UP_DlgMenu01				_T("C:\\R2RSet\\Pic\\DlgMenu01\\Ni_Bk_Up1.bmp")
-#define ICO_LED_BLU_DlgMenu01			_T("C:\\R2RSet\\Pic\\DlgMenu01\\3dBallBlue.ico")
-#define ICO_LED_RED_DlgMenu01			_T("C:\\R2RSet\\Pic\\DlgMenu01\\3dBallRed.ico")
-#define ICO_LED_GRY_DlgMenu01			_T("C:\\R2RSet\\Pic\\DlgMenu01\\3DBallGray.ico")
 
 #define IMG_BTN_DN_DlgMenu02			_T("C:\\R2RSet\\Pic\\DlgMenu02\\Btn_Bk_Dn.bmp")
 #define IMG_BTN_UP_DlgMenu02			_T("C:\\R2RSet\\Pic\\DlgMenu02\\Btn_Bk_Up.bmp")
@@ -670,9 +666,6 @@ struct stSystem
 	BOOL bSaveMkImg, bSaveGrabImg;
 	BOOL bStripPcsRgnBin;
 	BOOL bUseDTS, bUseITS;
-	BOOL bUseDevicePartial;
-	BOOL bUseEngrave, bUseAoiUp, bUseAoiDn, bUsePunch;
-	BOOL bUsePunchOnly;
 
 	stSystem()
 	{
@@ -729,10 +722,6 @@ struct stSystem
 		bStripPcsRgnBin = FALSE;
 		bUseDTS = FALSE;
 		bUseITS = FALSE;
-
-		bUseDevicePartial = FALSE;
-		bUseEngrave = FALSE; bUseAoiUp = TRUE; bUseAoiDn = TRUE; bUsePunch = TRUE;
-		bUsePunchOnly = FALSE;
 	}
 };
 
@@ -2199,8 +2188,6 @@ struct stDlgInfoReg
 	CString UltraSonicEngrave, UltraSonicAoi;
 	CString UltraSonicStTimeAoi, Laser346mm, Laser340mm;
 	CString SenserSaftyPunch;
-	CString UseEngrave, UseAoiUp, UseAoiDn, UsePunch;
-	CString UsePunchOnly;
 
 	CString LampCleanRollerAoiUp, LampCleanRollerAoiDn, LampUltraSonicAoi, LampUltraSonicEngrave, LampTwoMetal, LampOneMetal;
 	CString LampSampleTest, LampModeInner, LampModeOutter, LampFeedCcwRecoiler, LampFeedCcwUncoiler, LampDoorSensorUncoiler;
@@ -2242,12 +2229,6 @@ struct stDlgInfoReg
 		UltraSonicEngrave = _T("MB400062");
 		UltraSonicAoi = _T("MB400067");
 		SenserSaftyPunch = _T("MB40001A");
-
-		UseEngrave = _T("MB40009A");
-		UseAoiUp = _T("MB40009B");
-		UseAoiDn = _T("MB40009C");
-		UsePunch = _T("MB40009D");
-		UsePunchOnly = _T("MB40009E");
 
 		LampCleanRollerAoiUp = _T("MB400265");
 		LampCleanRollerAoiDn = _T("MB400266");
@@ -2341,16 +2322,6 @@ struct stDlgInfoReg
 			Laser340mm = CString(szData);
 		if (0 < ::GetPrivateProfileString(sMenu, _T("SenserSaftyPunch"), NULL, szData, sizeof(szData), sPath))
 			SenserSaftyPunch = CString(szData);
-		if (0 < ::GetPrivateProfileString(sMenu, _T("UseEngrave"), NULL, szData, sizeof(szData), sPath))
-			UseEngrave = CString(szData);
-		if (0 < ::GetPrivateProfileString(sMenu, _T("UseAoiUp"), NULL, szData, sizeof(szData), sPath))
-			UseAoiUp = CString(szData);
-		if (0 < ::GetPrivateProfileString(sMenu, _T("UseAoiDn"), NULL, szData, sizeof(szData), sPath))
-			UseAoiDn = CString(szData);
-		if (0 < ::GetPrivateProfileString(sMenu, _T("UsePunch"), NULL, szData, sizeof(szData), sPath))
-			UsePunch = CString(szData);
-		if (0 < ::GetPrivateProfileString(sMenu, _T("UsePunchOnly"), NULL, szData, sizeof(szData), sPath))
-			UsePunchOnly = CString(szData);
 		if (0 < ::GetPrivateProfileString(sMenu, _T("LampCleanRollerAoiUp"), NULL, szData, sizeof(szData), sPath))
 			LampCleanRollerAoiUp = CString(szData);
 		if (0 < ::GetPrivateProfileString(sMenu, _T("LampCleanRollerAoiDn"), NULL, szData, sizeof(szData), sPath))

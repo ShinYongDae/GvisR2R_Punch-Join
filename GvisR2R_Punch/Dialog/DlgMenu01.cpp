@@ -242,26 +242,6 @@ void CDlgMenu01::LoadImg()
 			myBtn[i].LoadBkImage(IMG_BTN_DN_DlgMenu01, BTN_IMG_DN);
 		}
 	}
-
-	for (i = 0; i < MAX_MENU01_LABEL; i++)
-	{
-		switch (i)
-		{
-		case 0:
-			myLabel[i].LoadImage(ICO_LED_GRY_DlgMenu01, LBL_IMG_UP, CSize(20, 20), LBL_POS_CENTER);
-			myLabel[i].LoadImage(ICO_LED_RED_DlgMenu01, LBL_IMG_DN, CSize(20, 20), LBL_POS_CENTER);
-			break;
-		case 1:
-		case 2:
-			myLabel[i].LoadImage(ICO_LED_GRY_DlgMenu01, LBL_IMG_UP, CSize(20, 20), LBL_POS_CENTER);
-			myLabel[i].LoadImage(ICO_LED_BLU_DlgMenu01, LBL_IMG_DN, CSize(20, 20), LBL_POS_CENTER);
-			break;
-		case 3:
-			myLabel[i].LoadImage(ICO_LED_GRY_DlgMenu01, LBL_IMG_UP, CSize(20, 20), LBL_POS_CENTER);
-			myLabel[i].LoadImage(ICO_LED_RED_DlgMenu01, LBL_IMG_DN, CSize(20, 20), LBL_POS_CENTER);
-			break;
-		}
-	}
 }
 
 void CDlgMenu01::DelImg()
@@ -273,8 +253,6 @@ void CDlgMenu01::DelImg()
 	int i;
 	for(i=0; i<MAX_MENU01_BTN; i++)
 		myBtn[i].DelImgList();
-	for (i = 0; i < MAX_MENU01_LABEL; i++)
-		myLabel[i].DelImgList();
 }
 
 
@@ -320,7 +298,6 @@ BOOL CDlgMenu01::OnInitDialog()
 	// TODO: Add extra initialization here
 	InitStatic();
 	InitBtn();
-	InitLabel();
 
 	SetRgbStcDef();
 	SetTitleStcDef();
@@ -1838,11 +1815,11 @@ BOOL CDlgMenu01::SaveDefImgPosUp(int nSerial, int nIdxMkInfo, int nIdxImg) // (n
 		nSerial,
 		nIdxImg);
 
-	strDefImgPathD.Format(_T("%s%s\\%s\\%s\\DefImagePos\\%d\\%05d_%s_%c_%d_%d.tif"), pDoc->WorkingInfo.System.sPathOldFile,
+	strDefImgPathD.Format(_T("%s%s\\%s\\%s\\DefImagePos\\%d\\%d_%05d_%s_%c_%d_%d.tif"), pDoc->WorkingInfo.System.sPathOldFile,
 		pDoc->WorkingInfo.LastJob.sModel,
 		pDoc->WorkingInfo.LastJob.sLot,
 		pDoc->WorkingInfo.LastJob.sLayerUp,
-		nSerial,
+		nSerial, nSerial,
 		nIdxImg, pDoc->m_pReelMap->m_sKorDef[nDefCode], nStrip + 'A', nCol + 1, nRow + 1);
 
 	CFileFind finder;
@@ -1882,11 +1859,11 @@ BOOL CDlgMenu01::SaveDefImgPosDn(int nSerial, int nIdxMkInfo, int nIdxImg) // (n
 		nSerial,
 		nIdxImg);
 
-	strDefImgPathD.Format(_T("%s%s\\%s\\%s\\DefImagePos\\%d\\%05d_%s_%c_%d_%d.tif"), pDoc->WorkingInfo.System.sPathOldFile,
+	strDefImgPathD.Format(_T("%s%s\\%s\\%s\\DefImagePos\\%d\\%d_%05d_%s_%c_%d_%d.tif"), pDoc->WorkingInfo.System.sPathOldFile,
 		pDoc->WorkingInfo.LastJob.sModel,
 		pDoc->WorkingInfo.LastJob.sLot,
 		pDoc->WorkingInfo.LastJob.sLayerDn,
-		nSerial,
+		nSerial, nSerial,
 		nIdxImg, pDoc->m_pReelMap->m_sKorDef[nDefCode], nStrip + 'A', nCol + 1, nRow + 1);
 
 	CFileFind finder;
@@ -2017,23 +1994,6 @@ void CDlgMenu01::ResetGL()
 {
 	if(m_pMyGL)
 		m_pMyGL->ResetRgn();
-}
-
-void CDlgMenu01::InitLabel()
-{
-	myLabel[0].SubclassDlgItem(IDC_STC_USE_ENG, this);
-	myLabel[1].SubclassDlgItem(IDC_STC_USE_AOI_UP, this);
-	myLabel[2].SubclassDlgItem(IDC_STC_USE_AOI_DN, this);
-	myLabel[3].SubclassDlgItem(IDC_STC_USE_PUNCH, this);
-
-	for (int i = 0; i < MAX_MENU01_LABEL; i++)
-	{
-		myLabel[i].SetFontName(_T("Arial"));
-		myLabel[i].SetFontSize(18);
-		myLabel[i].SetFontBold(TRUE);
-		myLabel[i].SetTextColor(RGB_DARKRED);
-		myLabel[i].SetImageBk(LBL_IMG_UP);
-	}
 }
 
 void CDlgMenu01::InitBtn()
@@ -3198,15 +3158,8 @@ void CDlgMenu01::ResetSerial()
 		myBtn[3].SetCheck(FALSE);
 		if (MODE_INNER != pDoc->GetTestMode())
 		{
-			if (!pDoc->WorkingInfo.System.bUseEngrave)
-			{
-				m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
-				pView->m_bWaitPcr[0] = FALSE;
-			}
-			else
-			{
-				m_bLastProcFromEng = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromEng"), m_bLastProcFromEng);
-			}
+			m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
+			pView->m_bWaitPcr[0] = FALSE;
 		}
 		else
 		{
@@ -3239,7 +3192,7 @@ void CDlgMenu01::UpdateData()
 	
 	myStcData[1].SetText(pDoc->WorkingInfo.LastJob.sModel);		// 모델
 	pDoc->SetMkMenu01(_T("Info"), _T("Model"), pDoc->WorkingInfo.LastJob.sModel);
-	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->WorkingInfo.System.bUseEngrave)
+	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
 		myStcData[91].SetText(pDoc->m_sItsCode);					// ITS CODE
 	else
 		myStcData[91].SetText(_T(""));
@@ -3312,8 +3265,6 @@ void CDlgMenu01::UpdateData()
 		if (GetDlgItem(IDC_STC_380mm)->IsWindowVisible())
 			GetDlgItem(IDC_STC_380mm)->ShowWindow(SW_HIDE);
 	}
-
-	DispDevicePartial();
 }
 
 void CDlgMenu01::UpdateWorking()
@@ -4121,15 +4072,8 @@ void CDlgMenu01::LotEnd()
 	{
 		if (MODE_INNER != pDoc->GetTestMode())
 		{
-			if (!pDoc->WorkingInfo.System.bUseEngrave)
-			{
-				m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
-				pView->m_bWaitPcr[0] = FALSE;
-			}
-			else
-			{
-				m_bLastProcFromEng = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromEng"), m_bLastProcFromEng);
-			}
+			m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
+			pView->m_bWaitPcr[0] = FALSE;
 		}
 		else
 		{
@@ -4160,15 +4104,8 @@ void CDlgMenu01::SetLastProc()
 	{
 		if (MODE_INNER != pDoc->GetTestMode())
 		{
-			if (!pDoc->WorkingInfo.System.bUseEngrave)
-			{
-				m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
-				pView->m_bWaitPcr[0] = FALSE;
-			}
-			else
-			{
-				m_bLastProcFromEng = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromEng"), m_bLastProcFromEng);
-			}
+			m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
+			pView->m_bWaitPcr[0] = FALSE;
 		}
 		else
 		{
@@ -4200,7 +4137,7 @@ void CDlgMenu01::OnChkEjectBuffer()
 			//pView->MpeWrite(pView->Plc.DlgMenu01.LastJobFromAoiUp, 0);			// 잔량처리 AOI(상) 부터(PC가 On시키고, PLC가 확인하고 Off시킴)-20141112
 			//pView->MpeWrite(pView->Plc.DlgMenu01.LastJobFromAoiDn, 0);			// 잔량처리 AOI(하) 부터(PC가 On시키고, PLC가 확인하고 Off시킴)-20141112
 
-			if(MODE_INNER != pDoc->GetTestMode() && !pDoc->WorkingInfo.System.bUseEngrave)
+			if(MODE_INNER != pDoc->GetTestMode())
 			{ 
 				if(IDNO == pView->MsgBox(_T("AOI 상면부터 잔량처리를 하시겠습니까?"), 0, MB_YESNO))
 				{
@@ -4244,7 +4181,7 @@ void CDlgMenu01::OnChkEjectBuffer()
 					}
 				}
 			}
-			else // MODE_INNER or pDoc->WorkingInfo.System.bUseEngrave
+			else // MODE_INNER
 			{
 				if (IDNO == pView->MsgBox(_T("각인부부터 잔량처리를 하시겠습니까?"), 0, MB_YESNO))
 				{
@@ -5972,7 +5909,7 @@ void CDlgMenu01::DispChangedModel()
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
 
 	myStcData[1].SetText(pDoc->WorkingInfo.LastJob.sModel);		// 모델
-	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->WorkingInfo.System.bUseEngrave)
+	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
 		myStcData[91].SetText(pDoc->m_sItsCode);					// ITS CODE
 	else
 		myStcData[91].SetText(_T(""));
@@ -6172,67 +6109,4 @@ void CDlgMenu01::OnStnClickedStcTqDisp3ValR()
 
 	pDoc->WorkingInfo.Marking[1].sMarkingDisp3Toq = sData;
 	::WritePrivateProfileString(_T("Marking1"), _T("MARKING_DISP3_TOQ"), sData, PATH_WORKING_INFO);
-}
-
-void CDlgMenu01::DispDevicePartial()
-{
-	BOOL bOn;
-
-	if (pDoc->WorkingInfo.System.bUseDevicePartial)
-	{
-		GetDlgItem(IDC_STC_DEV_ENG)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_STC_DEV_AOI_UP)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_STC_DEV_AOI_DN)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_STC_DEV_PUNCH)->ShowWindow(SW_SHOW);
-
-		GetDlgItem(IDC_STC_USE_ENG)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_STC_USE_AOI_UP)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_STC_USE_AOI_DN)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_STC_USE_PUNCH)->ShowWindow(SW_SHOW);
-
-		bOn = pDoc->WorkingInfo.System.bUsePunchOnly;
-		if (bOn)
-		{
-			pDoc->WorkingInfo.System.bUseEngrave = FALSE;
-			pDoc->WorkingInfo.System.bUseAoiUp = FALSE;
-			pDoc->WorkingInfo.System.bUseAoiDn = FALSE;
-			pDoc->WorkingInfo.System.bUsePunch = TRUE;
-		}
-
-		bOn = pDoc->WorkingInfo.System.bUseEngrave;
-		if (bOn && myLabel[0].GetImageBk() != LBL_IMG_DN)
-			myLabel[0].SetImageBk(LBL_IMG_DN);
-		else if (!bOn && myLabel[0].GetImageBk() != LBL_IMG_UP)
-			myLabel[0].SetImageBk(LBL_IMG_UP);
-
-		bOn = pDoc->WorkingInfo.System.bUseAoiUp;
-		if (bOn && myLabel[1].GetImageBk() != LBL_IMG_DN)
-			myLabel[1].SetImageBk(LBL_IMG_DN);
-		else if (!bOn && myLabel[1].GetImageBk() != LBL_IMG_UP)
-			myLabel[1].SetImageBk(LBL_IMG_UP);
-
-		bOn = pDoc->WorkingInfo.System.bUseAoiDn;
-		if (bOn && myLabel[2].GetImageBk() != LBL_IMG_DN)
-			myLabel[2].SetImageBk(LBL_IMG_DN);
-		else if (!bOn && myLabel[2].GetImageBk() != LBL_IMG_UP)
-			myLabel[2].SetImageBk(LBL_IMG_UP);
-
-		bOn = pDoc->WorkingInfo.System.bUsePunch;
-		if (bOn && myLabel[3].GetImageBk() != LBL_IMG_DN)
-			myLabel[3].SetImageBk(LBL_IMG_DN);
-		else if (!bOn && myLabel[3].GetImageBk() != LBL_IMG_UP)
-			myLabel[3].SetImageBk(LBL_IMG_UP);
-	}
-	else
-	{
-		GetDlgItem(IDC_STC_DEV_ENG)->ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_STC_DEV_AOI_UP)->ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_STC_DEV_AOI_DN)->ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_STC_DEV_PUNCH)->ShowWindow(SW_HIDE);
-
-		GetDlgItem(IDC_STC_USE_ENG)->ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_STC_USE_AOI_UP)->ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_STC_USE_AOI_DN)->ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_STC_USE_PUNCH)->ShowWindow(SW_HIDE);
-	}
 }

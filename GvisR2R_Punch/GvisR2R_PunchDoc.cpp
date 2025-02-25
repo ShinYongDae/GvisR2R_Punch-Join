@@ -1252,7 +1252,7 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 		WorkingInfo.System.bUseDTS = _ttoi(szData);
 	else
 	{
-		//pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("UseDTS가 설정되어 있지 않습니다."), MB_ICONWARNING | MB_OK);
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("UseDTS가 설정되어 있지 않습니다."), MB_ICONWARNING | MB_OK);
 		WorkingInfo.System.bUseDTS = FALSE;
 	}
 
@@ -1260,39 +1260,9 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 		WorkingInfo.System.bUseITS = _ttoi(szData);
 	else
 	{
-		//pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("UseITS가 설정되어 있지 않습니다."), MB_ICONWARNING | MB_OK);
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("UseITS가 설정되어 있지 않습니다."), MB_ICONWARNING | MB_OK);
 		WorkingInfo.System.bUseITS = FALSE;
 	}
-
-	if (0 < ::GetPrivateProfileString(_T("System"), _T("UseDevicePartial"), NULL, szData, sizeof(szData), sPath))
-		WorkingInfo.System.bUseDevicePartial = _ttoi(szData) ? TRUE : FALSE;
-	else
-		WorkingInfo.System.bUseDevicePartial = FALSE;
-
-	if (0 < ::GetPrivateProfileString(_T("System"), _T("UseEngrave"), NULL, szData, sizeof(szData), sPath))
-		WorkingInfo.System.bUseEngrave = _ttoi(szData) ? TRUE : FALSE;
-	else
-		WorkingInfo.System.bUseEngrave = FALSE;
-
-	if (0 < ::GetPrivateProfileString(_T("System"), _T("UseAoiUp"), NULL, szData, sizeof(szData), sPath))
-		WorkingInfo.System.bUseAoiUp = _ttoi(szData) ? TRUE : FALSE;
-	else
-		WorkingInfo.System.bUseAoiUp = TRUE;
-
-	if (0 < ::GetPrivateProfileString(_T("System"), _T("UseAoiDn"), NULL, szData, sizeof(szData), sPath))
-		WorkingInfo.System.bUseAoiDn = _ttoi(szData) ? TRUE : FALSE;
-	else
-		WorkingInfo.System.bUseAoiDn = TRUE;
-
-	if (0 < ::GetPrivateProfileString(_T("System"), _T("UsePunch"), NULL, szData, sizeof(szData), sPath))
-		WorkingInfo.System.bUsePunch = _ttoi(szData) ? TRUE : FALSE;
-	else
-		WorkingInfo.System.bUsePunch = TRUE;
-
-	if (0 < ::GetPrivateProfileString(_T("System"), _T("UsePunchOnly"), NULL, szData, sizeof(szData), sPath))
-		WorkingInfo.System.bUsePunchOnly = _ttoi(szData) ? TRUE : FALSE;
-	else
-		WorkingInfo.System.bUsePunchOnly = FALSE;
 
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("AOIUpDtsPath"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.System.sPathAoiUpDts = CString(szData);
@@ -6799,11 +6769,11 @@ BOOL CGvisR2R_PunchDoc::CopyDefImgUp(int nSerial, CString sNewLot)
 			}
 			else
 			{
-				strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImagePos\\%d\\%05d_%s_%c_%d_%d.tif"), WorkingInfo.System.sPathOldFile,
+				strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImagePos\\%d\\%d_%05d_%s_%c_%d_%d.tif"), WorkingInfo.System.sPathOldFile,
 					WorkingInfo.LastJob.sModel,
 					sLot,
 					WorkingInfo.LastJob.sLayerUp,
-					nSerial,
+					nSerial, nSerial,
 					nDefImg, pDoc->m_pReelMap->m_sKorDef[nDefCode], nStrip + 'A', nCol + 1, nRow + 1);
 			}
 
@@ -7108,11 +7078,11 @@ BOOL CGvisR2R_PunchDoc::CopyDefImgDn(int nSerial, CString sNewLot)
 			}
 			else
 			{
-				strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImagePos\\%d\\%05d_%s_%c_%d_%d.tif"), WorkingInfo.System.sPathOldFile,
+				strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImagePos\\%d\\%d_%05d_%s_%c_%d_%d.tif"), WorkingInfo.System.sPathOldFile,
 					WorkingInfo.LastJob.sModel,
 					sLot,
 					WorkingInfo.LastJob.sLayerDn,
-					nSerial,
+					nSerial, nSerial,
 					nDefImg, pDoc->m_pReelMap->m_sKorDef[nDefCode], nStrip + 'A', nCol + 1, nRow + 1);
 			}
 
@@ -15101,10 +15071,8 @@ double CGvisR2R_PunchDoc::GetVerifyPunchScore()
 {
 	//return m_dVerifyPunchScore;
 	double dVerifyPunchScore = 85.0;
-#ifdef USE_VISION
 	if (pView->m_pVision[0])
 		dVerifyPunchScore = pView->m_pVision[0]->GetVerifyPunchScore();
-#endif
 	return dVerifyPunchScore;
 }
 
@@ -15114,12 +15082,10 @@ void CGvisR2R_PunchDoc::SetVerifyPunchScore(double dScore)
 	//CString sData;
 	//sData.Format(_T("%d"), int(m_dVerifyPunchScore));
 	//::WritePrivateProfileString(_T("System"), _T("VerifyPunchScore"), sData, PATH_WORKING_INFO);
-#ifdef USE_VISION
 	if (pView->m_pVision[0])
 		pView->m_pVision[0]->SetVerifyPunchScore(dScore);
 	if (pView->m_pVision[1])
 		pView->m_pVision[1]->SetVerifyPunchScore(dScore);
-#endif
 }
 
 BOOL CGvisR2R_PunchDoc::MakeDirRmap(int nRmap)
