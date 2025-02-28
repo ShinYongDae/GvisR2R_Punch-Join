@@ -6607,6 +6607,13 @@ BOOL CReelMap::GetItsSerialInfo(int nItsSerial, BOOL &bDualTest, CString &sLot, 
 		else
 			sLot = _T("");
 
+		if (sLot.IsEmpty())
+		{
+			strTemp.Format(_T("내층 작업정보에 %d 시리얼에 대한 정보가 없습니다.\r\n%s"), nItsSerial, sPath);
+			pView->MsgBox(strTemp);
+			return FALSE;
+		}
+
 		pDoc->WorkingInfo.LastJob.sInnerLot = sLot;
 	}
 

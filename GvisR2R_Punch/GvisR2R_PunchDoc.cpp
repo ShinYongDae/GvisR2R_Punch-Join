@@ -5034,6 +5034,8 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoUp(int nSerial, int *pNewLot, BOOL bFromBuf) /
 	CString strCamID, strPieceID, strBadPointPosX, strBadPointPosY, strBadName,
 		strCellNum, strImageSize, strImageNum, strMarkingCode;
 
+	*pNewLot = 0;
+
 	if (nSerial < 1)
 	{
 		strFileData.Format(_T("PCR파일이 설정되지 않았습니다."));
@@ -5128,6 +5130,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoUp(int nSerial, int *pNewLot, BOOL bFromBuf) /
 		bUpdate = TRUE;
 		WorkingInfo.LastJob.sLot = Status.PcrShare[0].sLot;
 		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[0].sItsCode;
+		*pNewLot = 1;
 	}
 
 	if (WorkingInfo.LastJob.sModel != Status.PcrShare[0].sModel || WorkingInfo.LastJob.sLayerUp != Status.PcrShare[0].sLayer || pView->m_bInitAutoLoadMstInfo)
@@ -5135,6 +5138,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoUp(int nSerial, int *pNewLot, BOOL bFromBuf) /
 		bUpdate = TRUE;
 		WorkingInfo.LastJob.sModel = Status.PcrShare[0].sModel;
 		WorkingInfo.LastJob.sLayerUp = Status.PcrShare[0].sLayer;
+		*pNewLot = 1;
 
 		if (pView->m_bInitAutoLoadMstInfo)
 		{
@@ -5206,6 +5210,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoUp(int nSerial, int *pNewLot, BOOL bFromBuf) /
 
 BOOL CGvisR2R_PunchDoc::GetAoiInfoDn(int nSerial, int *pNewLot, BOOL bFromBuf) // TRUE: CHANGED, FALSE: NO CHANGED 
 {
+	*pNewLot = 0;
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
 	if (!bDualTest)
 		return TRUE;
@@ -5314,6 +5319,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoDn(int nSerial, int *pNewLot, BOOL bFromBuf) /
 		bUpdate = TRUE;
 		WorkingInfo.LastJob.sLot = Status.PcrShare[1].sLot;
 		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[1].sItsCode;
+		*pNewLot = 1;
 	}
 
 	if (WorkingInfo.LastJob.sModel != Status.PcrShare[1].sModel || WorkingInfo.LastJob.sLayerDn != Status.PcrShare[1].sLayer)
@@ -5321,6 +5327,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoDn(int nSerial, int *pNewLot, BOOL bFromBuf) /
 		bUpdate = TRUE;
 		WorkingInfo.LastJob.sModel = Status.PcrShare[1].sModel;
 		WorkingInfo.LastJob.sLayerDn = Status.PcrShare[1].sLayer;
+		*pNewLot = 1;
 	}
 
 	if (m_bBufEmptyF[1])
@@ -10503,7 +10510,12 @@ BOOL CGvisR2R_PunchDoc::GetItsSerialInfo(int nItsSerial, BOOL &bDualTest, CStrin
 			WorkingInfo.LastJob.sInnerLot = sLot;
 		}
 		else
-			bRtn = FALSE;
+		{
+			//bRtn = FALSE;
+			strTemp.Format(_T("내층 작업정보에 %d 시리얼에 대한 정보가 없습니다.\r\n%s"), nItsSerial, sPath);
+			pView->MsgBox(strTemp);
+			return FALSE;
+		}
 	}
 
 	// Option 3

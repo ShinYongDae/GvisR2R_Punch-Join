@@ -17195,8 +17195,14 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 			}
 
 			bNewModel = GetAoiUpInfo(m_nShareUpS, &nNewLot); // Buffer에서 PCR파일의 헤드 정보를 얻음.
+			if (bNewModel)
+			{
+				Stop();
+				break;
+			}
 
-			if (bNewModel)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
+			//if (bNewModel)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
+			if (nNewLot)
 			{
 				if (pDoc->GetTestMode() == MODE_OUTER)
 				{
@@ -17453,8 +17459,14 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 
 
 			bNewModel = GetAoiDnInfo(m_nShareDnS, &nNewLot);
+			if (bNewModel)
+			{
+				Stop();
+				break;
+			}
 
-			if (bNewModel)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
+			//if (bNewModel)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
+			if (nNewLot)
 			{
 				if (pDoc->GetTestMode() == MODE_OUTER)
 				{
@@ -18012,8 +18024,14 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 			}
 
 			bNewModel = GetAoiUpInfo(m_nShareUpS, &nNewLot); // Buffer에서 PCR파일의 헤드 정보를 얻음.
+			if (bNewModel)
+			{
+				Stop();
+				break;
+			}
 
-			if (bNewModel)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
+			//if (bNewModel)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
+			if (nNewLot)
 			{
 				if (pDoc->GetTestMode() == MODE_OUTER)
 				{
@@ -18273,8 +18291,14 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 
 
 			bNewModel = GetAoiDnInfo(m_nShareDnS, &nNewLot);
+			if (bNewModel)
+			{
+				Stop();
+				break;
+			}
 
-			if (bNewModel)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
+			//if (bNewModel)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
+			if (nNewLot)
 			{
 				if (pDoc->GetTestMode() == MODE_OUTER)
 				{
@@ -18965,11 +18989,12 @@ void CGvisR2R_PunchView::Mk2PtChkSerial()
 					}
 				}
 
-				if (bNewModel)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
+				if (bNewModel)
 				{
-					;
+					Stop();
+					break;
 				}
-				if (nNewLot)
+				if (nNewLot)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
 				{
 					// Lot Change.
 					ChgLot();
@@ -20866,11 +20891,12 @@ void CGvisR2R_PunchView::Mk4PtChkSerial()
 					}
 				}
 
-				if (bNewModel)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
+				if (bNewModel)
 				{
-					;
+					Stop();
+					break;
 				}
-				if (nNewLot)
+				if (nNewLot)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
 				{
 					// Lot Change.
 					ChgLot();

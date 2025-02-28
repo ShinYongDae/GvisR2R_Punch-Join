@@ -4424,8 +4424,8 @@ BOOL CVision::SaveMkImg(CString sPath) // Return FALSE; --> Alarm Message & Answ
 
 		// Check Marking Judge
 		m_bMkJudge = CheckVerifyPunching(MilGrabImgCld);
-		if (!m_bMkJudge)
-			return FALSE;
+		//if (!m_bMkJudge)
+		//	return FALSE;
 
 		// Draw Cross Line
 		MgraColor(M_DEFAULT, M_COLOR_BLACK);
@@ -4455,6 +4455,10 @@ BOOL CVision::SaveMkImg(CString sPath) // Return FALSE; --> Alarm Message & Answ
 		delete MilGrabImg;
 	Sleep(10);
 	m_cs.Unlock();
+
+	if (!m_bMkJudge)
+		return FALSE;
+
 #endif
 	return TRUE;
 }
