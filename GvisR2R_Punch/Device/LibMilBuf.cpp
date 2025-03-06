@@ -73,7 +73,8 @@ void CLibMilBuf::Clear()
 
 void CLibMilBuf::ChildBuffer2d(long OffX, long OffY, long SizeX, long SizeY)
 {
- 	MbufChild2d(m_MilImage, OffX, OffY, SizeX, SizeY, &m_MilImageChild);
+	if (m_MilImageChild == NULL)
+ 		MbufChild2d(m_MilImage, OffX, OffY, SizeX, SizeY, &m_MilImageChild);
 }
 
 void CLibMilBuf::BufferLoad(TCHAR* FileName)

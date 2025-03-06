@@ -133,6 +133,20 @@ class CVision : public CWnd
 	MIL_ID MilBufAlignTemp[4], MilAlignImgBuf[4];	// 4 points
 
 	MIL_ID MilBufRejectTemp, MilRejectImgBuf;
+	//MIL_ID MilBufRejectModelTemp, MilRejectModelImgBuf;
+	//if (BlobRst.nBlobTotal > 0)
+	//{
+	//	long SzX = BlobRst.nBoxRight - BlobRst.nBoxLeft + 2;
+	//	long SzY = BlobRst.nBoxBottom - BlobRst.nBoxTop + 2;
+	//	long StX = BlobRst.nBoxLeft - 1;
+	//	long StY = BlobRst.nBoxTop - 1;
+
+	//	if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+	//		m_pMilBufModel->ChildBuffer2d(StX, StY, SzX, SzY);
+	//	else
+	//		m_pMilBufModel->ChildBuffer2d(25, 25, 50, 50);
+	//}
+
 
 	int m_nCenterMarkLineLength;
 	int m_nDisplayCenterX;
@@ -163,7 +177,7 @@ public:
 // Attributes
 public:
 	CLibMil *m_pMil;
-	stPtMtRst PtMtRst;
+	stPtMtRst PtMtRst, MkMtRst;
 	stBlobRst BlobRst;
 
 // Operations
@@ -249,11 +263,14 @@ public:
 
 	void ShowDispReject();
 	void InitRejectBuf();
+	void AllocRejectBuf();
 	void LoadRejectBuf();
 	void DrawCrossOnReject(int nCenterX, int nCenterY, int nLineLength);
 	BOOL ClearRejectCenterMarkArea(int nCenterX, int nCenterY, int nLineLength);
 	BOOL FitSizeBlobModel();
 	BOOL BlobRejectModel();
+
+	BOOL TestJudgeMk(BOOL &bMkJudge);
 
 	// ITS
 	//CLibMilBuf *m_pMilBufCad[DEF_VIEW_IMG_NUMBER], *m_pMilBufDef[DEF_VIEW_IMG_NUMBER];

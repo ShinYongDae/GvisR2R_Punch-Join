@@ -149,6 +149,9 @@ BEGIN_MESSAGE_MAP(CDlgUtil03, CDialog)
 	ON_BN_CLICKED(IDC_CHECK_PCS_DN, &CDlgUtil03::OnBnClickedCheckPcsDn)
 	ON_BN_CLICKED(IDC_CHECK_ALIGN, &CDlgUtil03::OnBnClickedCheckAlign)
 	ON_WM_TIMER()
+	ON_BN_CLICKED(IDC_BTN_JUDGE_MK, &CDlgUtil03::OnBnClickedBtnJudgeMk)
+	ON_STN_CLICKED(IDC_STC_187, &CDlgUtil03::OnStnClickedStc187)
+	ON_STN_CLICKED(IDC_STC_189, &CDlgUtil03::OnStnClickedStc189)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -216,6 +219,21 @@ void CDlgUtil03::AtDlgShow()
 	LoadImg();
 	Disp(ROT_NONE);
 	((CButton*)GetDlgItem(IDC_CHECK_ALIGN))->SetCheck(FALSE);
+	if (pDoc->WorkingInfo.System.bHideTotalMarkingTest)
+		GetDlgItem(IDC_BTN_ALL_MK_TEST)->ShowWindow(SW_HIDE);
+	else
+		GetDlgItem(IDC_BTN_ALL_MK_TEST)->ShowWindow(SW_SHOW);
+
+
+	pView->m_pDlgMenu02->SetLight();
+	pView->m_pDlgMenu02->SetLight2();
+
+	CString str;
+	str.Format(_T("%d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0]);
+	myStcData[67].SetText(str);
+
+	str.Format(_T("%d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1]);
+	myStcData[68].SetText(str);
 
 	m_bTIM_DISP_STS = TRUE;
 	SetTimer(TIM_DISP_STS, 100, NULL);
@@ -236,8 +254,16 @@ void CDlgUtil03::LoadImg()
 	int i;
 	for(i=0; i<MAX_UTIL03_BTN; i++)
 	{
-		myBtn[i].LoadBkImage(IMG_BTN_UP_DlgUtil03, BTN_IMG_UP);
-		myBtn[i].LoadBkImage(IMG_BTN_DN_DlgUtil03, BTN_IMG_DN);
+		if (i == 7)
+		{
+			myBtn[i].LoadBkImage(NI_BTN_UP_DlgUtil03, BTN_IMG_UP);
+			myBtn[i].LoadBkImage(NI_BTN_DN_DlgUtil03, BTN_IMG_DN);
+		}
+		else
+		{
+			myBtn[i].LoadBkImage(IMG_BTN_UP_DlgUtil03, BTN_IMG_UP);
+			myBtn[i].LoadBkImage(IMG_BTN_DN_DlgUtil03, BTN_IMG_DN);
+		}
 	}
 }
 
@@ -261,6 +287,21 @@ BOOL CDlgUtil03::OnInitDialog()
 	// TODO: Add extra initialization here
 	InitStc();
 	InitBtn();
+
+	myStcMkJudge.SubclassDlgItem(IDC_STC_22, this);
+	myStcMkJudge.SetFontName(_T("Arial"));
+	myStcMkJudge.SetFontSize(11);
+	myStcMkJudge.SetTextColor(RGB_NAVY);
+	myStcMkJudge.SetBkColor(RGB_ORANGE);
+	myStcMkJudge.SetFontBold(TRUE);
+
+	myStcMkCurr.SubclassDlgItem(IDC_STC_188, this);
+	myStcMkCurr.SetFontName(_T("Arial"));
+	myStcMkCurr.SetFontSize(11);
+	myStcMkCurr.SetTextColor(RGB_NAVY);
+	myStcMkCurr.SetBkColor(RGB_LTYELLOW);
+	myStcMkCurr.SetFontBold(TRUE);
+
 
 	if(pDoc->m_Master[0].m_pPcsRgn)
 		SetScrlBarMax(pDoc->m_Master[0].m_pPcsRgn->m_nCol, pDoc->m_Master[0].m_pPcsRgn->m_nRow); // ROT_NONE
@@ -315,11 +356,14 @@ void CDlgUtil03::InitBtn()
 	myBtn[5].SetHwnd(this->GetSafeHwnd(), IDC_BTN_MK_MOVE_INIT);
 	myBtn[6].SubclassDlgItem(IDC_BTN_MK_HOME, this);
 	myBtn[6].SetHwnd(this->GetSafeHwnd(), IDC_BTN_MK_HOME);
+
+	myBtn[7].SubclassDlgItem(IDC_BTN_JUDGE_MK, this);
+	myBtn[7].SetHwnd(this->GetSafeHwnd(), IDC_BTN_JUDGE_MK);
 	
 	int i;
 	for(i=0; i<MAX_UTIL03_BTN; i++)
 	{
-		myBtn[i].SetFont(_T("굴림체"),16,TRUE);
+		myBtn[i].SetFont(_T("굴림체"),14,TRUE);
 		myBtn[i].SetTextColor(RGB_BLACK);
 // 		myBtn[i].SetBtnType(BTN_TYPE_CHECK);
 	}
@@ -400,6 +444,11 @@ void CDlgUtil03::InitStc()
 	myStcData[65].SubclassDlgItem(IDC_STC_5_10, this);
 
 	myStcData[66].SubclassDlgItem(IDC_EDIT_YSHIFT_RATIO, this);
+
+	myStcData[67].SubclassDlgItem(IDC_STC_187, this);
+	myStcData[68].SubclassDlgItem(IDC_STC_189, this);
+	myStcData[69].SubclassDlgItem(IDC_STC_REJECT_SCR, this);
+	myStcData[70].SubclassDlgItem(IDC_STC_REJECT_SCR2, this);
 
 	for(int i=0; i<MAX_UTIL03_STC_DATA; i++)
 	{
@@ -1640,16 +1689,112 @@ void CDlgUtil03::DispResultPtScore(int nCam)
 	{
 		if (pView->m_pVision[0])
 		{
-			sVal.Format(_T("%d"), pView->m_pVision[0]->PtMtRst.dScore);
+			sVal.Format(_T("%d"), int(100.0 - pView->m_pVision[0]->MkMtRst.dScore));
 			GetDlgItem(IDC_STC_REJECT_SCR)->SetWindowText(sVal);
 		}
 	}
 	else if(nCam == 1)
 	if (pView->m_pVision[1])
 	{
-		sVal.Format(_T("%d"), pView->m_pVision[1]->PtMtRst.dScore);
+		sVal.Format(_T("%d"), int(100.0 - pView->m_pVision[1]->MkMtRst.dScore));
 		GetDlgItem(IDC_STC_REJECT_SCR2)->SetWindowText(sVal);
 	}
 #endif
 }
 
+
+
+void CDlgUtil03::OnBnClickedBtnJudgeMk()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+	{
+		int nCam = -1;
+
+		BOOL bOn0 = myBtn[3].GetCheck();	// IDC_CHK_LEFT
+		BOOL bOn1 = myBtn[4].GetCheck();	// IDC_CHK_RIGHT
+
+		if (bOn0)
+			nCam = 0;
+		else if (bOn1)
+			nCam = 1;
+
+		if (nCam < 0)
+		{
+			AfxMessageBox(_T("좌/우 마킹 중 하나를 선택하세요."));
+			return;
+		}
+
+		if (IDNO == pView->MsgBox(_T("미마킹 테스트를 진행하시겠습니까?"), 0, MB_YESNO))
+			return;
+
+#ifdef USE_VISION
+		if (pView->m_pVision[nCam])
+		{
+			BOOL bJudgeMk;
+			BOOL bRtn = pView->m_pVision[nCam]->TestJudgeMk(bJudgeMk);
+			if(pView->m_pDlgMenu02)
+				pView->m_pDlgMenu02->DispMkPmScore(nCam);
+			if (bRtn && bJudgeMk)
+			{
+				AfxMessageBox(_T("마킹"));
+			}
+			else if (!bJudgeMk)
+			{
+				AfxMessageBox(_T("미마킹"));
+			}
+		}
+#endif
+
+	}
+}
+
+void CDlgUtil03::OnStnClickedStc187()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	myStcData[67].SetBkColor(RGB_RED);
+	myStcData[67].RedrawWindow();
+
+	CPoint pt;	CRect rt;
+	GetDlgItem(IDC_STC_187)->GetWindowRect(&rt);
+	pt.x = rt.right; pt.y = rt.bottom;
+	ShowKeypad(IDC_STC_187, pt, TO_BOTTOM | TO_RIGHT);
+
+	myStcData[67].SetBkColor(RGB_WHITE);
+	myStcData[67].RedrawWindow();
+
+	CString sVal;
+	GetDlgItem(IDC_STC_187)->GetWindowText(sVal);
+	pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0] = 100 - _ttoi(sVal);
+	pDoc->SetVerifyPunchScore(100.0 - _ttof(sVal));
+
+	::WritePrivateProfileString(_T("Last Job"), _T("Judge Marking Ratio"), sVal, PATH_WORKING_INFO);
+
+	if (pView->m_pDlgMenu02)
+		pView->m_pDlgMenu02->DispMkPmStdVal();
+}
+
+void CDlgUtil03::OnStnClickedStc189()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	myStcData[68].SetBkColor(RGB_RED);
+	myStcData[68].RedrawWindow();
+
+	CPoint pt;	CRect rt;
+	GetDlgItem(IDC_STC_189)->GetWindowRect(&rt);
+	pt.x = rt.right; pt.y = rt.bottom;
+	ShowKeypad(IDC_STC_189, pt, TO_BOTTOM | TO_RIGHT);
+
+	myStcData[68].SetBkColor(RGB_WHITE);
+	myStcData[68].RedrawWindow();
+
+	CString sVal;
+	GetDlgItem(IDC_STC_189)->GetWindowText(sVal);
+	pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1] = 100 - _ttoi(sVal);
+	pDoc->SetVerifyPunchScore2(100.0 - _ttof(sVal));
+
+	::WritePrivateProfileString(_T("Last Job"), _T("Judge Marking Ratio2"), sVal, PATH_WORKING_INFO);
+
+	if (pView->m_pDlgMenu02)
+		pView->m_pDlgMenu02->DispMkPmStdVal();
+}

@@ -51,9 +51,10 @@
 	#define PATH_PCS_IMG			_T("C:\\R2RSet\\Test\\Piece.tif")
 	#define PATH_ORDERING_Mk		_T("C:\\R2RSet\\Test\\WriteOrderingMkRotate90ccw.txt")
 	#define PATH_ORDERING_Mk_MIRROR	_T("C:\\R2RSet\\Test\\WriteOrderingMkRotate90ccwMirror.txt")
+	#define PATH_REJECT_IMG_		_T("C:\\R2RSet\\Test\\Reject.TIF")
 
-	#define	USE_MIL
-	#define	USE_VISION
+	//#define	USE_MIL
+	//#define	USE_VISION
 
 	//#define USE_TCPIP
 	//#define USE_ENGRAVE
@@ -384,6 +385,8 @@ typedef enum {KOREAN=0, ENGLISH=1, JAPANESE=2} LANG;
 
 #define IMG_BTN_DN_DlgUtil03			_T("C:\\R2RSet\\Pic\\DlgUtil03\\Btn_Bk_Dn.bmp")
 #define IMG_BTN_UP_DlgUtil03			_T("C:\\R2RSet\\Pic\\DlgUtil03\\Btn_Bk_Up.bmp")
+#define NI_BTN_DN_DlgUtil03				_T("C:\\R2RSet\\Pic\\DlgUtil03\\Ni_Bk_Dn.bmp")
+#define NI_BTN_UP_DlgUtil03				_T("C:\\R2RSet\\Pic\\DlgUtil03\\Ni_Bk_Up.bmp")
 
 #define IMG_BTN_DN_DlgUtil04			_T("C:\\R2RSet\\Pic\\DlgUtil04\\Btn_Bk_Dn.bmp")
 #define IMG_BTN_UP_DlgUtil04			_T("C:\\R2RSet\\Pic\\DlgUtil04\\Btn_Bk_Up.bmp")
@@ -651,7 +654,7 @@ struct stSystem
 	CString sPathOldFile, sPathItsFile, sPathItsInner, sPathItsOuter; //sPathIts, 
 	CString sIpPathOldFile, sIpPathItsFile, sIpPathIts;
 	CString sPathSapp3;
-	BOOL bSaveLog, bSaveReelmapTable, bRemakeReelmapInner, bDuplicateRmap, bInsertPunchingToDts, bDebugEngSig;
+	BOOL bSaveLog, bSaveReelmapTable, bRemakeReelmapInner, bDuplicateRmap, bInsertPunchingToDts, bDebugEngSig, bHideTotalMarkingTest;
 	BOOL bNoMk;	// 0 : 마킹모드, 1 : 비젼모드
 	CString sReViewMkLen;
 	BOOL bReViewMk;
@@ -704,6 +707,7 @@ struct stSystem
 		bDuplicateRmap = FALSE;
 		bInsertPunchingToDts = FALSE;
 		bDebugEngSig = FALSE;
+		bHideTotalMarkingTest = TRUE;
 		bNoMk = FALSE;	// 0 : 마킹모드, 1 : 비젼모드
 		sReViewMkLen = _T("");
 		bReViewMk = FALSE;
@@ -796,7 +800,7 @@ struct stLastJob
 	int nAlarmTimePunch, nAlarmTimeAoi;
 	BOOL bDispContRun, bDispLotEnd;
 	BOOL bUseJudgeMk;
-	int nJudgeMkRatio;
+	int nJudgeMkRatio[2];
 
 	stLastJob()
 	{
@@ -856,7 +860,8 @@ struct stLastJob
 		nAlarmTimePunch = 10800; nAlarmTimeAoi = 10800;
 		bDispContRun = FALSE; bDispLotEnd = FALSE;
 		bUseJudgeMk = TRUE;
-		nJudgeMkRatio = 85;
+		nJudgeMkRatio[0] = 85;
+		nJudgeMkRatio[1] = 85;
 	}
 };
 

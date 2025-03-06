@@ -285,6 +285,16 @@ void CDlgMenu02::AtDlgShow()
 	m_nMoveAlign[1] = 0;
 
 	//Disp();
+	if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+	{
+		GetDlgItem(IDC_BTN_ALIGN)->SetWindowText(_T("미마킹\r테스트"));
+		GetDlgItem(IDC_BTN_ALIGN2)->SetWindowText(_T("미마킹\r테스트"));
+	}
+	else
+	{
+		GetDlgItem(IDC_BTN_ALIGN)->SetWindowText(_T("2Point\rAlign"));
+		GetDlgItem(IDC_BTN_ALIGN2)->SetWindowText(_T("2Point\rAlign"));
+	}
 }
 
 void CDlgMenu02::AtDlgHide()
@@ -502,7 +512,8 @@ BOOL CDlgMenu02::OnInitDialog()
 	}
 
 
-	pDoc->SetVerifyPunchScore(double(pDoc->WorkingInfo.LastJob.nJudgeMkRatio));
+	pDoc->SetVerifyPunchScore(double(pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0]));
+	pDoc->SetVerifyPunchScore2(double(pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1]));
 
 #endif
 
@@ -560,6 +571,7 @@ BOOL CDlgMenu02::OnInitDialog()
 #endif
 
 	//DispCenterMark();
+	DispMkPmStdVal();
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
@@ -948,7 +960,7 @@ void CDlgMenu02::InitStcTitle()
 		if(i!=0 && i!=1 && i!=2 && i!=6 && i!=7 && i!=18 && i!=19 && i!=20)
 		{
 			myStcTitle[i].SetFontName(_T("Arial"));
-			myStcTitle[i].SetFontSize(12);
+			myStcTitle[i].SetFontSize(14);//12
 			myStcTitle[i].SetFontBold(TRUE);
 			myStcTitle[i].SetTextColor(RGB_NAVY);
 			myStcTitle[i].SetBkColor(RGB_DLG_FRM);
@@ -977,7 +989,7 @@ void CDlgMenu02::InitStcTitleDuo()
 	for(int i=0; i<MAX_MENU02_STC_DUO; i++)
 	{
 		myStcTitle2[i].SetFontName(_T("Arial"));
-		myStcTitle2[i].SetFontSize(14);
+		myStcTitle2[i].SetFontSize(14);//12
 		myStcTitle2[i].SetFontBold(TRUE);
 		myStcTitle2[i].SetTextColor(RGB_NAVY);
 		myStcTitle2[i].SetBkColor(RGB_DLG_FRM);
@@ -1019,7 +1031,7 @@ void CDlgMenu02::InitStcData()
 			if(i==2)
 				myStcData[i].SetFontSize(22);
 			else
-				myStcData[i].SetFontSize(12);
+				myStcData[i].SetFontSize(14);//12
 			myStcData[i].SetFontBold(TRUE);
 			myStcData[i].SetTextColor(RGB_BLACK);
 			myStcData[i].SetBkColor(RGB_WHITE);
@@ -1057,7 +1069,7 @@ void CDlgMenu02::InitStcDataDuo()
 			if(i==2)
 				myStcData2[i].SetFontSize(22);
 			else
-				myStcData2[i].SetFontSize(14);
+				myStcData2[i].SetFontSize(14);//14
 			myStcData2[i].SetFontBold(TRUE);
 			myStcData2[i].SetTextColor(RGB_BLACK);
 			myStcData2[i].SetBkColor(RGB_WHITE);
@@ -3470,29 +3482,65 @@ void CDlgMenu02::OnBtnAlign()
 	if(bOn)
 	{
 		myBtn[16].SetCheck(FALSE);
-		//if(m_pDlgUtil06)
-		//{
-		//	if(m_pDlgUtil06->IsWindowVisible())
-		//	{
-		//		m_pDlgUtil06->ShowWindow(SW_HIDE);
-		//	}
-		//}
 	}
-	int nAlignNum = m_nBtnAlignCam0Pos;
 
-	if (m_nBtnAlignCam0Pos == 0)
+	if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
 	{
-//		if(IDNO == pView->DoMyMsgBox(_T("Do you want to Two Point Align Test?"), MB_YESNO))
-		if(IDNO == pView->MsgBox(_T("Do you want to Two Point Align Test?"), 0, MB_YESNO))
+		if (IDNO == pView->MsgBox(_T("미마킹 테스트를 진행하시겠습니까?"), 0, MB_YESNO))
 			return;
 
-		TwoPointAlign0(nAlignNum);
-		m_nBtnAlignCam0Pos = 1;
+		if (pView->IsClampOff())
+		{
+			return;
+		}
+
+		if (!pView->m_pMotion)
+			return;
+
+		SetLight();
+
+		CfPoint ptPnt;
+		int nPcsId = 0;
+		if (pDoc->m_Master[0].m_pPcsRgn)
+			ptPnt = pDoc->m_Master[0].m_pPcsRgn->GetMkPnt0(nPcsId);
+
+		pView->Move0(ptPnt, TRUE, TRUE);
+		Sleep(300);
+#ifdef USE_VISION
+		if (pView->m_pVision[0])
+		{
+			BOOL bJudgeMk;
+			BOOL bRtn = pView->m_pVision[0]->TestJudgeMk(bJudgeMk);
+			DispMkPmScore(0);
+			if (bRtn && bJudgeMk)
+			{
+				AfxMessageBox(_T("마킹"));
+			}
+			else if (!bJudgeMk)
+			{
+				AfxMessageBox(_T("미마킹"));
+			}
+		}
+#endif
+
 	}
-	else if (m_nBtnAlignCam0Pos == 1)
+	else
 	{
-		TwoPointAlign0(nAlignNum);
-		m_nBtnAlignCam0Pos = 0;
+		int nAlignNum = m_nBtnAlignCam0Pos;
+
+		if (m_nBtnAlignCam0Pos == 0)
+		{
+			if (IDNO == pView->MsgBox(_T("Do you want to Two Point Align Test?"), 0, MB_YESNO))
+				return;
+
+			TwoPointAlign0(nAlignNum);
+			m_nBtnAlignCam0Pos = 1;
+		}
+		else if (m_nBtnAlignCam0Pos == 1)
+		{
+			TwoPointAlign0(nAlignNum);
+			m_nBtnAlignCam0Pos = 0;
+		}
 	}
 }
 
@@ -3503,31 +3551,69 @@ void CDlgMenu02::OnBtnAlign2()
 	if(bOn)
 	{
 		myBtn[16].SetCheck(FALSE);
-		//if(m_pDlgUtil06)
-		//{
-		//	if(m_pDlgUtil06->IsWindowVisible())
-		//	{
-		//		m_pDlgUtil06->ShowWindow(SW_HIDE);
-		//	}
-		//}
 	}
 
-	int nAlignNum = m_nBtnAlignCam1Pos;
-
-	if (m_nBtnAlignCam1Pos == 0)
+	if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
 	{
-//		if(IDNO == pView->DoMyMsgBox(_T("Do you want to Two Point Align Test?"), MB_YESNO))
-		if(IDNO == pView->MsgBox(_T("Do you want to Two Point Align Test?"), 0, MB_YESNO))
-		 	return;
+		if (IDNO == pView->MsgBox(_T("미마킹 테스트를 진행하시겠습니까?"), 0, MB_YESNO))
+			return;
 
-		TwoPointAlign1(nAlignNum);
-		m_nBtnAlignCam1Pos = 1;
+		if (pView->IsClampOff())
+		{
+			return;
+		}
+
+		if (!pView->m_pMotion)
+			return;
+
+		SetLight2();
+
+
+		CfPoint ptPnt;
+		int nPcsId = 0;
+		if (pDoc->m_Master[0].m_pPcsRgn)
+			ptPnt = pDoc->m_Master[0].m_pPcsRgn->GetMkPnt1(nPcsId);
+
+		pView->Move1(ptPnt, TRUE, TRUE);
+		Sleep(300);
+#ifdef USE_VISION
+		if (pView->m_pVision[1])
+		{
+			BOOL bJudgeMk;
+			BOOL bRtn = pView->m_pVision[1]->TestJudgeMk(bJudgeMk);
+			DispMkPmScore(1);
+			if (bRtn && bJudgeMk)
+			{
+				AfxMessageBox(_T("마킹"));
+			}
+			else if (!bJudgeMk)
+			{
+				AfxMessageBox(_T("미마킹"));
+			}
+		}
+#endif
+
 	}
-	else if (m_nBtnAlignCam1Pos == 1)
+	else
 	{
-		TwoPointAlign1(nAlignNum);
-		m_nBtnAlignCam1Pos = 0;
-	}	
+
+		int nAlignNum = m_nBtnAlignCam1Pos;
+
+		if (m_nBtnAlignCam1Pos == 0)
+		{
+			//		if(IDNO == pView->DoMyMsgBox(_T("Do you want to Two Point Align Test?"), MB_YESNO))
+			if (IDNO == pView->MsgBox(_T("Do you want to Two Point Align Test?"), 0, MB_YESNO))
+				return;
+
+			TwoPointAlign1(nAlignNum);
+			m_nBtnAlignCam1Pos = 1;
+		}
+		else if (m_nBtnAlignCam1Pos == 1)
+		{
+			TwoPointAlign1(nAlignNum);
+			m_nBtnAlignCam1Pos = 0;
+		}
+	}
 
 }
 
@@ -5426,6 +5512,9 @@ void CDlgMenu02::ShowDebugEngSig()
 		GetDlgItem(IDC_STATIC_1011)->ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_STATIC_MK_PM_SCORE)->ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_STATIC_MK_PM_SCORE2)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_1013)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_MK_PM_SCORE3)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_MK_PM_SCORE4)->ShowWindow(SW_HIDE);
 		//GetDlgItem(IDC_STATIC_1012)->ShowWindow(SW_HIDE);
 
 		GetDlgItem(IDC_STATIC_1001)->ShowWindow(SW_SHOW);
@@ -5463,6 +5552,9 @@ void CDlgMenu02::ShowDebugEngSig()
 		GetDlgItem(IDC_STATIC_1011)->ShowWindow(SW_SHOW);
 		GetDlgItem(IDC_STATIC_MK_PM_SCORE)->ShowWindow(SW_SHOW);
 		GetDlgItem(IDC_STATIC_MK_PM_SCORE2)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_1013)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_MK_PM_SCORE3)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_MK_PM_SCORE4)->ShowWindow(SW_SHOW);
 		//GetDlgItem(IDC_STATIC_1012)->ShowWindow(SW_SHOW);
 
 		GetDlgItem(IDC_STATIC_1001)->ShowWindow(SW_HIDE);
@@ -6191,22 +6283,34 @@ void CDlgMenu02::DispMkPmScore(int nCam)
 {
 	CString sVal;
 
+#ifdef USE_VISION
 	if (nCam == 0 && pView->m_pVision[0])
 	{
-		sVal.Format(_T("%d"), pView->m_pVision[0]->PtMtRst.dScore);
+		sVal.Format(_T("%d"), int(100.0 - pView->m_pVision[0]->MkMtRst.dScore));
 		GetDlgItem(IDC_STATIC_MK_PM_SCORE)->SetWindowText(sVal);
 	}
 	else if (nCam == 1 && pView->m_pVision[1])
 	{
-		sVal.Format(_T("%d"), pView->m_pVision[1]->PtMtRst.dScore);
+		sVal.Format(_T("%d"), int(100.0 - pView->m_pVision[1]->MkMtRst.dScore));
 		GetDlgItem(IDC_STATIC_MK_PM_SCORE2)->SetWindowText(sVal);
 	}
+#endif
 	if (m_pDlgUtil03)
 		m_pDlgUtil03->DispResultPtScore(nCam);
 }
 
+void CDlgMenu02::DispMkPmStdVal()
+{
+	CString sVal;
+	sVal.Format(_T("%d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0]);
+	GetDlgItem(IDC_STATIC_MK_PM_SCORE3)->SetWindowText(sVal);
+	sVal.Format(_T("%d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1]);
+	GetDlgItem(IDC_STATIC_MK_PM_SCORE4)->SetWindowText(sVal);
+}
+
 void CDlgMenu02::InitMkPmRst(int nCam)
 {
+#ifdef USE_VISION
 	if (nCam == 2)
 	{
 		if (pView->m_pVision[0])
@@ -6219,4 +6323,5 @@ void CDlgMenu02::InitMkPmRst(int nCam)
 		if (pView->m_pVision[nCam])
 			pView->m_pVision[nCam]->PtMtRst.dScore = 0.0;
 	}
+#endif
 }

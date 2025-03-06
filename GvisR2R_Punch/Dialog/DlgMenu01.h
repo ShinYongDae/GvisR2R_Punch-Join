@@ -15,7 +15,7 @@
 
 #define MAX_MENU01_STC_TITLE		78
 #define MAX_MENU01_STC_DATA			95
-#define MAX_MENU01_BTN				23
+#define MAX_MENU01_BTN				24
 
 #define TIM_DISP_DEF_IMG			100
 #define TIM_DISP_MK_INFO			101
@@ -275,6 +275,7 @@ public:
 	afx_msg void OnStnClickedStcTqDisp2ValR();
 	afx_msg void OnStnClickedStcTqDisp3ValL();
 	afx_msg void OnStnClickedStcTqDisp3ValR();
+	afx_msg void OnBnClickedChkMkJudge();
 };
 
 //{{AFX_INSERT_LOCATION}}

@@ -399,8 +399,11 @@ BOOL CCamMaster::LoadRejMkImg()
 	CFileFind finder;
 	if (!finder.FindFile(strFileNReject))
 	{
-		strTemp.Format(_T("%s \r\n: Reject 마크 이미지가 없습니다."), strFileNReject);
-		pView->MsgBox(strTemp);
+		if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+		{
+			strTemp.Format(_T("%s \r\n: Reject 마크 이미지가 없습니다."), strFileNReject);
+			pView->MsgBox(strTemp);
+		}
 		return FALSE;
 	}
 

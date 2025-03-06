@@ -14599,6 +14599,7 @@ void CGvisR2R_PunchView::DoMark0()
 				//AfxMessageBox(_T("Error-SaveMk0Img()"));
 				if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
 				{
+#ifdef USE_VISION
 					if (!m_pVision[0]->m_bMkJudge)
 					{
 						nRtn = MsgBox(_T("좌측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
@@ -14619,6 +14620,7 @@ void CGvisR2R_PunchView::DoMark0()
 						}
 
 					}
+#endif
 				}
 			}
 		}
@@ -15286,6 +15288,7 @@ void CGvisR2R_PunchView::DoMark1()
 				//AfxMessageBox(_T("Error-SaveMk1Img()"));
 				if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
 				{
+#ifdef USE_VISION
 					if (!m_pVision[1]->m_bMkJudge)
 					{
 						nRtn = MsgBox(_T("우측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
@@ -15306,6 +15309,7 @@ void CGvisR2R_PunchView::DoMark1()
 						}
 
 					}
+#endif
 				}
 			}
 		}
@@ -16924,7 +16928,7 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 	int nSerial = 0;
 	CString sNewLot, sMsg;
 	int nNewLot = 0;
-	BOOL bNewModel = FALSE;
+	BOOL bNewModel = FALSE, bChange = FALSE;
 
 	switch (m_nStepAuto)
 	{
@@ -17194,12 +17198,12 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 				}
 			}
 
-			bNewModel = GetAoiUpInfo(m_nShareUpS, &nNewLot); // Buffer에서 PCR파일의 헤드 정보를 얻음.
-			if (bNewModel)
-			{
-				Stop();
-				break;
-			}
+			bChange = GetAoiUpInfo(m_nShareUpS, &nNewLot); // Buffer에서 PCR파일의 헤드 정보를 얻음.
+			//if (!bNewModel)
+			//{
+			//	Stop();
+			//	break;
+			//}
 
 			//if (bNewModel)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
 			if (nNewLot)
@@ -17458,12 +17462,12 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 			m_nShareDnCnt++;
 
 
-			bNewModel = GetAoiDnInfo(m_nShareDnS, &nNewLot);
-			if (bNewModel)
-			{
-				Stop();
-				break;
-			}
+			bChange = GetAoiDnInfo(m_nShareDnS, &nNewLot);
+			//if (!bNewModel)
+			//{
+			//	Stop();
+			//	break;
+			//}
 
 			//if (bNewModel)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
 			if (nNewLot)
@@ -17774,7 +17778,7 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 	int nSerial = 0;
 	CString sNewLot, sMsg;
 	int nNewLot = 0;
-	BOOL bNewModel = FALSE;
+	BOOL bNewModel = FALSE, bChange = FALSE;
 
 	switch (m_nStepAuto)
 	{
@@ -18023,12 +18027,12 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 					pDoc->GetItsSerialInfo(m_nShareUpS, bDualTestInner, sLot, sLayerUp, sLayerDn, 0);
 			}
 
-			bNewModel = GetAoiUpInfo(m_nShareUpS, &nNewLot); // Buffer에서 PCR파일의 헤드 정보를 얻음.
-			if (bNewModel)
-			{
-				Stop();
-				break;
-			}
+			bChange = GetAoiUpInfo(m_nShareUpS, &nNewLot); // Buffer에서 PCR파일의 헤드 정보를 얻음.
+			//if (!bNewModel)
+			//{
+			//	Stop();
+			//	break;
+			//}
 
 			//if (bNewModel)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
 			if (nNewLot)
@@ -18290,12 +18294,12 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 			m_nShareDnCnt++;
 
 
-			bNewModel = GetAoiDnInfo(m_nShareDnS, &nNewLot);
-			if (bNewModel)
-			{
-				Stop();
-				break;
-			}
+			bChange = GetAoiDnInfo(m_nShareDnS, &nNewLot);
+			//if (!bNewModel)
+			//{
+			//	Stop();
+			//	break;
+			//}
 
 			//if (bNewModel)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
 			if (nNewLot)
@@ -18764,25 +18768,6 @@ void CGvisR2R_PunchView::Mk2PtReady()
 						m_nLotEndAuto = LOT_END; pDoc->SetStatusInt(_T("General"), _T("nLotEndAuto"), m_nLotEndAuto);
 					}
 				}
-
-				//if (pDoc->WorkingInfo.LastJob.bSampleTest)
-				//{
-				//	if (m_nBufUpSerial[0] == 1)
-				//	{
-				//		m_nLotEndSerial = _tstoi(pDoc->WorkingInfo.LastJob.sSampleTestShotNum); pDoc->SetStatusInt(_T("General"), _T("nLotEndSerial"), m_nLotEndSerial);
-				//		m_bLastProcFromUp = FALSE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
-				//		m_bLastProcFromEng = FALSE; pDoc->SetStatus(_T("General"), _T("bLastProcFromEng"), m_bLastProcFromEng);
-				//		m_bLastProc = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProc"), m_bLastProc);
-				//		if (m_pDlgMenu01)
-				//			m_pDlgMenu01->m_bLastProc = TRUE;
-				//		if (m_pMpe)
-				//		{
-				//			//MpeWrite(Plc.DlgMenu01.LastJobFromAoiDn, 1);	// 잔량처리 AOI(하) 부터(PC가 On시키고, PLC가 확인하고 Off시킴)-20141112
-				//			MpeWrite(Plc.DlgMenu01.DoLastJob, 1);			// 잔량처리(PC가 On시키고, PLC가 확인하고 Off시킴)-20141031
-				//			pDoc->LogAuto(_T("PC: 잔량처리 AOI(하) 부터(PC가 On시키고, PLC가 확인하고 Off시킴)"));
-				//		}
-				//	}
-				//}
 			}
 			else
 			{
@@ -18830,24 +18815,6 @@ void CGvisR2R_PunchView::Mk2PtReady()
 					}
 				}
 
-				//if (pDoc->WorkingInfo.LastJob.bSampleTest)
-				//{
-				//	if (m_nBufUpSerial[0] == 1)
-				//	{
-				//		m_nLotEndSerial = _tstoi(pDoc->WorkingInfo.LastJob.sSampleTestShotNum); pDoc->SetStatusInt(_T("General"), _T("nLotEndSerial"), m_nLotEndSerial);
-				//		m_bLastProcFromUp = FALSE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
-				//		m_bLastProcFromEng = FALSE; pDoc->SetStatus(_T("General"), _T("bLastProcFromEng"), m_bLastProcFromEng);
-				//		m_bLastProc = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProc"), m_bLastProc);
-				//		if (m_pDlgMenu01)
-				//			m_pDlgMenu01->m_bLastProc = TRUE;
-				//		if (m_pMpe)
-				//		{
-				//			//MpeWrite(Plc.DlgMenu01.LastJobFromAoiDn, 1);			// 잔량처리 AOI(하) 부터(PC가 On시키고, PLC가 확인하고 Off시킴)-20141112
-				//			MpeWrite(Plc.DlgMenu01.DoLastJob, 1);			// 잔량처리(PC가 On시키고, PLC가 확인하고 Off시킴)-20141031
-				//			pDoc->LogAuto(_T("PC: 잔량처리 AOI(하) 부터(PC가 On시키고, PLC가 확인하고 Off시킴)"));
-				//		}
-				//	}
-				//}
 			}
 			break;
 		case MK_ST + (Mk2PtIdx::Start) + 1:
@@ -18874,7 +18841,7 @@ void CGvisR2R_PunchView::Mk2PtChkSerial()
 {
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
 	CString sNewLot;
-	BOOL bNewModel = FALSE;
+	BOOL bNewModel = FALSE, bChange = FALSE;
 	int nSerial = 0;
 	int nNewLot = 0;
 	int nLastShot = 0;
@@ -18978,10 +18945,10 @@ void CGvisR2R_PunchView::Mk2PtChkSerial()
 					}
 				}
 
-				bNewModel = GetAoiUpInfo(nSerial, &nNewLot, TRUE);
+				bChange = GetAoiUpInfo(nSerial, &nNewLot, TRUE);
 				if (bDualTest)
 				{
-					bNewModel = GetAoiDnInfo(nSerial, &nNewLot, TRUE);
+					bChange = GetAoiDnInfo(nSerial, &nNewLot, TRUE);
 
 					if (!IsSameUpDnLot() && !m_bContDiffLot)
 					{
@@ -18989,11 +18956,11 @@ void CGvisR2R_PunchView::Mk2PtChkSerial()
 					}
 				}
 
-				if (bNewModel)
-				{
-					Stop();
-					break;
-				}
+				//if (!bNewModel)
+				//{
+				//	Stop();
+				//	break;
+				//}
 				if (nNewLot)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
 				{
 					// Lot Change.
@@ -19999,38 +19966,13 @@ void CGvisR2R_PunchView::Mk2PtDoMarking()
 			}
 			else
 			{
-				Sleep(100);
+				//Sleep(100);
 				m_nMkStAuto++;
 			}
 			break;
 
 		case MK_ST + (Mk2PtIdx::DoMk) + 2:
 			m_nMkStAuto++;
-
-			//if (!m_bTHREAD_UPDATAE_YIELD[0] && !m_bTHREAD_UPDATAE_YIELD[1])
-			//{
-			//	if (!m_bUpdateYieldOnRmap)
-			//	{
-			//		if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN)
-			//		{
-			//			if (!m_bTHREAD_UPDATE_YIELD_UP && !m_bTHREAD_UPDATE_YIELD_DN && !m_bTHREAD_UPDATE_YIELD_ALLUP && !m_bTHREAD_UPDATE_YIELD_ALLDN)
-			//			{
-			//				m_bUpdateYieldOnRmap = TRUE;
-			//				pDoc->UpdateYieldOnRmap(); // 20241115
-			//				m_nMkStAuto++;
-			//			}
-			//			else
-			//				Sleep(100);
-			//		}
-			//		else
-			//			Sleep(100);
-			//	}
-			//	else
-			//	{
-			//		Sleep(100);
-			//		m_nMkStAuto++; // 마킹 및 verify가 완전히 끝나지 않은 경우.
-			//	}
-			//}
 			break;
 
 		case MK_ST + (Mk2PtIdx::Verify) :
@@ -20775,7 +20717,7 @@ void CGvisR2R_PunchView::Mk4PtChkSerial()
 {
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
 	CString sNewLot;
-	BOOL bNewModel = FALSE;
+	BOOL bNewModel = FALSE, bChange = FALSE;
 	int nSerial = 0;
 	int nNewLot = 0;
 	int nLastShot = 0;
@@ -20880,10 +20822,10 @@ void CGvisR2R_PunchView::Mk4PtChkSerial()
 					}
 				}
 
-				bNewModel = GetAoiUpInfo(nSerial, &nNewLot, TRUE);
+				bChange = GetAoiUpInfo(nSerial, &nNewLot, TRUE);
 				if (bDualTest)
 				{
-					bNewModel = GetAoiDnInfo(nSerial, &nNewLot, TRUE);
+					bChange = GetAoiDnInfo(nSerial, &nNewLot, TRUE);
 
 					if (!IsSameUpDnLot() && !m_bContDiffLot)
 					{
@@ -20891,11 +20833,11 @@ void CGvisR2R_PunchView::Mk4PtChkSerial()
 					}
 				}
 
-				if (bNewModel)
-				{
-					Stop();
-					break;
-				}
+				//if (!bNewModel)
+				//{
+				//	Stop();
+				//	break;
+				//}
 				if (nNewLot)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
 				{
 					// Lot Change.
@@ -28347,6 +28289,7 @@ void CGvisR2R_PunchView::DoMark0Its()
 				//AfxMessageBox(_T("Error-SaveMk0Img()"));
 				if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
 				{
+#ifdef USE_VISION
 					if (!m_pVision[0]->m_bMkJudge)
 					{
 						nRtn = MsgBox(_T("좌측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
@@ -28367,6 +28310,7 @@ void CGvisR2R_PunchView::DoMark0Its()
 						}
 
 					}
+#endif
 				}
 			}
 		}
@@ -28977,6 +28921,7 @@ void CGvisR2R_PunchView::DoMark1Its()
 				//AfxMessageBox(_T("Error-SaveMk1Img()"));
 				if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
 				{
+#ifdef USE_VISION
 					if (!m_pVision[1]->m_bMkJudge)
 					{
 						nRtn = MsgBox(_T("우측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
@@ -28997,6 +28942,7 @@ void CGvisR2R_PunchView::DoMark1Its()
 						}
 
 					}
+#endif
 				}
 			}
 		}

@@ -11,7 +11,7 @@
 #include "MyStatic.h"
 
 #define MAX_INFO_STC				74
-#define MAX_INFO_STC_DATA			22
+#define MAX_INFO_STC_DATA			23
 #define MAX_INFO_BTN				29
 
 #define TIM_DISP_STS				450
@@ -130,6 +130,7 @@ public:
 	afx_msg void OnStnClickedStc82();
 	afx_msg void OnStnClickedStc83();
 	afx_msg void OnStnClickedStc187();
+	afx_msg void OnStnClickedStc189();
 	afx_msg void OnBnClickedChkUseAoiMiddle();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
