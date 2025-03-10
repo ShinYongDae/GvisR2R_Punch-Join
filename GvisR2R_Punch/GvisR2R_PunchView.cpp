@@ -10466,13 +10466,16 @@ void CGvisR2R_PunchView::ResetMkInfo(int nAoi) // 0 : AOI-Up , 1 : AOI-Dn , 2 : 
 		OpenReelmap();
 		SetAlignPosUp();
 
-		if (m_pDlgMenu02)
-		{
-			m_pDlgMenu02->ChgModelUp();
+		//if (m_pDlgMenu02)
+		//{
+		//	m_pDlgMenu02->ChgModelUp();
 
-			if (bDualTest)
-				m_pDlgMenu02->ChgModelDn();
-		}
+		//	//if (bDualTest)
+		//	//	m_pDlgMenu02->ChgModelDn();
+		//}
+
+		if (m_pDlgMenu02)
+			m_pDlgMenu02->InitCadImg();
 		
 		if (m_pDlgMenu01)
 		{
@@ -10542,8 +10545,8 @@ void CGvisR2R_PunchView::ResetMkInfo(int nAoi) // 0 : AOI-Up , 1 : AOI-Dn , 2 : 
 			InitReelmapDn();
 			SetAlignPosDn();
 
-			if (m_pDlgMenu02)
-				m_pDlgMenu02->ChgModelDn();
+			//if (m_pDlgMenu02)
+			//	m_pDlgMenu02->ChgModelDn();
 
 			if (m_pDlgMenu01)
 			{
@@ -12269,7 +12272,7 @@ BOOL CGvisR2R_PunchView::LoadMstInfo()
 
 	if (m_pDlgMenu02)
 	{
-		m_pDlgMenu02->ChgModelUp(); // PinImg, AlignImg를 Display함.
+		//m_pDlgMenu02->ChgModelUp(); // PinImg, AlignImg를 Display함.
 		m_pDlgMenu02->InitCadImg();
 	}
 #ifndef TEST_MODE
@@ -17294,7 +17297,7 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 
 				if (m_pDlgMenu02)
 				{
-					m_pDlgMenu02->ChgModelUp(); // PinImg, AlignImg를 Display함.
+					//m_pDlgMenu02->ChgModelUp(); // PinImg, AlignImg를 Display함.
 					m_pDlgMenu02->InitCadImg();
 				}
 
@@ -18123,7 +18126,7 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 
 				if (m_pDlgMenu02)
 				{
-					m_pDlgMenu02->ChgModelUp(); // PinImg, AlignImg를 Display함.
+					//m_pDlgMenu02->ChgModelUp(); // PinImg, AlignImg를 Display함.
 					m_pDlgMenu02->InitCadImg();
 				}
 

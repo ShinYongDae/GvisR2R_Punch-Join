@@ -517,6 +517,8 @@ BOOL CDlgMenu02::OnInitDialog()
 
 #endif
 
+	ShowDlg(IDD_DLG_UTIL_03);
+
 	InitStatic();
 	InitBtn();
 //	InitGL();
@@ -525,8 +527,8 @@ BOOL CDlgMenu02::OnInitDialog()
 	InitStaticDuo();
 	InitBtnDuo();
 
-
-	InitCadImg();
+	InitMkInfo();
+	//InitCadImg();
 
 
 	myStcData[3].SetText(pDoc->WorkingInfo.Vision[0].sResX);
@@ -564,8 +566,6 @@ BOOL CDlgMenu02::OnInitDialog()
 	//GetDlgItem(IDC_STATIC_1006)->ShowWindow(SW_HIDE);
 	//GetDlgItem(IDC_STATIC_ENG_MK_DONE)->ShowWindow(SW_HIDE);
 	
-	ShowDlg(IDD_DLG_UTIL_03);
-	
 #ifdef USE_FLUCK
 	ShowDlg(IDD_DLG_UTIL_06);
 #endif
@@ -577,52 +577,50 @@ BOOL CDlgMenu02::OnInitDialog()
 	              // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void CDlgMenu02::InitCadImg()
+void CDlgMenu02::InitMkInfo()
 {
 	HWND hWin;
 	CRect rect;
 
 #ifdef USE_VISION
-	if(pView->m_pVision[0])
+	if (pView->m_pVision[0])
 	{
-// 		hW = GetDlgItem(IDC_STC_PCS_IMG)->GetSafeHwnd();
-// 		GetDlgItem(IDC_STC_PCS_IMG)->GetWindowRect(&rt);
-// 		pView->m_pVision[0]->SelDispPcs(hW, rt, 0);
-// 		pView->m_pVision[0]->ShowDispPcs(0);
-
 		hWin = GetDlgItem(IDC_STC_PIN_IMG)->GetSafeHwnd();
 		GetDlgItem(IDC_STC_PIN_IMG)->GetWindowRect(&rect);
 		pView->m_pVision[0]->SelDispPin(hWin, rect, 0);
-		pView->m_pVision[0]->ShowDispPin(0);
-//		pView->m_pVision[0]->DrawCrossOnPin(PIN_IMG_DISP_SIZEX/2, PIN_IMG_DISP_SIZEY/2, 10);
-
-// 		hWin = GetDlgItem(IDC_STC_PIN_IMG)->GetSafeHwnd();
-// 		GetDlgItem(IDC_STC_PIN_IMG)->GetWindowRect(&rect);
- 		pView->m_pVision[0]->SelDispAlign(hWin, rect, 0);
-		pView->m_pVision[0]->ShowDispAlign();
-
+		pView->m_pVision[0]->SelDispAlign(hWin, rect, 0);
 		pView->m_pVision[0]->SetDispAxisPos();
+	}
+
+	if (pView->m_pVision[1])
+	{
+		hWin = GetDlgItem(IDC_STC_PIN_IMG_2)->GetSafeHwnd();
+		GetDlgItem(IDC_STC_PIN_IMG_2)->GetWindowRect(&rect);
+		pView->m_pVision[1]->SelDispPin(hWin, rect, 1);
+		pView->m_pVision[1]->SelDispAlign(hWin, rect, 1);
+		pView->m_pVision[1]->SetDispAxisPos();
+	}
+#endif
+
+	if (m_pDlgUtil03)
+		m_pDlgUtil03->InitMkInfo();
+}
+
+void CDlgMenu02::InitCadImg()
+{
+#ifdef USE_VISION
+	if(pView->m_pVision[0])
+	{
+		pView->m_pVision[0]->ShowDispPin(0);
+		pView->m_pVision[0]->ShowDispAlign();
+		//pView->m_pVision[0]->SetDispAxisPos();
 	}
 
 	if(pView->m_pVision[1])
 	{
-// 		hW = GetDlgItem(IDC_STC_PCS_IMG)->GetSafeHwnd();
-// 		GetDlgItem(IDC_STC_PCS_IMG)->GetWindowRect(&rt);
-// 		pView->m_pVision[0]->SelDispPcs(hW, rt, 0);
-// 		pView->m_pVision[0]->ShowDispPcs(1);
-
-		hWin = GetDlgItem(IDC_STC_PIN_IMG_2)->GetSafeHwnd();
-		GetDlgItem(IDC_STC_PIN_IMG_2)->GetWindowRect(&rect);
-		pView->m_pVision[1]->SelDispPin(hWin, rect, 1);
 		pView->m_pVision[1]->ShowDispPin(0);
-//		pView->m_pVision[1]->DrawCrossOnPin(PIN_IMG_DISP_SIZEX/2, PIN_IMG_DISP_SIZEY/2, 10);
-
-// 		hWin = GetDlgItem(IDC_STC_PIN_IMG_2)->GetSafeHwnd();
-// 		GetDlgItem(IDC_STC_PIN_IMG_2)->GetWindowRect(&rect);
- 		pView->m_pVision[1]->SelDispAlign(hWin, rect, 1);
 		pView->m_pVision[1]->ShowDispAlign();
-
-		pView->m_pVision[1]->SetDispAxisPos();
+		//pView->m_pVision[1]->SetDispAxisPos();
 	}
 #endif
 
@@ -3970,8 +3968,8 @@ void CDlgMenu02::ChgModel()
  		pView->m_pVision[0]->ShowDispPin(0);
 		pView->m_pVision[0]->ShowDispAlign();
 		pView->m_pVision[0]->ShowDispReject();
-		if (m_pDlgUtil03)
-			m_pDlgUtil03->DispResultBlob();
+		//if (m_pDlgUtil03)
+		//	m_pDlgUtil03->DispResultBlob();
 	}
 
 	if(pView->m_pVision[1])
@@ -3991,23 +3989,27 @@ void CDlgMenu02::ChgModelUp()
  		pView->m_pVision[0]->ShowDispPin(0);
 		pView->m_pVision[0]->ShowDispAlign();
 		pView->m_pVision[0]->ShowDispReject();
-		if (m_pDlgUtil03)
-			m_pDlgUtil03->DispResultBlob();
+		//if (m_pDlgUtil03)
+		//	m_pDlgUtil03->DispResultBlob();
 	}
 	if (pView->m_pVision[1])
+	{
+		pView->m_pVision[1]->ShowDispPin(0);
+		pView->m_pVision[1]->ShowDispAlign();
 		pView->m_pVision[1]->ShowDispReject();
+	}
 #endif
 }
 
 void CDlgMenu02::ChgModelDn()
 {
 #ifdef USE_VISION
-	if(pView->m_pVision[1])
-	{
- 		pView->m_pVision[1]->ShowDispPin(0);
-		pView->m_pVision[1]->ShowDispAlign();
-		//pView->m_pVision[1]->ShowDispReject();
-	}
+	//if(pView->m_pVision[1])
+	//{
+ 	//	pView->m_pVision[1]->ShowDispPin(0);
+	//	pView->m_pVision[1]->ShowDispAlign();
+	//	pView->m_pVision[1]->ShowDispReject();
+	//}
 #endif
 }
 

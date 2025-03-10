@@ -327,7 +327,7 @@ BOOL CDlgUtil03::OnInitDialog()
 	strRatio.Format(_T("%3.2f"), pDoc->m_dShiftAdjustRatio);
 	GetDlgItem(IDC_EDIT_YSHIFT_RATIO)->SetWindowText(strRatio);
 
-	InitCadImg();
+	//InitCadImg();
 
 	//GetDlgItem(IDC_STC_REJECT_IMG2)->ShowWindow(SW_HIDE);
 
@@ -1644,8 +1644,7 @@ void CDlgUtil03::OnTimer(UINT_PTR nIDEvent)
 	CDialog::OnTimer(nIDEvent);
 }
 
-
-void CDlgUtil03::InitCadImg()
+void CDlgUtil03::InitMkInfo()
 {
 	HWND hWin;
 	CRect rect;
@@ -1656,13 +1655,28 @@ void CDlgUtil03::InitCadImg()
 		hWin = GetDlgItem(IDC_STC_REJECT_IMG)->GetSafeHwnd();
 		GetDlgItem(IDC_STC_REJECT_IMG)->GetWindowRect(&rect);
 		pView->m_pVision[0]->SelDispReject(hWin, rect, 0);
-		pView->m_pVision[0]->ShowDispReject(); // First draw overlay 
+	}
 
+	if (pView->m_pVision[1])
+	{
 		hWin = GetDlgItem(IDC_STC_REJECT_IMG2)->GetSafeHwnd();
 		GetDlgItem(IDC_STC_REJECT_IMG2)->GetWindowRect(&rect);
 		pView->m_pVision[1]->SelDispReject(hWin, rect, 0);
-		pView->m_pVision[1]->ShowDispReject(); // First draw overlay
+	}
+#endif
+}
 
+void CDlgUtil03::InitCadImg()
+{
+#ifdef USE_VISION
+	if (pView->m_pVision[0])
+	{
+		pView->m_pVision[0]->ShowDispReject(); // First draw overlay 
+	}
+
+	if (pView->m_pVision[1])
+	{
+		pView->m_pVision[1]->ShowDispReject(); // First draw overlay
 	}
 #endif
 }

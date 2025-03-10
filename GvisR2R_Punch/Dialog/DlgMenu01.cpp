@@ -1248,7 +1248,7 @@ void CDlgMenu01::InitCadImg()
 	{
 		//pView->m_pVision[0]->InitDispCad();
 		pView->m_pVision[0]->InitCADBuf(0); // Top Side
-		pView->m_pVision[0]->InitRejectBuf();
+		//pView->m_pVision[0]->InitRejectBuf();
 	}
 
 	if(bDualTest)
@@ -1257,7 +1257,7 @@ void CDlgMenu01::InitCadImg()
 		{
 			//pView->m_pVision[1]->InitDispCad();
 			pView->m_pVision[1]->InitCADBuf(1); // Bottom Side
-			pView->m_pVision[1]->InitRejectBuf();
+			//pView->m_pVision[1]->InitRejectBuf();
 		}
 	}
 #endif
@@ -1270,7 +1270,7 @@ void CDlgMenu01::InitCadImgUp()
 	{
 		//pView->m_pVision[0]->InitDispCad();
 		pView->m_pVision[0]->InitCADBuf(0);
-		pView->m_pVision[0]->InitRejectBuf();
+		//pView->m_pVision[0]->InitRejectBuf();
 	}
 #endif
 }
@@ -1286,7 +1286,7 @@ void CDlgMenu01::InitCadImgDn()
 	{
 		//pView->m_pVision[1]->InitDispCad();
 		pView->m_pVision[1]->InitCADBuf(1);
-		pView->m_pVision[1]->InitRejectBuf();
+		//pView->m_pVision[1]->InitRejectBuf();
 	}
 #endif
 }

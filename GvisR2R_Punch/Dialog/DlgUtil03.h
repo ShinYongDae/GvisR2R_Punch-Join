@@ -52,6 +52,7 @@ public:
 // 	void DoDispenseTest();
 // 	void SetFurge();
 
+	void InitMkInfo();
 	void InitCadImg(); // for RejectImg
 	void DispResultBlob();
 	void DispResultPtScore(int nCam);

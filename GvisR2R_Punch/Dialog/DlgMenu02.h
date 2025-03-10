@@ -186,6 +186,7 @@ public:
 	BOOL ShowKeypad(int nCtlID, CPoint ptSt=(0, 0), int nDir=TO_NONE);
 
 	void ResetMkTestBtn();
+	void InitMkInfo();
 	void InitCadImg(); // for PinImg, AlignImg
 
 	void Grab2PntAlign();
