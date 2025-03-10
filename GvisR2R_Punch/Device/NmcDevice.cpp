@@ -940,7 +940,6 @@ BOOL CNmcDevice::GantryEnable(long lMaster, long lSlave, long lOnOff)
 {
 	TCHAR msg[MAX_ERR_LEN];
 	MC_STATUS ms = MC_OK;
-	char cstrErrorMsg[MAX_ERR_LEN];
 
 	UINT32 state = 0x00000000;
 	DWORD nTick = GetTickCount();
