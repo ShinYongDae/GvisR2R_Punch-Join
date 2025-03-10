@@ -111,6 +111,7 @@ BEGIN_MESSAGE_MAP(CDlgInfo, CDialog)
 	ON_STN_CLICKED(IDC_STC_82, &CDlgInfo::OnStnClickedStc82)
 	ON_STN_CLICKED(IDC_STC_83, &CDlgInfo::OnStnClickedStc83)
 	ON_STN_CLICKED(IDC_STC_187, &CDlgInfo::OnStnClickedStc187)
+	ON_STN_CLICKED(IDC_STC_189, &CDlgInfo::OnStnClickedStc189)
 	ON_BN_CLICKED(IDC_CHK_USE_AOI_MIDDLE, &CDlgInfo::OnBnClickedChkUseAoiMiddle)
 	ON_WM_TIMER()
 END_MESSAGE_MAP()
@@ -377,6 +378,7 @@ void CDlgInfo::InitBtn()
 	myBtnExit.SetTextColor(RGB_BLACK);
 }
 
+
 void CDlgInfo::InitStatic()
 {
 	InitStcTitle();
@@ -559,6 +561,7 @@ void CDlgInfo::InitStcData()
 	myStcData[20].SubclassDlgItem(IDC_STC_83, this); // 마킹부 재작업 알람 시간
 
 	myStcData[21].SubclassDlgItem(IDC_STC_187, this); // 마킹부 마킹여부 확인 미마킹일치율
+	myStcData[22].SubclassDlgItem(IDC_STC_189, this); // 마킹부 마킹여부 확인 미마킹일치율
 
 	for(int i=0; i<MAX_INFO_STC_DATA; i++)
 	{
@@ -658,8 +661,11 @@ void CDlgInfo::Disp()
 	else
 		myBtn[28].SetCheck(FALSE);
 
-	str.Format(_T("%d"), pDoc->WorkingInfo.LastJob.nJudgeMkRatio);
+	str.Format(_T("%d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0]);
 	myStcData[21].SetText(str);
+
+	str.Format(_T("%d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1]);
+	myStcData[22].SetText(str);
 
 	pDoc->WorkingInfo.LastJob.bRclDrSen = pView->MpeRead(pView->Plc.DlgInfo.LampDoorSensorRecoiler) ? TRUE : FALSE;
 	if(pDoc->WorkingInfo.LastJob.bRclDrSen)
@@ -2301,10 +2307,10 @@ void CDlgInfo::OnChk26()
 			strTemp.Format(_T("%s \r\n: Reject 마크 이미지가 없습니다."), strFileNReject);
 			pView->MsgBox(strTemp);
 			myBtn[28].SetCheck(FALSE);
-			return;
+			pDoc->WorkingInfo.LastJob.bUseJudgeMk = FALSE;
 		}
-
-		pDoc->WorkingInfo.LastJob.bUseJudgeMk = TRUE;
+		else
+			pDoc->WorkingInfo.LastJob.bUseJudgeMk = TRUE;
 	}
 	else
 		pDoc->WorkingInfo.LastJob.bUseJudgeMk = FALSE;
@@ -2330,9 +2336,38 @@ void CDlgInfo::OnStnClickedStc187()
 
 	CString sVal;
 	GetDlgItem(IDC_STC_187)->GetWindowText(sVal);
-	pDoc->WorkingInfo.LastJob.nJudgeMkRatio = _ttoi(sVal);
-	pDoc->SetVerifyPunchScore(_ttof(sVal));
+	pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0] = 100 - _ttoi(sVal);
+	pDoc->SetVerifyPunchScore(100.0 - _ttof(sVal));
 
 	::WritePrivateProfileString(_T("Last Job"), _T("Judge Marking Ratio"), sVal, PATH_WORKING_INFO);
+
+	if (pView->m_pDlgMenu02)
+		pView->m_pDlgMenu02->DispMkPmStdVal();
+
+}
+
+void CDlgInfo::OnStnClickedStc189()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	myStcData[22].SetBkColor(RGB_RED);
+	myStcData[22].RedrawWindow();
+
+	CPoint pt;	CRect rt;
+	GetDlgItem(IDC_STC_189)->GetWindowRect(&rt);
+	pt.x = rt.right; pt.y = rt.bottom;
+	ShowKeypad(IDC_STC_189, pt, TO_BOTTOM | TO_RIGHT);
+
+	myStcData[22].SetBkColor(RGB_WHITE);
+	myStcData[22].RedrawWindow();
+
+	CString sVal;
+	GetDlgItem(IDC_STC_189)->GetWindowText(sVal);
+	pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1] = 100 - _ttoi(sVal);
+	pDoc->SetVerifyPunchScore2(100.0 - _ttof(sVal));
+
+	::WritePrivateProfileString(_T("Last Job"), _T("Judge Marking Ratio2"), sVal, PATH_WORKING_INFO);
+
+	if (pView->m_pDlgMenu02)
+		pView->m_pDlgMenu02->DispMkPmStdVal();
 
 }

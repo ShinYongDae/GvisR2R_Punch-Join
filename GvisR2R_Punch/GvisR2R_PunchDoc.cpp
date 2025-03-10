@@ -1536,6 +1536,11 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	else
 		WorkingInfo.System.bInsertPunchingToDts = FALSE;
 
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("HideTotalMarkingTest"), NULL, szData, sizeof(szData), sPath))
+		WorkingInfo.System.bHideTotalMarkingTest = _ttoi(szData);
+	else
+		WorkingInfo.System.bHideTotalMarkingTest = TRUE;
+
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("DebugEngSig"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.System.bDebugEngSig = _ttoi(szData);
 	else
@@ -2058,9 +2063,14 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 		WorkingInfo.LastJob.bUseJudgeMk = TRUE;
 
 	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Judge Marking Ratio"), NULL, szData, sizeof(szData), sPath))
-		WorkingInfo.LastJob.nJudgeMkRatio = _ttoi(szData);
+		WorkingInfo.LastJob.nJudgeMkRatio[0] = 100 - _ttoi(szData);
 	else
-		WorkingInfo.LastJob.nJudgeMkRatio = 85;
+		WorkingInfo.LastJob.nJudgeMkRatio[0] = 15;
+
+	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Judge Marking Ratio2"), NULL, szData, sizeof(szData), sPath))
+		WorkingInfo.LastJob.nJudgeMkRatio[1] = 100 - _ttoi(szData);
+	else
+		WorkingInfo.LastJob.nJudgeMkRatio[1] = 15;
 
 	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Ultra Sonic Cleanner Start Time"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.LastJob.sUltraSonicCleannerStTim = CString(szData);
@@ -15083,21 +15093,27 @@ double CGvisR2R_PunchDoc::GetVerifyPunchScore()
 {
 	//return m_dVerifyPunchScore;
 	double dVerifyPunchScore = 85.0;
+#ifdef USE_VISION
 	if (pView->m_pVision[0])
 		dVerifyPunchScore = pView->m_pVision[0]->GetVerifyPunchScore();
+#endif
 	return dVerifyPunchScore;
 }
 
 void CGvisR2R_PunchDoc::SetVerifyPunchScore(double dScore)
 {
-	//m_dVerifyPunchScore = dScore;
-	//CString sData;
-	//sData.Format(_T("%d"), int(m_dVerifyPunchScore));
-	//::WritePrivateProfileString(_T("System"), _T("VerifyPunchScore"), sData, PATH_WORKING_INFO);
+#ifdef USE_VISION
 	if (pView->m_pVision[0])
 		pView->m_pVision[0]->SetVerifyPunchScore(dScore);
+#endif
+}
+
+void CGvisR2R_PunchDoc::SetVerifyPunchScore2(double dScore)
+{
+#ifdef USE_VISION
 	if (pView->m_pVision[1])
 		pView->m_pVision[1]->SetVerifyPunchScore(dScore);
+#endif
 }
 
 BOOL CGvisR2R_PunchDoc::MakeDirRmap(int nRmap)

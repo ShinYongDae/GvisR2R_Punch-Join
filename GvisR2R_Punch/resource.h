@@ -572,6 +572,7 @@
 #define IDC_STC_GD_RA_2_ALL             1175
 #define IDC_STATIC_RNG_00               1175
 #define IDC_STC_203                     1175
+#define IDC_STC_189                     1175
 #define IDC_STC_GD_RA_3_ALL             1176
 #define IDC_STATIC_RNG_2                1176
 #define IDC_STC_204                     1176
@@ -956,6 +957,8 @@
 #define IDC_STATIC_ENG_SN2              1249
 #define IDC_STATIC_READ_SN              1249
 #define IDC_STATIC_ALIGN_L3             1249
+#define IDC_CHK_TP_STOP2                1249
+#define IDC_CHK_MK_JUDGE                1249
 #define IDC_CHK_19                      1250
 #define IDC_STC_81                      1250
 #define IDC_STC_UTIL04_19               1250
@@ -1016,12 +1019,15 @@
 #define IDC_CHK_30                      1261
 #define IDC_STC_92                      1261
 #define IDC_STC_UTIL04_30               1261
+#define IDC_STATIC_1013                 1261
 #define IDC_CHK_31                      1262
 #define IDC_STC_93                      1262
 #define IDC_STC_UTIL04_31               1262
+#define IDC_STATIC_MK_PM_SCORE3         1262
 #define IDC_CHK_32                      1263
 #define IDC_STC_94                      1263
 #define IDC_STC_UTIL04_32               1263
+#define IDC_STATIC_MK_PM_SCORE4         1263
 #define IDC_STC_12_26                   1264
 #define IDC_STC_95                      1264
 #define IDC_STC_UTIL04_33               1264
@@ -1510,6 +1516,7 @@
 #define IDC_BTN_MEAS_DOWN2              1424
 #define IDC_STC_12_93                   1424
 #define IDC_CHK_RECOILER_CCW            1424
+#define IDC_CHECK11                     1424
 #define IDC_CHK_TWO_METAL               1425
 #define IDC_CHK_2LAYER                  1425
 #define IDC_STC_DEF_8                   1425
@@ -1534,6 +1541,7 @@
 #define IDC_STC_DEF_12                  1429
 #define IDC_CHK_USE_AOI_OUTER           1429
 #define IDC_CHK_123                     1429
+#define IDC_BTN_JUDGE_MK                1429
 #define IDC_STC_DEF_13                  1430
 #define IDC_CHK_USE_AOI_MIDDLE          1430
 #define IDC_STC_12_96                   1430
@@ -1592,7 +1600,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        361
 #define _APS_NEXT_COMMAND_VALUE         32785
-#define _APS_NEXT_CONTROL_VALUE         1420
+#define _APS_NEXT_CONTROL_VALUE         1430
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

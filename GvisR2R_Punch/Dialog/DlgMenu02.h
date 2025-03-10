@@ -203,6 +203,7 @@ public:
 
 	void DispMkPmScore(int nCam);
 	void InitMkPmRst(int nCam = 2);
+	void DispMkPmStdVal();
 
 	// ITS
 #ifdef USE_MIL

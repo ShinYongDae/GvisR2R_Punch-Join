@@ -150,6 +150,7 @@ BEGIN_MESSAGE_MAP(CDlgMenu01, CDialog)
 	ON_STN_CLICKED(IDC_STC_TQ_DISP2_VAL_R, &CDlgMenu01::OnStnClickedStcTqDisp2ValR)
 	ON_STN_CLICKED(IDC_STC_TQ_DISP3_VAL_L, &CDlgMenu01::OnStnClickedStcTqDisp3ValL)
 	ON_STN_CLICKED(IDC_STC_TQ_DISP3_VAL_R, &CDlgMenu01::OnStnClickedStcTqDisp3ValR)
+	ON_BN_CLICKED(IDC_CHK_MK_JUDGE, &CDlgMenu01::OnBnClickedChkMkJudge)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1247,6 +1248,7 @@ void CDlgMenu01::InitCadImg()
 	{
 		//pView->m_pVision[0]->InitDispCad();
 		pView->m_pVision[0]->InitCADBuf(0); // Top Side
+		pView->m_pVision[0]->InitRejectBuf();
 	}
 
 	if(bDualTest)
@@ -1255,6 +1257,7 @@ void CDlgMenu01::InitCadImg()
 		{
 			//pView->m_pVision[1]->InitDispCad();
 			pView->m_pVision[1]->InitCADBuf(1); // Bottom Side
+			pView->m_pVision[1]->InitRejectBuf();
 		}
 	}
 #endif
@@ -1267,6 +1270,7 @@ void CDlgMenu01::InitCadImgUp()
 	{
 		//pView->m_pVision[0]->InitDispCad();
 		pView->m_pVision[0]->InitCADBuf(0);
+		pView->m_pVision[0]->InitRejectBuf();
 	}
 #endif
 }
@@ -1282,6 +1286,7 @@ void CDlgMenu01::InitCadImgDn()
 	{
 		//pView->m_pVision[1]->InitDispCad();
 		pView->m_pVision[1]->InitCADBuf(1);
+		pView->m_pVision[1]->InitRejectBuf();
 	}
 #endif
 }
@@ -2087,6 +2092,13 @@ void CDlgMenu01::InitBtn()
 	myBtn[22].SetBtnType(BTN_TYPE_CHECK);
 	myBtn[22].ShowWindow(SW_HIDE);
 
+
+	myBtn[23].SubclassDlgItem(IDC_CHK_MK_JUDGE, this);
+	myBtn[23].SetHwnd(this->GetSafeHwnd(), IDC_CHK_MK_JUDGE);
+	//myBtn[23].SetBtnType(BTN_TYPE_CHECK);
+	myBtn[23].SetFont(_T("굴림체"), 16, TRUE);
+	//myBtn[23].SetTextColor(RGB_BLACK);
+
 	int i;
 	for(i=0; i<MAX_MENU01_BTN; i++)
 	{
@@ -2661,14 +2673,20 @@ void CDlgMenu01::ChkUserInfo(BOOL bOn)
 {
 	if(bOn)
 	{
+#ifdef TEST_MODE
+		pView->SendMessage(WM_DLG_INFO, 0, 0);
+#else
 		pView->PostMessage(WM_DLG_INFO, 0, 0);
+#endif
 	}
 	else
 	{
 		UpdateData();
 	}
 
+#ifndef TEST_MODE
 	myBtn[1].SetCheck(bOn);
+#endif
 }
 
 void CDlgMenu01::OnPaint() 
@@ -3265,6 +3283,12 @@ void CDlgMenu01::UpdateData()
 		if (GetDlgItem(IDC_STC_380mm)->IsWindowVisible())
 			GetDlgItem(IDC_STC_380mm)->ShowWindow(SW_HIDE);
 	}
+
+
+	if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+		myBtn[23].SetCheck(TRUE);
+	else
+		myBtn[23].SetCheck(FALSE);
 }
 
 void CDlgMenu01::UpdateWorking()
@@ -6109,4 +6133,38 @@ void CDlgMenu01::OnStnClickedStcTqDisp3ValR()
 
 	pDoc->WorkingInfo.Marking[1].sMarkingDisp3Toq = sData;
 	::WritePrivateProfileString(_T("Marking1"), _T("MARKING_DISP3_TOQ"), sData, PATH_WORKING_INFO);
+}
+
+
+void CDlgMenu01::OnBnClickedChkMkJudge()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CString strFileNReject, strTemp;
+	CString sPathCamSpecDir = pDoc->WorkingInfo.System.sPathCamSpecDir;
+	CString sModel = pDoc->WorkingInfo.LastJob.sModel;
+	CString sLayer = pDoc->WorkingInfo.LastJob.sLayerUp;
+
+	if (myBtn[23].GetCheck())
+	{
+		if (sPathCamSpecDir.Right(1) != "\\")
+			strFileNReject.Format(_T("%s\\%s\\%s_RejectMark.TIF"), sPathCamSpecDir, sModel, sLayer);
+		else
+			strFileNReject.Format(_T("%s%s\\%s_RejectMark.TIF"), sPathCamSpecDir, sModel, sLayer);
+
+		CFileFind finder;
+		if (!finder.FindFile(strFileNReject))
+		{
+			strTemp.Format(_T("%s \r\n: Reject 마크 이미지가 없습니다."), strFileNReject);
+			pView->MsgBox(strTemp);
+			myBtn[23].SetCheck(FALSE);
+			pDoc->WorkingInfo.LastJob.bUseJudgeMk = FALSE;
+		}
+		else
+			pDoc->WorkingInfo.LastJob.bUseJudgeMk = TRUE;
+	}
+	else
+		pDoc->WorkingInfo.LastJob.bUseJudgeMk = FALSE;
+
+	CString sData = pDoc->WorkingInfo.LastJob.bUseJudgeMk ? _T("1") : _T("0");
+	::WritePrivateProfileString(_T("Last Job"), _T("Use Judge Marking"), sData, PATH_WORKING_INFO);
 }

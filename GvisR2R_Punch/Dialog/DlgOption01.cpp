@@ -61,6 +61,7 @@ BEGIN_MESSAGE_MAP(CDlgOption01, CDialog)
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_CHECK9, &CDlgOption01::OnBnClickedCheck9)
 	ON_BN_CLICKED(IDC_CHECK10, &CDlgOption01::OnBnClickedCheck10)
+	ON_BN_CLICKED(IDC_CHECK11, &CDlgOption01::OnBnClickedCheck11)
 END_MESSAGE_MAP()
 
 
@@ -326,6 +327,7 @@ void CDlgOption01::DispStatus()
 	((CButton*)GetDlgItem(IDC_CHECK8))->SetCheck(pDoc->WorkingInfo.System.bDuplicateRmap);
 	((CButton*)GetDlgItem(IDC_CHECK9))->SetCheck(pDoc->WorkingInfo.System.bInsertPunchingToDts);
 	((CButton*)GetDlgItem(IDC_CHECK10))->SetCheck(pDoc->WorkingInfo.System.bDebugEngSig);
+	((CButton*)GetDlgItem(IDC_CHECK11))->SetCheck(pDoc->WorkingInfo.System.bHideTotalMarkingTest);
 
 	if (pView->m_pMotion)
 	{
@@ -477,3 +479,20 @@ void CDlgOption01::OnBnClickedCheck10()
 		pView->m_pDlgMenu02->ShowDebugEngSig();
 }
 
+
+
+void CDlgOption01::OnBnClickedCheck11()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	BOOL bOn = ((CButton*)GetDlgItem(IDC_CHECK11))->GetCheck();
+	pDoc->WorkingInfo.System.bHideTotalMarkingTest = bOn;
+
+	if (bOn)
+	{
+		::WritePrivateProfileString(_T("System"), _T("HideTotalMarkingTest"), _T("1"), PATH_WORKING_INFO);
+	}
+	else
+	{
+		::WritePrivateProfileString(_T("System"), _T("HideTotalMarkingTest"), _T("0"), PATH_WORKING_INFO);
+	}
+}

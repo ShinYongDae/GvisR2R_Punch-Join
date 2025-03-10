@@ -140,6 +140,7 @@ public:
 	BOOL MakeDirRmap(int nRmap);
 	double GetVerifyPunchScore();
 	void SetVerifyPunchScore(double dScore);
+	void SetVerifyPunchScore2(double dScore);
 
 	void LogAuto(CString strMsg, int nType = 0);
 	void LogPLC(CString strMsg, int nType = 0);
