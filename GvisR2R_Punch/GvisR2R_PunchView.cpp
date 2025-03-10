@@ -2949,7 +2949,7 @@ UINT CGvisR2R_PunchView::ThreadProc1(LPVOID lpContext)	// ChkCollision()
 			}
 			else
 			{
-				if (pThread->m_bCollision[0] && pThread->m_bCollision[1])
+				if (pThread->m_bCollision[0] && pThread->m_bCollision[1]) // 자동 마킹중에
 				{
 					if (!bCollision)
 					{
