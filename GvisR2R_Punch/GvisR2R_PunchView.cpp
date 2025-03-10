@@ -14623,6 +14623,7 @@ void CGvisR2R_PunchView::DoMark0()
 					{
 						Stop();
 					}
+
 #endif
 				}
 			}

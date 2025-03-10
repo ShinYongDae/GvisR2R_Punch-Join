@@ -231,6 +231,7 @@ void CDlgUtil03::AtDlgShow()
 		pView->m_pDlgMenu02->SetLight2();
 	}
 
+
 	CString str;
 	str.Format(_T("%d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0]);
 	myStcData[67].SetText(str);
@@ -345,8 +346,8 @@ void CDlgUtil03::InitBtn()
 	myBtn[2].SubclassDlgItem(IDC_CHK_NO_MK, this);
 	myBtn[2].SetHwnd(this->GetSafeHwnd(), IDC_CHK_NO_MK);
 	myBtn[2].SetBtnType(BTN_TYPE_CHECK);
-	myBtn[2].SetText(_T("¸¶Å·¸ðµå"), BTN_UP);
-	myBtn[2].SetText(_T("ºñÁ¯¸ðµå"), BTN_DN);
+	myBtn[2].SetText(_T("ë§ˆí‚¹ëª¨ë“œ"), BTN_UP);
+	myBtn[2].SetText(_T("ë¹„ì ¼ëª¨ë“œ"), BTN_DN);
 
 	myBtn[3].SubclassDlgItem(IDC_CHK_LEFT, this);
 	myBtn[3].SetHwnd(this->GetSafeHwnd(), IDC_CHK_LEFT);
@@ -366,7 +367,7 @@ void CDlgUtil03::InitBtn()
 	int i;
 	for(i=0; i<MAX_UTIL03_BTN; i++)
 	{
-		myBtn[i].SetFont(_T("±¼¸²Ã¼"),14,TRUE);
+		myBtn[i].SetFont(_T("ï¿½ï¿½ï¿½ï¿½Ã¼"),14,TRUE);
 		myBtn[i].SetTextColor(RGB_BLACK);
 // 		myBtn[i].SetBtnType(BTN_TYPE_CHECK);
 	}
@@ -482,7 +483,7 @@ void CDlgUtil03::Disp(int nDir)
 	switch(nDir)
 	{
 	case ROT_NONE:
-		for(nC=0; nC<MAX_SPREAD_COL; nC++)			// nC, nR : Cam(or Reelmap) ±âÁØ
+		for(nC=0; nC<MAX_SPREAD_COL; nC++)			// nC, nR : Cam(or Reelmap) ï¿½ï¿½ï¿½ï¿½
 		{
 			for(nR=0; nR<MAX_SPREAD_ROW; nR++)
 			{
@@ -498,12 +499,12 @@ void CDlgUtil03::Disp(int nDir)
 				}
 				else
 				{
-					if (!bChk2) // »ó¸é PCS
+					if (!bChk2) // ï¿½ï¿½ï¿½ PCS
 					{
 						if (pDoc->m_Master[0].m_pPcsRgn)
 							pDoc->m_Master[0].m_pPcsRgn->GetPcsRgn(nC + nScrlH, nR + nScrlV, nP, ptRect);
 					}
-					else		// ÇÏ¸é PCS
+					else		// ï¿½Ï¸ï¿½ PCS
 					{
 						if (pDoc->m_Master[1].m_pPcsRgn)
 							pDoc->m_Master[1].m_pPcsRgn->GetPcsRgn(nC + nScrlH, nR + nScrlV, nP, ptRect);
@@ -519,7 +520,7 @@ void CDlgUtil03::Disp(int nDir)
 		}
 		break;
 	case ROT_CCW_90:
-// 		for(int nC=0; nC<MAX_SPREAD_COL; nC++)			// nC, nR : Cam(or Reelmap) ±âÁØ
+// 		for(int nC=0; nC<MAX_SPREAD_COL; nC++)			// nC, nR : Cam(or Reelmap) ï¿½ï¿½ï¿½ï¿½
 // 		{
 // 			for(int nR=0; nR<MAX_SPREAD_ROW; nR++)
 // 			{
@@ -967,7 +968,7 @@ BOOL CDlgUtil03::PreTranslateMessage(MSG* pMsg)
 			return TRUE;
 		case 'S':
 		case 's':
-			if(GetKeyState(VK_CONTROL) < 0) // Ctrl Å°°¡ ´­·ÁÁø »óÅÂ
+			if(GetKeyState(VK_CONTROL) < 0) // Ctrl Å°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			{
 				WINDOWPLACEMENT wndPlace;
 				AfxGetMainWnd()->GetWindowPlacement(&wndPlace);
@@ -1458,8 +1459,8 @@ BOOL CDlgUtil03::ShowKeypad(int nCtlID, CPoint ptSt, int nDir)
 			_tstof(strData) > _tstof(strMax))
 		{
 			SetDlgItemText(nCtlID, strPrev);
-			//pView->DispMsg(_T("ÀÔ·Â ¹üÀ§¸¦ ¹þ¾î³µ½À´Ï´Ù."), _T("ÁÖÀÇ"), RGB_YELLOW);
-			pView->MsgBox(_T("ÀÔ·Â ¹üÀ§¸¦ ¹þ¾î³µ½À´Ï´Ù."));
+			//pView->DispMsg(_T("ï¿½Ô·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½î³µï¿½ï¿½ï¿½Ï´ï¿½."), _T("ï¿½ï¿½ï¿½ï¿½"), RGB_YELLOW);
+			pView->MsgBox(_T("ï¿½Ô·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½î³µï¿½ï¿½ï¿½Ï´ï¿½."));
 		}
 		else
 			SetDlgItemText(nCtlID, strData);
@@ -1513,7 +1514,7 @@ void CDlgUtil03::OnCheckYshift()
 
 void CDlgUtil03::OnBnClickedCheckPcs()
 {
-	// TODO: ¿©±â¿¡ ÄÁÆ®·Ñ ¾Ë¸² Ã³¸®±â ÄÚµå¸¦ Ãß°¡ÇÕ´Ï´Ù.
+	// TODO: ï¿½ï¿½ï¿½â¿¡ ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ë¸ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ ï¿½Úµå¸¦ ï¿½ß°ï¿½ï¿½Õ´Ï´ï¿½.
 	Disp(ROT_NONE);
 	((CButton*)GetDlgItem(IDC_CHECK_ALIGN))->SetCheck(FALSE);
 
@@ -1528,7 +1529,7 @@ void CDlgUtil03::OnBnClickedCheckPcs()
 
 void CDlgUtil03::OnBnClickedCheckPcsDn()
 {
-	// TODO: ¿©±â¿¡ ÄÁÆ®·Ñ ¾Ë¸² Ã³¸®±â ÄÚµå¸¦ Ãß°¡ÇÕ´Ï´Ù.
+	// TODO: ï¿½ï¿½ï¿½â¿¡ ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ë¸ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ ï¿½Úµå¸¦ ï¿½ß°ï¿½ï¿½Õ´Ï´ï¿½.
 	Disp(ROT_NONE);
 	((CButton*)GetDlgItem(IDC_CHECK_ALIGN))->SetCheck(FALSE);
 }
@@ -1536,7 +1537,7 @@ void CDlgUtil03::OnBnClickedCheckPcsDn()
 
 void CDlgUtil03::OnBnClickedCheckAlign()
 {
-	// TODO: ¿©±â¿¡ ÄÁÆ®·Ñ ¾Ë¸² Ã³¸®±â ÄÚµå¸¦ Ãß°¡ÇÕ´Ï´Ù.
+	// TODO: ï¿½ï¿½ï¿½â¿¡ ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ë¸ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ ï¿½Úµå¸¦ ï¿½ß°ï¿½ï¿½Õ´Ï´ï¿½.
 	BOOL bCheck = ((CButton*)GetDlgItem(IDC_CHECK_ALIGN))->GetCheck();
 	if (bCheck)
 	{
@@ -1568,16 +1569,16 @@ void CDlgUtil03::DispAlign(int nDir)
 	switch (nDir)
 	{
 	case ROT_NONE:
-		for (nC = 0; nC < MAX_SPREAD_COL; nC++)			// nC, nR : Cam(or Reelmap) ±âÁØ
+		for (nC = 0; nC < MAX_SPREAD_COL; nC++)			// nC, nR : Cam(or Reelmap) ï¿½ï¿½ï¿½ï¿½
 		{
 			for (nR = 0; nR < MAX_SPREAD_ROW; nR++)
 			{
-				if (!bChk2) // »ó¸é PCS
+				if (!bChk2) // ï¿½ï¿½ï¿½ PCS
 				{
 					if (pDoc->m_Master[0].m_pPcsRgn)
 						pDoc->m_Master[0].m_pPcsRgn->GetPcsRgn(nC + nScrlH, nR + nScrlV, nP, ptRect);
 				}
-				else		// ÇÏ¸é PCS
+				else		// ï¿½Ï¸ï¿½ PCS
 				{
 					if (pDoc->m_Master[1].m_pPcsRgn)
 						pDoc->m_Master[1].m_pPcsRgn->GetPcsRgn(nC + nScrlH, nR + nScrlV, nP, ptRect);
@@ -1608,7 +1609,7 @@ void CDlgUtil03::DispAlign(int nDir)
 		}
 		break;
 	case ROT_CCW_90:
-		// 		for(int nC=0; nC<MAX_SPREAD_COL; nC++)			// nC, nR : Cam(or Reelmap) ±âÁØ
+		// 		for(int nC=0; nC<MAX_SPREAD_COL; nC++)			// nC, nR : Cam(or Reelmap) ï¿½ï¿½ï¿½ï¿½
 		// 		{
 		// 			for(int nR=0; nR<MAX_SPREAD_ROW; nR++)
 		// 			{
@@ -1628,7 +1629,7 @@ void CDlgUtil03::DispAlign(int nDir)
 
 void CDlgUtil03::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: ¿©±â¿¡ ¸Þ½ÃÁö Ã³¸®±â ÄÚµå¸¦ Ãß°¡ ¹×/¶Ç´Â ±âº»°ªÀ» È£ÃâÇÕ´Ï´Ù.
+	// TODO: ï¿½ï¿½ï¿½â¿¡ ï¿½Þ½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ ï¿½Úµå¸¦ ï¿½ß°ï¿½ ï¿½ï¿½/ï¿½Ç´ï¿½ ï¿½âº»ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
 	//if (this->IsWindowVisible())
 	//{
 	//	m_bTIM_DISP_STS = FALSE;
@@ -1709,7 +1710,7 @@ void CDlgUtil03::DispResultPtScore(int nCam)
 
 void CDlgUtil03::OnBnClickedBtnJudgeMk()
 {
-	// TODO: ¿©±â¿¡ ÄÁÆ®·Ñ ¾Ë¸² Ã³¸®±â ÄÚµå¸¦ Ãß°¡ÇÕ´Ï´Ù.
+	// TODO: ï¿½ï¿½ï¿½â¿¡ ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ë¸ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ ï¿½Úµå¸¦ ï¿½ß°ï¿½ï¿½Õ´Ï´ï¿½.
 	if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
 	{
 		int nCam = -1;
@@ -1724,11 +1725,11 @@ void CDlgUtil03::OnBnClickedBtnJudgeMk()
 
 		if (nCam < 0)
 		{
-			AfxMessageBox(_T("ÁÂ/¿ì ¸¶Å· Áß ÇÏ³ª¸¦ ¼±ÅÃÇÏ¼¼¿ä."));
+			AfxMessageBox(_T("ï¿½ï¿½/ï¿½ï¿½ ï¿½ï¿½Å· ï¿½ï¿½ ï¿½Ï³ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½."));
 			return;
 		}
 
-		if (IDNO == pView->MsgBox(_T("¹Ì¸¶Å· Å×½ºÆ®¸¦ ÁøÇàÇÏ½Ã°Ú½À´Ï±î?"), 0, MB_YESNO))
+		if (IDNO == pView->MsgBox(_T("ï¿½Ì¸ï¿½Å· ï¿½×½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï½Ã°Ú½ï¿½ï¿½Ï±ï¿½?"), 0, MB_YESNO))
 			return;
 
 #ifdef USE_VISION
@@ -1740,11 +1741,11 @@ void CDlgUtil03::OnBnClickedBtnJudgeMk()
 				pView->m_pDlgMenu02->DispMkPmScore(nCam);
 			if (bRtn && bJudgeMk)
 			{
-				AfxMessageBox(_T("¸¶Å·"));
+				AfxMessageBox(_T("ï¿½ï¿½Å·"));
 			}
 			else if (!bJudgeMk)
 			{
-				AfxMessageBox(_T("¹Ì¸¶Å·"));
+				AfxMessageBox(_T("ï¿½Ì¸ï¿½Å·"));
 			}
 		}
 #endif
@@ -1754,7 +1755,7 @@ void CDlgUtil03::OnBnClickedBtnJudgeMk()
 
 void CDlgUtil03::OnStnClickedStc187()
 {
-	// TODO: ¿©±â¿¡ ÄÁÆ®·Ñ ¾Ë¸² Ã³¸®±â ÄÚµå¸¦ Ãß°¡ÇÕ´Ï´Ù.
+	// TODO: ï¿½ï¿½ï¿½â¿¡ ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ë¸ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ ï¿½Úµå¸¦ ï¿½ß°ï¿½ï¿½Õ´Ï´ï¿½.
 	myStcData[67].SetBkColor(RGB_RED);
 	myStcData[67].RedrawWindow();
 
@@ -1779,7 +1780,7 @@ void CDlgUtil03::OnStnClickedStc187()
 
 void CDlgUtil03::OnStnClickedStc189()
 {
-	// TODO: ¿©±â¿¡ ÄÁÆ®·Ñ ¾Ë¸² Ã³¸®±â ÄÚµå¸¦ Ãß°¡ÇÕ´Ï´Ù.
+	// TODO: ï¿½ï¿½ï¿½â¿¡ ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ë¸ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ ï¿½Úµå¸¦ ï¿½ß°ï¿½ï¿½Õ´Ï´ï¿½.
 	myStcData[68].SetBkColor(RGB_RED);
 	myStcData[68].RedrawWindow();
 
