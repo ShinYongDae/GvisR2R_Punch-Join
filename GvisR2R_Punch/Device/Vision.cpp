@@ -1150,8 +1150,8 @@ void CVision::SelDispReject(HWND hDispCtrl, CRect rtDispCtrl, int nDisplayFitMod
 		if (m_pMilDispReject == NULL)
 		{
 			m_pMilDispReject = m_pMil->AllocDisp();
-			//m_pMil->DisplaySelect(m_pMilDispReject, m_pMilBufReject, hDispCtrl, rtDispCtrl.Width(), rtDispCtrl.Height(), DISPLAY_FIT_MODE_CENTERVIEW);
-			m_pMil->DisplaySelect(m_pMilDispReject, m_pMilBufModel, hDispCtrl, rtDispCtrl.Width(), rtDispCtrl.Height(), DISPLAY_FIT_MODE_CENTERVIEW);
+			m_pMil->DisplaySelect(m_pMilDispReject, m_pMilBufReject, hDispCtrl, rtDispCtrl.Width(), rtDispCtrl.Height(), DISPLAY_FIT_MODE_CENTERVIEW);
+			//m_pMil->DisplaySelect(m_pMilDispReject, m_pMilBufModel, hDispCtrl, rtDispCtrl.Width(), rtDispCtrl.Height(), DISPLAY_FIT_MODE_CENTERVIEW);
 		}
 
 		// Create Overlay
@@ -3357,7 +3357,7 @@ double CVision::CalcCameraPixelSize()
 #endif
 
 //	m_pMil->PatternMatchingAlloc(MilGrabImg->m_MilImageChild);
-	m_pMil->PatternMatchingAlloc(MilGrabImg->m_MilImageChild);
+	m_pMil->PatternMatchingAlloc(MilGrabImg->m_MilImageChild); // 640 x 480 pattern matching model
 	
 
 	// 2. Measure Position
@@ -3709,7 +3709,7 @@ BOOL CVision::GrabIRayple(int nPos, BOOL bDraw) // set Model from cam master for
 	if (dScore < 10.0)
 		dScore = 10.0;
 
-	m_pMil->PatternMatchingAlloc(MilPatRzImg->m_MilImage, dScore);
+	m_pMil->PatternMatchingAlloc(MilPatRzImg->m_MilImage, dScore); // (200 x 200)에서 카메라 해상도로 Resized pattern matching model
 
 	CString str;
 	str.Format(_T("%d [mSec]"), GetTickCount() - dwSt);
@@ -4553,7 +4553,7 @@ BOOL CVision::CheckVerifyPunching(MIL_ID &GrabImgId) // Return FALSE; --> Alarm 
 		if (!Judge(GrabImgId, stRst))
 		{
 			//GetDlgItem(IDC_STC_JUDGE)->SetWindowText(_T("실패"));
-			return FALSE;
+			return TRUE; // 패턴이 인식되지 않으므로 "마킹 됨"으로 판단
 		}
 
 		//CString sVal;
@@ -4609,18 +4609,26 @@ BOOL CVision::Judge(MIL_ID &GrabImgId, stPtMtRst &stRst)
 		long SzY = BlobRst.nBoxBottom - BlobRst.nBoxTop + 2;
 		long StX = BlobRst.nBoxLeft - 1;
 		long StY = BlobRst.nBoxTop - 1;
-		m_pMilBufModel->ChildBuffer2d(StX, StY, SzX, SzY);
+		//m_pMilBufModel->ChildBuffer2d(StX, StY, SzX, SzY);
 		MilPtModelImg = m_pMil->AllocBuf(SzX, SzY, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
 		MbufCopy(m_pMilBufModel->m_MilImageChild, MilPtModelImg->m_MilImage);
 	}
 	else
 	{
-		m_pMilBufModel->ChildBuffer2d(25, 25, 50, 50);
-		MilPtModelImg = m_pMil->AllocBuf(50, 50, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
-		MbufCopy(m_pMilBufModel->m_MilImageChild, MilPtModelImg->m_MilImage);
+		if (MilPtModelImg)
+			delete MilPtModelImg;
+
+		MkMtRst.dX = stRst.dX = 50.0;
+		MkMtRst.dY = stRst.dY = 50.0;
+		MkMtRst.dAngle = stRst.dAngle = 0.0;
+		MkMtRst.dScore = stRst.dScore = 0.0;
+		return TRUE;
+		//m_pMilBufModel->ChildBuffer2d(25, 25, 50, 50);
+		//MilPtModelImg = m_pMil->AllocBuf(50, 50, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
+		//MbufCopy(m_pMilBufModel->m_MilImageChild, MilPtModelImg->m_MilImage);
 	}
 
-	m_pMil->PatternMatchingAlloc(MilPtModelImg->m_MilImage);
+	m_pMil->PatternMatchingAlloc(MilPtModelImg->m_MilImage); // 100 x 100 pattern matching model
 
 	// Measure Position
 	//if (!m_pMil->PatternMatchingAction(m_pMilBufTarget->m_MilImage))//, m_pMilDrawOverlay->m_MilBuffer, m_pMilDrawOverlay->m_MilGraphicContextID))
@@ -4628,6 +4636,11 @@ BOOL CVision::Judge(MIL_ID &GrabImgId, stPtMtRst &stRst)
 	{
 		if (MilPtModelImg)
 			delete MilPtModelImg;
+
+		MkMtRst.dX = stRst.dX = 50.0;
+		MkMtRst.dY = stRst.dY = 50.0;
+		MkMtRst.dAngle = stRst.dAngle = 0.0;
+		MkMtRst.dScore = stRst.dScore = 0.0;
 
 		return FALSE;
 	}
@@ -4642,6 +4655,14 @@ BOOL CVision::Judge(MIL_ID &GrabImgId, stPtMtRst &stRst)
 
 	if (MilPtModelImg)
 		delete MilPtModelImg;
+
+	if (MkMtRst.dScore < 0.0)// 패턴이 인식되지 않으므로 "마킹 됨"으로 판단 
+	{
+		MkMtRst.dX = stRst.dX = 50.0;
+		MkMtRst.dY = stRst.dY = 50.0;
+		MkMtRst.dAngle = stRst.dAngle = 0.0;
+		MkMtRst.dScore = stRst.dScore = 0.0;
+	}
 
 	return TRUE;
 }
@@ -4658,13 +4679,29 @@ BOOL CVision::Judge(MIL_ID &GrabImgId, stPtMtRst &stRst)
 
 void CVision::ShowDispReject()
 {
-	LoadRejectBuf();
-	if (MilBufRejectTemp)
-		MbufCopy(MilBufRejectTemp, m_pMilBufReject->m_MilImage); // connect 200 x 200 Crop Image
+	if (!LoadRejectBuf())
+	{
+		AfxMessageBox(_T("Failed - LoadRejectBuf()"));
+		return;
+	}
+	//if (MilBufRejectTemp)
+	//	MbufCopy(MilBufRejectTemp, m_pMilBufReject->m_MilImage); // connect 200 x 200 Crop Image
 	//DrawCrossOnReject(PIN_IMG_DISP_SIZEX / 2, PIN_IMG_DISP_SIZEY / 2, 14);
 
 	FitSizeBlobModel();
-	BlobRejectModel();
+	if (BlobRejectModel())
+	{
+		long SzX = BlobRst.nBoxRight - BlobRst.nBoxLeft + 2;
+		long SzY = BlobRst.nBoxBottom - BlobRst.nBoxTop + 2;
+		long StX = BlobRst.nBoxLeft - 1;
+		long StY = BlobRst.nBoxTop - 1;
+		m_pMilBufModel->ChildBuffer2d(StX, StY, SzX, SzY); // Blob된 이미지의 크기로 Crop
+	}
+	else
+	{
+		AfxMessageBox(_T("Failed - BlobRejectModel()"));
+		return;
+	}
 
 	//if (m_pMilBufRejectRz->m_MilImage)
 	//	MbufCopy(m_pMilBufModel->m_MilImage, m_pMilBufModel->m_MilImage);
@@ -4792,13 +4829,13 @@ void CVision::InitRejectBuf()
 // pCamMstModelImg -> pRejectImg
 // ShowBlobModel() -> FitSizeBlobModel()
 
-void CVision::LoadRejectBuf()
+BOOL CVision::LoadRejectBuf()
 {
 	//InitRejectBuf();
-	AllocRejectBuf();
+	AllocRejectBuf(); // MilRejectImgBuf , MilBufRejectTemp
 
 	if (!MilRejectImgBuf)
-		return;
+		return FALSE;
 
 	UCHAR *pRejectImg;
 	if (m_nIdx == 0 || m_nIdx == 1)
@@ -4834,6 +4871,11 @@ void CVision::LoadRejectBuf()
 			}
 		}
 	}
+
+	if (MilBufRejectTemp)
+		MbufCopy(MilBufRejectTemp, m_pMilBufReject->m_MilImage); // connect 200 x 200 Crop Image
+
+	return TRUE;
 }
 
 // m_MilBufCamMstModel -> MilRejectImgBuf
@@ -4858,13 +4900,20 @@ BOOL CVision::FitSizeBlobModel()
 		m_pMilBufRejectRz = NULL;
 	}
 
+	if (m_pMilBufModel)
+	{
+		delete m_pMilBufModel;
+		m_pMilBufModel = NULL;
+	}
+
+	// Cropping From CamMaster Model To Pattern Matching Model Size.
 	CLibMilBuf *MilBlobGrayImg = m_pMil->AllocBuf(PIN_IMG_DISP_SIZEX, PIN_IMG_DISP_SIZEY, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
 	m_pMilBufRejectRz = m_pMil->AllocBuf(lSzX, lSzY, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
 	MimBinarize(m_pMilBufReject->m_MilImage, MilBlobGrayImg->m_MilImage, M_GREATER, 0, 0);
 	MimResize(MilBlobGrayImg->m_MilImage, m_pMilBufRejectRz->m_MilImage, dRsRtoX, dRsRtoY, M_DEFAULT);
 
-	// Cropping From CamMaster Model To Pattern Matching Model Size.
 	MIL_ID MilBufCamMstModelCrop = M_NULL, MilBufCamMstModelCropCopy = M_NULL;
+	m_pMilBufModel = m_pMil->AllocBuf(3, DEF_IMG_DISP_SIZEX, DEF_IMG_DISP_SIZEY, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
 	MbufChild2d(m_pMilBufRejectRz->m_MilImage, (lSzX - DEF_IMG_DISP_SIZEX) / 2, (lSzY - DEF_IMG_DISP_SIZEY) / 2, DEF_IMG_DISP_SIZEX, DEF_IMG_DISP_SIZEY, &MilBufCamMstModelCrop);
 	MbufChild2d(m_pMilBufModel->m_MilImage, 0, 0, DEF_IMG_DISP_SIZEX, DEF_IMG_DISP_SIZEY, &MilBufCamMstModelCropCopy); // 100 x 100 pattern matching model
 

@@ -1444,6 +1444,14 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	//}
 
 
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("LogPath"), NULL, szData, sizeof(szData), sPath))
+		WorkingInfo.System.sPathLog = CString(szData);
+	else
+	{
+		//pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Log 파일 Path가 설정되어 있지 않습니다."), MB_ICONWARNING | MB_OK);
+		WorkingInfo.System.sPathLog = CString(_T("D:\\Log"));
+	}
+
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("VrsOldFileDirPath"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.System.sPathOldFile = CString(szData);
 	else
@@ -12661,48 +12669,54 @@ void CGvisR2R_PunchDoc::LogAuto(CString strMsg, int nType)
 	CSafeLockDoc lock(&g_LogLockAuto);
 
 	TCHAR szFile[MAX_PATH] = { 0, };
-	TCHAR szPath[MAX_PATH] = { 0, };
-	TCHAR* pszPos = NULL;
+	//TCHAR szPath[MAX_PATH] = { 0, };
+	//TCHAR* pszPos = NULL;
 
-	_stprintf(szPath, PATH_LOG);
-	if (!DirectoryExists(szPath))
-		CreateDirectory(szPath, NULL);
+	CString sPath = WorkingInfo.System.sPathLog;
 
-	_stprintf(szPath, PATH_LOG_AUTO);
-	if (!DirectoryExists(szPath))
-		CreateDirectory(szPath, NULL);
+	if (!DirectoryExists(sPath))
+		CreateDirectory(sPath, NULL);
+
+	//_stprintf(szPath, PATH_LOG);
+	//if (!DirectoryExists(szPath))
+	//	CreateDirectory(szPath, NULL);
+
+	//_stprintf(szPath, PATH_LOG_AUTO);
+	//if (!DirectoryExists(szPath))
+	//	CreateDirectory(szPath, NULL);
 
 	COleDateTime time = COleDateTime::GetCurrentTime();
 
 	switch (nType)
 	{
 	case 0:
-		_stprintf(szFile, _T("%s\\%s.txt"), szPath, COleDateTime::GetCurrentTime().Format(_T("%Y%m%d")));
+		_stprintf(szFile, _T("%s\\%s.txt"), sPath, COleDateTime::GetCurrentTime().Format(_T("%Y%m%d")));
+		//_stprintf(szFile, _T("%s\\%s.txt"), szPath, COleDateTime::GetCurrentTime().Format(_T("%Y%m%d")));
 		break;
 	}
 
 	CString strDate;
-	CString strContents;
+	CString strContents = _T("");
 	CTime now;
 
 	strDate.Format(_T("%s: "), COleDateTime::GetCurrentTime().Format(_T("%Y/%m/%d %H:%M:%S")));
 	strContents = strDate;
 	strContents += strMsg;
 	strContents += _T("\r\n");
-	strContents += _T("\r\n");
+	//strContents += _T("\r\n");
 
 	CFile file;
 
 	if (file.Open(szFile, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeWrite | CFile::shareDenyNone) == 0)
 		return;
 
-	char cameraKey[1024];
-	StringToChar(strContents, cameraKey);
+	char cData[MAX_PATH];
+	StringToChar(strContents, cData);
 
 	file.SeekToEnd();
 	int nLenth = strContents.GetLength();
-	int nLenth2 = strlen(cameraKey);
-	file.Write(cameraKey, nLenth2);
+	int nLenth2 = strlen(cData);
+	file.Write(cData, nLenth2);
 	file.Flush();
 	file.Close();
 }

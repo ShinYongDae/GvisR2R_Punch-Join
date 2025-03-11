@@ -164,14 +164,11 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "GvisR2R_Punch 정보"
 FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    ICON            IDR_MAINFRAME,IDC_STATIC,14,14,20,20
-    LTEXT           "GvisR2R_Punch, 버전 2.1.0",IDC_STATIC,42,14,114,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2024.03.07",IDC_STATIC,42,23,114,8
-    DEFPUSHBUTTON   "확인",IDOK,113,40,50,14,WS_GROUP
-    LTEXT           "마킹 얼라인 정밀도 향상-4PtAlign",IDC_STATIC,6,33,106,8
-    LTEXT           "미마킹 확인 기능 && 충돌방지",IDC_STATIC,6,40,102,8
-    LTEXT           "캠마스터 토크리스트 적용",IDC_STATIC,6,47,102,8
-    LTEXT           "불량이미지에 시리얼추가 && 마킹여부 확인시 충돌방지",IDC_STATIC,6,54,157,8
+    ICON            IDR_MAINFRAME,IDC_STATIC,14,7,18,18
+    LTEXT           "GvisR2R_Punch, 버전 2.1.0",IDC_STATIC,42,7,114,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2024.03.11",IDC_STATIC,42,16,114,8
+    DEFPUSHBUTTON   "확인",IDOK,113,43,50,14,WS_GROUP
+    LTEXT           "미마킹 테스트 중 마킹이미지가 날아간 경우 패치",IDC_STATIC,9,29,139,8
 END
 
 IDD_GVISR2R_PUNCH_FORM DIALOGEX 0, 0, 630, 461

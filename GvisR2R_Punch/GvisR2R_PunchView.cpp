@@ -1229,7 +1229,7 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 		//if (!(pDoc->m_pMpeSignal[20] & (0x01 << 11)))	// 일시정지사용(PC가 On시키고, PLC가 확인하고 Off시킴)-20141031
 		if (!bTempStop)	// 일시정지사용(PC가 On시키고, PLC가 확인하고 Off시킴)-20141031
 		{
-			pDoc->LogAuto(_T("PC: 일시정지 OFF"));
+			//pDoc->LogAuto(_T("마킹부 일시정지 OFF"));
 			m_bTIM_CHK_TEMP_STOP = FALSE;
 			m_pDlgMenu01->SetTempStop(FALSE);
 		}
@@ -3341,8 +3341,8 @@ void CGvisR2R_PunchView::ChkShareVsUp()
 		str.Format(_T("US: %d"), nSerial);
 		pDoc->Status.PcrShareVs[0].bExist = TRUE;
 		pDoc->Status.PcrShareVs[0].nSerial = nSerial;
-		str2.Format(_T("PCR파일 Received from VS - US: %d"), nSerial);
-		pDoc->LogAuto(str2);
+		//str2.Format(_T("PCR파일 Received from VS - US: %d"), nSerial);
+		//pDoc->LogAuto(str2);
 	}
 	else
 	{
@@ -3371,8 +3371,8 @@ void CGvisR2R_PunchView::ChkShareVsDn()
 		str.Format(_T("DS: %d"), nSerial);
 		pDoc->Status.PcrShareVs[1].bExist = TRUE;
 		pDoc->Status.PcrShareVs[1].nSerial = nSerial;
-		str2.Format(_T("PCR파일 Received from VS - DS: %d"), nSerial);
-		pDoc->LogAuto(str2);
+		//str2.Format(_T("PCR파일 Received from VS - DS: %d"), nSerial);
+		//pDoc->LogAuto(str2);
 	}
 	else
 	{
@@ -3501,11 +3501,11 @@ void CGvisR2R_PunchView::ChkShareUp()
 		str.Format(_T("US: %d"), nSerial);
 		pDoc->Status.PcrShare[0].bExist = TRUE;
 		pDoc->Status.PcrShare[0].nSerial = nSerial;
-		if (m_pMpe)
-		{
-			str2.Format(_T("PCR파일 Received - US: %d"), nSerial);
-			pDoc->LogAuto(str2);
-		}
+		//if (m_pMpe)
+		//{
+		//	str2.Format(_T("PCR파일 Received - US: %d"), nSerial);
+		//	pDoc->LogAuto(str2);
+		//}
 	}
 	else
 	{
@@ -3560,11 +3560,11 @@ void CGvisR2R_PunchView::ChkShareDn()
 		str.Format(_T("DS: %d"), nSerial);
 		pDoc->Status.PcrShare[1].bExist = TRUE;
 		pDoc->Status.PcrShare[1].nSerial = nSerial;
-		if (m_pMpe)
-		{
-			str2.Format(_T("PCR파일 Received - DS: %d"), nSerial);
-			pDoc->LogAuto(str2);
-		}
+		//if (m_pMpe)
+		//{
+		//	str2.Format(_T("PCR파일 Received - DS: %d"), nSerial);
+		//	pDoc->LogAuto(str2);
+		//}
 	}
 	else
 	{
@@ -5267,7 +5267,7 @@ void CGvisR2R_PunchView::DoIO()
 		//MyMsgBox(pDoc->m_sAlmMsg);
 		if (!pDoc->m_sAlmMsg.IsEmpty())
 		{
-			pDoc->LogAuto(pDoc->m_sAlmMsg);
+			//pDoc->LogAuto(pDoc->m_sAlmMsg);
 			MsgBox(pDoc->m_sAlmMsg, 0, MB_OK, DEFAULT_TIME_OUT, FALSE);
 			MpeWrite(_T("MB400183"), 1); // 알람메시지 확인
 
@@ -8185,19 +8185,23 @@ void CGvisR2R_PunchView::Shift2DummyBuf()
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
 	CString sSrc, sDest;
 	int nSerial;
+	CFileFind findfile;
 
 	sSrc = pDoc->WorkingInfo.System.sPathVrsShareUp;
 	sDest = pDoc->WorkingInfo.System.sPathVsDummyBufUp;
 
-	if (pDoc->m_pFile)
+	if (findfile.FindFile(sSrc))
 	{
-		nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
-		pDoc->m_pFile->DelPcr(sSrc, nSerial);
-		if (nSerial > 0)
+		if (pDoc->m_pFile)
 		{
-			MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiUp, (long)nSerial);	// 검사한 Panel의 AOI 상 Serial
-			Sleep(300);
-			MpeWrite(Plc.DlgMenu03.PcrReceivedAoiUp, 1); // AOI 상 : PCR파일 Received
+			nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
+			pDoc->m_pFile->DelPcr(sSrc, nSerial);
+			if (nSerial > 0)
+			{
+				MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiUp, (long)nSerial);	// 검사한 Panel의 AOI 상 Serial
+				Sleep(30);
+				MpeWrite(Plc.DlgMenu03.PcrReceivedAoiUp, 1); // AOI 상 : PCR파일 Received
+			}
 		}
 	}
 
@@ -8206,16 +8210,18 @@ void CGvisR2R_PunchView::Shift2DummyBuf()
 		sSrc = pDoc->WorkingInfo.System.sPathVrsShareDn;
 		sDest = pDoc->WorkingInfo.System.sPathVsDummyBufDn;
 
-		if (pDoc->m_pFile)
+		if (findfile.FindFile(sSrc))
 		{
-			nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
-			pDoc->m_pFile->DelPcr(sSrc, nSerial);
-			if (nSerial > 0)
+			if (pDoc->m_pFile)
 			{
-				MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn , (long)nSerial);	// 검사한 Panel의 AOI 하 Serial
-				//MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn , (long)GetAoiDnAutoSerial() - 1);	// 검사한 Panel의 AOI 하 Serial
-				Sleep(300);
-				MpeWrite(Plc.DlgMenu03.PcrReceivedAoiDn, 1); // AOI 하 : PCR파일 Received
+				nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
+				pDoc->m_pFile->DelPcr(sSrc, nSerial);
+				if (nSerial > 0)
+				{
+					MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn, (long)nSerial);	// 검사한 Panel의 AOI 하 Serial
+					Sleep(30);
+					MpeWrite(Plc.DlgMenu03.PcrReceivedAoiDn, 1); // AOI 하 : PCR파일 Received
+				}
 			}
 		}
 	}
@@ -8226,48 +8232,62 @@ void CGvisR2R_PunchView::Shift2Buf()	// 버퍼폴더의 마지막 시리얼과 Share폴더의 �
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
 	CString sSrc, sDest;
 	int nSerial;
+	CFileFind findfile;
 
 	if (pDoc->m_bVsStatusUp)
 	{
 		sSrc = pDoc->WorkingInfo.System.sPathVsShareUp;
 		sDest = pDoc->WorkingInfo.System.sPathVrsBufUp;
-		if (pDoc->m_pFile)
+
+		if (findfile.FindFile(sSrc))
 		{
-			nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
-			if (nSerial > 0)
-				m_nShareUpS = nSerial;
-			pDoc->m_pFile->DelPcr(sSrc, nSerial);
+			if (pDoc->m_pFile)
+			{
+				nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
+				if (nSerial > 0)
+					m_nShareUpS = nSerial;
+				pDoc->m_pFile->DelPcr(sSrc, nSerial);
+				SetListBuf();
+			}
 		}
 		if (bDualTest)
 		{
 			sSrc = pDoc->WorkingInfo.System.sPathVsShareDn;
 			sDest = pDoc->WorkingInfo.System.sPathVrsBufDn;
-			if (pDoc->m_pFile)
+			if (findfile.FindFile(sSrc))
 			{
-				nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
-				if(nSerial > 0)
-					m_nShareDnS = nSerial;
-				pDoc->m_pFile->DelPcr(sSrc, nSerial);
+				if (pDoc->m_pFile)
+				{
+					nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
+					if (nSerial > 0)
+						m_nShareDnS = nSerial;
+					pDoc->m_pFile->DelPcr(sSrc, nSerial);
+					SetListBuf();
+				}
 			}
 		}
 
-		SetListBuf();
+		//SetListBuf();
 	}
 	else
 	{
 		sSrc = pDoc->WorkingInfo.System.sPathVrsShareUp;
 		sDest = pDoc->WorkingInfo.System.sPathVrsBufUp;
 
-		if (pDoc->m_pFile)
+		if (findfile.FindFile(sSrc))
 		{
-			nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
-			pDoc->m_pFile->DelPcr(sSrc, nSerial);
-			if (nSerial > 0)
+			if (pDoc->m_pFile)
 			{
-				m_nShareUpS = nSerial;
-				MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiUp, (long)nSerial);	// 검사한 Panel의 AOI 상 Serial
-				Sleep(300);
-				MpeWrite(Plc.DlgMenu03.PcrReceivedAoiUp, 1); // AOI 상 : PCR파일 Received
+				nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
+				pDoc->m_pFile->DelPcr(sSrc, nSerial);
+				if (nSerial > 0)
+				{
+					m_nShareUpS = nSerial;
+					MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiUp, (long)nSerial);	// 검사한 Panel의 AOI 상 Serial
+					Sleep(30);
+					MpeWrite(Plc.DlgMenu03.PcrReceivedAoiUp, 1); // AOI 상 : PCR파일 Received
+				}
+				SetListBuf();
 			}
 		}
 
@@ -8276,22 +8296,26 @@ void CGvisR2R_PunchView::Shift2Buf()	// 버퍼폴더의 마지막 시리얼과 Share폴더의 �
 			sSrc = pDoc->WorkingInfo.System.sPathVrsShareDn;
 			sDest = pDoc->WorkingInfo.System.sPathVrsBufDn;
 
-			if (pDoc->m_pFile)
+			if (findfile.FindFile(sSrc))
 			{
-				nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
-				pDoc->m_pFile->DelPcr(sSrc, nSerial);
-				if (nSerial > 0)
+				if (pDoc->m_pFile)
 				{
-					m_nShareDnS = nSerial;
-					MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn , (long)nSerial);	// 검사한 Panel의 AOI 하 Serial
-					//MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn , (long)GetAoiDnAutoSerial() - 1);	// 검사한 Panel의 AOI 하 Serial
-					Sleep(300);
-					MpeWrite(Plc.DlgMenu03.PcrReceivedAoiDn, 1); // AOI 하 : PCR파일 Received
+					nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
+					pDoc->m_pFile->DelPcr(sSrc, nSerial);
+					if (nSerial > 0)
+					{
+						m_nShareDnS = nSerial;
+						MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn, (long)nSerial);	// 검사한 Panel의 AOI 하 Serial
+						//MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn , (long)GetAoiDnAutoSerial() - 1);	// 검사한 Panel의 AOI 하 Serial
+						Sleep(30);
+						MpeWrite(Plc.DlgMenu03.PcrReceivedAoiDn, 1); // AOI 하 : PCR파일 Received
+					}
+					SetListBuf();
 				}
 			}
 		}
 
-		SetListBuf();
+		//SetListBuf();
 	}
 }
 
@@ -8815,7 +8839,7 @@ BOOL CGvisR2R_PunchView::IsTestDone()
 	{
 		if (bOn0 && bOn1)
 		{
-			pDoc->LogAuto(_T("PLC: 검사부 상(X4328) & 하(X4428) 검사 완료"));
+			//pDoc->LogAuto(_T("PLC: 검사부 상(X4328) & 하(X4428) 검사 완료"));
 			return TRUE;
 		}
 	}
@@ -8823,7 +8847,7 @@ BOOL CGvisR2R_PunchView::IsTestDone()
 	{
 		if (bOn0)
 		{
-			pDoc->LogAuto(_T("PLC: 검사부 상(X4328) 검사 완료"));
+			//pDoc->LogAuto(_T("PLC: 검사부 상(X4328) 검사 완료"));
 			return TRUE;
 		}
 	}
@@ -8849,7 +8873,7 @@ BOOL CGvisR2R_PunchView::IsAoiTblVacDone()
 	{
 		if (bOn0 && bOn1)
 		{
-			pDoc->LogAuto(_T("PLC: 검사부 상(X4329) & 하(X4329) 테이블 진공 완료"));
+			//pDoc->LogAuto(_T("PLC: 검사부 상(X4329) & 하(X4329) 테이블 진공 완료"));
 			return TRUE;
 		}
 	}
@@ -8857,7 +8881,7 @@ BOOL CGvisR2R_PunchView::IsAoiTblVacDone()
 	{
 		if (bOn0)
 		{
-			pDoc->LogAuto(_T("PLC: 검사부 상(X4329) 테이블 진공 완료"));
+			//pDoc->LogAuto(_T("PLC: 검사부 상(X4329) 테이블 진공 완료"));
 			return TRUE;
 		}
 	}
@@ -8875,31 +8899,31 @@ BOOL CGvisR2R_PunchView::IsAoiTblVacDone()
 
 BOOL CGvisR2R_PunchView::IsTestDoneUp()
 {
-#ifdef USE_MPE
-	BOOL bOn0 = (pDoc->m_pMpeIb[10] & (0x01 << 8)) ? TRUE : FALSE;	// 검사부 상 검사 완료 <-> X4328 I/F
-	if (bOn0)
-	{
-		pDoc->LogAuto(_T("PLC: 검사부 상(X4328) 검사 완료"));
-		return TRUE;
-	}
-#endif
+//#ifdef USE_MPE
+//	BOOL bOn0 = (pDoc->m_pMpeIb[10] & (0x01 << 8)) ? TRUE : FALSE;	// 검사부 상 검사 완료 <-> X4328 I/F
+//	if (bOn0)
+//	{
+//		//pDoc->LogAuto(_T("PLC: 검사부 상(X4328) 검사 완료"));
+//		return TRUE;
+//	}
+//#endif
 	return TRUE;
 }
 
 BOOL CGvisR2R_PunchView::IsTestDoneDn()
 {
-#ifdef USE_MPE
-	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
-	if (!bDualTest)
-		return TRUE;
-
-	BOOL bOn1 = (pDoc->m_pMpeIb[14] & (0x01 << 8)) ? TRUE : FALSE;	// 검사부 하 검사 완료 <-> X4428 I/F
-	if (bOn1)
-	{
-		pDoc->LogAuto(_T("PLC: 검사부 하(X4428) 검사 완료"));
-		return TRUE;
-	}
-#endif
+//#ifdef USE_MPE
+//	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
+//	if (!bDualTest)
+//		return TRUE;
+//
+//	BOOL bOn1 = (pDoc->m_pMpeIb[14] & (0x01 << 8)) ? TRUE : FALSE;	// 검사부 하 검사 완료 <-> X4428 I/F
+//	if (bOn1)
+//	{
+//		pDoc->LogAuto(_T("PLC: 검사부 하(X4428) 검사 완료"));
+//		return TRUE;
+//	}
+//#endif
 	return TRUE;
 }
 
@@ -11373,7 +11397,7 @@ CString CGvisR2R_PunchView::GetMkInfo0(int nSerial, int nMkPcs) // return Cam0 :
 		if (nPcsIdx < 0)
 		{
 			MsgBox(_T("외층 작업에서 좌측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
-			pDoc->LogAuto(_T("외층 작업에서 좌측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
+			//pDoc->LogAuto(_T("외층 작업에서 좌측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
 			sInfo.Format(_T("%04d_%c_%d_%d"), nSerial, '?', 0, 0);
 			return sInfo;
 		}
@@ -11400,7 +11424,7 @@ CString CGvisR2R_PunchView::GetMkInfo0(int nSerial, int nMkPcs) // return Cam0 :
 		if (nPcsIdx < 0)
 		{
 			MsgBox(_T("양면or내층 작업에서 좌측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
-			pDoc->LogAuto(_T("양면or내층 작업에서 좌측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
+			//pDoc->LogAuto(_T("양면or내층 작업에서 좌측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
 			sInfo.Format(_T("%04d_%c_%d_%d"), nSerial, '?', 0, 0);
 			return sInfo;
 		}
@@ -11450,7 +11474,7 @@ CString CGvisR2R_PunchView::GetMkInfo1(int nSerial, int nMkPcs) // return Cam1 :
 		if (nPcsIdx < 0)
 		{
 			MsgBox(_T("외층 작업에서 우측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
-			pDoc->LogAuto(_T("외층 작업에서 우측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
+			//pDoc->LogAuto(_T("외층 작업에서 우측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
 			sInfo.Format(_T("%04d_%c_%d_%d"), nSerial, '?', 0, 0);
 			return sInfo;
 		}
@@ -11477,7 +11501,7 @@ CString CGvisR2R_PunchView::GetMkInfo1(int nSerial, int nMkPcs) // return Cam1 :
 		if (nPcsIdx < 0)
 		{
 			MsgBox(_T("양면or내층 작업에서 우측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
-			pDoc->LogAuto(_T("양면or내층 작업에서 우측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
+			//pDoc->LogAuto(_T("양면or내층 작업에서 우측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
 			sInfo.Format(_T("%04d_%c_%d_%d"), nSerial, '?', 0, 0);
 			return sInfo;
 		}
@@ -16152,7 +16176,7 @@ void CGvisR2R_PunchView::DoAtuoGetMkStSignal()
 
 				if (bMk1 || m_bMkStSw[1])	// 마킹시작(PC가 확인하고 Reset시킴.)
 				{
-					pDoc->LogAuto(_T("PLC: 마킹시작 #1 (PC가 확인하고 Reset시킴.)"));
+					//pDoc->LogAuto(_T("PLC: 마킹시작 #1 (PC가 확인하고 Reset시킴.)"));
 					m_bMkStSw[1] = FALSE;
 					MpeWrite(Plc.DlgMenu01.MarkingStart, 0);			// 마킹시작(PC가 확인하고 Reset시킴.)
 					Sleep(30);
@@ -16167,7 +16191,7 @@ void CGvisR2R_PunchView::DoAtuoGetMkStSignal()
 				}
 				else if (bMk0 || m_bMkStSw[0])	// 마킹시작(PC가 확인하고 Reset시킴.)
 				{
-					pDoc->LogAuto(_T("PLC: 마킹시작 #0 (PC가 확인하고 Reset시킴.)"));
+					//pDoc->LogAuto(_T("PLC: 마킹시작 #0 (PC가 확인하고 Reset시킴.)"));
 					m_bMkStSw[0] = FALSE;
 					MpeWrite(Plc.DlgMenu01.MarkingStart, 0);			// 마킹시작(PC가 확인하고 Reset시킴.)
 					Sleep(30);
@@ -16201,7 +16225,7 @@ void CGvisR2R_PunchView::DoAutoSetLastProcAtPlc()
 			}
 			break;
 		case LAST_PROC + 1:
-			pDoc->LogAuto(_T("PC: 잔량처리(PC가 On시키고, PLC가 확인하고 Off시킴)"));
+			//pDoc->LogAuto(_T("PC: 잔량처리(PC가 On시키고, PLC가 확인하고 Off시킴)"));
 			MpeWrite(Plc.DlgMenu01.DoLastJob, 1);			// 잔량처리(PC가 On시키고, PLC가 확인하고 Off시킴)-20141031
 			m_nLastProcAuto++;
 			break;
@@ -16231,7 +16255,7 @@ void CGvisR2R_PunchView::DoAutoSetFdOffsetLastProc()
 		m_bAoiTestF[0] = FALSE; pDoc->SetStatus(_T("General"), _T("bAoiTestF[0]"), m_bAoiTestF[0]);
 		m_bAoiFdWriteF[0] = FALSE; pDoc->SetStatus(_T("General"), _T("bAoiFdWriteF[0]"), m_bAoiFdWriteF[0]);
 		MpeWrite(Plc.DlgFrameHigh.FeedOffsetWriteDoneAoiUp, 0); // 검사부(상) Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)-20141103
-		pDoc->LogAuto(_T("PLC: 검사부(상) Feeding Offset Write 완료(PC가 확인하고 MB440111 Reset시킴.)"));
+		//pDoc->LogAuto(_T("PLC: 검사부(상) Feeding Offset Write 완료(PC가 확인하고 MB440111 Reset시킴.)"));
 	}
 
 	if (bOn1 && !(m_Flag & (0x01 << 3)))
@@ -16247,7 +16271,7 @@ void CGvisR2R_PunchView::DoAutoSetFdOffsetLastProc()
 		m_bAoiTestF[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bAoiTestF[1]"), m_bAoiTestF[1]);
 		m_bAoiFdWriteF[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bAoiFdWriteF[1]"), m_bAoiFdWriteF[1]);
 		MpeWrite(Plc.DlgFrameHigh.FeedOffsetWriteDoneAoiDn, 0); // 검사부(하) Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)-20141103
-		pDoc->LogAuto(_T("PLC: 검사부(하) Feeding Offset Write 완료(PC가 확인하고 MB440112 Reset시킴.)"));
+		//pDoc->LogAuto(_T("PLC: 검사부(하) Feeding Offset Write 완료(PC가 확인하고 MB440112 Reset시킴.)"));
 	}
 #endif
 }
@@ -16275,7 +16299,7 @@ void CGvisR2R_PunchView::DoAutoSetFdOffset()
 		m_bAoiFdWriteF[0] = FALSE; pDoc->SetStatus(_T("General"), _T("bAoiFdWriteF[0]"), pView->m_bAoiFdWriteF[0]);
 
 		//MpeWrite(Plc.DlgFrameHigh.FeedOffsetWriteDoneAoiUp, 0); // 검사부(상) Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)-20141103
-		pDoc->LogAuto(_T("PLC: 검사부(상) Feeding Offset Write 완료(PC가 확인하고 MB440111 Reset시킴.)"));
+		//pDoc->LogAuto(_T("PLC: 검사부(상) Feeding Offset Write 완료(PC가 확인하고 MB440111 Reset시킴.)"));
 	}
 
 	BOOL bOnTestDn = MpeRead(_T("MB40023D")); // PLC AOI 하 검사 중
@@ -16294,7 +16318,7 @@ void CGvisR2R_PunchView::DoAutoSetFdOffset()
 		m_bAoiTest[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bAoiTest[1]"), m_bAoiTest[1]);
 		m_bAoiFdWriteF[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bAoiFdWriteF[1]"), m_bAoiFdWriteF[1]);
 		//MpeWrite(Plc.DlgFrameHigh.FeedOffsetWriteDoneAoiDn, 0); // 검사부(하) Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)
-		pDoc->LogAuto(_T("PLC: 검사부(하) Feeding Offset Write 완료(PC가 확인하고 MB440112 Reset시킴.)"));
+		//pDoc->LogAuto(_T("PLC: 검사부(하) Feeding Offset Write 완료(PC가 확인하고 MB440112 Reset시킴.)"));
 	}
 
 	BOOL bOffsetDoneUp = MpeRead(_T("MB40024D")); // PLC AOI 상 피딩 Offset Write(GUI Off)
@@ -16357,7 +16381,7 @@ void CGvisR2R_PunchView::DoAutoSetFdOffset()
 
 			MpeWrite(Plc.DlgFrameHigh.FeedOffsetWriteDoneAoiUp, 0); // 검사부(상) Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)-20141103
 			MpeWrite(Plc.DlgFrameHigh.FeedOffsetWriteDoneAoiDn, 0); // 검사부(하) Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)-20141103
-			pDoc->LogAuto(_T("PLC: 검사부(상MB440111,하MB440112) Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)"));
+			//pDoc->LogAuto(_T("PLC: 검사부(상MB440111,하MB440112) Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)"));
 		}
 		else if ((!m_bAoiFdWrite[0] && !m_bAoiFdWrite[1]) && (m_bAoiFdWriteF[0] && m_bAoiFdWriteF[1]))
 		{
@@ -16392,7 +16416,7 @@ void CGvisR2R_PunchView::DoAutoSetFdOffset()
 					MpeWrite(Plc.DlgFrameHigh.FeedOffsetAoiUp, (long)(-1.0*OfStUp.x*1000.0));
 				}
 				MpeWrite(Plc.DlgFrameHigh.FeedOffsetWriteDoneAoiUp, 0); // 검사부(상) Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)-20141103
-				pDoc->LogAuto(_T("PLC: 검사부(상MB440111) Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)"));
+				//pDoc->LogAuto(_T("PLC: 검사부(상MB440111) Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)"));
 			}
 			else if (!m_bAoiFdWrite[0] && m_bAoiFdWriteF[0])
 			{
@@ -16422,7 +16446,7 @@ void CGvisR2R_PunchView::DoAutoSetFdOffset()
 					//else
 					//	MpeWrite(Plc.DlgFrameHigh.FeedOffsetAoiUp, (long)(-1.0*OfStDn.x*1000.0));
 					MpeWrite(Plc.DlgFrameHigh.FeedOffsetWriteDoneAoiDn, 0); // 검사부(하) Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)-20141103
-					pDoc->LogAuto(_T("PLC: 검사부(하MB440112) Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)"));
+					//pDoc->LogAuto(_T("PLC: 검사부(하MB440112) Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)"));
 				}
 			}
 			else if (!m_bAoiFdWrite[1] && m_bAoiFdWriteF[1])
@@ -16454,7 +16478,7 @@ void CGvisR2R_PunchView::DoAutoSetFdOffset()
 
 			MpeWrite(Plc.DlgFrameHigh.FeedOffsetWriteDoneAoiUp, 0); // 검사부(상) Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)-20141103
 			MpeWrite(Plc.DlgFrameHigh.FeedOffsetWriteDoneAoiDn, 0); // 검사부(하) Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)-20141103  // 20160721-syd-temp
-			pDoc->LogAuto(_T("PLC: 검사부(상MB440111,하MB440112) Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)"));
+			//pDoc->LogAuto(_T("PLC: 검사부(상MB440111,하MB440112) Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)"));
 		}
 		else if (!m_bAoiFdWrite[0] && m_bAoiFdWriteF[0])
 		{
@@ -16493,7 +16517,7 @@ void CGvisR2R_PunchView::DoAutoSetFdOffset()
 
 			MpeWrite(Plc.DlgFrameHigh.FeedOffsetEngrave, (long)(-1.0*dAveX*1000.0));	// 각인부 Feeding 롤러 Offset(*1000, +:더 보냄, -덜 보냄)
 			MpeWrite(Plc.DlgFrameHigh.FeedOffsetWriteDoneEngrave, 0); // 각인부 Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)-20141103
-			pDoc->LogAuto(_T("PLC: 각인부 Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)"));
+			//pDoc->LogAuto(_T("PLC: 각인부 Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)"));
 		}
 		else if (!m_bEngFdWrite && m_bEngFdWriteF)
 		{
@@ -16520,7 +16544,7 @@ void CGvisR2R_PunchView::DoAutoSetFdOffset()
 
 		MpeWrite(pView->Plc.DlgFrameHigh.FeedOffsetPunch, (long)(-1.0 * dAveX * 1000.0));	// 마킹부 Feeding 롤러 Offset(*1000, +:더 보냄, -덜 보냄)
 		MpeWrite(Plc.DlgFrameHigh.FeedOffsetWriteDonePunch, 0); // 마킹부 Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)
-		pDoc->LogAuto(_T("PLC: 마킹부 Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)"));
+		//pDoc->LogAuto(_T("PLC: 마킹부 Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)"));
 	}
 	else if (!m_bMkFdWrite && m_bMkFdWriteF)
 	{
@@ -16539,7 +16563,7 @@ void CGvisR2R_PunchView::DoAutoChkCycleStop()
 		TowerLamp(RGB_YELLOW, TRUE);
 		if (!pDoc->m_sAlmMsg.IsEmpty())
 		{
-			pDoc->LogAuto(pDoc->m_sAlmMsg);
+			//pDoc->LogAuto(pDoc->m_sAlmMsg);
 			MsgBox(pDoc->m_sAlmMsg, 0, MB_OK, DEFAULT_TIME_OUT, FALSE);
 			MpeWrite(_T("MB400183"), 1); // 알람메시지 확인
 
@@ -18663,7 +18687,7 @@ void CGvisR2R_PunchView::Mk2PtReady()
 		case MK_ST:	// PLC MK 신호 확인	
 			if (IsRun())
 			{
-				pDoc->LogAuto(_T("PC: 마킹부 마킹중 ON (PC가 ON, OFF)"));
+				//pDoc->LogAuto(_T("PC: 마킹부 마킹중 ON (PC가 ON, OFF)"));
 				MpeWrite(Plc.DlgMenu01.MarkingDoing, 1);// 마킹부 마킹중 ON (PC가 ON, OFF)
 #ifdef USE_SR1000W
 				if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
@@ -19061,7 +19085,7 @@ void CGvisR2R_PunchView::Mk2PtInit()
 					if ((m_nBufUpSerial[0] < m_nLotEndSerial/* || m_nBufUpSerial[1] < m_nLotEndSerial*/) && m_nLotEndSerial > 0) // Left
 					{
 						//MpeWrite(Plc.DlgMenu01.MarkingInitDone, 1); // 마킹부 작업완료.(PC가 On, PLC가 확인 후 Off)
-						pDoc->LogAuto(_T("PC: 마킹부 작업완료.(PC가 On, PLC가 확인 후 Off)"));
+						//pDoc->LogAuto(_T("PC: 마킹부 작업완료.(PC가 On, PLC가 확인 후 Off)"));
 					}
 				}
 				else
@@ -19069,7 +19093,7 @@ void CGvisR2R_PunchView::Mk2PtInit()
 					if ((m_nBufUpSerial[0] > m_nLotEndSerial/* || m_nBufUpSerial[1] >= m_nLotEndSerial*/) && m_nLotEndSerial > 0)
 					{
 						//MpeWrite(Plc.DlgMenu01.MarkingInitDone, 1); // 마킹부 작업완료.(PC가 On, PLC가 확인 후 Off) - 20160718
-						pDoc->LogAuto(_T("PC: 마킹부 작업완료.(PC가 On, PLC가 확인 후 Off)"));
+						//pDoc->LogAuto(_T("PC: 마킹부 작업완료.(PC가 On, PLC가 확인 후 Off)"));
 					}
 				}
 			}
@@ -20130,7 +20154,7 @@ void CGvisR2R_PunchView::Mk2PtDoMarking()
 			MpeWrite(Plc.DlgMenu03.PcrMarkedSerialRight, m_nBufUpSerial[1]);
 			MpeWrite(Plc.DlgMenu03.FeedingReadyPunch, 1);
 
-			pDoc->LogAuto(_T("PC: 마킹완료(PLC가 확인하고 Reset시킴.)"));
+			//pDoc->LogAuto(_T("PC: 마킹완료(PLC가 확인하고 Reset시킴.)"));
 			if (IsNoMk() || IsShowLive())
 				ShowLive(FALSE);
 
@@ -20143,7 +20167,7 @@ void CGvisR2R_PunchView::Mk2PtDoMarking()
 			if (bChk)	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)
 			{
 				MpeWrite(_T("MB400243"), 0);// PLC 마킹 피딩 완료
-				pDoc->LogAuto(_T("PLC: 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)"));
+				//pDoc->LogAuto(_T("PLC: 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)"));
 				m_nMkStAuto++;
 			}
 			break;
@@ -20152,7 +20176,7 @@ void CGvisR2R_PunchView::Mk2PtDoMarking()
 			if (!m_bTHREAD_SHIFT2MK)
 			{
 				MpeWrite(Plc.DlgMenu01.TableVacuumAoiUp, 0);	// 마킹부 Feeding완료
-				pDoc->LogAuto(_T("PC: 마킹부 Feeding완료 OFF"));
+				//pDoc->LogAuto(_T("PC: 마킹부 Feeding완료 OFF"));
 
 				m_bShift2Mk = TRUE;
 				DoShift2Mk();
@@ -20250,7 +20274,7 @@ void CGvisR2R_PunchView::Mk2PtShift2Mk() // MODE_INNER
 		case MK_ST + (Mk2PtIdx::Shift2Mk) + 2:
 			MpeWrite(Plc.DlgMenu01.MarkingDoing, 0);	// 마킹부 마킹중 ON (PC가 ON, OFF)
 			MpeWrite(Plc.DlgMenu01.MarkingDone, 1);	// 마킹완료(PLC가 확인하고 Reset시킴.)-20141029
-			pDoc->LogAuto(_T("PC: 마킹완료(PLC가 확인하고 Reset시킴.)"));
+			//pDoc->LogAuto(_T("PC: 마킹완료(PLC가 확인하고 Reset시킴.)"));
 			m_nMkStAuto++;
 			break;
 
@@ -20259,7 +20283,7 @@ void CGvisR2R_PunchView::Mk2PtShift2Mk() // MODE_INNER
 			//if (pDoc->m_pMpeSignal && pDoc->m_pMpeSignal[4] & (0x01 << 3))	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)-20141030
 			if (bChk)	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)-20141030
 			{
-				pDoc->LogAuto(_T("PLC: 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)"));
+				//pDoc->LogAuto(_T("PLC: 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)"));
 				m_nMkStAuto++;
 			}
 			break;
@@ -20267,7 +20291,7 @@ void CGvisR2R_PunchView::Mk2PtShift2Mk() // MODE_INNER
 		case MK_ST + (Mk2PtIdx::Shift2Mk) + 4:
 			if (!m_bTHREAD_SHIFT2MK)
 			{
-				pDoc->LogAuto(_T("PC: 마킹부 Feeding완료 OFF"));
+				//pDoc->LogAuto(_T("PC: 마킹부 Feeding완료 OFF"));
 				MpeWrite(Plc.DlgMenu01.FeedingDonePunch, 0);	// 마킹부 Feeding완료
 				m_bShift2Mk = TRUE;
 				DoShift2Mk();
@@ -20562,7 +20586,7 @@ void CGvisR2R_PunchView::Mk4PtReady()
 		case MK_ST:	// PLC MK 신호 확인	
 			if (IsRun())
 			{
-				pDoc->LogAuto(_T("PC: 마킹부 마킹중 ON (PC가 ON, OFF)"));
+				//pDoc->LogAuto(_T("PC: 마킹부 마킹중 ON (PC가 ON, OFF)"));
 				MpeWrite(Plc.DlgMenu01.MarkingDoing, 1);// 마킹부 마킹중 ON (PC가 ON, OFF)
 				m_nMkStAuto++;
 			}
@@ -20898,7 +20922,7 @@ void CGvisR2R_PunchView::Mk4PtInit()
 					if ((m_nBufUpSerial[0] < m_nLotEndSerial/* || m_nBufUpSerial[1] < m_nLotEndSerial*/) && m_nLotEndSerial > 0) // Left
 					{
 						//MpeWrite(Plc.DlgMenu01.MarkingInitDone, 1); // 마킹부 작업완료.(PC가 On, PLC가 확인 후 Off)
-						pDoc->LogAuto(_T("PC: 마킹부 작업완료.(PC가 On, PLC가 확인 후 Off)"));
+						//pDoc->LogAuto(_T("PC: 마킹부 작업완료.(PC가 On, PLC가 확인 후 Off)"));
 					}
 				}
 				else
@@ -20906,7 +20930,7 @@ void CGvisR2R_PunchView::Mk4PtInit()
 					if ((m_nBufUpSerial[0] > m_nLotEndSerial/* || m_nBufUpSerial[1] >= m_nLotEndSerial*/) && m_nLotEndSerial > 0)
 					{
 						//MpeWrite(Plc.DlgMenu01.MarkingInitDone, 1); // 마킹부 작업완료.(PC가 On, PLC가 확인 후 Off) - 20160718
-						pDoc->LogAuto(_T("PC: 마킹부 작업완료.(PC가 On, PLC가 확인 후 Off)"));
+						//pDoc->LogAuto(_T("PC: 마킹부 작업완료.(PC가 On, PLC가 확인 후 Off)"));
 					}
 				}
 			}
@@ -22672,7 +22696,7 @@ void CGvisR2R_PunchView::Mk4PtDoMarking()
 			MpeWrite(Plc.DlgMenu03.PcrMarkedSerialRight, m_nBufUpSerial[1]);
 			MpeWrite(Plc.DlgMenu03.FeedingReadyPunch, 1);
 
-			pDoc->LogAuto(_T("PC: 마킹완료(PLC가 확인하고 Reset시킴.)"));
+			//pDoc->LogAuto(_T("PC: 마킹완료(PLC가 확인하고 Reset시킴.)"));
 			if (IsNoMk() || IsShowLive())
 				ShowLive(FALSE);
 
@@ -22685,7 +22709,7 @@ void CGvisR2R_PunchView::Mk4PtDoMarking()
 			if (bChk)	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)
 			{
 				MpeWrite(_T("MB400243"), 0);// PLC 마킹 피딩 완료
-				pDoc->LogAuto(_T("PLC: 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)"));
+				//pDoc->LogAuto(_T("PLC: 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)"));
 				m_nMkStAuto++;
 			}
 
@@ -22695,7 +22719,7 @@ void CGvisR2R_PunchView::Mk4PtDoMarking()
 			if (!m_bTHREAD_SHIFT2MK)
 			{
 				MpeWrite(Plc.DlgMenu01.TableVacuumAoiUp, 0);	// 마킹부 Feeding완료
-				pDoc->LogAuto(_T("PC: 마킹부 Feeding완료 OFF"));
+				//pDoc->LogAuto(_T("PC: 마킹부 Feeding완료 OFF"));
 
 				m_bShift2Mk = TRUE;
 				DoShift2Mk();
@@ -24184,7 +24208,7 @@ BOOL CGvisR2R_PunchView::IsRdyTest0()
 
 	if (bOn0 && bOn1)
 	{
-		pDoc->LogAuto(_T("PLC: 검사부 상 자동(X432B) 운전 & 테이블 진공(X4329) 완료"));
+		//pDoc->LogAuto(_T("PLC: 검사부 상 자동(X432B) 운전 & 테이블 진공(X4329) 완료"));
 		return TRUE;
 	}
 	return FALSE;
@@ -24205,7 +24229,7 @@ BOOL CGvisR2R_PunchView::IsRdyTest1()
 		{
 			if (bOn0 && bOn1)
 			{
-				pDoc->LogAuto(_T("PLC: 검사부 하 자동(X442B) 운전 & 테이블 진공(X4329) 완료"));
+				//pDoc->LogAuto(_T("PLC: 검사부 하 자동(X442B) 운전 & 테이블 진공(X4329) 완료"));
 				return TRUE;
 			}
 		}
@@ -26598,7 +26622,7 @@ BOOL CGvisR2R_PunchView::IsEngraveFd()
 			//if ((pDoc->m_pMpeSignal[8] & (0x01 << 6))/* || (pDoc->m_pMpeSignal[8] & (0x01 << 7))*/)	// 각인부 피딩 CW ON (PLC가 피딩완료 후 OFF)
 			if (bChk)	// 각인부 피딩 CW ON (PLC가 피딩완료 후 OFF)
 			{
-				pDoc->LogAuto(_T("PLC: 각인부 피딩 CW ON (PLC가 피딩완료 후 OFF)"));
+				//pDoc->LogAuto(_T("PLC: 각인부 피딩 CW ON (PLC가 피딩완료 후 OFF)"));
 				return TRUE;
 			}
 			return FALSE;
@@ -26613,7 +26637,7 @@ BOOL CGvisR2R_PunchView::IsEngraveFd()
 				bChk = MpeRead(_T("MB400286")); // PLC 각인기 피딩 정방향 Run
 				if (bChk)	// 각인부 피딩 CW ON (PLC가 피딩완료 후 OFF)
 				{
-					pDoc->LogAuto(_T("PLC: 각인부 피딩 CW ON (PLC가 피딩완료 후 OFF)"));
+					//pDoc->LogAuto(_T("PLC: 각인부 피딩 CW ON (PLC가 피딩완료 후 OFF)"));
 					return TRUE;
 				}
 				return FALSE;
@@ -27052,7 +27076,7 @@ void CGvisR2R_PunchView::DoAutoSetFdOffsetEngrave()
 		m_bEngTest = FALSE; pDoc->SetStatus(_T("General"), _T("bEngTest"), m_bEngTest);
 		m_bEngFdWriteF = FALSE; pDoc->SetStatus(_T("General"), _T("bEngFdWriteF"), m_bEngFdWriteF);
 		MpeWrite(Plc.DlgFrameHigh.FeedOffsetWriteDoneEngrave, 0);					// 각인부 Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)
-		pDoc->LogAuto(_T("PC: 각인부 Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)"));
+		//pDoc->LogAuto(_T("PC: 각인부 Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)"));
 	}
 
 	BOOL bChk = MpeRead(Plc.DlgFrameHigh.FeedOffsetWriteDoneEngrave); // PLC 각인기 피딩 Offset Write(GUI Off) _T("MB40024C")
@@ -27082,7 +27106,7 @@ void CGvisR2R_PunchView::DoAutoSetFdOffsetEngrave()
 			m_pDlgMenu02->m_dEngFdOffsetY = OfSt.y;
 		}
 
-		pDoc->LogAuto(_T("PC: 각인부 Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)"));
+		//pDoc->LogAuto(_T("PC: 각인부 Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)"));
 		MpeWrite(Plc.DlgFrameHigh.FeedOffsetEngrave, (long)(dAveX*1000.0));	// 각인부 Feeding 롤러 Offset(*1000, +:더 보냄, -덜 보냄, PC가 쓰고 PLC에서 지움)
 		MpeWrite(Plc.DlgFrameHigh.FeedOffsetWriteDoneEngrave, 0);					// 각인부 Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)
 		Sleep(10);
@@ -27106,7 +27130,7 @@ void CGvisR2R_PunchView::DoAutoMarkingEngrave()
 		MpeWrite(Plc.DlgMenu01.MarkingOnEngrave, 1); // B400104 : 2D(GUI) 각인 동작Running신호(PC On->PC Off)
 		pDoc->SetCurrentInfoSignal(_SigInx::_EngAutoSeqOnMkIng, TRUE);
 		//CheckCurrentInfoSignal();
-		pDoc->LogAuto(_T("PC: 2D(GUI) 각인 동작Running신호 ON (PC On->PC Off)"));
+		//pDoc->LogAuto(_T("PC: 2D(GUI) 각인 동작Running신호 ON (PC On->PC Off)"));
 		if (m_pDlgMenu02)
 		{
 			sVal.Format(_T("%d"), 1);
@@ -27118,7 +27142,7 @@ void CGvisR2R_PunchView::DoAutoMarkingEngrave()
 		MpeWrite(Plc.DlgMenu01.MarkingOnEngrave, 0); // 2D(GUI) 각인 동작Running신호(PC On->PC Off)
 		pDoc->SetCurrentInfoSignal(_SigInx::_EngAutoSeqOnMkIng, FALSE);
 		//CheckCurrentInfoSignal();
-		pDoc->LogAuto(_T("PC: 2D(GUI) 각인 동작Running신호 OFF (PC On->PC Off)"));
+		//pDoc->LogAuto(_T("PC: 2D(GUI) 각인 동작Running신호 OFF (PC On->PC Off)"));
 		if (m_pDlgMenu02)
 		{
 			sVal.Format(_T("%d"), 0);
@@ -27136,7 +27160,7 @@ void CGvisR2R_PunchView::DoAutoMarkingEngrave()
 		MpeWrite(Plc.DlgMenu01.MarkingDoneEngrave, 1); // 각인부 작업완료.(PC가 On, PLC가 확인 후 Off)
 		pDoc->SetCurrentInfoSignal(_SigInx::_IsEngAutoSeqMkDone, TRUE);
 		//CheckCurrentInfoSignal();
-		pDoc->LogAuto(_T("PC: 각인부 작업완료 ON (PC가 On, PLC가 확인 후 Off)"));
+		//pDoc->LogAuto(_T("PC: 각인부 작업완료 ON (PC가 On, PLC가 확인 후 Off)"));
 
 		long nSerialEng = (long)pDoc->GetCurrentInfoEngShotNum();
 		long nSerialRead = (long)pDoc->GetCurrentInfoReadShotNum();
@@ -27178,7 +27202,7 @@ void CGvisR2R_PunchView::DoAutoMarkingEngrave()
 		MpeWrite(Plc.DlgMenu01.Reading2dOnEngrave, 1); // 각인부 2D 리더 작업중 신호(PC On->PC Off)
 		pDoc->SetCurrentInfoSignal(_SigInx::_EngAutoSeqOnReading2d, TRUE);
 		//CheckCurrentInfoSignal();
-		pDoc->LogAuto(_T("PC: 각인부 2D 리더 작업중 신호 ON (PC On->PC Off)"));
+		//pDoc->LogAuto(_T("PC: 각인부 2D 리더 작업중 신호 ON (PC On->PC Off)"));
 		if (m_pDlgMenu02)
 		{
 			sVal.Format(_T("%d"), 1);
@@ -27189,7 +27213,7 @@ void CGvisR2R_PunchView::DoAutoMarkingEngrave()
 	{
 		pDoc->SetCurrentInfoSignal(_SigInx::_EngAutoSeqOnReading2d, FALSE);
 		//CheckCurrentInfoSignal();
-		pDoc->LogAuto(_T("PC: 각인부 2D 리더 작업중 신호 OFF (PC On->PC Off)"));
+		//pDoc->LogAuto(_T("PC: 각인부 2D 리더 작업중 신호 OFF (PC On->PC Off)"));
 		MpeWrite(Plc.DlgMenu01.Reading2dOnEngrave, 0); // 각인부 2D 리더 작업중 신호(PC On->PC Off)
 		if (m_pDlgMenu02)
 		{
@@ -27214,7 +27238,7 @@ void CGvisR2R_PunchView::DoAutoMarkingEngrave()
 		pDoc->SetCurrentInfoSignal(_SigInx::_IsEngAutoSeq2dReadDone, TRUE);
 		//pDoc->SetCurrentInfoSignal(_SigInx::_EngAutoSeq2dReadDone, TRUE);
 		//CheckCurrentInfoSignal();
-		pDoc->LogAuto(_T("PC: 각인부 2D 리더 작업완료 신호 ON (PC가 On, PLC가 확인 후 Off)"));
+		//pDoc->LogAuto(_T("PC: 각인부 2D 리더 작업완료 신호 ON (PC가 On, PLC가 확인 후 Off)"));
 		if (m_pDlgMenu02)
 		{
 			sVal.Format(_T("%d"), 1);
@@ -28186,7 +28210,7 @@ void CGvisR2R_PunchView::DoMark0Its()
 		if (m_nBufUpSerial[1] < m_nBufUpSerial[0])
 		{
 			sMsg.Format(_T("%d:%d"), nSerial, GetTotDefPcs0Its(nSerial));
-			pDoc->LogAuto(sMsg);
+			//pDoc->LogAuto(sMsg);
 		}
 		if (nSerial > 0)
 		{
@@ -28805,7 +28829,7 @@ void CGvisR2R_PunchView::DoMark1Its()
 	case 2:
 		nSerial = m_nBufUpSerial[1]; // Cam1
 		sMsg.Format(_T("%d:%d,%d:%d"), nSerial-1, GetTotDefPcs0Its(nSerial-1), nSerial, GetTotDefPcs1Its(nSerial));
-		pDoc->LogAuto(sMsg);
+		//pDoc->LogAuto(sMsg);
 		if (nSerial > 0)
 		{
 			if ((nErrCode = GetErrCode1Its(nSerial)) != 1)
@@ -33955,7 +33979,7 @@ void CGvisR2R_PunchView::Mk4PtShift2Mk() // MODE_INNER
 		case MK_ST + (Mk4PtIdx::Shift2Mk) + 2:
 			MpeWrite(Plc.DlgMenu01.MarkingDoing, 0);	// 마킹부 마킹중 ON (PC가 ON, OFF)
 			MpeWrite(Plc.DlgMenu01.MarkingDone, 1);	// 마킹완료(PLC가 확인하고 Reset시킴.)-20141029
-			pDoc->LogAuto(_T("PC: 마킹완료(PLC가 확인하고 Reset시킴.)"));
+			//pDoc->LogAuto(_T("PC: 마킹완료(PLC가 확인하고 Reset시킴.)"));
 			m_nMkStAuto++;
 			break;
 
@@ -33964,7 +33988,7 @@ void CGvisR2R_PunchView::Mk4PtShift2Mk() // MODE_INNER
 											//if (pDoc->m_pMpeSignal && pDoc->m_pMpeSignal[4] & (0x01 << 3))	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)-20141030
 			if (bChk)	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)-20141030
 			{
-				pDoc->LogAuto(_T("PLC: 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)"));
+				//pDoc->LogAuto(_T("PLC: 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)"));
 				m_nMkStAuto++;
 			}
 			break;
@@ -33972,7 +33996,7 @@ void CGvisR2R_PunchView::Mk4PtShift2Mk() // MODE_INNER
 		case MK_ST + (Mk4PtIdx::Shift2Mk) + 4:
 			if (!m_bTHREAD_SHIFT2MK)
 			{
-				pDoc->LogAuto(_T("PC: 마킹부 Feeding완료 OFF"));
+				//pDoc->LogAuto(_T("PC: 마킹부 Feeding완료 OFF"));
 				MpeWrite(Plc.DlgMenu01.FeedingDonePunch, 0);	// 마킹부 Feeding완료
 				m_bShift2Mk = TRUE;
 				DoShift2Mk();

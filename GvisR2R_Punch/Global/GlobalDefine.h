@@ -637,6 +637,8 @@ struct stSystem
 	CString sPathCamSpecDir;
 	CString sPathTorqSpecDir;
 
+	CString sPathLog;
+
 	CString sPathAoiUp, sPathAoiUpDts, sPathAoiUpCurrInfo, sPathAoiUpVrsData, sPathAoiUpOffset, sPathAoiUpDefImg;
 	CString sPathAoiUpLocalSpec, sPathAoiUpCamInfo;
 	CString sPathVrsShareUp, sPathVrsBufUp;
@@ -675,6 +677,8 @@ struct stSystem
 		sMcName = _T("");
 		sPathCamSpecDir = _T("");
 		sPathTorqSpecDir = _T("");
+
+		sPathLog = _T("");
 
 		sPathAoiUp = _T(""); sPathAoiUpDts = _T(""); sPathAoiUpCurrInfo = _T(""); sPathAoiUpDefImg = _T("");
 		sPathAoiUpOffset = _T(""); sPathAoiUpVrsData = _T(""); sPathAoiUpCamInfo = _T("");

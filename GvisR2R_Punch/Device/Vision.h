@@ -264,7 +264,7 @@ public:
 	void ShowDispReject();
 	void InitRejectBuf();
 	void AllocRejectBuf();
-	void LoadRejectBuf();
+	BOOL LoadRejectBuf();
 	void DrawCrossOnReject(int nCenterX, int nCenterY, int nLineLength);
 	BOOL ClearRejectCenterMarkArea(int nCenterX, int nCenterY, int nLineLength);
 	BOOL FitSizeBlobModel();
