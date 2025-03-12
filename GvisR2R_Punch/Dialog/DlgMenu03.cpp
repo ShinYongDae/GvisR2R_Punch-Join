@@ -1343,7 +1343,12 @@ void CDlgMenu03::DispMain()
 	if (pDoc->Status.bAuto)	// Auto
 	{
 		if (myStcTitle[33].GetImageBk() != LBL_IMG_DN)
+		{
 			myStcTitle[33].SetImageBk(LBL_IMG_DN);	// 자 동
+			if (pView->m_pEngrave)
+				pView->m_pEngrave->SwAuto(TRUE);
+			pDoc->LogAuto(_T("자동 모드 전환"));
+		}
 		if (myStcTitle[35].GetImageBk() != LBL_IMG_UP)
 			myStcTitle[35].SetImageBk(LBL_IMG_UP);	// 수 동 
 	}
@@ -1352,7 +1357,12 @@ void CDlgMenu03::DispMain()
 		if (myStcTitle[33].GetImageBk() != LBL_IMG_UP)
 			myStcTitle[33].SetImageBk(LBL_IMG_UP);	// 자 동
 		if (myStcTitle[35].GetImageBk() != LBL_IMG_DN)
+		{
 			myStcTitle[35].SetImageBk(LBL_IMG_DN);	// 수 동 
+			if (pView->m_pEngrave)
+				pView->m_pEngrave->SwManual(TRUE);
+			pDoc->LogAuto(_T("수동 모드 전환"));
+		}
 	}
 	else
 	{
@@ -1945,7 +1955,7 @@ void CDlgMenu03::OnTimer(UINT_PTR nIDEvent)//(UINT nIDEvent)
 		KillTimer(TIM_MENU03_DISP);
 		UpdateSignal();
 		if (m_bTIM_MENU03_DISP)
-			SetTimer(TIM_MENU03_DISP, 300, NULL);
+			SetTimer(TIM_MENU03_DISP, 500, NULL);
 	}
 
 	//if(nIDEvent == TIM_CHK_DONE_MKAOI)

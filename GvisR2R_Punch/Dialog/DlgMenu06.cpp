@@ -5071,10 +5071,10 @@ void CDlgMenu06::ChkTpStop()
 	if (pDoc->m_pReelMapInner)
 		pDoc->m_pReelMapInner->m_bUseTempPause = bUse;
 
-#ifdef USE_ENGRAVE
-	if (pView && pView->m_pEngrave)
-		pView->m_pEngrave->SetTempPause();	//_stSigInx::_TempPause
-#endif
+//#ifdef USE_ENGRAVE
+//	if (pView && pView->m_pEngrave)
+//		pView->m_pEngrave->SetTempPause();	//_stSigInx::_TempPause
+//#endif
 
 	CString sData = bUse ? _T("1") : _T("0");
 	::WritePrivateProfileString(_T("Last Job"), _T("Use Temporary Pause"), sData, PATH_WORKING_INFO);

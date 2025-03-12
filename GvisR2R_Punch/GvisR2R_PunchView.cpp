@@ -6008,8 +6008,9 @@ void CGvisR2R_PunchView::DoModeSel()
 
 		m_bAuto = TRUE;
 		m_bManual = FALSE;
-		if(pView->m_pEngrave)
-			pView->m_pEngrave->SwAuto(TRUE);
+		//if(pView->m_pEngrave)
+		//	pView->m_pEngrave->SwAuto(TRUE);
+		//pDoc->LogAuto(_T("자동 모드 전환"));
 	}
 	else
 	{
@@ -6018,8 +6019,9 @@ void CGvisR2R_PunchView::DoModeSel()
 
 		m_bManual = TRUE;
 		m_bAuto = FALSE;
-		if (pView->m_pEngrave)
-			pView->m_pEngrave->SwManual(TRUE);
+		//if (pView->m_pEngrave)
+		//	pView->m_pEngrave->SwManual(TRUE);
+		//pDoc->LogAuto(_T("수동 모드 전환"));
 	}
 #else
 	pDoc->Status.bAuto = FALSE;
@@ -16123,6 +16125,7 @@ BOOL CGvisR2R_PunchView::DoAutoGetLotEndSignal()
 			MpeWrite(Plc.DlgMenu01.JobEnd, 1);		// 작업종료(PC가 On시키고, PLC가 확인하고 Off시킴)
 			//MpeWrite(_T("MB40019C"), 1);			// 작업종료알람(PC가 On시키고, PLC가 확인하고 Off시킴)
 			DispMain(_T("작업종료"), RGB_RED);
+			pDoc->LogAuto(_T("작업종료"));
 			m_nLotEndAuto++;
 			break;
 		case LOT_END + 2:
@@ -25423,11 +25426,10 @@ void CGvisR2R_PunchView::DispContRun(BOOL bOn)
 		pDoc->WorkingInfo.LastJob.bDispContRun = bOn;
 		pDoc->SetMkInfo(_T("Signal"), _T("DispContRun"), bOn);
 
-#ifdef USE_ENGRAVE
-		if (pView && pView->m_pEngrave)
-			pView->m_pEngrave->SetDispContRun();	//_stSigInx::_DispContRun
-#endif
-
+//#ifdef USE_ENGRAVE
+//		if (pView && pView->m_pEngrave)
+//			pView->m_pEngrave->SetDispContRun();	//_stSigInx::_DispContRun
+//#endif
 	}
 }
 
@@ -25438,10 +25440,10 @@ void CGvisR2R_PunchView::DispLotEnd(BOOL bOn)
 		pDoc->WorkingInfo.LastJob.bDispLotEnd = bOn;
 		pDoc->SetMkInfo(_T("Signal"), _T("DispLotEnd"), bOn);
 
-#ifdef USE_ENGRAVE
-		if (pView && pView->m_pEngrave)
-			pView->m_pEngrave->SetDispLotEnd();	//_stSigInx::_DispLotEnd
-#endif
+//#ifdef USE_ENGRAVE
+//		if (pView && pView->m_pEngrave)
+//			pView->m_pEngrave->SetDispLotEnd();	//_stSigInx::_DispLotEnd
+//#endif
 
 	}
 }
@@ -33777,10 +33779,10 @@ BOOL CGvisR2R_PunchView::ApplyTorq(double dTorqL, double dTorqR)
 	if (pView->m_pVoiceCoil[0])
 		pView->m_pVoiceCoil[0]->SetMarkFinalData(0);
 
-#ifdef USE_ENGRAVE
-	if (pView && pView->m_pEngrave)
-		pView->m_pEngrave->SetMkFnlTqLf();	//_ItemInx::_MkFnlTqLf
-#endif
+//#ifdef USE_ENGRAVE
+//	if (pView && pView->m_pEngrave)
+//		pView->m_pEngrave->SetMkFnlTqLf();	//_ItemInx::_MkFnlTqLf
+//#endif
 	Sleep(100);
 
 	pDoc->SetMarkingToq2(dTorqR);
@@ -33788,10 +33790,10 @@ BOOL CGvisR2R_PunchView::ApplyTorq(double dTorqL, double dTorqR)
 	if (pView->m_pVoiceCoil[1])
 		pView->m_pVoiceCoil[1]->SetMarkFinalData(1);
 
-#ifdef USE_ENGRAVE
-	if (pView && pView->m_pEngrave)
-		pView->m_pEngrave->SetMkFnlTqRt();	//_ItemInx::_MkFnlTqRt
-#endif
+//#ifdef USE_ENGRAVE
+//	if (pView && pView->m_pEngrave)
+//		pView->m_pEngrave->SetMkFnlTqRt();	//_ItemInx::_MkFnlTqRt
+//#endif
 
 	return TRUE;
 }

@@ -1655,13 +1655,15 @@ int CDlgInfo::GetTestMode()
 
 void CDlgInfo::SetTestMode(int nMode)
 {
-	pDoc->SetTestMode(nMode);
+	if (pDoc->WorkingInfo.LastJob.nTestMode != nMode)
+	{
+		pDoc->SetTestMode(nMode);
 
 #ifdef USE_ENGRAVE
-	if (pView && pView->m_pEngrave)
-		pView->m_pEngrave->SetTestMode();	//_ItemInx::_TestMode
+		if (pView && pView->m_pEngrave)
+			pView->m_pEngrave->SetTestMode();	//_ItemInx::_TestMode
 #endif
-
+	}
 	myBtn[23].RedrawWindow();
 	myBtn[24].RedrawWindow();
 }

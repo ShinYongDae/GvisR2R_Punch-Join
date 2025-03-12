@@ -2921,15 +2921,15 @@ void CDlgMenu01::DispStTime()
 		pDoc->SetMkMenu01(_T("LotTime"), _T("Start"), str);
 	}
 
-#ifdef USE_ENGRAVE
-	if (pView)
-	{
-		if (pView->m_pEngrave)
-		{
-			pView->m_pEngrave->SetStTime();
-		}
-	}
-#endif
+//#ifdef USE_ENGRAVE
+//	if (pView)
+//	{
+//		if (pView->m_pEngrave)
+//		{
+//			pView->m_pEngrave->SetStTime();
+//		}
+//	}
+//#endif
 }
 
 CString CDlgMenu01::GetStTime()
@@ -3053,15 +3053,15 @@ void CDlgMenu01::DispEdTime()
 		pDoc->SetMkMenu01(_T("LotTime"), _T("End"), str);
 	}
 
-#ifdef USE_ENGRAVE
-	if (pView)
-	{
-		if (pView->m_pEngrave)
-		{
-			pView->m_pEngrave->SetEdTime();
-		}
-	}
-#endif
+//#ifdef USE_ENGRAVE
+//	if (pView)
+//	{
+//		if (pView->m_pEngrave)
+//		{
+//			pView->m_pEngrave->SetEdTime();
+//		}
+//	}
+//#endif
 }
 
 CString CDlgMenu01::GetEdTime()
