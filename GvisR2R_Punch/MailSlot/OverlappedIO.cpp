@@ -30,9 +30,11 @@ void COverlappedIO::Attach(HANDLE hIO)
 
 bool COverlappedIO::Read(BYTE *pbData, DWORD dwBufferSize, LPDWORD pdwBytesRead, HANDLE hStopEvent)
 {
+#ifdef _DEBUG
 	assert(pbData);
 	assert(dwBufferSize);
 	assert(pdwBytesRead);
+#endif
 
 	if (m_hIO != INVALID_HANDLE_VALUE)
 	{
@@ -57,9 +59,11 @@ bool COverlappedIO::Read(BYTE *pbData, DWORD dwBufferSize, LPDWORD pdwBytesRead,
 
 bool COverlappedIO::Write(BYTE *pbData, DWORD dwBufferSize, LPDWORD pdwBytesWritten, HANDLE hStopEvent)
 {
+#ifdef _DEBUG
 	assert(pbData);
 	assert(dwBufferSize);
 	assert(pdwBytesWritten);
+#endif
 
 	if (m_hIO != INVALID_HANDLE_VALUE)
 	{
