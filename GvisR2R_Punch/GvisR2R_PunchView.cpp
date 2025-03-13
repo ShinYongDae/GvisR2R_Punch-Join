@@ -621,6 +621,11 @@ CGvisR2R_PunchView::CGvisR2R_PunchView()
 	m_bPcrInShare[1] = FALSE;
 	m_bPcrInShareVs[0] = FALSE;
 	m_bPcrInShareVs[1] = FALSE;
+
+	m_sLogAuto[0] = _T("");
+	m_sLogAuto[1] = _T("");
+	m_bFailMkJudge[0] = FALSE;
+	m_bFailMkJudge[1] = FALSE;
 }
 
 CGvisR2R_PunchView::~CGvisR2R_PunchView()
@@ -13612,8 +13617,10 @@ void CGvisR2R_PunchView::DoReject1()
 			{
 				if (m_pMotion->IsMotionDone(MS_X1) && m_pMotion->IsMotionDone(MS_Y1))
 				{
-					if (!IsMkEdPos1() && !IsPinPos1())
-						MoveMkEdPos1();
+					if (!IsInitPos1() && !IsPinPos1())
+						MoveInitPos1();
+					//if (!IsMkEdPos1() && !IsPinPos1())
+					//	MoveMkEdPos1();
 				}
 			}
 		}
@@ -13873,7 +13880,8 @@ void CGvisR2R_PunchView::DoReject1()
 	case 101:
 		if (!WaitDelay1(1))		// F:Done, T:On Waiting....
 		{
-			MoveMkEdPos1();
+			MoveInitPos1();
+			//MoveMkEdPos1();
 			m_nStepMk[3]++;
 		}
 		break;
@@ -14072,8 +14080,10 @@ void CGvisR2R_PunchView::DoMark1All()
 			{
 				if (m_pMotion->IsMotionDone(MS_X1) && m_pMotion->IsMotionDone(MS_Y1))
 				{
-					if (!IsMkEdPos1() && !IsPinPos1())
-						MoveMkEdPos1();
+					if (!IsInitPos1() && !IsPinPos1())
+						MoveInitPos1();
+					//if (!IsMkEdPos1() && !IsPinPos1())
+					//	MoveMkEdPos1();
 				}
 			}
 
@@ -14240,7 +14250,8 @@ void CGvisR2R_PunchView::DoMark1All()
 					if (IsMoveDone1())
 					{
 						m_Flag &= ~(0x01 << 0); pDoc->SetStatusInt(_T("General"), _T("Flag"), m_Flag);
-						MoveMkEdPos1();
+						MoveInitPos1();
+						//MoveMkEdPos1();
 						m_nStepMk[3]++;
 					}
 				}
@@ -14250,7 +14261,8 @@ void CGvisR2R_PunchView::DoMark1All()
 				if (IsMoveDone1())
 				{
 					m_Flag &= ~(0x01 << 0); pDoc->SetStatusInt(_T("General"), _T("Flag"), m_Flag);
-					MoveMkEdPos1();
+					MoveInitPos1();
+					//MoveMkEdPos1();
 					m_nStepMk[3]++;
 				}
 			}
@@ -14404,6 +14416,19 @@ void CGvisR2R_PunchView::DoMark0()
 		}
 		break;
 	case 3:
+		if (m_bCam)
+		{
+			if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+				sMsg.Format(_T("Left 미마킹 테스트 시작 SN:%d"), m_nBufUpSerial[0]);
+			else
+				sMsg.Format(_T("Left verify 시작 SN:%d"), m_nBufUpSerial[0]);
+			pDoc->LogAuto(sMsg);
+		}
+		else
+		{
+			sMsg.Format(_T("Left marking 시작 SN:%d"), m_nBufUpSerial[0]);
+			pDoc->LogAuto(sMsg);
+		}
 		m_nStepMk[0]++;
 		break;
 	case 4:
@@ -14631,9 +14656,12 @@ void CGvisR2R_PunchView::DoMark0()
 #ifdef USE_VISION
 					if (!m_pVision[0]->m_bMkJudge)
 					{
+						pDoc->LogAuto(_T("좌측 펀칭 미마킹 알람 발생"));
 						nRtn = MsgBox(_T("좌측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+						pDoc->LogAuto(_T("좌측 펀칭 미마킹 알람 해제"));
 						if (IDYES == nRtn)
 						{
+							m_bFailMkJudge[0] = TRUE;
 							ptPnt.x = m_dTarget[AXIS_X0];
 							ptPnt.y = m_dTarget[AXIS_Y0];
 
@@ -14647,12 +14675,17 @@ void CGvisR2R_PunchView::DoMark0()
 							Stop();
 							break;
 						}
+						else
+						{
+							m_pVision[0]->ArMkMtRst.Add(m_pVision[0]->MkMtRst);
+							Stop();
+						}
+
 					}
 					else
 					{
-						Stop();
+						m_pVision[0]->ArMkMtRst.Add(m_pVision[0]->MkMtRst);
 					}
-
 #endif
 				}
 			}
@@ -14874,6 +14907,7 @@ void CGvisR2R_PunchView::DoMark0()
 	case 105:
 		if (IsInitPos0())
 		{
+			SetArMkMtRstOnLogAuto(0);
 			m_nStepMk[0]++;
 		}
 		else
@@ -14999,7 +15033,7 @@ BOOL CGvisR2R_PunchView::SaveMk0Img(int nMkPcsIdx) // Cam0
 		if (m_pVision[0])
 		{
 			BOOL bRtn = m_pVision[0]->SaveMkImg(sPath);
-			//if (bRtn)
+			if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
 			{
 				if(m_pDlgMenu02)
 					m_pDlgMenu02->DispMkPmScore(0);
@@ -15040,8 +15074,10 @@ void CGvisR2R_PunchView::DoMark1()
 			{
 				if (m_pMotion->IsMotionDone(MS_X1) && m_pMotion->IsMotionDone(MS_Y1))
 				{
-					if (!IsMkEdPos1() && !IsPinPos1())
-						MoveMkEdPos1();
+					if (!IsInitPos1() && !IsPinPos1())
+						MoveInitPos1();
+					//if (!IsMkEdPos1() && !IsPinPos1())
+					//	MoveMkEdPos1();
 				}
 			}
 
@@ -15093,6 +15129,19 @@ void CGvisR2R_PunchView::DoMark1()
 		}
 		break;
 	case 3:
+		if (m_bCam)
+		{
+			if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+				sMsg.Format(_T("Right 미마킹 테스트 시작 SN:%d"), m_nBufUpSerial[1]);
+			else
+				sMsg.Format(_T("Right verify 시작 SN:%d"), m_nBufUpSerial[1]);
+			pDoc->LogAuto(sMsg);
+		}
+		else
+		{
+			sMsg.Format(_T("Right marking 시작 SN:%d"), m_nBufUpSerial[1]);
+			pDoc->LogAuto(sMsg);
+		}
 		m_nStepMk[1]++;
 		break;
 	case 4:
@@ -15324,9 +15373,12 @@ void CGvisR2R_PunchView::DoMark1()
 #ifdef USE_VISION
 					if (!m_pVision[1]->m_bMkJudge)
 					{
+						pDoc->LogAuto(_T("우측 펀칭 미마킹 알람 발생"));
 						nRtn = MsgBox(_T("우측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+						pDoc->LogAuto(_T("우측 펀칭 미마킹 알람 해제"));
 						if (IDYES == nRtn)
 						{
+							m_bFailMkJudge[1] = TRUE;
 							ptPnt.x = m_dTarget[AXIS_X1];
 							ptPnt.y = m_dTarget[AXIS_Y1];
 
@@ -15342,9 +15394,13 @@ void CGvisR2R_PunchView::DoMark1()
 						}
 						else
 						{
+							m_pVision[1]->ArMkMtRst.Add(m_pVision[1]->MkMtRst);
 							Stop();
 						}
-
+					}
+					else
+					{
+						m_pVision[1]->ArMkMtRst.Add(m_pVision[1]->MkMtRst);
 					}
 #endif
 				}
@@ -15543,14 +15599,16 @@ void CGvisR2R_PunchView::DoMark1()
 			m_nStepMk[1]++;
 		break;
 	case 103:
-		if (!IsMkEdPos1())
+		//if (!IsMkEdPos1())
+		if (!IsInitPos1())
 		{
 			m_dTarget[AXIS_X1] = _tstof(pDoc->WorkingInfo.Motion.sStPosX[1]);
 			m_dTarget[AXIS_Y1] = _tstof(pDoc->WorkingInfo.Motion.sStPosY[1]);
 			m_dNextTarget[AXIS_X1] = _tstof(pDoc->WorkingInfo.Motion.sStPosX[1]);
 			m_dNextTarget[AXIS_Y1] = _tstof(pDoc->WorkingInfo.Motion.sStPosY[1]);
 
-			MoveMkEdPos1();
+			MoveInitPos1();
+			//MoveMkEdPos1();
 		}
 
 		pDoc->SaveMkCntR();
@@ -15564,8 +15622,10 @@ void CGvisR2R_PunchView::DoMark1()
 		}
 		break;
 	case 105:
-		if (IsMkEdPos1())
+		//if (IsMkEdPos1())
+		if (IsInitPos1())
 		{
+			SetArMkMtRstOnLogAuto(1);
 			m_nStepMk[1]++;
 		}
 		else
@@ -15693,7 +15753,7 @@ BOOL CGvisR2R_PunchView::SaveMk1Img(int nMkPcsIdx) // Cam1
 		if (m_pVision[1])
 		{
 			BOOL bRtn = m_pVision[1]->SaveMkImg(sPath);
-			//if (bRtn)
+			if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
 			{
 				if (m_pDlgMenu02)
 					m_pDlgMenu02->DispMkPmScore(1);
@@ -16125,7 +16185,7 @@ BOOL CGvisR2R_PunchView::DoAutoGetLotEndSignal()
 			MpeWrite(Plc.DlgMenu01.JobEnd, 1);		// 작업종료(PC가 On시키고, PLC가 확인하고 Off시킴)
 			//MpeWrite(_T("MB40019C"), 1);			// 작업종료알람(PC가 On시키고, PLC가 확인하고 Off시킴)
 			DispMain(_T("작업종료"), RGB_RED);
-			pDoc->LogAuto(_T("작업종료"));
+			pDoc->LogAuto(_T("작업 완료"));
 			m_nLotEndAuto++;
 			break;
 		case LOT_END + 2:
@@ -19112,6 +19172,15 @@ void CGvisR2R_PunchView::Mk2PtInit()
 		case MK_ST + (Mk2PtIdx::InitMk) + 1:
 			if (IsRun())
 			{
+				m_sLogAuto[0] = _T("");
+				m_sLogAuto[1] = _T("");
+				m_bFailMkJudge[0] = FALSE;
+				m_bFailMkJudge[1] = FALSE;
+				if (m_pVision[0])
+					m_pVision[0]->ArMkMtRst.RemoveAll();
+				if (m_pVision[1])
+					m_pVision[1]->ArMkMtRst.RemoveAll();
+
 				m_nMkStAuto = MK_ST + (Mk2PtIdx::Move0Cam1); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);	// Move - Cam1 - Pt0
 			}
 			break;
@@ -19125,6 +19194,7 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 		return;
 
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
+	CString sMsg;
 
 	if ((m_bMkSt[0] || m_bMkSt[1]) && IsBuffer())
 	{
@@ -19293,7 +19363,9 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 			break;
 		case MK_ST + (Mk2PtIdx::Move0Cam0) + 1:
 			if (IsRun())
+			{
 				m_nMkStAuto++;
+			}
 			break;
 		case MK_ST + (Mk2PtIdx::Move0Cam0) + 2:
 			if (IsMoveDone())
@@ -19307,13 +19379,20 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 			{
 				if (!m_bSkipAlign[1][0])
 				{
+					sMsg.Format(_T("SN:%d Right 2Point align #1 실행 (조명 2 : %s, 기준 score 2 : %d), marking torque  %s"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Vision[1].sStdScr, pDoc->WorkingInfo.Marking[1].sMarkingToq);
+					pDoc->LogAuto(sMsg);
+
 					if (TwoPointAlign1(0))	// Right
 					{
 						m_bFailAlign[1][0] = FALSE; pDoc->SetStatus(_T("General"), _T("bFailAlign[1][0]"), m_bFailAlign[1][0]);
+						sMsg.Format(_T("SN:%d Right 2Point align #1 정상 (조명 2 : %s, 결과 score 2 : %s)"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Motion.sAlignResultScore[1][0]);
+						pDoc->LogAuto(sMsg);
 					}
 					else
 					{
 						m_bFailAlign[1][0] = TRUE; pDoc->SetStatus(_T("General"), _T("bFailAlign[1][0]"), m_bFailAlign[1][0]);
+						sMsg.Format(_T("SN:%d Right 2Point align #1 비정상 (조명 2 : %s, 결과 score 2 : %s)"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Motion.sAlignResultScore[1][0]);
+						pDoc->LogAuto(sMsg);
 					}
 				}
 				else
@@ -19332,13 +19411,20 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 			{
 				if (!m_bSkipAlign[0][0])
 				{
+					sMsg.Format(_T("SN:%d Left 2Point align #1 실행, (조명 1 : %s, 기준 score 1 : %d) marking torque  %s"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Vision[0].sStdScr, pDoc->WorkingInfo.Marking[0].sMarkingToq);
+					pDoc->LogAuto(sMsg);
+
 					if (TwoPointAlign0(0))	// Left
 					{
 						m_bFailAlign[0][0] = FALSE; pDoc->SetStatus(_T("General"), _T("bFailAlign[0][0]"), m_bFailAlign[0][0]);
+						sMsg.Format(_T("SN:%d Left 2Point align #1 정상 (조명 1 : %s, 결과 score 1 : %s)"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Motion.sAlignResultScore[0][0]);
+						pDoc->LogAuto(sMsg);
 					}
 					else
 					{
 						m_bFailAlign[0][0] = TRUE; pDoc->SetStatus(_T("General"), _T("bFailAlign[0][0]"), m_bFailAlign[0][0]);
+						sMsg.Format(_T("SN:%d Left 2Point align #1 비정상 (조명 1 : %s, 결과 score 1 : %s)"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Motion.sAlignResultScore[0][0]);
+						pDoc->LogAuto(sMsg);
 					}
 				}
 				else
@@ -19489,6 +19575,8 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 
 void CGvisR2R_PunchView::Mk2PtAlignPt1()
 {
+	CString sMsg;
+
 	if (!IsRun())
 		return;
 
@@ -19671,13 +19759,20 @@ void CGvisR2R_PunchView::Mk2PtAlignPt1()
 			{
 				if (!m_bSkipAlign[1][1])	// Right
 				{
-					if (!TwoPointAlign1(1))
+					sMsg.Format(_T("SN:%d Right 2Point align #2 실행 (조명 2 : %s, 기준 score 2 : %d), marking torque  %s"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Vision[1].sStdScr, pDoc->WorkingInfo.Marking[1].sMarkingToq);
+					pDoc->LogAuto(sMsg);
+
+					if (TwoPointAlign1(1))
 					{
-						m_bFailAlign[1][1] = TRUE; pDoc->SetStatus(_T("General"), _T("bFailAlign[1][1]"), m_bFailAlign[1][1]);
+						m_bFailAlign[1][1] = FALSE; pDoc->SetStatus(_T("General"), _T("bFailAlign[1][1]"), m_bFailAlign[1][1]);
+						sMsg.Format(_T("SN:%d Right 2Point align #2 정상 (조명 2 : %s, 결과 score 2 : %s)"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Motion.sAlignResultScore[1][1]);
+						pDoc->LogAuto(sMsg);
 					}
 					else
 					{
-						m_bFailAlign[1][1] = FALSE; pDoc->SetStatus(_T("General"), _T("bFailAlign[1][1]"), m_bFailAlign[1][1]);
+						m_bFailAlign[1][1] = TRUE; pDoc->SetStatus(_T("General"), _T("bFailAlign[1][1]"), m_bFailAlign[1][1]);
+						sMsg.Format(_T("SN:%d Right 2Point align #2 비정상 (조명 2 : %s, 결과 score 2 : %s)"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Motion.sAlignResultScore[1][1]);
+						pDoc->LogAuto(sMsg);
 					}
 				}
 				else
@@ -19696,13 +19791,20 @@ void CGvisR2R_PunchView::Mk2PtAlignPt1()
 			{
 				if (!m_bSkipAlign[0][1])	// Left
 				{
-					if (!TwoPointAlign0(1))
+					sMsg.Format(_T("SN:%d Left 2Point align #2 실행 (조명 2 : %s, 기준 score 2 : %d), marking torque  %s"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Vision[0].sStdScr, pDoc->WorkingInfo.Marking[0].sMarkingToq);
+					pDoc->LogAuto(sMsg);
+
+					if (TwoPointAlign0(1))
 					{
-						m_bFailAlign[0][1] = TRUE; pDoc->SetStatus(_T("General"), _T("bFailAlign[0][1]"), m_bFailAlign[0][1]);
+						m_bFailAlign[0][1] = FALSE; pDoc->SetStatus(_T("General"), _T("bFailAlign[0][1]"), m_bFailAlign[0][1]);
+						sMsg.Format(_T("SN:%d Left 2Point align #2 정상 (조명 1 : %s, 결과 score 1 : %s)"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Motion.sAlignResultScore[0][1]);
+						pDoc->LogAuto(sMsg);
 					}
 					else
 					{
-						m_bFailAlign[0][1] = FALSE; pDoc->SetStatus(_T("General"), _T("bFailAlign[0][1]"), m_bFailAlign[0][1]);
+						m_bFailAlign[0][1] = TRUE; pDoc->SetStatus(_T("General"), _T("bFailAlign[0][1]"), m_bFailAlign[0][1]);
+						sMsg.Format(_T("SN:%d Left 2Point align #2 비정상 (조명 1 : %s, 결과 score 1 : %s)"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Motion.sAlignResultScore[0][1]);
+						pDoc->LogAuto(sMsg);
 					}
 				}
 				else
@@ -20962,6 +21064,7 @@ void CGvisR2R_PunchView::Mk4PtAlignPt0()
 		return;
 
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
+	CString sMsg;
 
 	if ((m_bMkSt[0] || m_bMkSt[1]) && IsBuffer())
 	{
@@ -21128,7 +21231,9 @@ void CGvisR2R_PunchView::Mk4PtAlignPt0()
 			break;
 		case MK_ST + (Mk4PtIdx::Move0Cam0) + 1:
 			if (IsRun())
+			{
 				m_nMkStAuto++;
+			}
 			break;
 		case MK_ST + (Mk4PtIdx::Move0Cam0) + 2:
 			if (IsMoveDone())
@@ -21142,13 +21247,20 @@ void CGvisR2R_PunchView::Mk4PtAlignPt0()
 			{
 				if (!m_bSkipAlign[1][0])
 				{
+					sMsg.Format(_T("SN:%d Right 4Point align #1 실행 (조명 2 : %s, 기준 score 2 : %d), marking torque  %s"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Vision[1].sStdScr, pDoc->WorkingInfo.Marking[1].sMarkingToq);
+					pDoc->LogAuto(sMsg);
+
 					if (FourPointAlign1(0))
 					{
 						m_bFailAlign[1][0] = FALSE; pDoc->SetStatus(_T("General"), _T("bFailAlign[1][0]"), m_bFailAlign[1][0]);
+						sMsg.Format(_T("SN:%d Right 4Point align #1 정상 (조명 2 : %s, 결과 score 2 : %s)"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Motion.sAlignResultScore[1][0]);
+						pDoc->LogAuto(sMsg);
 					}
 					else
 					{
 						m_bFailAlign[1][0] = TRUE; pDoc->SetStatus(_T("General"), _T("bFailAlign[1][0]"), m_bFailAlign[1][0]);
+						sMsg.Format(_T("SN:%d Right 4Point align #1 비정상 (조명 2 : %s, 결과 score 2 : %s)"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Motion.sAlignResultScore[1][0]);
+						pDoc->LogAuto(sMsg);
 					}
 				}
 				else
@@ -21167,13 +21279,20 @@ void CGvisR2R_PunchView::Mk4PtAlignPt0()
 			{
 				if (!m_bSkipAlign[0][0])
 				{
+					sMsg.Format(_T("SN:%d Left 4Point align #1 실행 (조명 1 : %s, 기준 score 1 : %d), marking torque  %s"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Vision[0].sStdScr, pDoc->WorkingInfo.Marking[0].sMarkingToq);
+					pDoc->LogAuto(sMsg);
+
 					if (FourPointAlign0(0))
 					{
 						m_bFailAlign[0][0] = FALSE; pDoc->SetStatus(_T("General"), _T("bFailAlign[0][0]"), m_bFailAlign[0][0]);
+						sMsg.Format(_T("SN:%d Left 4Point align #1 정상 (조명 1 : %s, 결과 score 1 : %s)"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Motion.sAlignResultScore[0][0]);
+						pDoc->LogAuto(sMsg);
 					}
 					else
 					{
 						m_bFailAlign[0][0] = TRUE; pDoc->SetStatus(_T("General"), _T("bFailAlign[0][0]"), m_bFailAlign[0][0]);
+						sMsg.Format(_T("SN:%d Left 4Point align #1 비정상 (조명 1 : %s, 결과 score 1 : %s)"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Motion.sAlignResultScore[0][0]);
+						pDoc->LogAuto(sMsg);
 					}
 				}
 				else
@@ -21324,6 +21443,7 @@ void CGvisR2R_PunchView::Mk4PtAlignPt0()
 
 void CGvisR2R_PunchView::Mk4PtAlignPt1()
 {
+	CString sMsg;
 	if (!IsRun())
 		return;
 
@@ -21506,13 +21626,20 @@ void CGvisR2R_PunchView::Mk4PtAlignPt1()
 			{
 				if (!m_bSkipAlign[1][1])	// Right
 				{
-					if (!FourPointAlign1(1))
+					sMsg.Format(_T("SN:%d Right 4Point align #2 실행 (조명 2 : %s, 기준 score 2 : %d), marking torque  %s"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Vision[1].sStdScr, pDoc->WorkingInfo.Marking[1].sMarkingToq);
+					pDoc->LogAuto(sMsg);
+
+					if (FourPointAlign1(1))
 					{
-						m_bFailAlign[1][1] = TRUE; pDoc->SetStatus(_T("General"), _T("bFailAlign[1][1]"), m_bFailAlign[1][1]);
+						m_bFailAlign[1][1] = FALSE; pDoc->SetStatus(_T("General"), _T("bFailAlign[1][1]"), m_bFailAlign[1][1]);
+						sMsg.Format(_T("SN:%d Right 4Point align #2 정상 (조명 2 : %s, 결과 score 2 : %s)"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Motion.sAlignResultScore[1][1]);
+						pDoc->LogAuto(sMsg);
 					}
 					else
 					{
-						m_bFailAlign[1][1] = FALSE; pDoc->SetStatus(_T("General"), _T("bFailAlign[1][1]"), m_bFailAlign[1][1]);
+						m_bFailAlign[1][1] = TRUE; pDoc->SetStatus(_T("General"), _T("bFailAlign[1][1]"), m_bFailAlign[1][1]);
+						sMsg.Format(_T("SN:%d Right 4Point align #2 비정상 (조명 2 : %s, 결과 score 2 : %s)"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Motion.sAlignResultScore[1][1]);
+						pDoc->LogAuto(sMsg);
 					}
 				}
 				else
@@ -21531,13 +21658,20 @@ void CGvisR2R_PunchView::Mk4PtAlignPt1()
 			{
 				if (!m_bSkipAlign[0][1])	// Left
 				{
-					if (!FourPointAlign0(1))
+					sMsg.Format(_T("SN:%d Left 4Point align #2 실행 (조명 1 : %s, 기준 score 1 : %d), marking torque  %s"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Vision[0].sStdScr, pDoc->WorkingInfo.Marking[0].sMarkingToq);
+					pDoc->LogAuto(sMsg);
+
+					if (FourPointAlign0(1))
 					{
-						m_bFailAlign[0][1] = TRUE; pDoc->SetStatus(_T("General"), _T("bFailAlign[0][1]"), m_bFailAlign[0][1]);
+						m_bFailAlign[0][1] = FALSE; pDoc->SetStatus(_T("General"), _T("bFailAlign[0][1]"), m_bFailAlign[0][1]);
+						sMsg.Format(_T("SN:%d Left 4Point align #2 정상 (조명 1 : %s, 결과 score 1 : %s)"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Motion.sAlignResultScore[0][1]);
+						pDoc->LogAuto(sMsg);
 					}
 					else
 					{
-						m_bFailAlign[0][1] = FALSE; pDoc->SetStatus(_T("General"), _T("bFailAlign[0][1]"), m_bFailAlign[0][1]);
+						m_bFailAlign[0][1] = TRUE; pDoc->SetStatus(_T("General"), _T("bFailAlign[0][1]"), m_bFailAlign[0][1]);
+						sMsg.Format(_T("SN:%d Left 4Point align #2 비정상 (조명 1 : %s, 결과 score 1 : %s)"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Motion.sAlignResultScore[0][1]);
+						pDoc->LogAuto(sMsg);
 					}
 				}
 				else
@@ -21673,6 +21807,7 @@ void CGvisR2R_PunchView::Mk4PtAlignPt1()
 
 void CGvisR2R_PunchView::Mk4PtAlignPt2()
 {
+	CString sMsg;
 	if (!IsRun())
 		return;
 
@@ -21847,13 +21982,20 @@ void CGvisR2R_PunchView::Mk4PtAlignPt2()
 				{
 					if (!m_bSkipAlign[1][2])	// Right
 					{
-						if (!FourPointAlign1(2))
+						sMsg.Format(_T("SN:%d Right 4Point align #3 실행 (조명 2 : %s, 기준 score 2 : %d), marking torque  %s"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Vision[1].sStdScr, pDoc->WorkingInfo.Marking[1].sMarkingToq);
+						pDoc->LogAuto(sMsg);
+
+						if (FourPointAlign1(2))
 						{
-							m_bFailAlign[1][2] = TRUE; pDoc->SetStatus(_T("General"), _T("bFailAlign[1][2]"), m_bFailAlign[1][2]);
+							m_bFailAlign[1][2] = FALSE; pDoc->SetStatus(_T("General"), _T("bFailAlign[1][2]"), m_bFailAlign[1][2]);
+							sMsg.Format(_T("SN:%d Right 4Point align #3 정상 (조명 2 : %s, 결과 score 2 : %s)"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Motion.sAlignResultScore[1][2]);
+							pDoc->LogAuto(sMsg);
 						}
 						else
 						{
-							m_bFailAlign[1][2] = FALSE; pDoc->SetStatus(_T("General"), _T("bFailAlign[1][2]"), m_bFailAlign[1][2]);
+							m_bFailAlign[1][2] = TRUE; pDoc->SetStatus(_T("General"), _T("bFailAlign[1][2]"), m_bFailAlign[1][2]);
+							sMsg.Format(_T("SN:%d Right 4Point align #3 비정상 (조명 2 : %s, 결과 score 2 : %s)"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Motion.sAlignResultScore[1][2]);
+							pDoc->LogAuto(sMsg);
 						}
 					}
 					else
@@ -21879,13 +22021,20 @@ void CGvisR2R_PunchView::Mk4PtAlignPt2()
 				{
 					if (!m_bSkipAlign[0][2])
 					{
-						if (!FourPointAlign0(2))
+						sMsg.Format(_T("SN:%d Left 4Point align #3 실행 (조명 1 : %s, 기준 score 1 : %d), marking torque  %s"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Vision[0].sStdScr, pDoc->WorkingInfo.Marking[0].sMarkingToq);
+						pDoc->LogAuto(sMsg);
+
+						if (FourPointAlign0(2))
 						{
-							m_bFailAlign[0][2] = TRUE; pDoc->SetStatus(_T("General"), _T("bFailAlign[0][2]"), m_bFailAlign[0][2]);
+							m_bFailAlign[0][2] = FALSE; pDoc->SetStatus(_T("General"), _T("bFailAlign[0][2]"), m_bFailAlign[0][2]);
+							sMsg.Format(_T("SN:%d Left 4Point align #3 정상 (조명 1 : %s, 결과 score 1 : %s)"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Motion.sAlignResultScore[0][2]);
+							pDoc->LogAuto(sMsg);
 						}
 						else
 						{
-							m_bFailAlign[0][2] = FALSE; pDoc->SetStatus(_T("General"), _T("bFailAlign[0][2]"), m_bFailAlign[0][2]);
+							m_bFailAlign[0][2] = TRUE; pDoc->SetStatus(_T("General"), _T("bFailAlign[0][2]"), m_bFailAlign[0][2]);
+							sMsg.Format(_T("SN:%d Left 4Point align #3 비정상 (조명 1 : %s, 결과 score 1 : %s)"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Motion.sAlignResultScore[0][2]);
+							pDoc->LogAuto(sMsg);
 						}
 					}
 					else
@@ -22022,6 +22171,7 @@ void CGvisR2R_PunchView::Mk4PtAlignPt2()
 
 void CGvisR2R_PunchView::Mk4PtAlignPt3()
 {
+	CString sMsg;
 	if (!IsRun())
 		return;
 
@@ -22208,13 +22358,20 @@ void CGvisR2R_PunchView::Mk4PtAlignPt3()
 					{
 						if (!m_bSkipAlign[1][3])
 						{
-							if (!FourPointAlign1(3))
+							sMsg.Format(_T("SN:%d Right 4Point align #4 실행 (조명 2 : %s, 기준 score 2 : %d), marking torque  %s"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Vision[1].sStdScr, pDoc->WorkingInfo.Marking[1].sMarkingToq);
+							pDoc->LogAuto(sMsg);
+
+							if (FourPointAlign1(3))
 							{
-								m_bFailAlign[1][3] = TRUE; pDoc->SetStatus(_T("General"), _T("bFailAlign[1][3]"), m_bFailAlign[1][3]);
+								m_bFailAlign[1][3] = FALSE; pDoc->SetStatus(_T("General"), _T("bFailAlign[1][3]"), m_bFailAlign[1][3]);
+								sMsg.Format(_T("SN:%d Right 4Point align #4 정상 (조명 2 : %s, 결과 score 2 : %s)"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Motion.sAlignResultScore[1][3]);
+								pDoc->LogAuto(sMsg);
 							}
 							else
 							{
-								m_bFailAlign[1][3] = FALSE; pDoc->SetStatus(_T("General"), _T("bFailAlign[1][3]"), m_bFailAlign[1][3]);
+								m_bFailAlign[1][3] = TRUE; pDoc->SetStatus(_T("General"), _T("bFailAlign[1][3]"), m_bFailAlign[1][3]);
+								sMsg.Format(_T("SN:%d Right 4Point align #4 비정상 (조명 2 : %s, 결과 score 2 : %s)"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Motion.sAlignResultScore[1][3]);
+								pDoc->LogAuto(sMsg);
 							}
 						}
 						else
@@ -22248,13 +22405,20 @@ void CGvisR2R_PunchView::Mk4PtAlignPt3()
 					{
 						if (!m_bSkipAlign[0][3])
 						{
-							if (!FourPointAlign0(3))
+							sMsg.Format(_T("SN:%d Left 4Point align #4 실행 (조명 1 : %s, 기준 score 1 : %d), marking torque  %s"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Vision[0].sStdScr, pDoc->WorkingInfo.Marking[0].sMarkingToq);
+							pDoc->LogAuto(sMsg);
+
+							if (FourPointAlign0(3))
 							{
-								m_bFailAlign[0][3] = TRUE; pDoc->SetStatus(_T("General"), _T("bFailAlign[0][3]"), m_bFailAlign[0][3]);
+								m_bFailAlign[0][3] = FALSE; pDoc->SetStatus(_T("General"), _T("bFailAlign[0][3]"), m_bFailAlign[0][3]);
+								sMsg.Format(_T("SN:%d Left 4Point align #4 정상 (조명 1 : %s, 결과 score 1 : %s)"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Motion.sAlignResultScore[0][3]);
+								pDoc->LogAuto(sMsg);
 							}
 							else
 							{
-								m_bFailAlign[0][3] = FALSE; pDoc->SetStatus(_T("General"), _T("bFailAlign[0][3]"), m_bFailAlign[0][3]);
+								m_bFailAlign[0][3] = TRUE; pDoc->SetStatus(_T("General"), _T("bFailAlign[0][3]"), m_bFailAlign[0][3]);
+								sMsg.Format(_T("SN:%d Left 4Point align #4 비정상 (조명 1 : %s, 결과 score 1 : %s)"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Motion.sAlignResultScore[0][3]);
+								pDoc->LogAuto(sMsg);
 							}
 						}
 						else
@@ -25460,6 +25624,7 @@ void CGvisR2R_PunchView::MonDispMain() // PLC의 운전상태 표시
 	{
 		if (m_sDispMain != _T("운전중"))
 		{
+			pDoc->LogAuto(_T("재가동, 운전 버튼 누름"));
 			DispMain(_T("운전중"), RGB_GREEN);	
 			pDoc->SetMkMenu03(_T("Main"), _T("Run"), TRUE);
 			pDoc->SetMkMenu03(_T("Main"), _T("Stop"), FALSE);
@@ -28235,6 +28400,19 @@ void CGvisR2R_PunchView::DoMark0Its()
 		}
 		break;
 	case 3:
+		if (m_bCam)
+		{
+			if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+				sMsg.Format(_T("Left 미마킹 테스트 시작 SN:%d"), m_nBufUpSerial[0]);
+			else
+				sMsg.Format(_T("Left verify 시작 SN:%d"), m_nBufUpSerial[0]);
+			pDoc->LogAuto(sMsg);
+		}
+		else
+		{
+			sMsg.Format(_T("Left marking 시작 SN:%d"), m_nBufUpSerial[0]);
+			pDoc->LogAuto(sMsg);
+		}
 		m_nStepMk[0]++;
 		break;
 	case 4:
@@ -28445,9 +28623,12 @@ void CGvisR2R_PunchView::DoMark0Its()
 #ifdef USE_VISION
 					if (!m_pVision[0]->m_bMkJudge)
 					{
+						pDoc->LogAuto(_T("좌측 펀칭 미마킹 알람 발생"));
 						nRtn = MsgBox(_T("좌측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+						pDoc->LogAuto(_T("좌측 펀칭 미마킹 알람 해제"));
 						if (IDYES == nRtn)
 						{
+							m_bFailMkJudge[0] = TRUE;
 							ptPnt.x = m_dTarget[AXIS_X0];
 							ptPnt.y = m_dTarget[AXIS_Y0];
 
@@ -28464,8 +28645,12 @@ void CGvisR2R_PunchView::DoMark0Its()
 						else
 						{
 							Stop();
+							m_pVision[0]->ArMkMtRst.Add(m_pVision[0]->MkMtRst);
 						}
-
+					}
+					else
+					{
+						m_pVision[0]->ArMkMtRst.Add(m_pVision[0]->MkMtRst);
 					}
 #endif
 				}
@@ -28688,6 +28873,7 @@ void CGvisR2R_PunchView::DoMark0Its()
 	case 105:
 		if (IsInitPos0())
 		{
+			SetArMkMtRstOnLogAuto(0);
 			m_nStepMk[0]++;
 		}
 		else
@@ -28800,8 +28986,10 @@ void CGvisR2R_PunchView::DoMark1Its()
 			{
 				if (m_pMotion->IsMotionDone(MS_X1) && m_pMotion->IsMotionDone(MS_Y1))
 				{
-					if (!IsMkEdPos1() && !IsPinPos1())
-						MoveMkEdPos1();
+					if (!IsInitPos1() && !IsPinPos1())
+						MoveInitPos1();
+					//if (!IsMkEdPos1() && !IsPinPos1())
+					//	MoveMkEdPos1();
 				}
 			}
 
@@ -28830,7 +29018,7 @@ void CGvisR2R_PunchView::DoMark1Its()
 		break;
 	case 2:
 		nSerial = m_nBufUpSerial[1]; // Cam1
-		sMsg.Format(_T("%d:%d,%d:%d"), nSerial-1, GetTotDefPcs0Its(nSerial-1), nSerial, GetTotDefPcs1Its(nSerial));
+		sMsg.Format(_T("%d:%d,%d:%d"), nSerial - 1, GetTotDefPcs0Its(nSerial - 1), nSerial, GetTotDefPcs1Its(nSerial));
 		//pDoc->LogAuto(sMsg);
 		if (nSerial > 0)
 		{
@@ -28853,6 +29041,19 @@ void CGvisR2R_PunchView::DoMark1Its()
 		}
 		break;
 	case 3:
+		if (m_bCam)
+		{
+			if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+				sMsg.Format(_T("Right 미마킹 테스트 시작 SN:%d"), m_nBufUpSerial[1]);
+			else
+				sMsg.Format(_T("Right verify 시작 SN:%d"), m_nBufUpSerial[1]);
+			pDoc->LogAuto(sMsg);
+		}
+		else
+		{
+			sMsg.Format(_T("Right marking 시작 SN:%d"), m_nBufUpSerial[1]);
+			pDoc->LogAuto(sMsg);
+		}
 		m_nStepMk[1]++;
 		break;
 	case 4:
@@ -29081,9 +29282,12 @@ void CGvisR2R_PunchView::DoMark1Its()
 #ifdef USE_VISION
 					if (!m_pVision[1]->m_bMkJudge)
 					{
+						pDoc->LogAuto(_T("우측 펀칭 미마킹 알람 발생"));
 						nRtn = MsgBox(_T("우측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+						pDoc->LogAuto(_T("우측 펀칭 미마킹 알람 해제"));
 						if (IDYES == nRtn)
 						{
+							m_bFailMkJudge[1] = TRUE;
 							ptPnt.x = m_dTarget[AXIS_X1];
 							ptPnt.y = m_dTarget[AXIS_Y1];
 
@@ -29099,9 +29303,13 @@ void CGvisR2R_PunchView::DoMark1Its()
 						}
 						else
 						{
+							m_pVision[1]->ArMkMtRst.Add(m_pVision[1]->MkMtRst);
 							Stop();
 						}
-
+					}
+					else
+					{
+						m_pVision[1]->ArMkMtRst.Add(m_pVision[1]->MkMtRst);
 					}
 #endif
 				}
@@ -29300,14 +29508,16 @@ void CGvisR2R_PunchView::DoMark1Its()
 			m_nStepMk[1]++;
 		break;
 	case 103:
-		if (!IsMkEdPos1())
+		//if (!IsMkEdPos1())
+		if (!IsInitPos1())
 		{
 			m_dTarget[AXIS_X1] = _tstof(pDoc->WorkingInfo.Motion.sStPosX[1]);
 			m_dTarget[AXIS_Y1] = _tstof(pDoc->WorkingInfo.Motion.sStPosY[1]);
 			m_dNextTarget[AXIS_X1] = _tstof(pDoc->WorkingInfo.Motion.sStPosX[1]);
 			m_dNextTarget[AXIS_Y1] = _tstof(pDoc->WorkingInfo.Motion.sStPosY[1]);
 
-			MoveMkEdPos1();
+			MoveInitPos1();
+			//MoveMkEdPos1();
 		}
 
 		pDoc->SaveMkCntR();
@@ -29321,8 +29531,10 @@ void CGvisR2R_PunchView::DoMark1Its()
 		}
 		break;
 	case 105:
-		if (IsMkEdPos1())
+		//if (IsMkEdPos1())
+		if (IsInitPos1())
 		{
+			SetArMkMtRstOnLogAuto(1);
 			m_nStepMk[1]++;
 		}
 		else
@@ -34053,4 +34265,329 @@ void CGvisR2R_PunchView::Mk4PtShift2Mk() // MODE_INNER
 			break;
 		}
 	}
+}
+
+BOOL CGvisR2R_PunchView::SetArMkMtRstOnLogAuto(int nCam)
+{
+	if (!m_pVision[nCam])
+		return FALSE;
+	if (!pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+		return FALSE;
+
+	CString sTemp[2];
+	int nRef[2], nAvg[2], nMin[2], nMax[2];
+
+	if (nCam == 0)			// Left
+	{
+		if (GetArMkMtRst(0, nRef[0], nAvg[0], nMin[0], nMax[0]))
+		{
+			sTemp[0].Format(_T("미마킹 테스트 결과 SN:%d "), m_nBufUpSerial[0]);
+			m_sLogAuto[0] = sTemp[0];
+			if (m_bFailMkJudge[0])
+				m_sLogAuto[0] += _T("비정상 ");
+			else
+				m_sLogAuto[0] += _T("정상 ");
+			sTemp[0].Format(_T("Ref %d, Avg %d, Min %d, Max %d "), nRef[0], nAvg[0], nMin[0], nMax[0]);
+			m_sLogAuto[0] += sTemp[0];
+			m_sLogAuto[0] += GetMarkedPcsList(0);
+			pDoc->LogAuto(m_sLogAuto[0]);
+		}
+		else
+			return FALSE;
+	}
+	else if (nCam == 1)		// Right
+	{
+		if (GetArMkMtRst(1, nRef[1], nAvg[1], nMin[1], nMax[1]))
+		{
+			sTemp[1].Format(_T("미마킹 테스트 결과 SN:%d "), m_nBufUpSerial[1]);
+			m_sLogAuto[1] = sTemp[1];
+			if (m_bFailMkJudge[1])
+				m_sLogAuto[1] += _T("비정상 ");
+			else
+				m_sLogAuto[1] += _T("정상 ");
+			sTemp[1].Format(_T("Ref %d, Avg %d, Min %d, Max %d "), nRef[1], nAvg[1], nMin[1], nMax[1]);
+			m_sLogAuto[1] += sTemp[1];
+			m_sLogAuto[1] += GetMarkedPcsList(1);
+			pDoc->LogAuto(m_sLogAuto[1]);
+		}
+		else
+			return FALSE;
+	}
+
+	return TRUE;
+}
+
+BOOL CGvisR2R_PunchView::GetArMkMtRst(int nCam, int &nRef, int &nAvg, int &nMin, int &nMax)
+{
+	if (!m_pVision[nCam])
+		return FALSE;
+	if (!pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+		return FALSE;
+
+	int nTotalRst[2], nTotalScore[2], nMinScore[2], nMaxScore[2], nScore[2];
+	stPtMtRst MkMtRst[2];
+
+	if (nCam == 0)			// Left
+	{
+		nRef = 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0];
+		nTotalRst[0] = m_pVision[0]->ArMkMtRst.GetCount();
+		nTotalScore[0] = 0;
+		nMinScore[0] = 100;
+		nMaxScore[0] = 0;
+
+		if (nTotalRst[0] < 1)
+			return FALSE;
+
+		for (int i = 0; i < nTotalRst[0]; i++)
+		{
+			MkMtRst[0] = m_pVision[0]->ArMkMtRst.GetAt(i);
+			nScore[0] = int(MkMtRst[0].dScore);
+			nTotalScore[0] += nScore[0];
+			nMinScore[0] = (nMinScore[0] > nScore[0]) ? nScore[0] : nMinScore[0];
+			nMaxScore[0] = (nMaxScore[0] < nScore[0]) ? nScore[0] : nMaxScore[0];
+		}
+
+		nAvg = int(nTotalScore[0] / nTotalRst[0]);
+		nMin = nMinScore[0];
+		nMax = nMaxScore[0];
+	}
+	else if (nCam == 1)		// Right
+	{
+		nRef = 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1];
+		nTotalRst[1] = m_pVision[1]->ArMkMtRst.GetCount();
+		nTotalScore[1] = 0;
+		nMinScore[1] = 100;
+		nMaxScore[1] = 0;
+
+		if (nTotalRst[1] < 1)
+			return FALSE;
+
+		for (int i = 0; i < nTotalRst[1]; i++)
+		{
+			MkMtRst[1] = m_pVision[1]->ArMkMtRst.GetAt(i);
+			nScore[1] = int(MkMtRst[1].dScore);
+			nTotalScore[1] += nScore[1];
+			nMinScore[1] = (nMinScore[1] > nScore[1]) ? nScore[1] : nMinScore[1];
+			nMaxScore[1] = (nMaxScore[1] < nScore[1]) ? nScore[1] : nMaxScore[1];
+		}
+
+		nAvg = int(nTotalScore[1] / nTotalRst[1]);
+		nMin = nMinScore[1];
+		nMax = nMaxScore[1];
+	}
+
+	return TRUE;
+}
+
+CString CGvisR2R_PunchView::GetMarkedPcsList(int nCam)
+{
+	if (!m_pVision[nCam])
+		return _T("");
+	if (!pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+		return _T("");
+
+	CString sData[2];
+	CString sTemp[2];
+	int nSerial[2], nTotalRst[2], nRef[2], nScore[2];
+	stPtMtRst MkMtRst[2];
+
+	if (nCam == 0)			// Left
+	{
+		nRef[0] = 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0];
+		nSerial[0] = m_nBufUpSerial[0];
+		nTotalRst[0] = GetTotDefPcs0(nSerial[0]);
+		if (nTotalRst[0] < 1)
+			return _T("");
+
+		sData[0] = _T("(");
+		for (int i = 0; i < nTotalRst[0]; i++)
+		{
+			MkMtRst[0] = m_pVision[0]->ArMkMtRst.GetAt(i);
+			nScore[0] = int(MkMtRst[0].dScore);
+			sData[0] += GetMkMtInfo0(nSerial[0], i);
+			sTemp[0].Format(_T("_%d_%d"), nRef[0], nScore[0]);
+			sData[0] += sTemp[0];
+			if (i < nTotalRst[0] - 1)
+				sData[0] += _T(", ");
+		}
+		sData[0] += _T(")");
+		return sData[0];
+	}
+	else if (nCam == 1)		// Right
+	{
+		nRef[1] = 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1];
+		nSerial[1] = m_nBufUpSerial[1];
+		nTotalRst[1] = GetTotDefPcs0(nSerial[1]);
+		if (nTotalRst[1] < 1)
+			return _T("");
+
+		sData[1] = _T("(");
+		for (int i = 0; i < nTotalRst[1]; i++)
+		{
+			MkMtRst[1] = m_pVision[1]->ArMkMtRst.GetAt(i);
+			nScore[1] = int(MkMtRst[1].dScore);
+			sData[1] += GetMkMtInfo0(nSerial[1], i);
+			sTemp[1].Format(_T("_%d_%d"), nRef[1], nScore[1]);
+			sData[1] += sTemp[1];
+			if (i < nTotalRst[1] - 1)
+				sData[1] += _T(", ");
+		}
+		sData[1] += _T(")");
+		return sData[1];
+	}
+
+	return _T("");
+}
+
+CString CGvisR2R_PunchView::GetMkMtInfo0(int nSerial, int nMkPcs) // return Cam0 : "Serial_Strip_Col_Row"
+{
+	CString sInfo;
+	if (nSerial <= 0)
+	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
+		pView->ClrDispMsg();
+		MsgBox(_T("좌측 마킹위치 정보 실패."));
+		sInfo.Format(_T("%c_%d_%d"), '?', 0, 0);
+		return sInfo;
+	}
+
+	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
+
+	int nStrip = -1, nCol = -1, nRow = -1;
+	int nPcsIdx = -1, nDefCode = -1;
+	int nPcrIdx = pDoc->GetPcrIdx0(nSerial);
+
+	if (pDoc->GetTestMode() == MODE_OUTER)
+	{
+		if (pDoc->m_pPcrIts)
+		{
+			nPcsIdx = pDoc->m_pPcrIts[nPcrIdx]->m_pDefPcs[nMkPcs];
+			nDefCode = pDoc->m_pPcrIts[nPcrIdx]->m_pDefType[nMkPcs];
+		}
+
+		if (nPcsIdx < 0)
+		{
+			MsgBox(_T("외층 작업에서 좌측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
+			//pDoc->LogAuto(_T("외층 작업에서 좌측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
+			sInfo.Format(_T("%c_%d_%d"), '?', 0, 0);
+			return sInfo;
+		}
+	}
+	else
+	{
+		if (bDualTest)
+		{
+			if (pDoc->m_pPcr[2])
+			{
+				nPcsIdx = pDoc->m_pPcr[2][nPcrIdx]->m_pDefPcs[nMkPcs];
+				nDefCode = pDoc->m_pPcr[2][nPcrIdx]->m_pDefType[nMkPcs];
+			}
+		}
+		else
+		{
+			if (pDoc->m_pPcr[0])
+			{
+				nPcsIdx = pDoc->m_pPcr[0][nPcrIdx]->m_pDefPcs[nMkPcs];
+				nDefCode = pDoc->m_pPcr[0][nPcrIdx]->m_pDefType[nMkPcs];
+			}
+		}
+
+		if (nPcsIdx < 0)
+		{
+			MsgBox(_T("양면or내층 작업에서 좌측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
+			//pDoc->LogAuto(_T("양면or내층 작업에서 좌측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
+			sInfo.Format(_T("%c_%d_%d"), '?', 0, 0);
+			return sInfo;
+		}
+	}
+
+	if (pDoc->m_Master[0].m_pPcsRgn)
+	{
+		pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[0].MasterInfo.nActionCode, nPcsIdx, nStrip, nCol, nRow);
+		sInfo.Format(_T("%c_%d_%d"), nStrip + 'A', nCol + 1, nRow + 1);
+	}
+	else
+	{
+		sInfo.Format(_T("%c_%d_%d"), '?', 0, 0);
+		MsgBox(_T("좌측 마킹위치 정보 실패."));
+	}
+
+	return sInfo;
+}
+
+CString CGvisR2R_PunchView::GetMkMtInfo1(int nSerial, int nMkPcs) // return Cam1 : "Serial_Strip_Col_Row"
+{
+	CString sInfo;
+
+	if (nSerial <= 0)
+	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
+		pView->ClrDispMsg();
+		MsgBox(_T("우측 마킹위치 정보 실패."));
+		sInfo.Format(_T("%c_%d_%d"), '?', 0, 0);
+		return sInfo;
+	}
+
+	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
+
+	int nPcsIdx = -1, nDefCode = -1;
+	int nStrip = -1, nCol = -1, nRow = -1;
+	int nPcrIdx = pDoc->GetPcrIdx1(nSerial);
+
+	if (pDoc->GetTestMode() == MODE_OUTER)
+	{
+		if (pDoc->m_pPcrIts)
+		{
+			nPcsIdx = pDoc->m_pPcrIts[nPcrIdx]->m_pDefPcs[nMkPcs];
+			nDefCode = pDoc->m_pPcrIts[nPcrIdx]->m_pDefType[nMkPcs];
+		}
+
+		if (nPcsIdx < 0)
+		{
+			MsgBox(_T("외층 작업에서 우측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
+			//pDoc->LogAuto(_T("외층 작업에서 우측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
+			sInfo.Format(_T("%c_%d_%d"), '?', 0, 0);
+			return sInfo;
+		}
+	}
+	else
+	{
+		if (bDualTest)
+		{
+			if (pDoc->m_pPcr[2])
+			{
+				nPcsIdx = pDoc->m_pPcr[2][nPcrIdx]->m_pDefPcs[nMkPcs];
+				nDefCode = pDoc->m_pPcr[2][nPcrIdx]->m_pDefType[nMkPcs];
+			}
+		}
+		else
+		{
+			if (pDoc->m_pPcr[0])
+			{
+				nPcsIdx = pDoc->m_pPcr[0][nPcrIdx]->m_pDefPcs[nMkPcs];
+				nDefCode = pDoc->m_pPcr[0][nPcrIdx]->m_pDefType[nMkPcs];
+			}
+		}
+
+		if (nPcsIdx < 0)
+		{
+			MsgBox(_T("양면or내층 작업에서 우측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
+			//pDoc->LogAuto(_T("양면or내층 작업에서 우측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
+			sInfo.Format(_T("%c_%d_%d"), '?', 0, 0);
+			return sInfo;
+		}
+	}
+
+	if (pDoc->m_Master[0].m_pPcsRgn)
+	{
+		pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[0].MasterInfo.nActionCode, nPcsIdx, nStrip, nCol, nRow);
+		sInfo.Format(_T("%c_%d_%d"), nStrip + 'A', nCol + 1, nRow + 1);
+	}
+	else
+	{
+		sInfo.Format(_T("%c_%d_%d"), '?', 0, 0);
+		MsgBox(_T("우측 마킹위치 정보 실패."));
+	}
+
+	return sInfo;
 }

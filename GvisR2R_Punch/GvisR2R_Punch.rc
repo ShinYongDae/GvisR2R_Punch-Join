@@ -166,10 +166,10 @@ FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,14,7,20,20
     LTEXT           "GvisR2R_Punch, 버전 2.1.0",IDC_STATIC,42,7,114,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2024.03.12",IDC_STATIC,42,16,114,8
+    LTEXT           "Copyright (C) 2024.03.13",IDC_STATIC,42,16,114,8
     DEFPUSHBUTTON   "확인",IDOK,113,43,50,14,WS_GROUP
     LTEXT           "미마킹 테스트 중 마킹이미지가 날아간 경우 패치",IDC_STATIC,9,29,139,8
-    LTEXT           "Log 추가",IDC_STATIC,9,38,96,8
+    LTEXT           "Log 추가 (미마킹 검사 결과)",IDC_STATIC,9,38,96,8
 END
 
 IDD_GVISR2R_PUNCH_FORM DIALOGEX 0, 0, 630, 461

@@ -71,7 +71,7 @@ typedef struct stPtMtRst
 {
 	double dX, dY, dAngle, dScore;
 } PT_MT_RST;
-
+typedef CArray <stPtMtRst, stPtMtRst> CArMkMtRst;
 
 typedef struct stBlobRst
 {
@@ -179,6 +179,7 @@ public:
 	CLibMil *m_pMil;
 	stPtMtRst PtMtRst, MkMtRst;
 	stBlobRst BlobRst;
+	CArMkMtRst ArMkMtRst;
 
 // Operations
 public:

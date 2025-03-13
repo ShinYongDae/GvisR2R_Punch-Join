@@ -4465,15 +4465,17 @@ BOOL CVision::SaveMkImg(CString sPath) // Return FALSE; --> Alarm Message & Answ
 		return FALSE;
 	}
 
+	m_bMkJudge = TRUE;
 	if (MilGrabImg && MilGrabImg->m_MilImage)
 	{
 		MIL_ID MilGrabImgCld = M_NULL;
 		MbufChild2d(MilGrabImg->m_MilImage, (640 - DEF_IMG_DISP_SIZEX) / 2, (480 - DEF_IMG_DISP_SIZEX) / 2, DEF_IMG_DISP_SIZEX, DEF_IMG_DISP_SIZEX, &MilGrabImgCld);
 
-		// Check Marking Judge
-		m_bMkJudge = CheckVerifyPunching(MilGrabImgCld);
-		//if (!m_bMkJudge)
-		//	return FALSE;
+		if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+		{
+			// Check Marking Judge
+			m_bMkJudge = CheckVerifyPunching(MilGrabImgCld);
+		}
 
 		// Draw Cross Line
 		MgraColor(M_DEFAULT, M_COLOR_BLACK);

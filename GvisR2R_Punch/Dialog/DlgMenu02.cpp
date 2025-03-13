@@ -2053,6 +2053,8 @@ BOOL CDlgMenu02::MovePinPos()
 			}
 		}
 
+		pDoc->LogAuto(_T("핀1 위치 이동"));
+
 		return TRUE;
 	}
 
@@ -2103,6 +2105,8 @@ BOOL CDlgMenu02::MovePinPos2()
 				}
 			}
 		}
+
+		pDoc->LogAuto(_T("핀2 위치 이동"));
 
 		return TRUE;
 	}
@@ -2404,11 +2408,15 @@ void CDlgMenu02::SetPinPos(int nCam, CfPoint ptPnt)
 	{
 		::WritePrivateProfileString(_T("Motion"), _T("PIN_POS0_X"), pDoc->WorkingInfo.Motion.sPinPosX[nCam], sPath);
 		::WritePrivateProfileString(_T("Motion"), _T("PIN_POS0_Y"), pDoc->WorkingInfo.Motion.sPinPosY[nCam], sPath);
+
+		pDoc->LogAuto(_T("핀1 위치 저장"));
 	}
 	else if(nCam==1)
 	{
 		::WritePrivateProfileString(_T("Motion"), _T("PIN_POS1_X"), pDoc->WorkingInfo.Motion.sPinPosX[nCam], sPath);
 		::WritePrivateProfileString(_T("Motion"), _T("PIN_POS1_Y"), pDoc->WorkingInfo.Motion.sPinPosY[nCam], sPath);
+
+		pDoc->LogAuto(_T("핀2 위치 저장"));
 	}
 
 	pView->SetAlignPos();
@@ -2540,6 +2548,8 @@ void CDlgMenu02::OnBtnHomeMove()
 			}
 		}
 	}
+
+	pDoc->LogAuto(_T("핀1 초기위치 이동"));
 }
 
 void CDlgMenu02::OnBtnHomeMove2() 
@@ -2584,6 +2594,8 @@ void CDlgMenu02::OnBtnHomeMove2()
 			}
 		}
 	}	
+
+	pDoc->LogAuto(_T("핀2 초기위치 이동"));
 }
 
 void CDlgMenu02::OnBtnHomeSave() 

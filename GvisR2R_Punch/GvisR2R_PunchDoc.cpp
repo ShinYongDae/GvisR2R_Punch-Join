@@ -5150,13 +5150,26 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoUp(int nSerial, int *pNewLot, BOOL bFromBuf) /
 		if (WorkingInfo.LastJob.sLot != Status.PcrShare[0].sLot)
 		{
 			WorkingInfo.LastJob.sLot = Status.PcrShare[0].sLot;
-			sMsg.Format(_T("Lot Change %s"), Status.PcrShare[0].sLot);
-			pDoc->LogAuto(sMsg);
+			if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[0].sItsCode)
+			{
+				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[0].sItsCode;
+				sMsg.Format(_T("ITS%s Lot%s SN:%d"), Status.PcrShare[0].sItsCode, Status.PcrShare[0].sLot, nSerial);
+				pDoc->LogAuto(sMsg);
+			}
+			else
+			{
+				sMsg.Format(_T("Lot Change %s"), Status.PcrShare[0].sLot);
+				pDoc->LogAuto(sMsg);
+			}
 		}
-
-		if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[0].sItsCode)
+		else
 		{
-			m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[0].sItsCode;
+			if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[0].sItsCode)
+			{
+				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[0].sItsCode;
+				sMsg.Format(_T("ITS Change %s"), Status.PcrShare[0].sItsCode);
+				pDoc->LogAuto(sMsg);
+			}
 		}
 		*pNewLot = 1;
 	}
@@ -5359,13 +5372,27 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoDn(int nSerial, int *pNewLot, BOOL bFromBuf) /
 		bUpdate = TRUE;
 		if (WorkingInfo.LastJob.sLot != Status.PcrShare[1].sLot)
 		{
-			WorkingInfo.LastJob.sLot = Status.PcrShare[1].sLot;
-			sMsg.Format(_T("Lot Change %s"), Status.PcrShare[1].sLot);
-			pDoc->LogAuto(sMsg);
+			if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[1].sItsCode)
+			{
+				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[1].sItsCode;
+				sMsg.Format(_T("ITS%s Lot%s SN:%d"), Status.PcrShare[1].sItsCode, Status.PcrShare[1].sLot, nSerial);
+				pDoc->LogAuto(sMsg);
+			}
+			else
+			{
+				WorkingInfo.LastJob.sLot = Status.PcrShare[1].sLot;
+				sMsg.Format(_T("Lot Change %s"), Status.PcrShare[1].sLot);
+				pDoc->LogAuto(sMsg);
+			}
 		}
-		if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[1].sItsCode)
+		else
 		{
-			m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[1].sItsCode;
+			if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[1].sItsCode)
+			{
+				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[1].sItsCode;
+				sMsg.Format(_T("ITS Change %s"), Status.PcrShare[1].sItsCode);
+				pDoc->LogAuto(sMsg);
+			}
 		}
 		*pNewLot = 1;
 	}
@@ -6110,20 +6137,38 @@ int CGvisR2R_PunchDoc::LoadPCRUp(int nSerial, BOOL bFromShare)	// return : 2(Fai
 
 	if (WorkingInfo.LastJob.sLot != strLot || WorkingInfo.LastJob.sEngItsCode != sItsCode)
 	{
+		bUpdate = TRUE;
 		if (WorkingInfo.LastJob.sLot != strLot)
 		{
 			WorkingInfo.LastJob.sLot = strLot;
 			if(pView->m_pEngrave)
 				pView->m_pEngrave->SetLotName();
-			sMsg.Format(_T("Lot Change %s"), strLot);
-			pDoc->LogAuto(sMsg);
+			if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
+			{
+				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+				sMsg.Format(_T("ITS%s Lot%s SN:%d"), sItsCode, strLot, nSerial);
+				pDoc->LogAuto(sMsg);
+			}
+			else
+			{
+				sMsg.Format(_T("Lot Change %s"), strLot);
+				pDoc->LogAuto(sMsg);
+			}
 		}
-		bUpdate = TRUE;
-		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		else
+		{
+			if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
+			{
+				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+				sMsg.Format(_T("ITS Change %s"), sItsCode);
+				pDoc->LogAuto(sMsg);
+			}
+		}
 	}
 
 	if (WorkingInfo.LastJob.sModel != strModel || WorkingInfo.LastJob.sLayerUp != strLayer)
 	{
+		bUpdate = TRUE;
 		if (WorkingInfo.LastJob.sModel != strModel)
 		{
 			WorkingInfo.LastJob.sModel = strModel;
@@ -6137,11 +6182,10 @@ int CGvisR2R_PunchDoc::LoadPCRUp(int nSerial, BOOL bFromShare)	// return : 2(Fai
 			WorkingInfo.LastJob.sLayerUp = strLayer;
 			if (pView->m_pEngrave)
 				pView->m_pEngrave->SetLayerUpName();
-			sMsg.Format(_T("Layer Change %s"), strLayer);
+			sMsg.Format(_T("LayerUp Change %s"), strLayer);
 			pDoc->LogAuto(sMsg);
 		}
 
-		bUpdate = TRUE;
 		pView->ResetMkInfo(0); // CAD 데이터 리로딩   0 : AOI-Up , 1 : AOI-Dn , 2 : AOI-UpDn
 	}
 
@@ -6399,34 +6443,58 @@ int CGvisR2R_PunchDoc::LoadPCRDn(int nSerial, BOOL bFromShare)	// return : 2(Fai
 	}
 
 	BOOL bUpdate = FALSE;
+	CString sMsg;
 
 	if (WorkingInfo.LastJob.sLot != strLot || WorkingInfo.LastJob.sEngItsCode != sItsCode)
 	{
+		bUpdate = TRUE;
 		if (WorkingInfo.LastJob.sLot != strLot)
 		{
 			WorkingInfo.LastJob.sLot = strLot;
 			if (pView->m_pEngrave)
 				pView->m_pEngrave->SetLotName();
+			if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
+			{
+				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+				sMsg.Format(_T("ITS%s Lot%s SN:%d"), sItsCode, strLot, nSerial);
+				pDoc->LogAuto(sMsg);
+			}
+			else
+			{
+				sMsg.Format(_T("Lot Change %s"), strLot);
+				pDoc->LogAuto(sMsg);
+			}
 		}
-		bUpdate = TRUE;
-		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		else
+		{
+			if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
+			{
+				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+				sMsg.Format(_T("ITS Change %s"), sItsCode);
+				pDoc->LogAuto(sMsg);
+			}
+		}
 	}
 
 	if (WorkingInfo.LastJob.sModel != strModel || WorkingInfo.LastJob.sLayerDn != strLayer)
 	{
+		bUpdate = TRUE;
 		if (WorkingInfo.LastJob.sModel != strModel)
 		{
 			WorkingInfo.LastJob.sModel = strModel;
 			if (pView->m_pEngrave)
 				pView->m_pEngrave->SetModelName();
+			sMsg.Format(_T("Model Change %s"), strModel);
+			pDoc->LogAuto(sMsg);
 		}
 		if (WorkingInfo.LastJob.sLayerDn != strLayer)
 		{
 			WorkingInfo.LastJob.sLayerDn = strLayer;
 			if (pView->m_pEngrave)
 				pView->m_pEngrave->SetLayerDnName();
+			sMsg.Format(_T("LayerDn Change %s"), strLayer);
+			pDoc->LogAuto(sMsg);
 		}
-		bUpdate = TRUE;
 	}
 
 	if (bUpdate)
@@ -12972,32 +13040,56 @@ int CGvisR2R_PunchDoc::LoadPcrUp(CString sPath)	// return : 2(Failed), 1(정상), 
 	}
 
 	BOOL bUpdate = FALSE;
+	CString sMsg;
 
 	if (WorkingInfo.LastJob.sLot != strLot || WorkingInfo.LastJob.sEngItsCode != sItsCode)
 	{
+		bUpdate = TRUE;
 		if (WorkingInfo.LastJob.sLot != strLot)
 		{
 			WorkingInfo.LastJob.sLot = strLot;
 			pView->m_pEngrave->SetLotName();
+			if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
+			{
+				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+				sMsg.Format(_T("ITS%s Lot%s SN:%d"), sItsCode, strLot, nSerial);
+				pDoc->LogAuto(sMsg);
+			}
+			else
+			{
+				sMsg.Format(_T("Lot Change %s"), strLot);
+				pDoc->LogAuto(sMsg);
+			}
 		}
-		bUpdate = TRUE;
-		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		else
+		{
+			if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
+			{
+				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+				sMsg.Format(_T("ITS Change %s"), sItsCode);
+				pDoc->LogAuto(sMsg);
+			}
+		}
 	}
 
 	if (WorkingInfo.LastJob.sModel != strModel || WorkingInfo.LastJob.sLayerUp != strLayer)
 	{
+		bUpdate = TRUE;
 		if (WorkingInfo.LastJob.sModel != strModel)
 		{
 			WorkingInfo.LastJob.sModel = strModel;
 			pView->m_pEngrave->SetModelName();
+			sMsg.Format(_T("Mode Change %s"), strModel);
+			pDoc->LogAuto(sMsg);
 		}
 		if (WorkingInfo.LastJob.sLayerUp != strLayer)
 		{
 			WorkingInfo.LastJob.sLayerUp = strLayer;
 			pView->m_pEngrave->SetLayerUpName();
+			sMsg.Format(_T("LayerUp Change %s"), strLayer);
+			pDoc->LogAuto(sMsg);
 		}
 
-		bUpdate = TRUE;
 		pView->ResetMkInfo(0); // CAD 데이터 리로딩   0 : AOI-Up , 1 : AOI-Dn , 2 : AOI-UpDn
 	}
 
@@ -13255,31 +13347,55 @@ int CGvisR2R_PunchDoc::LoadPcrDn(CString sPath)	// return : 2(Failed), 1(정상), 
 	}
 
 	BOOL bUpdate = FALSE;
+	CString sMsg;
 
 	if (WorkingInfo.LastJob.sLot != strLot || WorkingInfo.LastJob.sEngItsCode != sItsCode)
 	{
+		bUpdate = TRUE;
 		if (WorkingInfo.LastJob.sLot != strLot)
 		{
 			WorkingInfo.LastJob.sLot = strLot;
 			pView->m_pEngrave->SetLotName();
+			if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
+			{
+				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+				sMsg.Format(_T("ITS%s Lot%s SN:%d"), sItsCode, strLot, nSerial);
+				pDoc->LogAuto(sMsg);
+			}
+			else
+			{
+				sMsg.Format(_T("Lot Change %s"), strLot);
+				pDoc->LogAuto(sMsg);
+			}
 		}
-		bUpdate = TRUE;
-		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		else
+		{
+			if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
+			{
+				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+				sMsg.Format(_T("ITS Change %s"), sItsCode);
+				pDoc->LogAuto(sMsg);
+			}
+		}
 	}
 
 	if (WorkingInfo.LastJob.sModel != strModel || WorkingInfo.LastJob.sLayerDn != strLayer)
 	{
+		bUpdate = TRUE;
 		if (WorkingInfo.LastJob.sModel != strModel)
 		{
 			WorkingInfo.LastJob.sModel = strModel;
 			pView->m_pEngrave->SetModelName();
+			sMsg.Format(_T("Model Change %s"), strModel);
+			pDoc->LogAuto(sMsg);
 		}
 		if (WorkingInfo.LastJob.sLayerDn != strLayer)
 		{
 			WorkingInfo.LastJob.sLayerDn = strLayer;
 			pView->m_pEngrave->SetLayerDnName();
+			sMsg.Format(_T("LayerDn Change %s"), strLayer);
+			pDoc->LogAuto(sMsg);
 		}
-		bUpdate = TRUE;
 	}
 
 	if (bUpdate)

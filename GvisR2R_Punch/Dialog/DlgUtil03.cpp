@@ -1724,6 +1724,8 @@ void CDlgUtil03::DispResultPtScore(int nCam)
 void CDlgUtil03::OnBnClickedBtnJudgeMk()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CString sMsg;
+
 	if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
 	{
 		int nCam = -1;
@@ -1748,16 +1750,53 @@ void CDlgUtil03::OnBnClickedBtnJudgeMk()
 #ifdef USE_VISION
 		if (pView->m_pVision[nCam])
 		{
+			if (nCam == 0)
+			{
+				pDoc->LogAuto(_T("Left 미마킹 테스트 클릭"));
+				sMsg.Format(_T("조명 1 : %s"), pDoc->WorkingInfo.Light.sVal[0]);
+				pDoc->LogAuto(sMsg);
+				sMsg.Format(_T("기준값 1 : %d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0]);
+				pDoc->LogAuto(sMsg);
+			}
+			else if (nCam == 1)
+			{
+				pDoc->LogAuto(_T("Right 미마킹 테스트 클릭"));
+				sMsg.Format(_T("조명 2 : %s"), pDoc->WorkingInfo.Light.sVal[1]);
+				pDoc->LogAuto(sMsg);
+				sMsg.Format(_T("기준값 2 : %d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1]);
+				pDoc->LogAuto(sMsg);
+			}
+
 			BOOL bJudgeMk;
 			BOOL bRtn = pView->m_pVision[nCam]->TestJudgeMk(bJudgeMk);
 			if(pView->m_pDlgMenu02)
 				pView->m_pDlgMenu02->DispMkPmScore(nCam);
 			if (bRtn && bJudgeMk)
 			{
+				if (nCam == 0)
+				{
+					sMsg.Format(_T("미마킹 테스트 결과 1 : 정상 (%d)"), int(100.0 - pView->m_pVision[0]->MkMtRst.dScore));
+					pDoc->LogAuto(sMsg);
+				}
+				else if (nCam == 1)
+				{
+					sMsg.Format(_T("미마킹 테스트 결과 2 : 정상 (%d)"), int(100.0 - pView->m_pVision[1]->MkMtRst.dScore));
+					pDoc->LogAuto(sMsg);
+				}
 				AfxMessageBox(_T("마킹"));
 			}
 			else if (!bJudgeMk)
 			{
+				if (nCam == 0)
+				{
+					sMsg.Format(_T("미마킹 테스트 결과 1 : 비정상 (%d)"), int(100.0 - pView->m_pVision[0]->MkMtRst.dScore));
+					pDoc->LogAuto(sMsg);
+				}
+				else if (nCam == 1)
+				{
+					sMsg.Format(_T("미마킹 테스트 결과 2 : 비정상 (%d)"), int(100.0 - pView->m_pVision[1]->MkMtRst.dScore));
+					pDoc->LogAuto(sMsg);
+				}
 				AfxMessageBox(_T("미마킹"));
 			}
 		}

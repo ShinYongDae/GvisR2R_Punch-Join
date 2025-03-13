@@ -1322,6 +1322,15 @@ public:
 	CString GetThicknessName(int nIdx); // 설정없음[0], 얇은 두께[1], 중간 두께[2], 두꺼운 두께[3]
 	void Mk4PtShift2Mk();
 
+	CString m_sLogAuto[2]; // [nCam] : 0(Left), 1(Right)
+	BOOL m_bFailMkJudge[2]; // [nCam] : 0(Left), 1(Right)
+	BOOL SetArMkMtRstOnLogAuto(int nCam); // [nCam] : 0(Left), 1(Right)
+	BOOL GetArMkMtRst(int nCam, int &nRef, int &nAvg, int &nMin, int &nMax);
+	CString GetMarkedPcsList(int nCam); // [nCam] : 0(Left), 1(Right)
+	CString GetMkMtInfo0(int nSerial, int nMkPcs);
+	CString GetMkMtInfo1(int nSerial, int nMkPcs);
+
+
 // 재정의입니다.
 public:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
