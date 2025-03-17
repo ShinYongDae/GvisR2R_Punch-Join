@@ -1139,10 +1139,10 @@ void CVision::SelDispReject(HWND hDispCtrl, CRect rtDispCtrl, int nDisplayFitMod
 	//	m_pMilBufModel = NULL;
 	//}
 
-	if (m_pMilBufModel == NULL) // 100 x 100 pattern matching model
-	{
-		m_pMilBufModel = m_pMil->AllocBuf(3, DEF_IMG_DISP_SIZEX, DEF_IMG_DISP_SIZEY, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
-	}
+	//if (m_pMilBufModel == NULL) // 100 x 100 pattern matching model
+	//{
+	//	m_pMilBufModel = m_pMil->AllocBuf(3, DEF_IMG_DISP_SIZEX, DEF_IMG_DISP_SIZEY, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
+	//}
 
 	if (nDisplayFitMode == 0)
 	{
@@ -4679,12 +4679,15 @@ BOOL CVision::Judge(MIL_ID &GrabImgId, stPtMtRst &stRst)
 // pCamMstModelImg -> pRejectImg
 // ShowBlobModel() -> FitSizeBlobModel()
 
-void CVision::ShowDispReject()
+BOOL CVision::ShowDispReject()
 {
+	//CString sSzX, sSzY, sStX, sStY;
+	CString sMsg;
+
 	if (!LoadRejectBuf())
 	{
 		AfxMessageBox(_T("Failed - LoadRejectBuf()"));
-		return;
+		return FALSE;
 	}
 	//if (MilBufRejectTemp)
 	//	MbufCopy(MilBufRejectTemp, m_pMilBufReject->m_MilImage); // connect 200 x 200 Crop Image
@@ -4695,14 +4698,29 @@ void CVision::ShowDispReject()
 	{
 		long SzX = BlobRst.nBoxRight - BlobRst.nBoxLeft + 2;
 		long SzY = BlobRst.nBoxBottom - BlobRst.nBoxTop + 2;
-		long StX = BlobRst.nBoxLeft - 1;
-		long StY = BlobRst.nBoxTop - 1;
-		m_pMilBufModel->ChildBuffer2d(StX, StY, SzX, SzY); // Blob된 이미지의 크기로 Crop
+		//long StX = BlobRst.nBoxLeft - 1;
+		//long StY = BlobRst.nBoxTop - 1;
+		long StX = long((DEF_IMG_DISP_SIZEX - SzX) / 2);
+		long StY = long ((DEF_IMG_DISP_SIZEY - SzY) / 2);
+		if (StX < 0 || StY < 0 || SzX < 0 || SzY < 0)
+		{
+			//AfxMessageBox(_T("Failed - Small size image is returned from BlobRejectModel()."));
+			sMsg.Format(_T("Failed - Small size image is returned from BlobRejectModel().\r\n(%d, %d, %d, %d)"), StX, StY, SzX, SzY);
+			AfxMessageBox(sMsg);
+			return FALSE;
+		}
+		else
+		{
+			//m_pMilBufRejectRz->ChildBuffer2d(StX, StY, SzX, SzY); // Blob된 이미지의 크기로 Crop
+			m_pMilBufModel->ChildBuffer2d(StX, StY, SzX, SzY); // Blob된 이미지의 크기로 Crop : m_pMilBufModel 는 m_pMilBufRejectRz의 100x100 이미지
+			if (pDoc->m_bDebugJudgeMk)
+				MbufSave(_T("C:\\Model_JudgeMkChild.tif"), m_pMilBufModel->m_MilImageChild);
+		}
 	}
 	else
 	{
 		AfxMessageBox(_T("Failed - BlobRejectModel()"));
-		return;
+		return FALSE;
 	}
 
 	//if (m_pMilBufRejectRz->m_MilImage)
@@ -4722,6 +4740,8 @@ void CVision::ShowDispReject()
 	//	else
 	//		m_pMilBufModel->ChildBuffer2d(25, 25, 50, 50);
 	//}
+
+	return TRUE;
 }
 
 void CVision::DrawCrossOnReject(int nCenterX, int nCenterY, int nLineLength)
@@ -4841,9 +4861,33 @@ BOOL CVision::LoadRejectBuf()
 
 	UCHAR *pRejectImg;
 	if (m_nIdx == 0 || m_nIdx == 1)
-		pRejectImg = pDoc->m_Master[0].m_pRejectImg;
+	{
+		if (pDoc->m_Master[0].m_pRejectImg)
+		{
+			pRejectImg = pDoc->m_Master[0].m_pRejectImg;
+		}
+		else if (pView->m_pDlgMenu02)
+		{
+			if (pView->m_pDlgMenu02->m_pRejectImg)
+				pRejectImg = pView->m_pDlgMenu02->m_pRejectImg;
+		}
+		else
+			return FALSE;
+	}
 	else
-		pRejectImg = pDoc->m_MasterInner[0].m_pRejectImg;
+	{
+		if (pDoc->m_MasterInner[0].m_pRejectImg)
+		{
+			pRejectImg = pDoc->m_MasterInner[0].m_pRejectImg;
+		}
+		else if (pView->m_pDlgMenu02)
+		{
+			if (pView->m_pDlgMenu02->m_pRejectImg)
+				pRejectImg = pView->m_pDlgMenu02->m_pRejectImg;
+		}
+		else
+			return FALSE;
+	}
 
 	TiffData tdat;
 	MIL_ID MilBufCamMstModelCrop = M_NULL, MilBufCamMstModelCropCopy = M_NULL;
@@ -4854,7 +4898,14 @@ BOOL CVision::LoadRejectBuf()
 		{
 			MIL_ID MilBufRejectCld = M_NULL, MilBufRejectTempCld = M_NULL;
 
+			CString str;
+			str.Format(_T("%d"), 2);
+			pView->DispStsBar(str, 0);
 			MbufChild2d(MilRejectImgBuf, (1024 - PIN_IMG_DISP_SIZEX) / 2, (1024 - PIN_IMG_DISP_SIZEY) / 2, PIN_IMG_DISP_SIZEX, PIN_IMG_DISP_SIZEY, &MilBufCamMstModelCrop);
+
+
+			str.Format(_T("%d"), 3);
+			pView->DispStsBar(str, 0);
 			MbufChild2d(MilBufRejectTemp, 0, 0, PIN_IMG_DISP_SIZEX, PIN_IMG_DISP_SIZEY, &MilBufCamMstModelCropCopy);
 
 			if (MilBufCamMstModelCrop && MilBufCamMstModelCropCopy)
@@ -4916,7 +4967,14 @@ BOOL CVision::FitSizeBlobModel()
 
 	MIL_ID MilBufCamMstModelCrop = M_NULL, MilBufCamMstModelCropCopy = M_NULL;
 	m_pMilBufModel = m_pMil->AllocBuf(3, DEF_IMG_DISP_SIZEX, DEF_IMG_DISP_SIZEY, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
+
+	CString str;
+	str.Format(_T("%d"), 4);
+	pView->DispStsBar(str, 0);
 	MbufChild2d(m_pMilBufRejectRz->m_MilImage, (lSzX - DEF_IMG_DISP_SIZEX) / 2, (lSzY - DEF_IMG_DISP_SIZEY) / 2, DEF_IMG_DISP_SIZEX, DEF_IMG_DISP_SIZEY, &MilBufCamMstModelCrop);
+
+	str.Format(_T("%d"), 5);
+	pView->DispStsBar(str, 0);
 	MbufChild2d(m_pMilBufModel->m_MilImage, 0, 0, DEF_IMG_DISP_SIZEX, DEF_IMG_DISP_SIZEY, &MilBufCamMstModelCropCopy); // 100 x 100 pattern matching model
 
 	if (MilBufCamMstModelCrop && MilBufCamMstModelCropCopy)
@@ -4939,6 +4997,9 @@ BOOL CVision::FitSizeBlobModel()
 		delete MilBlobGrayImg;
 	}
 
+	if (pDoc->m_bDebugJudgeMk)
+		MbufSave(_T("C:\\Model_JudgeMk.tif"), m_pMilBufModel->m_MilImage);
+
 	return TRUE;
 }
 
@@ -4960,7 +5021,8 @@ BOOL CVision::BlobRejectModel()
 	MIL_DOUBLE *CogY;		/* Y coordinate of center of gravity. */
 	MIL_DOUBLE *BoxMinX, *BoxMaxX, *BoxMinY, *BoxMaxY;
 	MIL_DOUBLE *BoxArea;
-	MIL_INT nBlobAreaMax = (PIN_IMG_DISP_SIZEX - MIN_BLOB_SIZE_X) * (PIN_IMG_DISP_SIZEY - MIN_BLOB_SIZE_Y);
+	MIL_INT nBlobAreaMax = (DEF_IMG_DISP_SIZEX - MIN_BLOB_SIZE_X) * (DEF_IMG_DISP_SIZEY - MIN_BLOB_SIZE_Y);
+	//MIL_INT nBlobAreaMax = (PIN_IMG_DISP_SIZEX - MIN_BLOB_SIZE_X) * (PIN_IMG_DISP_SIZEY - MIN_BLOB_SIZE_Y);
 
 	MilSystem = m_pMil->GetSystemID();
 
@@ -4970,11 +5032,12 @@ BOOL CVision::BlobRejectModel()
 	long lSzX = (long)((double)PIN_IMG_DISP_SIZEX * dRsRtoX);
 	long lSzY = (long)((double)PIN_IMG_DISP_SIZEY * dRsRtoY);
 
-	int n, nChoice, nBoxAreaMin = 10000000;
+	int n, nChoice = -1, nBoxAreaMin = 10000000;
 	int nCenterX = lSzX / 2;
 	int nCenterY = lSzY / 2;
 
 	CLibMilBuf *MilBlobBinImg = m_pMil->AllocBuf(lSzX, lSzY, 1L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
+	//MimBinarize(m_pMilBufModel->m_MilImage, MilBlobBinImg->m_MilImage, M_GREATER, 0, 0);
 	MimBinarize(m_pMilBufRejectRz->m_MilImage, MilBlobBinImg->m_MilImage, M_GREATER, 0, 0);
 
 	m_pMil->Erode(MilBlobBinImg->m_MilImage, MilBlobBinImg->m_MilImage, 1, M_BINARY);
@@ -5005,6 +5068,12 @@ BOOL CVision::BlobRejectModel()
 	MblobGetNumber(MilBlobResult, &nTotalBlobs);
 
 	BlobRst.nBlobTotal = nTotalBlobs;
+
+	if (BlobRst.nBlobTotal < 1)
+	{
+		AfxMessageBox(_T("Model Blob is not exist in RejectMarkImage."));
+		return FALSE;
+	}
 
 	/* Read and print the blob's center of gravity. */
 	if ((BoxArea = (MIL_DOUBLE *)malloc(nTotalBlobs * sizeof(MIL_DOUBLE))))
@@ -5097,6 +5166,14 @@ BOOL CVision::BlobRejectModel()
 
 	if (MilBlobBinImg)
 		delete MilBlobBinImg;
+
+	if (nChoice < 0)
+	{
+		CString sMsg;
+		sMsg.Format(_T("Didn't select any one on Model_Blobs(%d) in RejectMarkImage."), nTotalBlobs);
+		AfxMessageBox(sMsg);
+		return FALSE;
+	}
 
 	return TRUE;
 }

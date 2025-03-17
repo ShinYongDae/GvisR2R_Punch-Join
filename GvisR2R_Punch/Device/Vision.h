@@ -117,9 +117,10 @@ class CVision : public CWnd
 	CLibMilDraw *m_pMilOvrCad[DEF_VIEW_IMG_NUMBER], *m_pMilOvrDef[DEF_VIEW_IMG_NUMBER];
 	CLibMilDraw *m_pMilDelOvrCad[DEF_VIEW_IMG_NUMBER], *m_pMilDelOvrDef[DEF_VIEW_IMG_NUMBER];
 
-	CLibMilDisp *m_pMilDispPin, *m_pMilDispReject;// , *m_pMilDispAlign;//, *m_pMilDispPcs;
-	CLibMilBuf *m_pMilBufPin, *m_pMilBufAlign, *m_pMilBufReject;//, *m_pMilBufPcs;
-	CLibMilBuf *m_pMilBufRejectRz, *m_pMilBufModel; // 100 x 100 pattern matching model
+	CLibMilDisp *m_pMilDispPin, *m_pMilDispReject;					// 200 x 200 (2-Bits)
+	CLibMilBuf *m_pMilBufPin, *m_pMilBufAlign, *m_pMilBufReject;	// 200 x 200 (2-Bits)
+	CLibMilBuf *m_pMilBufRejectRz;									// 200 x 200 Resized Blob Image for finding pattern matching model (8-Bits)
+	CLibMilBuf *m_pMilBufModel;										// 100 x 100 pattern matching model (8-Bits)
 	CLibMilDraw *m_pMilPinOverlay, *m_pMilRejectOverlay;
 	CLibMilDraw *m_pMilPinOverlayDelete, *m_pMilRejectOverlayDelete;
 
@@ -262,7 +263,7 @@ public:
 	BOOL CheckVerifyPunching(MIL_ID &GrabImgId);
 	BOOL Judge(MIL_ID &GrabImgId, stPtMtRst &stRst);
 
-	void ShowDispReject();
+	BOOL ShowDispReject();
 	void InitRejectBuf();
 	void AllocRejectBuf();
 	BOOL LoadRejectBuf();

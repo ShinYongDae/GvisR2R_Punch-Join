@@ -16,6 +16,10 @@ static char THIS_FILE[] = __FILE__;
 #include "../GvisR2R_PunchDoc.h"
 #include "../GvisR2R_PunchView.h"
 
+#include <windowsx.h>
+#include "../Device/Vic7defs.h"
+#include "../Process/FreeImage.h"
+
 extern CMainFrame* pFrm;
 extern CGvisR2R_PunchDoc* pDoc;
 extern CGvisR2R_PunchView* pView;
@@ -78,10 +82,15 @@ CDlgMenu02::CDlgMenu02(CWnd* pParent /*=NULL*/)
 	m_pDlgUtil03 = NULL;
 
 	m_bLockTimer = FALSE;
+
+	m_pRejectImg = NULL;
+	m_RejectFileSize = 0;
 }
 
 CDlgMenu02::~CDlgMenu02()
 {
+	RejectImgFree();
+
 	m_bTIM_LIGHT_UP = FALSE;
 	m_bTIM_LIGHT_DN = FALSE;
 	m_bTIM_LIGHT_UP2 = FALSE;
@@ -503,6 +512,11 @@ BOOL CDlgMenu02::OnInitDialog()
 	{
 		pView->m_pVision[0]->ClearOverlay();
 		pView->m_pVision[0]->DrawCenterMark();
+
+		if (!LoadRejMkImg())
+		{
+			pDoc->WorkingInfo.LastJob.bUseJudgeMk = FALSE;
+		}
 	}
 
 	if(pView->m_pVision[1])
@@ -625,7 +639,13 @@ void CDlgMenu02::InitCadImg()
 #endif
 
 	if (m_pDlgUtil03)
-		m_pDlgUtil03->InitCadImg();
+	{
+		if (!m_pDlgUtil03->InitCadImg())
+		{
+			if (pView->m_pDlgMenu01)
+				pView->m_pDlgMenu01->UpdateData();
+		}
+	}
 }
 
 void CDlgMenu02::InitSlider()
@@ -3971,46 +3991,46 @@ void CDlgMenu02::DispAxisPos()
 
 void CDlgMenu02::ChgModel()
 {
-// 	m_pPcsGL->LoadPcsImg(PATH_PCS_IMG);
-
-#ifdef USE_VISION
-	if(pView->m_pVision[0])
-	{
-// 		pView->m_pVision[0]->ShowDispPcs(nLayer);
- 		pView->m_pVision[0]->ShowDispPin(0);
-		pView->m_pVision[0]->ShowDispAlign();
-		pView->m_pVision[0]->ShowDispReject();
-		//if (m_pDlgUtil03)
-		//	m_pDlgUtil03->DispResultBlob();
-	}
-
-	if(pView->m_pVision[1])
-	{
- 		pView->m_pVision[1]->ShowDispPin(0);
-		pView->m_pVision[1]->ShowDispAlign();
-		pView->m_pVision[1]->ShowDispReject();
-	}
-#endif
+//// 	m_pPcsGL->LoadPcsImg(PATH_PCS_IMG);
+//
+//#ifdef USE_VISION
+//	if(pView->m_pVision[0])
+//	{
+//// 		pView->m_pVision[0]->ShowDispPcs(nLayer);
+// 		pView->m_pVision[0]->ShowDispPin(0);
+//		pView->m_pVision[0]->ShowDispAlign();
+//		pView->m_pVision[0]->ShowDispReject();
+//		//if (m_pDlgUtil03)
+//		//	m_pDlgUtil03->DispResultBlob();
+//	}
+//
+//	if(pView->m_pVision[1])
+//	{
+// 		pView->m_pVision[1]->ShowDispPin(0);
+//		pView->m_pVision[1]->ShowDispAlign();
+//		pView->m_pVision[1]->ShowDispReject();
+//	}
+//#endif
 }
 
 void CDlgMenu02::ChgModelUp()
 {
-#ifdef USE_VISION
-	if(pView->m_pVision[0])
-	{
- 		pView->m_pVision[0]->ShowDispPin(0);
-		pView->m_pVision[0]->ShowDispAlign();
-		pView->m_pVision[0]->ShowDispReject();
-		//if (m_pDlgUtil03)
-		//	m_pDlgUtil03->DispResultBlob();
-	}
-	if (pView->m_pVision[1])
-	{
-		pView->m_pVision[1]->ShowDispPin(0);
-		pView->m_pVision[1]->ShowDispAlign();
-		pView->m_pVision[1]->ShowDispReject();
-	}
-#endif
+//#ifdef USE_VISION
+//	if(pView->m_pVision[0])
+//	{
+// 		pView->m_pVision[0]->ShowDispPin(0);
+//		pView->m_pVision[0]->ShowDispAlign();
+//		pView->m_pVision[0]->ShowDispReject();
+//		//if (m_pDlgUtil03)
+//		//	m_pDlgUtil03->DispResultBlob();
+//	}
+//	if (pView->m_pVision[1])
+//	{
+//		pView->m_pVision[1]->ShowDispPin(0);
+//		pView->m_pVision[1]->ShowDispAlign();
+//		pView->m_pVision[1]->ShowDispReject();
+//	}
+//#endif
 }
 
 void CDlgMenu02::ChgModelDn()
@@ -6338,4 +6358,184 @@ void CDlgMenu02::InitMkPmRst(int nCam)
 			pView->m_pVision[nCam]->PtMtRst.dScore = 0.0;
 	}
 #endif
+}
+
+
+BOOL CDlgMenu02::LoadRejMkImg()
+{
+	BOOL prcStopF = FALSE;
+	TCHAR FileNLoc[MAX_PATH];
+	CString StrDirectoryPath;
+	CFileFind RejectFindFile;
+	CString strFileNReject, strTemp;
+
+	CString sPathCamSpecDir = pDoc->WorkingInfo.System.sPathCamSpecDir;
+	CString sModel = pDoc->WorkingInfo.LastJob.sModel;
+	CString sLayer = pDoc->WorkingInfo.LastJob.sLayerUp;
+
+	DWORD dwMilliseconds = 10;
+
+	pView->DispMsg(_T("Reject 이미지를 다운로드 중입니다."), _T("Reject 이미지"), RGB_GREEN, DELAY_TIME_MSG);
+
+	wsprintf(FileNLoc, TEXT("%s"), _T("C:\\R2RSet\\Reject"));
+
+	if (!pDoc->DirectoryExists(FileNLoc))
+	{
+		if (!CreateDirectory(FileNLoc, NULL))
+		{
+			pView->MsgBox(_T("Can not Create Reject Directory"));
+		}
+	}
+	else
+	{
+		StrDirectoryPath.Format(_T("%s"), FileNLoc);
+		DeleteFileInFolder(FileNLoc);
+	}
+	RejectImgFree();
+
+#ifdef USE_CAM_MASTER
+	int Cell;
+	int i;
+	TCHAR FileNReject[MAX_PATH];
+
+	// CAM-Master File Copy and Local File Load
+	wsprintf(FileNLoc, TEXT("%s"), PATH_REJECT_IMG);
+	if (sPathCamSpecDir.Right(1) != "\\")
+		strFileNReject.Format(_T("%s\\%s\\%s_RejectMark.TIF"), sPathCamSpecDir, sModel, sLayer);
+	else
+		strFileNReject.Format(_T("%s%s\\%s_RejectMark.TIF"), sPathCamSpecDir, sModel, sLayer);
+	wsprintf(FileNReject, TEXT("%s"), strFileNReject);
+
+	CFileFind finder;
+	if (!finder.FindFile(strFileNReject))
+	{
+		if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+		{
+			strTemp.Format(_T("%s \r\n: Reject 마크 이미지가 없습니다."), strFileNReject);
+			pView->MsgBox(strTemp);
+		}
+		return FALSE;
+	}
+
+	if (!CopyFile((LPCTSTR)FileNReject, (LPCTSTR)FileNLoc, FALSE))
+	{
+		if (!CopyFile((LPCTSTR)FileNReject, (LPCTSTR)FileNLoc, FALSE))
+		{
+			if (!CopyFile((LPCTSTR)FileNReject, (LPCTSTR)FileNLoc, FALSE))
+			{
+				prcStopF = TRUE;
+			}
+		}
+	}
+
+
+	if (!prcStopF)
+	{
+		RejectImgBufAlloc(FileNLoc);
+		//pView->m_pVision[0]->ShowDispReject();
+		//pView->m_pVision[0]->RejectImgCrop();
+		//pView->DispStsBar("Reject 이미지 다운로드를 완료하였습니다.", 0);
+	}
+	else
+	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
+		pView->DispMsg(_T("Reject 이미지 다운로드를 실패하였습니다."), _T("경고"), RGB_GREEN, DELAY_TIME_MSG);
+		return FALSE;
+	}
+#else
+	RejectImgBufAlloc(PATH_REJECT_IMG_);
+#endif
+
+	//	pView->ClrDispMsg();
+	return TRUE;
+}
+
+void CDlgMenu02::DeleteFileInFolder(CString sPathDir)
+{
+	BOOL bRes;
+	CFileFind ff;
+
+	if (CheckPath(sPathDir) == PATH_IS_FILE)
+	{
+		DeleteFile(sPathDir);
+		return;
+	}
+
+	if (sPathDir.Right(1) != _T("\\"))
+		sPathDir.Append(_T("\\"));	//sPathDir += _T("\\");
+
+	sPathDir.Append(_T("*.*"));	//sPathDir += _T("*.*");
+
+	bRes = ff.FindFile(sPathDir);
+
+	while (bRes)
+	{
+		bRes = ff.FindNextFile();
+		if (ff.IsDots())
+			continue;
+		if (ff.IsDirectory())
+		{
+			sPathDir = ff.GetFilePath();
+			DeleteFileInFolder(sPathDir);
+		}
+		else
+			DeleteFileInFolder(ff.GetFilePath());
+	}
+
+	ff.Close();
+}
+
+void CDlgMenu02::RejectImgFree()
+{
+	if (m_pRejectImg != NULL)
+	{
+		GlobalFreePtr(m_pRejectImg);
+		m_pRejectImg = NULL;
+	}
+}
+
+int CDlgMenu02::CheckPath(CString strPath)
+{
+	DWORD dwAttr = GetFileAttributes(strPath);
+	if (dwAttr == 0xffffffff)
+	{
+		if (GetLastError() == ERROR_FILE_NOT_FOUND || GetLastError() == ERROR_PATH_NOT_FOUND)
+			return PATH_NOT_FOUND;
+		return PATH_ERROR;
+	}
+	if (dwAttr & FILE_ATTRIBUTE_DIRECTORY) return PATH_IS_FOLDER;
+	return PATH_IS_FILE;
+}
+
+BOOL CDlgMenu02::RejectImgBufAlloc(TCHAR *strRejectImg)
+{
+	CFile file;
+	int RSize;
+
+	if (!file.Open(strRejectImg, CFile::modeRead | CFile::typeBinary))
+	{
+		if (!file.Open(strRejectImg, CFile::modeRead | CFile::typeBinary))
+		{
+			return(FALSE);
+		}
+	}
+
+	m_RejectFileSize = file.GetLength();
+	if (m_RejectFileSize != 0)
+	{
+		if (m_pRejectImg)
+			RejectImgFree();
+
+		m_pRejectImg = (UCHAR *)GlobalAllocPtr(GMEM_MOVEABLE, m_RejectFileSize);
+	}
+
+	RSize = file.Read((void *)m_pRejectImg, m_RejectFileSize);
+	if (RSize != m_RejectFileSize)
+	{
+		file.Close();
+		return(FALSE);
+	}
+
+	file.Close();
+	return TRUE;
 }

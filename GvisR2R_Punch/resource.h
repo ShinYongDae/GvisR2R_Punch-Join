@@ -1525,6 +1525,7 @@
 #define IDC_CHECK_PCS_DN                1425
 #define IDC_CHK_121                     1425
 #define IDC_CHK_UNCOILER_CCW            1425
+#define IDC_CHECK12                     1425
 #define IDC_STC_DEF_9                   1426
 #define IDC_CHK_2_POINT_ALIGN           1426
 #define IDC_STC_12_94                   1426

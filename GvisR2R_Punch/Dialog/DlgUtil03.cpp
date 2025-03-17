@@ -1666,19 +1666,29 @@ void CDlgUtil03::InitMkInfo()
 #endif
 }
 
-void CDlgUtil03::InitCadImg()
+BOOL CDlgUtil03::InitCadImg()
 {
 #ifdef USE_VISION
 	if (pView->m_pVision[0])
 	{
-		pView->m_pVision[0]->ShowDispReject(); // First draw overlay 
+		if (!pView->m_pVision[0]->ShowDispReject()) // First draw overlay 
+		{
+			pDoc->WorkingInfo.LastJob.bUseJudgeMk = FALSE;
+		}
 	}
 
 	if (pView->m_pVision[1])
 	{
-		pView->m_pVision[1]->ShowDispReject(); // First draw overlay
+		if (!pView->m_pVision[1]->ShowDispReject()) // First draw overlay
+		{
+			pDoc->WorkingInfo.LastJob.bUseJudgeMk = FALSE;
+		}
 	}
 #endif
+	if (!pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+		return FALSE;
+
+	return TRUE;
 }
 
 

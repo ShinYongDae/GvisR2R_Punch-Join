@@ -280,6 +280,7 @@ CGvisR2R_PunchDoc::CGvisR2R_PunchDoc()
 	m_nWritedItsSerial = 0;
 
 	m_nEjectBufferLastShot = -1;
+	m_bDebugJudgeMk = FALSE;
 	m_bDebugGrabAlign = FALSE;
 
 	SetCurrentInfoSignal(_SigInx::_MyMsgYes, FALSE);
@@ -1059,6 +1060,11 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 		m_bDebugGrabAlign = _ttoi(szData) ? TRUE : FALSE;
 	else
 		m_bDebugGrabAlign = FALSE;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("DebugJudgeMk"), NULL, szData, sizeof(szData), PATH_WORKING_INFO))
+		m_bDebugJudgeMk = _ttoi(szData) ? TRUE : FALSE;
+	else
+		m_bDebugJudgeMk = FALSE;
 
 	//if (0 < ::GetPrivateProfileString(_T("DTS"), _T("UseIts"), NULL, szData, sizeof(szData), PATH_WORKING_INFO))
 	//	m_bUseIts = _ttoi(szData) ? TRUE : FALSE;
@@ -8609,7 +8615,7 @@ BOOL CGvisR2R_PunchDoc::Shift2Mk(int nSerial)
 		if (!GetPcrInfo(sSrc, stInfo))
 		{
 			pView->SetAlarmToPlc(UNIT_PUNCH);
-			pView->DispStsBar(_T("E(2)"), 5);
+			//pView->DispStsBar(_T("E(2)"), 5);
 			pView->ClrDispMsg();
 			AfxMessageBox(_T("Error-GetPcrInfo(2)"));
 			return FALSE;
@@ -8635,7 +8641,7 @@ BOOL CGvisR2R_PunchDoc::Shift2Mk(int nSerial)
 			if (!GetPcrInfo(sSrc, stInfo))
 			{
 				pView->SetAlarmToPlc(UNIT_PUNCH);
-				pView->DispStsBar(_T("E(3)"), 5);
+				//pView->DispStsBar(_T("E(3)"), 5);
 				pView->ClrDispMsg();
 				AfxMessageBox(_T("Error-GetPcrInfo(3)"));
 				return FALSE;
@@ -13883,7 +13889,7 @@ int CGvisR2R_PunchDoc::IsOfflineFolder() // 0 : Not exist, 1 : Exist only Up, 2 
 	CFileFind finder;
 
 	str = _T("OFFLINE");
-	sPath.Format(_T("%s%s\\%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathOldFile,
+	sPath.Format(_T("%s%s\\%s\\%s\\%s\\*.*"), pDoc->WorkingInfo.System.sPathOldFile,
 		pDoc->WorkingInfo.LastJob.sModel,
 		pDoc->WorkingInfo.LastJob.sLot,
 		pDoc->WorkingInfo.LastJob.sLayerUp,
@@ -13896,7 +13902,7 @@ int CGvisR2R_PunchDoc::IsOfflineFolder() // 0 : Not exist, 1 : Exist only Up, 2 
 		nRtn |= 0x01;
 
 	str = _T("OFFLINE");
-	sPath.Format(_T("%s%s\\%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathOldFile,
+	sPath.Format(_T("%s%s\\%s\\%s\\%s\\*.*"), pDoc->WorkingInfo.System.sPathOldFile,
 		pDoc->WorkingInfo.LastJob.sModel,
 		pDoc->WorkingInfo.LastJob.sLot,
 		pDoc->WorkingInfo.LastJob.sLayerDn,

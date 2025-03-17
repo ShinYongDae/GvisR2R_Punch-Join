@@ -4,6 +4,7 @@
 #include "stdafx.h"
 //#include "gvisr2r.h"
 #include "LibMilBuf.h"
+#include "../GvisR2R_PunchView.h"
 
 
 #ifdef _DEBUG
@@ -11,6 +12,8 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+extern CGvisR2R_PunchView* pView;
 
 /////////////////////////////////////////////////////////////////////////////
 // CLibMilBuf
@@ -74,7 +77,13 @@ void CLibMilBuf::Clear()
 void CLibMilBuf::ChildBuffer2d(long OffX, long OffY, long SizeX, long SizeY)
 {
 	if (m_MilImageChild == NULL)
- 		MbufChild2d(m_MilImage, OffX, OffY, SizeX, SizeY, &m_MilImageChild);
+	{
+		CString str;
+		str.Format(_T("%d"), 1);
+		pView->DispStsBar(str, 0);
+
+		MbufChild2d(m_MilImage, OffX, OffY, SizeX, SizeY, &m_MilImageChild);
+	}
 }
 
 void CLibMilBuf::BufferLoad(TCHAR* FileName)

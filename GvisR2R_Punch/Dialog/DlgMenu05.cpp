@@ -2547,6 +2547,14 @@ void CDlgMenu05::MakeIts()
 
 	int nLayer = GetLayer(m_sLayer);
 
+	if (pDoc->GetTestMode() == MODE_OUTER)
+	{
+		if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+		{
+			pView->MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
+		}
+	}
+
 	pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir, m_sModel, m_sLayer);
 	pDoc->m_Master[0].LoadMstInfo();
 

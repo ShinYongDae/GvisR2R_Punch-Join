@@ -53,7 +53,7 @@ public:
 // 	void SetFurge();
 
 	void InitMkInfo();
-	void InitCadImg(); // for RejectImg
+	BOOL InitCadImg(); // for RejectImg
 	void DispResultBlob();
 	void DispResultPtScore(int nCam);
 

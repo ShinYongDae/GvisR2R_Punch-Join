@@ -558,7 +558,7 @@ void CDlgFrameHigh::DispFdCnt()
 
 	//str.Format(_T("%d,%d,%d"), nFeedCntMk, nFeedCntAoi, nFeedCntEng);
 	str.Format(_T("%d"), nFeedCntAoi);
-	pView->DispStsBar(str, 0);
+	//pView->DispStsBar(str, 0);
 }
 
 void CDlgFrameHigh::DispFdOffset()

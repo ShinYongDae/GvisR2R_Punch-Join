@@ -211,6 +211,15 @@ public:
 	MIL_ID m_MilSys;
 #endif
 
+	UCHAR *m_pRejectImg;
+	long m_RejectFileSize;
+
+	BOOL LoadRejMkImg();
+	void DeleteFileInFolder(CString sPathDir);
+	void RejectImgFree();
+	int CheckPath(CString strPath);
+	BOOL RejectImgBufAlloc(TCHAR *strRejectImg);
+
 // Dialog Data
 	//{{AFX_DATA(CDlgMenu02)
 	enum { IDD = IDD_DLG_MENU_02 };

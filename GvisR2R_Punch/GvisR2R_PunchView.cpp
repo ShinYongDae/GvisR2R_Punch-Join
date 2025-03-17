@@ -1334,6 +1334,13 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 	if (nIDEvent == TIM_CAMMASTER_UPDATE)
 	{
 		KillTimer(TIM_CAMMASTER_UPDATE);
+		if (pDoc->GetTestMode() == MODE_OUTER)
+		{
+			if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+			{
+				MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
+			}
+		}
 		if (LoadMstInfo())
 		{
 			if (m_pDlgMenu01)
@@ -4653,7 +4660,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			Buzzer(TRUE, 0);
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
-			pView->DispStsBar(_T("정지-19"), 0);
+			//pView->DispStsBar(_T("정지-19"), 0);
 			DispMain(_T("정 지"), RGB_RED);
 			MsgBox(_T("일시정지 - 리코일러부 전면 우측 도어 Open"));
 		}
@@ -10432,6 +10439,13 @@ void CGvisR2R_PunchView::ResetMkInfo(int nAoi) // 0 : AOI-Up , 1 : AOI-Dn , 2 : 
 
 		if (IsLastJob(0)) // Up
 		{
+			if (pDoc->GetTestMode() == MODE_OUTER)
+			{
+				if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+				{
+					MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
+				}
+			}
 			pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
 				pDoc->WorkingInfo.LastJob.sModel,
 				pDoc->WorkingInfo.LastJob.sLayerUp);
@@ -12185,6 +12199,13 @@ BOOL CGvisR2R_PunchView::LoadMstInfo()
 
 	if (IsLastJob(0)) // Up
 	{
+		if (pDoc->GetTestMode() == MODE_OUTER)
+		{
+			if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+			{
+				MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
+			}
+		}
 		if (bGetCurrentInfoEng)
 		{
 			pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
@@ -12795,8 +12816,8 @@ void CGvisR2R_PunchView::SetLotEnd(int nSerial)
 	m_nAoiLastSerial[0] = nSerial;
 
 	CString str;
-	str.Format(_T("%d"), m_nLotEndSerial);
-	DispStsBar(str, 0);
+	//str.Format(_T("%d"), m_nLotEndSerial);
+	//DispStsBar(str, 0);
 	if (m_pDlgMenu01)
 		m_pDlgMenu01->DispLotEndSerial(m_nLotEndSerial);
 }
@@ -15005,7 +15026,7 @@ BOOL CGvisR2R_PunchView::SaveMk0Img(int nMkPcsIdx) // Cam0
 	if (!pDoc->GetPcrInfo(sSrc, stInfo))
 	{
 		pView->SetAlarmToPlc(UNIT_PUNCH);
-		pView->DispStsBar(_T("E(2)"), 5);
+		//pView->DispStsBar(_T("E(2)"), 5);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("Error-GetPcrInfo(2)"));
 		return FALSE;
@@ -15725,7 +15746,7 @@ BOOL CGvisR2R_PunchView::SaveMk1Img(int nMkPcsIdx) // Cam1
 	if (!pDoc->GetPcrInfo(sSrc, stInfo))
 	{
 		pView->SetAlarmToPlc(UNIT_PUNCH);
-		pView->DispStsBar(_T("E(2)"), 5);
+		//pView->DispStsBar(_T("E(2)"), 5);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("Error-GetPcrInfo(2)"));
 		return FALSE;
@@ -17323,6 +17344,13 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 				{
 					if (IsLastJob(0)) // Up
 					{
+						if (pDoc->GetTestMode() == MODE_OUTER)
+						{
+							if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+							{
+								MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
+							}
+						}
 						pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
 							pDoc->WorkingInfo.LastJob.sModel,
 							pDoc->WorkingInfo.LastJob.sLayerUp);
@@ -17581,6 +17609,13 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 				{
 					if (IsLastJob(0)) // Up
 					{
+						if (pDoc->GetTestMode() == MODE_OUTER)
+						{
+							if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+							{
+								MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
+							}
+						}
 						pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
 							pDoc->WorkingInfo.LastJob.sModel,
 							pDoc->WorkingInfo.LastJob.sLayerUp);
@@ -18152,6 +18187,13 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 				{
 					if (IsLastJob(0)) // Up
 					{
+						if (pDoc->GetTestMode() == MODE_OUTER)
+						{
+							if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+							{
+								MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
+							}
+						}
 						pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
 							pDoc->WorkingInfo.LastJob.sModel,
 							pDoc->WorkingInfo.LastJob.sLayerUp);
@@ -18413,6 +18455,13 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 				{
 					if (IsLastJob(0)) // Up
 					{
+						if (pDoc->GetTestMode() == MODE_OUTER)
+						{
+							if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+							{
+								MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
+							}
+						}
 						pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
 							pDoc->WorkingInfo.LastJob.sModel,
 							pDoc->WorkingInfo.LastJob.sLayerUp);
@@ -23738,7 +23787,7 @@ BOOL CGvisR2R_PunchView::OpenReelmapFromBuf(int nSerial)
 	if (!pDoc->GetPcrInfo(sSrc, stInfoUp))
 	{
 		pView->SetAlarmToPlc(UNIT_PUNCH);
-		pView->DispStsBar(_T("E(6)"), 5);
+		//pView->DispStsBar(_T("E(6)"), 5);
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("Error-GetPcrInfo(6)"));
 		return FALSE;
@@ -23749,7 +23798,7 @@ BOOL CGvisR2R_PunchView::OpenReelmapFromBuf(int nSerial)
 		if (!pDoc->GetPcrInfo(sSrc, stInfoDn))
 		{
 			pView->SetAlarmToPlc(UNIT_PUNCH);
-			pView->DispStsBar(_T("E(7)"), 5);
+			//pView->DispStsBar(_T("E(7)"), 5);
 			pView->ClrDispMsg();
 			AfxMessageBox(_T("Error-GetPcrInfo(7)"));
 			return FALSE;
@@ -31445,9 +31494,9 @@ void CGvisR2R_PunchView::DelOverLotEndSerialDn(int nSerial)
 
 void CGvisR2R_PunchView::ChkReTestAlarmOnAoiUp()
 {
-	CString sMsg;
-	sMsg.Format(_T("U%03d"), GetAoiUpAutoSerial());
-	DispStsBar(sMsg, 0);
+	//CString sMsg;
+	//sMsg.Format(_T("U%03d"), GetAoiUpAutoSerial());
+	//DispStsBar(sMsg, 0);
 
 	int nSerial = m_pBufSerial[0][m_nBufTot[0] - 1];
 
@@ -31483,9 +31532,9 @@ void CGvisR2R_PunchView::ChkReTestAlarmOnAoiUp()
 
 void CGvisR2R_PunchView::ChkReTestAlarmOnAoiDn()
 {
-	CString sMsg;
-	sMsg.Format(_T("D%03d"), GetAoiDnAutoSerial());
-	DispStsBar(sMsg, 0);
+	//CString sMsg;
+	//sMsg.Format(_T("D%03d"), GetAoiDnAutoSerial());
+	//DispStsBar(sMsg, 0);
 
 	int nSerial = m_pBufSerial[1][m_nBufTot[1] - 1];
 
@@ -32572,7 +32621,7 @@ int CGvisR2R_PunchView::IsOfflineFolder() // 0 : Not exist, 1 : Exist only Up, 2
 	CFileFind finder;
 
 	str = _T("OFFLINE");
-	sPath.Format(_T("%s%s\\%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathOldFile,
+	sPath.Format(_T("%s%s\\%s\\%s\\%s\\*.*"), pDoc->WorkingInfo.System.sPathOldFile,
 		pDoc->WorkingInfo.LastJob.sModel,
 		pDoc->WorkingInfo.LastJob.sLot,
 		pDoc->WorkingInfo.LastJob.sLayerUp,
@@ -32585,7 +32634,7 @@ int CGvisR2R_PunchView::IsOfflineFolder() // 0 : Not exist, 1 : Exist only Up, 2
 		nRtn |= 0x01;
 
 	str = _T("OFFLINE");
-	sPath.Format(_T("%s%s\\%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathOldFile,
+	sPath.Format(_T("%s%s\\%s\\%s\\%s\\*.*"), pDoc->WorkingInfo.System.sPathOldFile,
 		pDoc->WorkingInfo.LastJob.sModel,
 		pDoc->WorkingInfo.LastJob.sLot,
 		pDoc->WorkingInfo.LastJob.sLayerDn,
