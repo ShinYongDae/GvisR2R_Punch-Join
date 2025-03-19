@@ -238,6 +238,8 @@ void CDlgUtil03::AtDlgShow()
 	str.Format(_T("%d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1]);
 	myStcData[68].SetText(str);
 
+	DispResultBlob();
+
 	m_bTIM_DISP_STS = TRUE;
 	SetTimer(TIM_DISP_STS, 100, NULL);
 }
@@ -584,6 +586,9 @@ void CDlgUtil03::MoveMkPos(int nStcId)
 
 	if(bOn0 && !bOn1)
 	{
+		if(!pView->IsInitPos1())
+			pView->MoveInitPos1();
+
 		str = myStcData[nStcId].GetText();
 		nPos = str.Find('(', 0);
 		nPcsId = _tstoi(str.Left(nPos));
@@ -619,6 +624,9 @@ void CDlgUtil03::MoveMkPos(int nStcId)
 	}
 	else if(!bOn0 && bOn1)
 	{
+		if (!pView->IsInitPos0())
+			pView->MoveInitPos0();
+
 		str = myStcData[nStcId].GetText();
 		nPos = str.Find('(', 0);
 		nPcsId = _tstoi(str.Left(nPos));
@@ -652,73 +660,73 @@ void CDlgUtil03::MoveMkPos(int nStcId)
 			}
 		}
 	}
-	else if(bOn0 && bOn1)
-	{
-		str = myStcData[nStcId].GetText();
-		nPos = str.Find('(', 0);
-		nPcsId = _tstoi(str.Left(nPos));
+	//else if(bOn0 && bOn1)
+	//{
+	//	str = myStcData[nStcId].GetText();
+	//	nPos = str.Find('(', 0);
+	//	nPcsId = _tstoi(str.Left(nPos));
 
-		if (!bCheckAlign)
-		{
-			if (pDoc->m_Master[0].m_pPcsRgn)
-				ptPnt = pDoc->m_Master[0].m_pPcsRgn->GetMkPnt0(nPcsId);
-		}
-		else
-		{
-			if (pDoc->m_Master[0].m_pPcsRgn)
-				ptPnt = pDoc->m_Master[0].m_pPcsRgn->pMkPnt[0][nPcsId];
-		}
+	//	if (!bCheckAlign)
+	//	{
+	//		if (pDoc->m_Master[0].m_pPcsRgn)
+	//			ptPnt = pDoc->m_Master[0].m_pPcsRgn->GetMkPnt0(nPcsId);
+	//	}
+	//	else
+	//	{
+	//		if (pDoc->m_Master[0].m_pPcsRgn)
+	//			ptPnt = pDoc->m_Master[0].m_pPcsRgn->pMkPnt[0][nPcsId];
+	//	}
 
-		dCurrX = pView->m_dEnc[AXIS_X0]; // pView->m_pMotion->GetActualPosition(AXIS_X);
-		dCurrY = pView->m_dEnc[AXIS_Y0]; // pView->m_pMotion->GetActualPosition(AXIS_Y);
-		
-		pPos[0] = ptPnt.x;
-		pPos[1] = ptPnt.y;
+	//	dCurrX = pView->m_dEnc[AXIS_X0]; // pView->m_pMotion->GetActualPosition(AXIS_X);
+	//	dCurrY = pView->m_dEnc[AXIS_Y0]; // pView->m_pMotion->GetActualPosition(AXIS_Y);
+	//	
+	//	pPos[0] = ptPnt.x;
+	//	pPos[1] = ptPnt.y;
 
-		fLen = sqrt( ((pPos[0] - dCurrX) * (pPos[0] - dCurrX)) + ((pPos[1] - dCurrY) * (pPos[1] - dCurrY)) );
-		if(fLen > 0.001)
-		{
-			pView->m_pMotion->GetSpeedProfile(TRAPEZOIDAL, AXIS_X0, fLen, fVel, fAcc, fJerk);
-			if (!pView->m_pMotion->Move(MS_X0Y0, pPos, fVel, fAcc, fAcc))
-			{
-				pView->SetAlarmToPlc(UNIT_PUNCH);
-				pView->ClrDispMsg();
-				AfxMessageBox(_T("Move X0Y0 Error..."));
-			}
-		}
+	//	fLen = sqrt( ((pPos[0] - dCurrX) * (pPos[0] - dCurrX)) + ((pPos[1] - dCurrY) * (pPos[1] - dCurrY)) );
+	//	if(fLen > 0.001)
+	//	{
+	//		pView->m_pMotion->GetSpeedProfile(TRAPEZOIDAL, AXIS_X0, fLen, fVel, fAcc, fJerk);
+	//		if (!pView->m_pMotion->Move(MS_X0Y0, pPos, fVel, fAcc, fAcc))
+	//		{
+	//			pView->SetAlarmToPlc(UNIT_PUNCH);
+	//			pView->ClrDispMsg();
+	//			AfxMessageBox(_T("Move X0Y0 Error..."));
+	//		}
+	//	}
 
-		nPos = str.Find('(', 0);
-		nPcsId = _tstoi(str.Left(nPos));
+	//	nPos = str.Find('(', 0);
+	//	nPcsId = _tstoi(str.Left(nPos));
 
-		if (!bCheckAlign)
-		{
-			if (pDoc->m_Master[0].m_pPcsRgn)
-				ptPnt = pDoc->m_Master[0].m_pPcsRgn->GetMkPnt1(nPcsId);
-		}
-		else
-		{
-			if (pDoc->m_Master[0].m_pPcsRgn)
-				ptPnt = pDoc->m_Master[0].m_pPcsRgn->pMkPnt[1][nPcsId];
-		}
+	//	if (!bCheckAlign)
+	//	{
+	//		if (pDoc->m_Master[0].m_pPcsRgn)
+	//			ptPnt = pDoc->m_Master[0].m_pPcsRgn->GetMkPnt1(nPcsId);
+	//	}
+	//	else
+	//	{
+	//		if (pDoc->m_Master[0].m_pPcsRgn)
+	//			ptPnt = pDoc->m_Master[0].m_pPcsRgn->pMkPnt[1][nPcsId];
+	//	}
 
-		dCurrX = pView->m_dEnc[AXIS_X1]; // pView->m_pMotion->GetActualPosition(AXIS_X);
-		dCurrY = pView->m_dEnc[AXIS_Y1]; // pView->m_pMotion->GetActualPosition(AXIS_Y);
-		
-		pPos[0] = ptPnt.x;
-		pPos[1] = ptPnt.y;
+	//	dCurrX = pView->m_dEnc[AXIS_X1]; // pView->m_pMotion->GetActualPosition(AXIS_X);
+	//	dCurrY = pView->m_dEnc[AXIS_Y1]; // pView->m_pMotion->GetActualPosition(AXIS_Y);
+	//	
+	//	pPos[0] = ptPnt.x;
+	//	pPos[1] = ptPnt.y;
 
-		fLen = sqrt( ((pPos[0] - dCurrX) * (pPos[0] - dCurrX)) + ((pPos[1] - dCurrY) * (pPos[1] - dCurrY)) );
-		if(fLen > 0.001)
-		{
-			pView->m_pMotion->GetSpeedProfile(TRAPEZOIDAL, AXIS_X1, fLen, fVel, fAcc, fJerk);
-			if (!pView->m_pMotion->Move(MS_X1Y1, pPos, fVel, fAcc, fAcc))
-			{
-				pView->SetAlarmToPlc(UNIT_PUNCH);
-				pView->ClrDispMsg();
-				AfxMessageBox(_T("Move X1Y1 Error..."));
-			}
-		}
-	}
+	//	fLen = sqrt( ((pPos[0] - dCurrX) * (pPos[0] - dCurrX)) + ((pPos[1] - dCurrY) * (pPos[1] - dCurrY)) );
+	//	if(fLen > 0.001)
+	//	{
+	//		pView->m_pMotion->GetSpeedProfile(TRAPEZOIDAL, AXIS_X1, fLen, fVel, fAcc, fJerk);
+	//		if (!pView->m_pMotion->Move(MS_X1Y1, pPos, fVel, fAcc, fAcc))
+	//		{
+	//			pView->SetAlarmToPlc(UNIT_PUNCH);
+	//			pView->ClrDispMsg();
+	//			AfxMessageBox(_T("Move X1Y1 Error..."));
+	//		}
+	//	}
+	//}
 
 
 	myStcData[nStcId].SetBkColor(RGB_WHITE);
@@ -1688,12 +1696,15 @@ BOOL CDlgUtil03::InitCadImg()
 	if (!pDoc->WorkingInfo.LastJob.bUseJudgeMk)
 		return FALSE;
 
+	DispResultBlob();
+
 	return TRUE;
 }
 
 
 void CDlgUtil03::DispResultBlob()
 {
+	return;
 	CString sVal;
 
 #ifdef USE_VISION

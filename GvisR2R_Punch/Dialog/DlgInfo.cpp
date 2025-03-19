@@ -114,6 +114,7 @@ BEGIN_MESSAGE_MAP(CDlgInfo, CDialog)
 	ON_STN_CLICKED(IDC_STC_189, &CDlgInfo::OnStnClickedStc189)
 	ON_BN_CLICKED(IDC_CHK_USE_AOI_MIDDLE, &CDlgInfo::OnBnClickedChkUseAoiMiddle)
 	ON_WM_TIMER()
+	ON_STN_CLICKED(IDC_STC_89, &CDlgInfo::OnStnClickedStc89)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -138,8 +139,8 @@ void CDlgInfo::AtDlgShow()
 {
 	LoadImg();
 	Disp();
-	if (pView->m_pDlgMenu01)
-		pView->m_pDlgMenu01->ChkAoiVsStatus();
+	//if (pView->m_pDlgMenu01)
+	//	pView->m_pDlgMenu01->ChkAoiVsStatus();
 }
 
 void CDlgInfo::AtDlgHide()
@@ -226,6 +227,8 @@ BOOL CDlgInfo::OnInitDialog()
 	
 	m_bTIM_DISP_STS = TRUE;
 	SetTimer(TIM_DISP_STS, 100, NULL);
+
+	InitMkInfo();
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
@@ -468,6 +471,8 @@ void CDlgInfo::InitStcTitle()
 	myStcTitle[71].SubclassDlgItem(IDC_STC_19, this);
 	myStcTitle[72].SubclassDlgItem(IDC_STC_22, this);
 	myStcTitle[73].SubclassDlgItem(IDC_STC_188, this);
+	myStcTitle[74].SubclassDlgItem(IDC_STC_190, this);
+	myStcTitle[75].SubclassDlgItem(IDC_STC_191, this);
 
 
 	for(int i=0; i<MAX_INFO_STC; i++)
@@ -519,6 +524,7 @@ void CDlgInfo::InitStcTitle()
 		case 58:
 		case 61:
 		case 73:
+		case 75:
 			myStcTitle[i].SetTextColor(RGB_NAVY);
 			myStcTitle[i].SetBkColor(RGB_WHITE);
 			myStcTitle[i].SetFontBold(TRUE);
@@ -548,20 +554,21 @@ void CDlgInfo::InitStcData()
 	myStcData[11].SubclassDlgItem(IDC_STC_61, this);
 	myStcData[12].SubclassDlgItem(IDC_STC_181, this);
 
-	myStcData[13].SubclassDlgItem(IDC_STC_32, this); // 초음파세정기 동작 검사시작 후 시작시간 [초]
-	myStcData[14].SubclassDlgItem(IDC_STC_183, this); // 고객출하수율
+	myStcData[13].SubclassDlgItem(IDC_STC_32, this);	// 초음파세정기 동작 검사시작 후 시작시간 [초]
+	myStcData[14].SubclassDlgItem(IDC_STC_183, this);	// 고객출하수율
 
-	myStcData[15].SubclassDlgItem(IDC_STC_36, this); // 불량 확인 Period [Shot]
+	myStcData[15].SubclassDlgItem(IDC_STC_36, this);	// 불량 확인 Period [Shot]
 
-	myStcData[16].SubclassDlgItem(IDC_STC_17, this); // ITS코드
-	myStcData[17].SubclassDlgItem(IDC_STC_41, this); // Shot수 현재값
-	myStcData[18].SubclassDlgItem(IDC_STC_43, this); // Shot수 설정값
+	myStcData[16].SubclassDlgItem(IDC_STC_17, this);	// ITS코드
+	myStcData[17].SubclassDlgItem(IDC_STC_41, this);	// Shot수 현재값
+	myStcData[18].SubclassDlgItem(IDC_STC_43, this);	// Shot수 설정값
 
-	myStcData[19].SubclassDlgItem(IDC_STC_82, this); // 검사부 AOI 상하면 재작업 알람 시간
-	myStcData[20].SubclassDlgItem(IDC_STC_83, this); // 마킹부 재작업 알람 시간
+	myStcData[19].SubclassDlgItem(IDC_STC_82, this);	// 검사부 AOI 상하면 재작업 알람 시간
+	myStcData[20].SubclassDlgItem(IDC_STC_83, this);	// 마킹부 재작업 알람 시간
 
-	myStcData[21].SubclassDlgItem(IDC_STC_187, this); // 마킹부 마킹여부 확인 미마킹일치율
-	myStcData[22].SubclassDlgItem(IDC_STC_189, this); // 마킹부 마킹여부 확인 미마킹일치율
+	myStcData[21].SubclassDlgItem(IDC_STC_187, this);	// 마킹부 마킹여부 확인 미마킹일치율 L
+	myStcData[22].SubclassDlgItem(IDC_STC_189, this);	// 마킹부 마킹여부 확인 미마킹일치율 R
+	myStcData[23].SubclassDlgItem(IDC_STC_89, this);	// 마킹부 마킹여부 모델 크기
 
 	for(int i=0; i<MAX_INFO_STC_DATA; i++)
 	{
@@ -666,6 +673,9 @@ void CDlgInfo::Disp()
 
 	str.Format(_T("%d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1]);
 	myStcData[22].SetText(str);
+
+	str.Format(_T("%d"), pDoc->m_nJudgeMkModelSize); // [um]
+	myStcData[23].SetText(str);
 
 	pDoc->WorkingInfo.LastJob.bRclDrSen = pView->MpeRead(pView->Plc.DlgInfo.LampDoorSensorRecoiler) ? TRUE : FALSE;
 	if(pDoc->WorkingInfo.LastJob.bRclDrSen)
@@ -2372,4 +2382,64 @@ void CDlgInfo::OnStnClickedStc189()
 	if (pView->m_pDlgMenu02)
 		pView->m_pDlgMenu02->DispMkPmStdVal();
 
+}
+
+
+void CDlgInfo::OnStnClickedStc89()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	myStcData[23].SetBkColor(RGB_RED);
+	myStcData[23].RedrawWindow();
+
+	CPoint pt;	CRect rt;
+	GetDlgItem(IDC_STC_89)->GetWindowRect(&rt);
+	pt.x = rt.right; pt.y = rt.bottom;
+	ShowKeypad(IDC_STC_89, pt, TO_BOTTOM | TO_RIGHT);
+
+	myStcData[23].SetBkColor(RGB_WHITE);
+	myStcData[23].RedrawWindow();
+
+	CString sVal;
+	GetDlgItem(IDC_STC_89)->GetWindowText(sVal);
+	if (_ttoi(sVal) > 800 || _ttoi(sVal) < 100)
+	{
+		AfxMessageBox(_T("모델크기는 100 ~ 800 um 이내여야 합니다."));
+		sVal.Format(_T("%d"), pDoc->m_nJudgeMkModelSize);
+		GetDlgItem(IDC_STC_89)->SetWindowText(sVal);
+		return;
+	}
+
+	pDoc->m_nJudgeMkModelSize = _ttoi(sVal); // [um]
+	::WritePrivateProfileString(_T("System"), _T("JudgeMk ModelSize"), sVal, PATH_WORKING_INFO);
+
+	if (pView->m_pDlgMenu02 && pView->m_pDlgMenu02->m_pDlgUtil03)
+	{
+		if (!pView->m_pDlgMenu02->m_pDlgUtil03->InitCadImg())
+		{
+			if (pView->m_pDlgMenu01)
+				pView->m_pDlgMenu01->UpdateData();
+		}
+	}
+}
+
+void CDlgInfo::InitMkInfo()
+{
+	HWND hWin;
+	CRect rect;
+
+#ifdef USE_VISION
+	if (pView->m_pVision[0])
+	{
+		hWin = GetDlgItem(IDC_PIC_MODEL_L)->GetSafeHwnd();
+		GetDlgItem(IDC_PIC_MODEL_L)->GetWindowRect(&rect);
+		pView->m_pVision[0]->SelDispMkModel(hWin, rect, 0);
+	}
+
+	if (pView->m_pVision[1])
+	{
+		hWin = GetDlgItem(IDC_PIC_MODEL_R)->GetSafeHwnd();
+		GetDlgItem(IDC_PIC_MODEL_R)->GetWindowRect(&rect);
+		pView->m_pVision[1]->SelDispMkModel(hWin, rect, 0);
+	}
+#endif
 }

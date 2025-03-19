@@ -10,8 +10,8 @@
 #include "MyBtn.h"
 #include "MyStatic.h"
 
-#define MAX_INFO_STC				74
-#define MAX_INFO_STC_DATA			23
+#define MAX_INFO_STC				76
+#define MAX_INFO_STC_DATA			24
 #define MAX_INFO_BTN				29
 
 #define TIM_DISP_STS				450
@@ -54,6 +54,7 @@ public:
 	void AtDlgHide();
 
 	void UpdateData();
+	void InitMkInfo();
 
 // Dialog Data
 	//{{AFX_DATA(CDlgInfo)
@@ -133,6 +134,7 @@ public:
 	afx_msg void OnStnClickedStc189();
 	afx_msg void OnBnClickedChkUseAoiMiddle();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnStnClickedStc89();
 };
 
 //{{AFX_INSERT_LOCATION}}

@@ -205,11 +205,11 @@ void CDlgMenu01::AtDlgShow()
 
 	myBtn[21].SetCheck(pDoc->WorkingInfo.Probing[0].bUse);
 	myBtn[22].SetCheck(pDoc->WorkingInfo.Probing[0].bStopOnOpen);
+	//ChkAoiVsStatus();
 }
 
 void CDlgMenu01::AtDlgHide()
 {
-	ChkAoiVsStatus();
 	DelImg();
 }
 

@@ -618,6 +618,8 @@ void CDlgMenu02::InitMkInfo()
 
 	if (m_pDlgUtil03)
 		m_pDlgUtil03->InitMkInfo();
+	//if (pView->m_pDlgInfo)
+	//	pView->m_pDlgInfo->InitMkInfo();
 }
 
 void CDlgMenu02::InitCadImg()

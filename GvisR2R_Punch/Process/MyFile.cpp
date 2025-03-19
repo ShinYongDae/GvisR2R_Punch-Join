@@ -662,6 +662,49 @@ void CMyFile::DelPcr(CString strPath, int nSerial)
 	return; // Sucess.
 }
 
+//void CMyFile::DelPcr(CString strPath, int nSerial)
+//{
+//	CString strFileName;
+//	CString strFilePath;
+//	CFileFind cFile;
+//	BOOL bExist;
+//
+//	int nPos;
+//	CString sFolder;// , sFile, sDest, sRemain, sDestFolder;
+//	//sDest = strPath;
+//
+//	// 폴더명을 얻음.
+//	nPos = strPath.ReverseFind('\\');
+//	sFolder = strPath.Left(nPos + 1);
+//	//sFile = sDest.Right(sDest.GetLength() - nPos - 1);
+//	//if (sFile.Find(_T("."), 0) != -1)
+//	//{
+//	//	nPos = sFile.Find(_T("."), 0);
+//	//	sFile.Delete(nPos, sFile.GetLength() - nPos);
+//	//}
+//	//sFolder = ParseFolderName(sDest, sRemain);
+//	//if (sFolder.IsEmpty()) return; // 폴더가 존재하지 않음.
+//	//sDestFolder = sRemain + _T("\\") + sFolder + _T("\\");
+//
+//	//sFolder = ParseFolderName(sSrc, sRemain);
+//	//if (sFolder.IsEmpty()) return -1; // 폴더가 존재하지 않음.
+//	//sSrcFolder = sRemain + _T("\\") + sFolder + _T("\\");
+//
+//
+//	//strFilePath.Format(_T("%s%04d.pcr"), strPath, nSerial);
+//	strFilePath.Format(_T("%s%04d.pcr"), sFolder, nSerial);
+//	bExist = cFile.FindFile(strFilePath);
+//	if (!bExist)
+//		return;
+//
+//	if (!DeleteFolerOrFile(strFilePath))
+//	{
+//		ShowError(); // 실패.
+//	}
+//
+//	return; // Sucess.
+//}
+
 void CMyFile::DelPcrAll(CString strPath)
 {
 	CString strFileName;

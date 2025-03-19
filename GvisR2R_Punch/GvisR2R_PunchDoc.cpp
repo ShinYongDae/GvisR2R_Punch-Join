@@ -282,6 +282,7 @@ CGvisR2R_PunchDoc::CGvisR2R_PunchDoc()
 	m_nEjectBufferLastShot = -1;
 	m_bDebugJudgeMk = FALSE;
 	m_bDebugGrabAlign = FALSE;
+	m_bUseStatus = FALSE;
 
 	SetCurrentInfoSignal(_SigInx::_MyMsgYes, FALSE);
 	SetCurrentInfoSignal(_SigInx::_MyMsgNo, FALSE);
@@ -1660,6 +1661,11 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 		m_nDelayShow = _ttoi(szData);
 	else
 		m_nDelayShow = 500;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("JudgeMk ModelSize"), NULL, szData, sizeof(szData), sPath))
+		m_nJudgeMkModelSize = _ttoi(szData);
+	else
+		m_nJudgeMkModelSize = 70;
 
 	// 마킹 금지 구역 - Left
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkLeft0_Lt_X"), NULL, szData, sizeof(szData), sPath))
@@ -5577,7 +5583,7 @@ int CGvisR2R_PunchDoc::LoadPCR1(int nSerial, BOOL bFromShare)	// return : 2(Fail
 	if (nRtn[0] != 1)
 		return nRtn[0];
 
-	if (pDoc->m_bVsStatusDn)
+	if (pDoc->m_bVsStatusUp)
 	{
 		if (pDoc->m_ListBuf[1].nTot < pDoc->m_ListBuf[0].nTot)
 		{
@@ -6902,7 +6908,7 @@ BOOL CGvisR2R_PunchDoc::CopyDefImgUp(int nSerial, CString sNewLot)
 			int nPcsIdx = pDoc->m_pPcr[0][nPcrIdx]->m_pDefPcs[i];
 			int nDefCode = pDoc->m_pPcr[0][nPcrIdx]->m_pDefType[i];
 			if (pDoc->m_Master[0].m_pPcsRgn)
-				pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(nPcsIdx, nStrip, nCol, nRow);
+				pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[0].MasterInfo.nActionCode, nPcsIdx, nStrip, nCol, nRow);
 
 			if (WorkingInfo.System.sPathOldFile.Right(1) != "\\")
 			{
@@ -7211,7 +7217,7 @@ BOOL CGvisR2R_PunchDoc::CopyDefImgDn(int nSerial, CString sNewLot)
 			int nPcsIdx = pDoc->m_pPcr[1][nPcrIdx]->m_pDefPcs[i];
 			int nDefCode = pDoc->m_pPcr[1][nPcrIdx]->m_pDefType[i];
 			if (pDoc->m_Master[0].m_pPcsRgn)
-				pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(nPcsIdx, nStrip, nCol, nRow);
+				pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[0].MasterInfo.nActionCode, nPcsIdx, nStrip, nCol, nRow);
 
 			if (WorkingInfo.System.sPathOldFile.Right(1) != "\\")
 			{
@@ -13919,6 +13925,8 @@ int CGvisR2R_PunchDoc::IsOfflineFolder() // 0 : Not exist, 1 : Exist only Up, 2 
 
 void CGvisR2R_PunchDoc::SetStatus(CString sMenu, CString sItem, BOOL bOn)
 {
+	return;
+
 	if (!m_bUseStatus) return;
 	CString sPath = WorkingInfo.System.sPathMkStatus;
 	CString sData = _T("");
@@ -13932,6 +13940,8 @@ void CGvisR2R_PunchDoc::SetStatus(CString sMenu, CString sItem, BOOL bOn)
 
 void CGvisR2R_PunchDoc::SetStatusInt(CString sMenu, CString sItem, int nData)
 {
+	return;
+
 	if (!m_bUseStatus) return;
 	CString sPath = WorkingInfo.System.sPathMkStatus;
 	if (sPath.IsEmpty())
@@ -13944,6 +13954,8 @@ void CGvisR2R_PunchDoc::SetStatusInt(CString sMenu, CString sItem, int nData)
 
 void CGvisR2R_PunchDoc::SetStatus(CString sMenu, CString sItem, CString sData)
 {
+	return;
+
 	if (!m_bUseStatus) return;
 	CString sPath = WorkingInfo.System.sPathMkStatus;
 	if (sPath.IsEmpty())
@@ -13954,6 +13966,8 @@ void CGvisR2R_PunchDoc::SetStatus(CString sMenu, CString sItem, CString sData)
 
 CString CGvisR2R_PunchDoc::GetStatus(CString sMenu, CString sItem)
 {
+	return _T("");
+
 	if (!m_bUseStatus) return _T("");
 	CString sPath = WorkingInfo.System.sPathMkStatus;
 	TCHAR szData[512];
@@ -13969,6 +13983,8 @@ CString CGvisR2R_PunchDoc::GetStatus(CString sMenu, CString sItem)
 
 BOOL CGvisR2R_PunchDoc::LoadStatus()
 {
+	return FALSE;
+
 	CString sPath = WorkingInfo.System.sPathMkStatus;
 	TCHAR szData[512];
 

@@ -577,10 +577,12 @@
 #define IDC_STATIC_RNG_2                1176
 #define IDC_STC_204                     1176
 #define IDC_COMBO_MODEL                 1176
+#define IDC_STC_190                     1176
 #define IDC_STC_GD_RA_4_ALL             1177
 #define IDC_CHK_MK_OFFSET_ST2           1177
 #define IDC_STC_205                     1177
 #define IDC_LIST_LOT                    1177
+#define IDC_STC_191                     1177
 #define IDC_STC_GD_RA_ALL_ALL           1178
 #define IDC_STC_MK_POS4                 1178
 #define IDC_STC_202                     1178
@@ -1548,8 +1550,11 @@
 #define IDC_STC_12_96                   1430
 #define IDC_STC_DEF_14                  1431
 #define IDC_CHK_124                     1431
+#define IDC_PIC_MODEL_L                 1431
 #define IDC_STC_DEF_15                  1432
 #define IDC_STC_12_97                   1432
+#define IDC_PIC_MODEL_L2                1432
+#define IDC_PIC_MODEL_R                 1432
 #define IDC_STC_DEF_16                  1433
 #define IDC_CHK_125                     1433
 #define IDC_STC_DEF_17                  1434
@@ -1601,7 +1606,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        361
 #define _APS_NEXT_COMMAND_VALUE         32785
-#define _APS_NEXT_CONTROL_VALUE         1430
+#define _APS_NEXT_CONTROL_VALUE         1432
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

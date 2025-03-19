@@ -117,10 +117,11 @@ class CVision : public CWnd
 	CLibMilDraw *m_pMilOvrCad[DEF_VIEW_IMG_NUMBER], *m_pMilOvrDef[DEF_VIEW_IMG_NUMBER];
 	CLibMilDraw *m_pMilDelOvrCad[DEF_VIEW_IMG_NUMBER], *m_pMilDelOvrDef[DEF_VIEW_IMG_NUMBER];
 
-	CLibMilDisp *m_pMilDispPin, *m_pMilDispReject;					// 200 x 200 (2-Bits)
-	CLibMilBuf *m_pMilBufPin, *m_pMilBufAlign, *m_pMilBufReject;	// 200 x 200 (2-Bits)
-	CLibMilBuf *m_pMilBufRejectRz;									// 200 x 200 Resized Blob Image for finding pattern matching model (8-Bits)
-	CLibMilBuf *m_pMilBufModel;										// 100 x 100 pattern matching model (8-Bits)
+	CLibMilDisp *m_pMilDispPin, *m_pMilDispReject, *m_pMilDispModelDisp;			// 200 x 200 (2-Bits)
+	CLibMilBuf *m_pMilBufPin, *m_pMilBufAlign, *m_pMilBufReject;				// 200 x 200 (2-Bits)
+	CLibMilBuf *m_pMilBufRejectRz;												// 200 x 200 Resized Blob Image for finding pattern matching model (8-Bits)
+	CLibMilBuf *m_pMilBufModel;													// 100 x 100 pattern matching model (8-Bits)
+	CLibMilBuf *m_pMilBufModelDisp;
 	CLibMilDraw *m_pMilPinOverlay, *m_pMilRejectOverlay;
 	CLibMilDraw *m_pMilPinOverlayDelete, *m_pMilRejectOverlayDelete;
 
@@ -208,6 +209,7 @@ public:
 	void SelDispPin(HWND hDispCtrl, CRect rtDispCtrl, int nDisplayFitMode);
 	void SelDispAlign(HWND hDispCtrl, CRect rtDispCtrl, int nDisplayFitMode);
 	void SelDispReject(HWND hDispCtrl, CRect rtDispCtrl, int nDisplayFitMode);
+	void SelDispMkModel(HWND hDispCtrl, CRect rtDispCtrl, int nDisplayFitMode);
 
 	void SetOvrCadFontSz(int nIdxMkInfo);
 	void InitCADBuf(int nLayer);
@@ -253,7 +255,7 @@ public:
 	void GetCrevisSize(int &nX, int &nY);
 	void GetIRaypleSize(int &nX, int &nY);
 
-	BOOL SaveMkImg(CString sPath);
+	BOOL SaveMkImg(int nSerial, int nMkPcsIdx, CString sDest);
 	void SaveCadImg(int nIdxMkInfo, CString sPath); // (화면의 IDC 인덱스, 저장할 파일 Path)
 
 	BOOL m_bMkJudge; // TRUE : Mked, FALSE : NoMked

@@ -86,6 +86,8 @@ CVision::CVision(int nIdx, MIL_ID MilSysId, HWND *hCtrl, CWnd* pParent /*=NULL*/
 	m_pMilRejectOverlay = NULL;
 	m_pMilRejectOverlayDelete = NULL;
 	m_pMilBufModel = NULL;
+	m_pMilDispModelDisp = NULL;
+	m_pMilBufModelDisp = NULL;
 
 	m_pMilBufAlign = NULL;
 
@@ -213,6 +215,18 @@ CVision::~CVision()
 	{
 		delete m_pMilDispReject;
 		m_pMilDispReject = NULL;
+	}
+
+	if (m_pMilBufModelDisp)
+	{
+		delete m_pMilBufModelDisp;
+		m_pMilBufModelDisp = NULL;
+	}
+
+	if (m_pMilDispModelDisp)
+	{
+		delete m_pMilDispModelDisp;
+		m_pMilDispModelDisp = NULL;
 	}
 
 	if (MilBufPinTemp != M_NULL)
@@ -1144,6 +1158,11 @@ void CVision::SelDispReject(HWND hDispCtrl, CRect rtDispCtrl, int nDisplayFitMod
 	//	m_pMilBufModel = m_pMil->AllocBuf(3, DEF_IMG_DISP_SIZEX, DEF_IMG_DISP_SIZEY, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
 	//}
 
+	if (m_pMilBufModelDisp == NULL)
+	{
+		m_pMilBufModelDisp = m_pMil->AllocBuf(3, DEF_IMG_DISP_SIZEX, DEF_IMG_DISP_SIZEY, 1L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
+	}
+
 	if (nDisplayFitMode == 0)
 	{
 		// Mil Display set
@@ -1174,6 +1193,53 @@ void CVision::SelDispReject(HWND hDispCtrl, CRect rtDispCtrl, int nDisplayFitMod
 			m_pMilRejectOverlayDelete->SetDrawColor(m_pMilDispReject->m_lOverlayColor);
 			m_pMilRejectOverlayDelete->SetDrawBackColor(m_pMilDispReject->m_lOverlayColor);
 		}
+	}
+}
+
+void CVision::SelDispMkModel(HWND hDispCtrl, CRect rtDispCtrl, int nDisplayFitMode)
+{
+	// Mil System set
+	if (!m_pMil)
+		return;
+	if (!m_pMilBufModelDisp)
+		return;
+
+	// Live Image Buffer set
+
+	//if (m_pMilBufModelDisp == NULL)
+	//{
+	//	m_pMilBufModelDisp = m_pMil->AllocBuf(3, DEF_IMG_DISP_SIZEX, DEF_IMG_DISP_SIZEY, 1L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
+	//}
+
+	if (nDisplayFitMode == 0)
+	{
+		// Mil Display set
+		if (m_pMilDispModelDisp == NULL)
+		{
+			m_pMilDispModelDisp = m_pMil->AllocDisp();
+		}
+		m_pMil->DisplaySelect(m_pMilDispModelDisp, m_pMilBufModelDisp, hDispCtrl, rtDispCtrl.Width(), rtDispCtrl.Height(), DISPLAY_FIT_MODE_CENTERVIEW);
+
+		//// Create Overlay
+		//if (m_pMilDispModelDisp)
+		//{
+		//	m_pMil->CreateOverlay(m_pMilDispModelDisp, M_COLOR_GREEN);
+		//	Sleep(30);
+		//}
+
+		//// Draw
+		//if (!m_pMilModelDispOverlay)
+		//{
+		//	m_pMilModelDispOverlay = m_pMil->AllocDraw(m_pMilDispModelDisp);
+		//	m_pMilModelDispOverlay->SetDrawColor(M_COLOR_GREEN);
+		//	m_pMilModelDispOverlay->SetDrawBackColor(m_pMilDispModelDisp->m_lOverlayColor);
+		//}
+		//if (!m_pMilModelDispOverlayDelete)
+		//{
+		//	m_pMilModelDispOverlayDelete = m_pMil->AllocDraw(m_pMilDispModelDisp);
+		//	m_pMilModelDispOverlayDelete->SetDrawColor(m_pMilDispModelDisp->m_lOverlayColor);
+		//	m_pMilModelDispOverlayDelete->SetDrawBackColor(m_pMilDispModelDisp->m_lOverlayColor);
+		//}
 	}
 }
 
@@ -4436,7 +4502,7 @@ BOOL CVision::ClearPinCenterMarkArea(int nCenterX, int nCenterY, int nLineLength
 }
 
 
-BOOL CVision::SaveMkImg(CString sPath) // Return FALSE; --> Alarm Message & Answer Remarking
+BOOL CVision::SaveMkImg(int nSerial, int nMkPcsIdx, CString sDest) // Return FALSE; --> Alarm Message & Answer Remarking
 {
 #ifdef USE_IRAYPLE
 	m_cs.Lock();
@@ -4484,7 +4550,18 @@ BOOL CVision::SaveMkImg(CString sPath) // Return FALSE; --> Alarm Message & Answ
 
 		if (MilGrabImgCld)
 		{
-			MbufSave(sPath, MilGrabImgCld);
+			CString sPath;
+			if (m_nIdx == 0)
+			{
+				sPath.Format(_T("%s\\%s.tif"), sDest, pView->GetMkInfo0(nSerial, nMkPcsIdx));
+				MbufSave(sPath, MilGrabImgCld);
+			}
+			else if (m_nIdx == 1)
+			{
+				sPath.Format(_T("%s\\%s.tif"), sDest, pView->GetMkInfo1(nSerial, nMkPcsIdx));
+				MbufSave(sPath, MilGrabImgCld);
+			}
+
 			MbufFree(MilGrabImgCld);
 			MilGrabImgCld = M_NULL;
 		}
@@ -4555,7 +4632,8 @@ BOOL CVision::CheckVerifyPunching(MIL_ID &GrabImgId) // Return FALSE; --> Alarm 
 		if (!Judge(GrabImgId, stRst))
 		{
 			//GetDlgItem(IDC_STC_JUDGE)->SetWindowText(_T("실패"));
-			return TRUE; // 패턴이 인식되지 않으므로 "마킹 됨"으로 판단
+			//return TRUE; // 패턴이 인식되지 않으므로 "마킹 됨"으로 판단
+			return FALSE; // 패턴이 인식되지 않으므로 "미마킹 됨"으로 판단
 		}
 
 		//CString sVal;
@@ -4607,11 +4685,25 @@ BOOL CVision::Judge(MIL_ID &GrabImgId, stPtMtRst &stRst)
 	//if (((CPunchingMeasSysDlg*)m_pParent)->m_bUseCamMstModel)
 	if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
 	{
+		/*
 		long SzX = BlobRst.nBoxRight - BlobRst.nBoxLeft + 2;
 		long SzY = BlobRst.nBoxBottom - BlobRst.nBoxTop + 2;
 		long StX = BlobRst.nBoxLeft - 1;
 		long StY = BlobRst.nBoxTop - 1;
 		//m_pMilBufModel->ChildBuffer2d(StX, StY, SzX, SzY);
+		*/
+		double dRes = 10000.0;
+		dRes = dRes > _tstof(pDoc->WorkingInfo.Vision[0].sResX) ? _tstof(pDoc->WorkingInfo.Vision[0].sResX) : dRes;
+		dRes = dRes > _tstof(pDoc->WorkingInfo.Vision[0].sResY) ? _tstof(pDoc->WorkingInfo.Vision[0].sResY) : dRes;
+		dRes = dRes > _tstof(pDoc->WorkingInfo.Vision[1].sResX) ? _tstof(pDoc->WorkingInfo.Vision[1].sResX) : dRes;
+		dRes = dRes > _tstof(pDoc->WorkingInfo.Vision[1].sResY) ? _tstof(pDoc->WorkingInfo.Vision[1].sResY) : dRes;
+		dRes *= 1000.0; //[um]
+
+		long SzX = (long)((double)pDoc->m_nJudgeMkModelSize / dRes);
+		long SzY = (long)((double)pDoc->m_nJudgeMkModelSize / dRes);
+		long StX = long((DEF_IMG_DISP_SIZEX - SzX) / 2);
+		long StY = long((DEF_IMG_DISP_SIZEY - SzY) / 2);
+
 		MilPtModelImg = m_pMil->AllocBuf(SzX, SzY, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
 		MbufCopy(m_pMilBufModel->m_MilImageChild, MilPtModelImg->m_MilImage);
 	}
@@ -4623,7 +4715,7 @@ BOOL CVision::Judge(MIL_ID &GrabImgId, stPtMtRst &stRst)
 		MkMtRst.dX = stRst.dX = 50.0;
 		MkMtRst.dY = stRst.dY = 50.0;
 		MkMtRst.dAngle = stRst.dAngle = 0.0;
-		MkMtRst.dScore = stRst.dScore = 0.0;
+		MkMtRst.dScore = stRst.dScore = 100.0;
 		return TRUE;
 		//m_pMilBufModel->ChildBuffer2d(25, 25, 50, 50);
 		//MilPtModelImg = m_pMil->AllocBuf(50, 50, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
@@ -4636,13 +4728,16 @@ BOOL CVision::Judge(MIL_ID &GrabImgId, stPtMtRst &stRst)
 	//if (!m_pMil->PatternMatchingAction(m_pMilBufTarget->m_MilImage))//, m_pMilDrawOverlay->m_MilBuffer, m_pMilDrawOverlay->m_MilGraphicContextID))
 	if (!m_pMil->PatternMatchingAction(GrabImgId))//, m_pMilDrawOverlay->m_MilBuffer, m_pMilDrawOverlay->m_MilGraphicContextID))
 	{
+		//  Measure End
+		m_pMil->PatternMatchingFree();
+
 		if (MilPtModelImg)
 			delete MilPtModelImg;
 
 		MkMtRst.dX = stRst.dX = 50.0;
 		MkMtRst.dY = stRst.dY = 50.0;
 		MkMtRst.dAngle = stRst.dAngle = 0.0;
-		MkMtRst.dScore = stRst.dScore = 0.0;
+		MkMtRst.dScore = stRst.dScore = 100.0;
 
 		return FALSE;
 	}
@@ -4663,7 +4758,7 @@ BOOL CVision::Judge(MIL_ID &GrabImgId, stPtMtRst &stRst)
 		MkMtRst.dX = stRst.dX = 50.0;
 		MkMtRst.dY = stRst.dY = 50.0;
 		MkMtRst.dAngle = stRst.dAngle = 0.0;
-		MkMtRst.dScore = stRst.dScore = 0.0;
+		MkMtRst.dScore = stRst.dScore = 100.0;
 	}
 
 	return TRUE;
@@ -4694,6 +4789,33 @@ BOOL CVision::ShowDispReject()
 	//DrawCrossOnReject(PIN_IMG_DISP_SIZEX / 2, PIN_IMG_DISP_SIZEY / 2, 14);
 
 	FitSizeBlobModel();
+
+	double dRes = 10000.0;
+	dRes = dRes > _tstof(pDoc->WorkingInfo.Vision[0].sResX) ? _tstof(pDoc->WorkingInfo.Vision[0].sResX) : dRes;
+	dRes = dRes > _tstof(pDoc->WorkingInfo.Vision[0].sResY) ? _tstof(pDoc->WorkingInfo.Vision[0].sResY) : dRes;
+	dRes = dRes > _tstof(pDoc->WorkingInfo.Vision[1].sResX) ? _tstof(pDoc->WorkingInfo.Vision[1].sResX) : dRes;
+	dRes = dRes > _tstof(pDoc->WorkingInfo.Vision[1].sResY) ? _tstof(pDoc->WorkingInfo.Vision[1].sResY) : dRes;
+	dRes *= 1000.0; //[um]
+
+	long SzX = (long)((double)pDoc->m_nJudgeMkModelSize / dRes);
+	long SzY = (long)((double)pDoc->m_nJudgeMkModelSize / dRes);
+	long StX = long((DEF_IMG_DISP_SIZEX - SzX) / 2);
+	long StY = long((DEF_IMG_DISP_SIZEY - SzY) / 2);
+
+	if (!m_pMilBufModel->m_MilImageChild)
+	{
+		m_pMilBufModel->ChildBuffer2d(StX, StY, SzX, SzY); // Blob된 이미지의 크기로 Crop : m_pMilBufModel 는 m_pMilBufRejectRz의 100x100 이미지
+		MbufClear(m_pMilBufModelDisp->m_MilImage, 0);
+		MbufCopy(m_pMilBufModel->m_MilImageChild, m_pMilBufModelDisp->m_MilImage);
+		if (pDoc->m_bDebugJudgeMk)
+		{
+			CString sName;
+			sName.Format(_T("C:\\Model_JudgeMkChild_%d.tif"), m_nIdx);
+			MbufSave(sName, m_pMilBufModel->m_MilImageChild);
+		}
+	}
+
+	/*
 	if (BlobRejectModel())
 	{
 		long SzX = BlobRst.nBoxRight - BlobRst.nBoxLeft + 2;
@@ -4722,6 +4844,7 @@ BOOL CVision::ShowDispReject()
 		AfxMessageBox(_T("Failed - BlobRejectModel()"));
 		return FALSE;
 	}
+	*/
 
 	//if (m_pMilBufRejectRz->m_MilImage)
 	//	MbufCopy(m_pMilBufModel->m_MilImage, m_pMilBufModel->m_MilImage);
@@ -4841,6 +4964,18 @@ void CVision::InitRejectBuf()
 	{
 		delete m_pMilBufModel;
 		m_pMilBufModel = NULL;
+	}
+
+	if (m_pMilDispModelDisp)
+	{
+		delete m_pMilDispModelDisp;
+		m_pMilDispModelDisp = NULL;
+	}
+
+	if (m_pMilBufModelDisp)
+	{
+		delete m_pMilBufModelDisp;
+		m_pMilBufModelDisp = NULL;
 	}
 }
 
