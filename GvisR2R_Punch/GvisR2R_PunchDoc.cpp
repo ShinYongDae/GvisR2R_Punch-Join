@@ -8961,7 +8961,7 @@ BOOL CGvisR2R_PunchDoc::GetEngOffset(CfPoint &OfSt)
 #ifndef TEST_MODE
 	CString sMsg;
 	CFileFind finder;
-	if (finder.FindFile(sPath))
+	//if (finder.FindFile(sPath))
 	{
 
 		if (0 < ::GetPrivateProfileString(_T("OFFSET"), _T("ALIGN X"), NULL, szData, sizeof(szData), sPath))
@@ -8980,13 +8980,13 @@ BOOL CGvisR2R_PunchDoc::GetEngOffset(CfPoint &OfSt)
 			bRtn = FALSE;
 		}
 	}
-	else
-	{
-		pView->SetAlarmToPlc(UNIT_PUNCH);
-		sMsg.Format(_T("%s파일의 OFFSET에 ALIGN 정보가  없습니다."), sPath);
-		pView->ClrDispMsg();
-		AfxMessageBox(sMsg);
-	}
+	//else
+	//{
+	//	pView->SetAlarmToPlc(UNIT_PUNCH);
+	//	sMsg.Format(_T("%s파일의 OFFSET에 ALIGN 정보가  없습니다."), sPath);
+	//	pView->ClrDispMsg();
+	//	AfxMessageBox(sMsg);
+	//}
 #endif
 	return bRtn;
 }
@@ -9000,7 +9000,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiUpOffset(CfPoint &OfSt)
 #ifndef TEST_MODE
 	CString sMsg;
 	CFileFind finder;
-	if (finder.FindFile(sPath))
+	//if (finder.FindFile(sPath))
 	{
 
 		if (0 < ::GetPrivateProfileString(_T("OFFSET"), _T("ALIGN X"), NULL, szData, sizeof(szData), sPath))
@@ -9019,13 +9019,13 @@ BOOL CGvisR2R_PunchDoc::GetAoiUpOffset(CfPoint &OfSt)
 			bRtn = FALSE;
 		}
 	}
-	else
-	{
-		pView->SetAlarmToPlc(UNIT_PUNCH);
-		sMsg.Format(_T("%s파일의 OFFSET에 ALIGN 정보가  없습니다."), sPath);
-		pView->ClrDispMsg();
-		AfxMessageBox(sMsg);
-	}
+	//else
+	//{
+	//	pView->SetAlarmToPlc(UNIT_PUNCH);
+	//	sMsg.Format(_T("%s파일의 OFFSET에 ALIGN 정보가  없습니다."), sPath);
+	//	pView->ClrDispMsg();
+	//	AfxMessageBox(sMsg);
+	//}
 #endif
 	return bRtn;
 }
@@ -9040,7 +9040,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiDnOffset(CfPoint &OfSt)
 	CString sMsg;
 
 	CFileFind finder;
-	if (finder.FindFile(sPath))
+	//if (finder.FindFile(sPath))
 	{
 		if (0 < ::GetPrivateProfileString(_T("OFFSET"), _T("ALIGN X"), NULL, szData, sizeof(szData), sPath))
 		OfSt.x = -1.0*_tstof(szData);
@@ -9058,13 +9058,13 @@ BOOL CGvisR2R_PunchDoc::GetAoiDnOffset(CfPoint &OfSt)
 			bRtn = FALSE;
 		}
 	}
-	else
-	{
-		pView->SetAlarmToPlc(UNIT_PUNCH);
-		sMsg.Format(_T("%s파일의 Region에 Piece Region Type 정보가 없습니다."), sPath);
-		pView->ClrDispMsg();
-		AfxMessageBox(sMsg);
-	}
+	//else
+	//{
+	//	pView->SetAlarmToPlc(UNIT_PUNCH);
+	//	sMsg.Format(_T("%s파일의 Region에 Piece Region Type 정보가 없습니다."), sPath);
+	//	pView->ClrDispMsg();
+	//	AfxMessageBox(sMsg);
+	//}
 #endif
 	return bRtn;
 }

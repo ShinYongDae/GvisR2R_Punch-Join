@@ -223,7 +223,6 @@ class CGvisR2R_PunchView : public CFormView
 	BOOL m_bChkLightErr;
 
 	double m_dElecChkVal;
-	BOOL m_bContEngraveF;
 	CString m_sMsg;
 
 
@@ -364,6 +363,7 @@ public:
 
 	stGuiRegister Plc;
 
+	BOOL m_bContEngraveF;
 	double m_dMkTorqList[2]; // [0] : Left, [1] : Right
 
 	int m_nDebugStep; 	void DispThreadTick();

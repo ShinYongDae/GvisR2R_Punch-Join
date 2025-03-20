@@ -184,6 +184,9 @@ LRESULT CEngrave::wmClientReceived(WPARAM wParam, LPARAM lParam)
 
 int CEngrave::OnClientReceived(WPARAM wParam, LPARAM lParam)
 {
+	if (!pView->m_bContEngraveF)
+		return 1;
+
 	int nServerID = (int)wParam;
 	//SOCKET_DATA *pSocketData = (SOCKET_DATA*)lParam;
 	SOCKET_DATA rSockData = m_SocketData;
@@ -430,13 +433,16 @@ void CEngrave::OnTimer(UINT_PTR nIDEvent)
 		break;
 	case TIM_CHK_RCV_SIG:
 		KillTimer(TIM_CHK_RCV_SIG);
-		for (nMsgID = 0; nMsgID < _SigInx::_EndIdx; nMsgID++)
+		if (pView->m_bContEngraveF)
 		{
-			if (m_bSendSig[nMsgID])		// 상대방이 받지 못하면 500mSec 후에 다시 신호를 전송함.
+			for (nMsgID = 0; nMsgID < _SigInx::_EndIdx; nMsgID++)
 			{
-				SetSignal(nMsgID, m_nSendSigData[nMsgID]);		// 1 : Return RCV_Signal, 0 : No Return
-				if (!m_nSendSigData[nMsgID])
-					m_bSendSig[nMsgID] = FALSE;
+				if (m_bSendSig[nMsgID])		// 상대방이 받지 못하면 500mSec 후에 다시 신호를 전송함.
+				{
+					SetSignal(nMsgID, m_nSendSigData[nMsgID]);		// 1 : Return RCV_Signal, 0 : No Return
+					if (!m_nSendSigData[nMsgID])
+						m_bSendSig[nMsgID] = FALSE;
+				}
 			}
 		}
 		if (m_bTIM_CHK_RCV_SIG)

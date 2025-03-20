@@ -1155,7 +1155,7 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 		DoIO();
 		ChkMyMsg();
 		if (m_bTIM_MPE_IO)
-			SetTimer(TIM_MPE_IO, 300, NULL);
+			SetTimer(TIM_MPE_IO, 50, NULL);
 	}
 
 	if (nIDEvent == TIM_TOWER_WINKER)
@@ -16210,7 +16210,8 @@ void CGvisR2R_PunchView::DoAuto()
 	//pDoc->LogAuto(str);
 
 	// Engrave Marking Start
-	DoAutoMarkingEngrave();
+	if (m_bContEngraveF)
+		DoAutoMarkingEngrave();
 
 	//dwSt = GetTickCount();
 	//str.Format(_T("10:%d"), dwSt - dwSt2);
@@ -16221,7 +16222,8 @@ BOOL CGvisR2R_PunchView::DoAutoGetLotEndSignal()
 {
 	int nSerial;
 
-	if (MpeRead(_T("MB40039F"))) // PLC 작업종료 신호 - Last Shot 피딩 후 신호 On
+	//if (MpeRead(_T("MB40039F"))) // PLC 작업종료 신호 - Last Shot 피딩 후 신호 On
+	if (pDoc->m_pMpeSignal[19] & (0x01 << 15))
 	{
 		MpeWrite(_T("MB40039F"), 0);
 		m_nMkStAuto = 0; pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
@@ -16319,10 +16321,10 @@ void CGvisR2R_PunchView::DoAtuoGetMkStSignal()
 	if (!pDoc->m_pMpeSignal)
 		return;
 
-	BOOL bMk0 = MpeRead(_T("MB400236")); // MB400236 : MK0 - PLC 마킹 마킹 시작#1
-	BOOL bMk1 = MpeRead(_T("MB400237")); // MB400237 : MK0 & MK1 - PLC 마킹 마킹 시작#2
-	//BOOL bMk0 = pDoc->m_pMpeSignal[3] & (0x01 << 6); // MB400236 : MK0 - PLC 마킹 마킹 시작#1
-	//BOOL bMk1 = pDoc->m_pMpeSignal[3] & (0x01 << 7); // MB400237 : MK0 & MK1 - PLC 마킹 마킹 시작#2
+	//BOOL bMk0 = MpeRead(_T("MB400236")); // MB400236 : MK0 - PLC 마킹 마킹 시작#1
+	//BOOL bMk1 = MpeRead(_T("MB400237")); // MB400237 : MK0 & MK1 - PLC 마킹 마킹 시작#2
+	BOOL bMk0 = pDoc->m_pMpeSignal[3] & (0x01 << 6); // MB400236 : MK0 - PLC 마킹 마킹 시작#1
+	BOOL bMk1 = pDoc->m_pMpeSignal[3] & (0x01 << 7); // MB400237 : MK0 & MK1 - PLC 마킹 마킹 시작#2
 
 	if (m_pMpe)
 	{
@@ -16340,9 +16342,9 @@ void CGvisR2R_PunchView::DoAtuoGetMkStSignal()
 				{
 					//pDoc->LogAuto(_T("PLC: 마킹시작 #1 (PC가 확인하고 Reset시킴.)"));
 					m_bMkStSw[1] = FALSE;
-					MpeWrite(Plc.DlgMenu01.MarkingStart, 0);			// 마킹시작(PC가 확인하고 Reset시킴.)
-					Sleep(30);
-					MpeWrite(Plc.DlgMenu01.MarkingStart, 0);			// 마킹시작(PC가 확인하고 Reset시킴.)
+					//MpeWrite(Plc.DlgMenu01.MarkingStart, 0);			// 마킹시작(PC가 확인하고 Reset시킴.)
+					//Sleep(30);
+					//MpeWrite(Plc.DlgMenu01.MarkingStart, 0);			// 마킹시작(PC가 확인하고 Reset시킴.)
 					m_bMkSt[0] = TRUE; pDoc->SetStatus(_T("General"), _T("bMkSt0"), m_bMkSt[0]);
 					m_bMkSt[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bMkSt1"), m_bMkSt[1]);
 					m_nMkStAuto = MK_ST; pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
@@ -16355,9 +16357,9 @@ void CGvisR2R_PunchView::DoAtuoGetMkStSignal()
 				{
 					//pDoc->LogAuto(_T("PLC: 마킹시작 #0 (PC가 확인하고 Reset시킴.)"));
 					m_bMkStSw[0] = FALSE;
-					MpeWrite(Plc.DlgMenu01.MarkingStart, 0);			// 마킹시작(PC가 확인하고 Reset시킴.)
-					Sleep(30);
-					MpeWrite(Plc.DlgMenu01.MarkingStart, 0);			// 마킹시작(PC가 확인하고 Reset시킴.)
+					//MpeWrite(Plc.DlgMenu01.MarkingStart, 0);			// 마킹시작(PC가 확인하고 Reset시킴.)
+					//Sleep(30);
+					//MpeWrite(Plc.DlgMenu01.MarkingStart, 0);			// 마킹시작(PC가 확인하고 Reset시킴.)
 					m_bMkSt[0] = TRUE; pDoc->SetStatus(_T("General"), _T("bMkSt0"), m_bMkSt[0]);
 					m_nMkStAuto = MK_ST; pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
 					::WritePrivateProfileString(_T("Last Job"), _T("MkSt0"), _T("1"), PATH_WORKING_INFO);
@@ -16445,8 +16447,8 @@ void CGvisR2R_PunchView::DoAutoSetFdOffset()
 	double dAveX, dAveY;
 	CfPoint OfStUp, OfStDn;
 
-	BOOL bOnTestUp = MpeRead(_T("MB40023C")); // PLC AOI 상 검사 중
-
+	//BOOL bOnTestUp = MpeRead(_T("MB40023C")); // PLC AOI 상 검사 중
+	BOOL bOnTestUp = pDoc->m_pMpeSignal[3] & (0x01 << 12);
 	//if (pDoc->m_pMpeSignal[3] & (0x01 << 12) && !m_bAoiTestF[0])		// PLC AOI 상 검사 중
 	if (bOnTestUp && !m_bAoiTestF[0])		// PLC AOI 상 검사 중
 	{
@@ -16464,8 +16466,8 @@ void CGvisR2R_PunchView::DoAutoSetFdOffset()
 		//pDoc->LogAuto(_T("PLC: 검사부(상) Feeding Offset Write 완료(PC가 확인하고 MB440111 Reset시킴.)"));
 	}
 
-	BOOL bOnTestDn = MpeRead(_T("MB40023D")); // PLC AOI 하 검사 중
-
+	//BOOL bOnTestDn = MpeRead(_T("MB40023D")); // PLC AOI 하 검사 중
+	BOOL bOnTestDn = pDoc->m_pMpeSignal[3] & (0x01 << 13);
 	//if (pDoc->m_pMpeSignal[3] & (0x01 << 13) && !m_bAoiTestF[1])		// PLC AOI 하 검사 중
 	if (bOnTestDn && !m_bAoiTestF[1])		// PLC AOI 하 검사 중
 	{
@@ -16483,8 +16485,8 @@ void CGvisR2R_PunchView::DoAutoSetFdOffset()
 		//pDoc->LogAuto(_T("PLC: 검사부(하) Feeding Offset Write 완료(PC가 확인하고 MB440112 Reset시킴.)"));
 	}
 
-	BOOL bOffsetDoneUp = MpeRead(_T("MB40024D")); // PLC AOI 상 피딩 Offset Write(GUI Off)
-
+	//BOOL bOffsetDoneUp = MpeRead(_T("MB40024D")); // PLC AOI 상 피딩 Offset Write(GUI Off)
+	BOOL bOffsetDoneUp = pDoc->m_pMpeSignal[4] & (0x01 << 13);
 	//if (pDoc->m_pMpeSignal[4] & (0x01 << 13) && !m_bAoiFdWrite[0])		// 검사부(상) Feeding Offset Write 완료
 	if (bOffsetDoneUp && !m_bAoiFdWrite[0])		// 검사부(상) Feeding Offset Write 완료
 	{
@@ -16496,8 +16498,8 @@ void CGvisR2R_PunchView::DoAutoSetFdOffset()
 		m_bAoiFdWrite[0] = FALSE; pDoc->SetStatus(_T("General"), _T("bAoiFdWrite[0]"), m_bAoiFdWrite[0]);
 	}
 
-	BOOL bOffsetDoneDn = MpeRead(_T("MB40024E")); // PLC AOI 하 피딩 Offset Write(GUI Off)
-
+	//BOOL bOffsetDoneDn = MpeRead(_T("MB40024E")); // PLC AOI 하 피딩 Offset Write(GUI Off)
+	BOOL bOffsetDoneDn = pDoc->m_pMpeSignal[4] & (0x01 << 14);
 	//if (pDoc->m_pMpeSignal[4] & (0x01 << 14) && !m_bAoiFdWrite[1])		// 검사부(하) Feeding Offset Write 완료-20141103
 	if (bOffsetDoneDn && !m_bAoiFdWrite[1])		// 검사부(하) Feeding Offset Write 완료-20141103
 		m_bAoiFdWrite[1] = TRUE;
@@ -16653,7 +16655,8 @@ void CGvisR2R_PunchView::DoAutoSetFdOffset()
 	{
 		CfPoint OfStEng;
 
-		BOOL bOffsetDoneEng = MpeRead(Plc.DlgFrameHigh.FeedOffsetWriteDoneEngrave); // PLC 각인기 피딩 Offset Write(GUI Off) _T("MB40024C")
+		//BOOL bOffsetDoneEng = MpeRead(Plc.DlgFrameHigh.FeedOffsetWriteDoneEngrave); // PLC 각인기 피딩 Offset Write(GUI Off) _T("MB40024C")
+		BOOL bOffsetDoneEng = pDoc->m_pMpeSignal[4] & (0x01 << 12); // PLC 각인기 피딩 Offset Write(GUI Off) _T("MB40024C")
 
 		//if (pDoc->m_pMpeSignal[4] & (0x01 << 12) && !m_bEngFdWrite)		// PLC: 각인부 Feeding Offset Write 완료
 		if (bOffsetDoneEng && !m_bEngFdWrite)		// PLC: 각인부 Feeding Offset Write 완료
@@ -16687,7 +16690,8 @@ void CGvisR2R_PunchView::DoAutoSetFdOffset()
 		}
 	}
 
-	BOOL bOffsetDonePunch = MpeRead(Plc.DlgFrameHigh.FeedOffsetWriteDonePunch); // PLC 각인기 피딩 Offset Write(GUI Off) _T("MB40024F")
+	//BOOL bOffsetDonePunch = MpeRead(Plc.DlgFrameHigh.FeedOffsetWriteDonePunch); // PLC 각인기 피딩 Offset Write(GUI Off) _T("MB40024F")
+	BOOL bOffsetDonePunch = pDoc->m_pMpeSignal[4] & (0x01 << 15); // PLC 각인기 피딩 Offset Write(GUI Off) _T("MB40024F")
 
 	if (bOffsetDonePunch && !m_bMkFdWrite)		// PLC: 각인부 Feeding Offset Write 완료
 		m_bMkFdWrite = TRUE;
@@ -18173,17 +18177,17 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 		break;
 
 	case AT_LP + 3:
-		if (m_bTHREAD_UPDATE_REELMAP_UP || m_bTHREAD_UPDATE_REELMAP_DN || m_bTHREAD_UPDATE_REELMAP_ALLUP || m_bTHREAD_UPDATE_REELMAP_ALLDN) // Write Reelmap
-		{
-			Sleep(100);
-			break;
-		}
-
-		if (m_bTHREAD_UPDATE_YIELD_UP || m_bTHREAD_UPDATE_YIELD_DN || m_bTHREAD_UPDATE_YIELD_ALLUP || m_bTHREAD_UPDATE_YIELD_ALLDN) // Write Reelmap
-		{
-			Sleep(100);
-			break;
-		}
+		// 2025.03.21
+		//if (m_bTHREAD_UPDATE_REELMAP_UP || m_bTHREAD_UPDATE_REELMAP_DN || m_bTHREAD_UPDATE_REELMAP_ALLUP || m_bTHREAD_UPDATE_REELMAP_ALLDN) // Write Reelmap
+		//{
+		//	Sleep(100);
+		//	break;
+		//}
+		//if (m_bTHREAD_UPDATE_YIELD_UP || m_bTHREAD_UPDATE_YIELD_DN || m_bTHREAD_UPDATE_YIELD_ALLUP || m_bTHREAD_UPDATE_YIELD_ALLDN) // Write Reelmap
+		//{
+		//	Sleep(100);
+		//	break;
+		//}
 
 		Shift2Buf();			// PCR 이동(Share->Buffer)
 		m_nStepAuto++;
@@ -18193,17 +18197,19 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 		if (!IsRun())
 			break;
 
-		if (m_bTHREAD_UPDATE_REELMAP_UP || m_bTHREAD_UPDATE_REELMAP_DN || m_bTHREAD_UPDATE_REELMAP_ALLUP || m_bTHREAD_UPDATE_REELMAP_ALLDN) // Write Reelmap
-		{
-			Sleep(100);
+		if (m_bTHREAD_UPDATE_REELMAP_UP)
 			break;
-		}
-
-		if (m_bTHREAD_UPDATE_YIELD_UP || m_bTHREAD_UPDATE_YIELD_DN || m_bTHREAD_UPDATE_YIELD_ALLUP || m_bTHREAD_UPDATE_YIELD_ALLDN) // Write Reelmap
+		if (bDualTest)
 		{
-			Sleep(100);
-			break;
+			if (m_bTHREAD_UPDATE_REELMAP_DN || m_bTHREAD_UPDATE_REELMAP_ALLUP || m_bTHREAD_UPDATE_REELMAP_ALLDN) // Write Reelmap
+				break;
 		}
+		// 2025.03.21
+		//if (m_bTHREAD_UPDATE_YIELD_UP || m_bTHREAD_UPDATE_YIELD_DN || m_bTHREAD_UPDATE_YIELD_ALLUP || m_bTHREAD_UPDATE_YIELD_ALLDN) // Write Reelmap
+		//{
+		//	Sleep(100);
+		//	break;
+		//}
 
 		if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
 		{
@@ -18212,8 +18218,21 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 
 			if (bDualTest)
 			{
+				
 				if (m_bTHREAD_MAKE_ITS_FILE_DN)
 					break;
+			}
+
+			// 2025.03.21
+			if (pDoc->GetTestMode() == MODE_OUTER)
+			{
+				if (m_bTHREAD_UPDATE_REELMAP_INNER_UP) // Write Reelmap
+					break;
+				if (pDoc->WorkingInfo.LastJob.bDualTestInner)
+				{
+					if (m_bTHREAD_UPDATE_REELMAP_INNER_DN || m_bTHREAD_UPDATE_REELMAP_INNER_ALLUP || m_bTHREAD_UPDATE_REELMAP_INNER_ALLDN) // Write Reelmap
+						break;
+				}
 			}
 		}
 
@@ -18723,27 +18742,27 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 	case AT_LP + 7:
 		if (IsRun())
 		{
-			if (pDoc->GetTestMode() == MODE_OUTER)
-			{
-				if (m_bTHREAD_UPDATE_REELMAP_INNER_UP) // Write Reelmap
-					break;
-				if (pDoc->WorkingInfo.LastJob.bDualTestInner)
-				{
-					if (m_bTHREAD_UPDATE_REELMAP_INNER_DN || m_bTHREAD_UPDATE_REELMAP_INNER_ALLUP || m_bTHREAD_UPDATE_REELMAP_INNER_ALLDN) // Write Reelmap
-						break;
-				}
-			}
-
-			if (bDualTest)
-			{
-				if (m_bTHREAD_UPDATE_REELMAP_UP || m_bTHREAD_UPDATE_REELMAP_DN || m_bTHREAD_UPDATE_REELMAP_ALLUP || m_bTHREAD_UPDATE_REELMAP_ALLDN) // Write Reelmap
-					break;
-			}
-			else
-			{
-				if (m_bTHREAD_UPDATE_REELMAP_UP) // Write Reelmap
-					break;
-			}
+			// 2025.03.21
+			//if (pDoc->GetTestMode() == MODE_OUTER)
+			//{
+			//	if (m_bTHREAD_UPDATE_REELMAP_INNER_UP) // Write Reelmap
+			//		break;
+			//	if (pDoc->WorkingInfo.LastJob.bDualTestInner)
+			//	{
+			//		if (m_bTHREAD_UPDATE_REELMAP_INNER_DN || m_bTHREAD_UPDATE_REELMAP_INNER_ALLUP || m_bTHREAD_UPDATE_REELMAP_INNER_ALLDN) // Write Reelmap
+			//			break;
+			//	}
+			//}
+			//if (bDualTest)
+			//{
+			//	if (m_bTHREAD_UPDATE_REELMAP_UP || m_bTHREAD_UPDATE_REELMAP_DN || m_bTHREAD_UPDATE_REELMAP_ALLUP || m_bTHREAD_UPDATE_REELMAP_ALLDN) // Write Reelmap
+			//		break;
+			//}
+			//else
+			//{
+			//	if (m_bTHREAD_UPDATE_REELMAP_UP) // Write Reelmap
+			//		break;
+			//}
 			m_nStepAuto++;
 		}
 		break;
@@ -19057,20 +19076,22 @@ void CGvisR2R_PunchView::Mk2PtReady()
 			}
 			break;
 		case MK_ST + (Mk2PtIdx::Start) + 1:
-			if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
-			{
-				if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN && !m_bTHREAD_MAKE_ITS_FILE_UP && !m_bTHREAD_MAKE_ITS_FILE_DN && !m_bTHREAD_UPDATE_REELMAP_INNER_UP && !m_bTHREAD_UPDATE_REELMAP_INNER_DN && !m_bTHREAD_UPDATE_REELMAP_INNER_ALLUP && !m_bTHREAD_UPDATE_REELMAP_INNER_ALLDN)
-				{
-					m_nMkStAuto = MK_ST + (Mk2PtIdx::ChkSn); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
-				}
-			}
-			else
-			{
-				if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN) // Write Reelmap
-				{
-					m_nMkStAuto = MK_ST + (Mk2PtIdx::ChkSn); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
-				}
-			}
+			// 2025.03.21
+			//if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
+			//{
+			//	if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN && !m_bTHREAD_MAKE_ITS_FILE_UP && !m_bTHREAD_MAKE_ITS_FILE_DN && !m_bTHREAD_UPDATE_REELMAP_INNER_UP && !m_bTHREAD_UPDATE_REELMAP_INNER_DN && !m_bTHREAD_UPDATE_REELMAP_INNER_ALLUP && !m_bTHREAD_UPDATE_REELMAP_INNER_ALLDN)
+			//	{
+			//		m_nMkStAuto = MK_ST + (Mk2PtIdx::ChkSn); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
+			//	}
+			//}
+			//else
+			//{
+			//	if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN) // Write Reelmap
+			//	{
+			//		m_nMkStAuto = MK_ST + (Mk2PtIdx::ChkSn); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
+			//	}
+			//}
+			m_nMkStAuto = MK_ST + (Mk2PtIdx::ChkSn); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
 			break;
 		}
 	}
@@ -19130,7 +19151,8 @@ void CGvisR2R_PunchView::Mk2PtChkSerial()
 
 			if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
 			{
-				if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN && !m_bTHREAD_MAKE_ITS_FILE_UP && !m_bTHREAD_MAKE_ITS_FILE_DN && !m_bTHREAD_UPDATE_REELMAP_INNER_UP && !m_bTHREAD_UPDATE_REELMAP_INNER_DN && !m_bTHREAD_UPDATE_REELMAP_INNER_ALLUP && !m_bTHREAD_UPDATE_REELMAP_INNER_ALLDN)
+				// 2025.03.21
+				//if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN && !m_bTHREAD_MAKE_ITS_FILE_UP && !m_bTHREAD_MAKE_ITS_FILE_DN && !m_bTHREAD_UPDATE_REELMAP_INNER_UP && !m_bTHREAD_UPDATE_REELMAP_INNER_DN && !m_bTHREAD_UPDATE_REELMAP_INNER_ALLUP && !m_bTHREAD_UPDATE_REELMAP_INNER_ALLDN)
 				{
 					if (!m_bTHREAD_DISP_DEF && !m_bTHREAD_DISP_DEF_INNER)
 					{
@@ -19148,7 +19170,8 @@ void CGvisR2R_PunchView::Mk2PtChkSerial()
 			}
 			else
 			{
-				if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN) // Write Reelmap
+				// 2025.03.21
+				//if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN) // Write Reelmap
 				{
 					if (!m_bTHREAD_DISP_DEF)
 					{
@@ -20408,9 +20431,9 @@ void CGvisR2R_PunchView::Mk2PtDoMarking()
 			break;
 
 		case MK_ST + (Mk2PtIdx::DoneMk) + 2:
-			bChk = MpeRead(_T("MB400243")); // PLC 마킹 피딩 완료
-			//if (pDoc->m_pMpeSignal && pDoc->m_pMpeSignal[4] & (0x01 << 3))	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)
-			if (bChk)	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)
+			//bChk = MpeRead(_T("MB400243")); // PLC 마킹 피딩 완료
+			//if (bChk)	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)
+			if (pDoc->m_pMpeSignal && pDoc->m_pMpeSignal[4] & (0x01 << 3))	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)
 			{
 				MpeWrite(_T("MB400243"), 0);// PLC 마킹 피딩 완료
 				//pDoc->LogAuto(_T("PLC: 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)"));
@@ -20499,7 +20522,8 @@ void CGvisR2R_PunchView::Mk2PtShift2Mk() // MODE_INNER
 		case MK_ST + (Mk2PtIdx::Shift2Mk) + 1:
 			if (!m_bTHREAD_UPDATAE_YIELD[0] && !m_bTHREAD_UPDATAE_YIELD[1])
 			{
-				if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN)
+				// 2025.03.21
+				//if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN)
 				{
 					if (!m_bTHREAD_UPDATE_YIELD_UP && !m_bTHREAD_UPDATE_YIELD_DN && !m_bTHREAD_UPDATE_YIELD_INNER_UP && !m_bTHREAD_UPDATE_YIELD_INNER_DN
 						&& !m_bTHREAD_UPDATE_YIELD_ALLUP && !m_bTHREAD_UPDATE_YIELD_ALLDN && !m_bTHREAD_UPDATE_YIELD_INNER_ALLUP && !m_bTHREAD_UPDATE_YIELD_INNER_ALLDN)	// Left Shot의 수율과 Right Shot의 수율을 업데이트함.
@@ -20509,11 +20533,11 @@ void CGvisR2R_PunchView::Mk2PtShift2Mk() // MODE_INNER
 						//pDoc->UpdateYieldOnRmap(); // 20241115
 						m_nMkStAuto++;
 					}
-					else
-						Sleep(100);
+					//else
+					//	Sleep(100);
 				}
-				else
-					Sleep(100);
+				//else
+				//	Sleep(100);
 			}
 			break;
 
@@ -20525,9 +20549,9 @@ void CGvisR2R_PunchView::Mk2PtShift2Mk() // MODE_INNER
 			break;
 
 		case MK_ST + (Mk2PtIdx::Shift2Mk) + 3:
-			bChk = MpeRead(_T("MB400243")); // PLC 마킹 피딩 완료
-			//if (pDoc->m_pMpeSignal && pDoc->m_pMpeSignal[4] & (0x01 << 3))	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)-20141030
-			if (bChk)	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)-20141030
+			//bChk = MpeRead(_T("MB400243")); // PLC 마킹 피딩 완료
+			//if (bChk)	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)-20141030
+			if (pDoc->m_pMpeSignal && pDoc->m_pMpeSignal[4] & (0x01 << 3))	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)
 			{
 				//pDoc->LogAuto(_T("PLC: 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)"));
 				m_nMkStAuto++;
@@ -20975,20 +20999,22 @@ void CGvisR2R_PunchView::Mk4PtReady()
 			}
 			break;
 		case MK_ST + (Mk4PtIdx::Start) + 1:
-			if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
-			{
-				if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN && !m_bTHREAD_MAKE_ITS_FILE_UP && !m_bTHREAD_MAKE_ITS_FILE_DN && !m_bTHREAD_UPDATE_REELMAP_INNER_UP && !m_bTHREAD_UPDATE_REELMAP_INNER_DN && !m_bTHREAD_UPDATE_REELMAP_INNER_ALLUP && !m_bTHREAD_UPDATE_REELMAP_INNER_ALLDN)
-				{
-					m_nMkStAuto = MK_ST + (Mk4PtIdx::ChkSn); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
-				}
-			}
-			else
-			{
-				if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN) // Write Reelmap
-				{
-					m_nMkStAuto = MK_ST + (Mk4PtIdx::ChkSn); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
-				}
-			}
+			// 2025.03.21
+			//if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
+			//{
+			//	if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN && !m_bTHREAD_MAKE_ITS_FILE_UP && !m_bTHREAD_MAKE_ITS_FILE_DN && !m_bTHREAD_UPDATE_REELMAP_INNER_UP && !m_bTHREAD_UPDATE_REELMAP_INNER_DN && !m_bTHREAD_UPDATE_REELMAP_INNER_ALLUP && !m_bTHREAD_UPDATE_REELMAP_INNER_ALLDN)
+			//	{
+			//		m_nMkStAuto = MK_ST + (Mk4PtIdx::ChkSn); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
+			//	}
+			//}
+			//else
+			//{
+			//	if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN) // Write Reelmap
+			//	{
+			//		m_nMkStAuto = MK_ST + (Mk4PtIdx::ChkSn); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
+			//	}
+			//}
+			m_nMkStAuto = MK_ST + (Mk4PtIdx::ChkSn); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
 			break;
 		}
 	}
@@ -21049,7 +21075,8 @@ void CGvisR2R_PunchView::Mk4PtChkSerial()
 
 			if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
 			{
-				if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN && !m_bTHREAD_MAKE_ITS_FILE_UP && !m_bTHREAD_MAKE_ITS_FILE_DN && !m_bTHREAD_UPDATE_REELMAP_INNER_UP && !m_bTHREAD_UPDATE_REELMAP_INNER_DN && !m_bTHREAD_UPDATE_REELMAP_INNER_ALLUP && !m_bTHREAD_UPDATE_REELMAP_INNER_ALLDN)
+				// 2025.03.21
+				//if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN && !m_bTHREAD_MAKE_ITS_FILE_UP && !m_bTHREAD_MAKE_ITS_FILE_DN && !m_bTHREAD_UPDATE_REELMAP_INNER_UP && !m_bTHREAD_UPDATE_REELMAP_INNER_DN && !m_bTHREAD_UPDATE_REELMAP_INNER_ALLUP && !m_bTHREAD_UPDATE_REELMAP_INNER_ALLDN)
 				{
 					if (!m_bTHREAD_DISP_DEF && !m_bTHREAD_DISP_DEF_INNER)
 					{
@@ -21067,7 +21094,8 @@ void CGvisR2R_PunchView::Mk4PtChkSerial()
 			}
 			else
 			{
-				if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN) // Write Reelmap
+				// 2025.03.21
+				//if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN) // Write Reelmap
 				{
 					if (!m_bTHREAD_DISP_DEF)
 					{
@@ -23012,9 +23040,9 @@ void CGvisR2R_PunchView::Mk4PtDoMarking()
 			break;
 
 		case MK_ST + (Mk4PtIdx::DoneMk) + 2:
-			bChk = MpeRead(_T("MB400243")); // PLC 마킹 피딩 완료
-											//if (pDoc->m_pMpeSignal && pDoc->m_pMpeSignal[4] & (0x01 << 3))	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)
-			if (bChk)	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)
+			//bChk = MpeRead(_T("MB400243")); // PLC 마킹 피딩 완료
+			//if (bChk)	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)
+			if (pDoc->m_pMpeSignal && pDoc->m_pMpeSignal[4] & (0x01 << 3))	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)
 			{
 				MpeWrite(_T("MB400243"), 0);// PLC 마킹 피딩 완료
 				//pDoc->LogAuto(_T("PLC: 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)"));
@@ -25644,9 +25672,9 @@ BOOL CGvisR2R_PunchView::IsLastJob(int nAoi) // 0 : AOI-Up , 1 : AOI-Dn , 2 : AO
 void CGvisR2R_PunchView::MonPlcSignal()
 {
 #ifdef USE_MPE
-	BOOL bChk = MpeRead(_T("MB400108")); // GUI 각인기 리딩 완료
-	//if (pDoc->m_pMpeSignal[30] & (0x01 << 8))		// 각인부 2D Leading 작업완료(PLC가 ON/OFF) - MB440130
-	if (bChk)		// 각인부 2D Leading 작업완료(PLC가 ON/OFF) - MB440130
+	//BOOL bChk = MpeRead(_T("MB400108")); // GUI 각인기 리딩 완료
+	//if (bChk)		// 각인부 2D Leading 작업완료(PLC가 ON/OFF) - MB440130
+	if (pDoc->m_pMpeSignal[30] & (0x01 << 8))		// 각인부 2D Leading 작업완료(PLC가 ON/OFF) - MB440130
 	{
 		if (m_pDlgMenu03)
 			m_pDlgMenu03->SetLed(0, TRUE);
@@ -25657,9 +25685,9 @@ void CGvisR2R_PunchView::MonPlcSignal()
 			m_pDlgMenu03->SetLed(0, FALSE);
 	}
 
-	bChk = MpeRead(_T("MB400105")); // GUI 각인기 레이저 완료
-	//if (pDoc->m_pMpeSignal[30] & (0x01 << 5))		// 각인부 Laser 작업완료(PLC가 ON/OFF) - MB440132
-	if (bChk)		// 각인부 Laser 작업완료(PLC가 ON/OFF) - MB440132
+	//bChk = MpeRead(_T("MB400105")); // GUI 각인기 레이저 완료
+	//if (bChk)		// 각인부 Laser 작업완료(PLC가 ON/OFF) - MB440132
+	if (pDoc->m_pMpeSignal[30] & (0x01 << 5))		// 각인부 Laser 작업완료(PLC가 ON/OFF) - MB440132
 	{
 		if (m_pDlgMenu03)
 			m_pDlgMenu03->SetLed(1, TRUE);
@@ -25670,9 +25698,9 @@ void CGvisR2R_PunchView::MonPlcSignal()
 			m_pDlgMenu03->SetLed(1, FALSE);
 	}
 
-	bChk = MpeRead(_T("MB400122")); // GUI AOI 상면 검사 완료
-	//if (pDoc->m_pMpeSignal[32] & (0x01 << 2))		// 검사부 상면 검사 작업완료(PLC가 ON/OFF) - MB440133
-	if (bChk)		// 검사부 상면 검사 작업완료(PLC가 ON/OFF) - MB440133
+	//bChk = MpeRead(_T("MB400122")); // GUI AOI 상면 검사 완료
+	//if (bChk)		// 검사부 상면 검사 작업완료(PLC가 ON/OFF) - MB440133
+	if (pDoc->m_pMpeSignal[32] & (0x01 << 2))		// 검사부 상면 검사 작업완료(PLC가 ON/OFF) - MB440133
 	{
 		if (m_pDlgMenu03)
 			m_pDlgMenu03->SetLed(2, TRUE);
@@ -25683,9 +25711,9 @@ void CGvisR2R_PunchView::MonPlcSignal()
 			m_pDlgMenu03->SetLed(2, FALSE);
 	}
 
-	bChk = MpeRead(_T("MB400138")); // GUI AOI 하면 검사 완료
-	//if (pDoc->m_pMpeSignal[33] & (0x01 << 8))		// 검사부 하면 검사 작업완료(PLC가 ON/OFF) - MB440134
-	if (bChk)		// 검사부 하면 검사 작업완료(PLC가 ON/OFF) - MB440134
+	//bChk = MpeRead(_T("MB400138")); // GUI AOI 하면 검사 완료
+	//if (bChk)		// 검사부 하면 검사 작업완료(PLC가 ON/OFF) - MB440134
+	if (pDoc->m_pMpeSignal[33] & (0x01 << 8))		// 검사부 하면 검사 작업완료(PLC가 ON/OFF) - MB440134
 	{
 		if (m_pDlgMenu03)
 			m_pDlgMenu03->SetLed(3, TRUE);
@@ -25696,9 +25724,9 @@ void CGvisR2R_PunchView::MonPlcSignal()
 			m_pDlgMenu03->SetLed(3, FALSE);
 	}
 
-	bChk = MpeRead(_T("MB400152")); // GUI 마킹 검사 완료
-	//if (pDoc->m_pMpeSignal[35] & (0x01 << 2))		// 마킹부 마킹 작업완료(PLC가 ON/OFF) - MB440135
-	if (bChk)		// 마킹부 마킹 작업완료(PLC가 ON/OFF) - MB440135
+	//bChk = MpeRead(_T("MB400152")); // GUI 마킹 검사 완료
+	//if (bChk)		// 마킹부 마킹 작업완료(PLC가 ON/OFF) - MB440135
+	if (pDoc->m_pMpeSignal[35] & (0x01 << 2))		// 마킹부 마킹 작업완료(PLC가 ON/OFF) - MB440135
 	{
 		if (m_pDlgMenu03)
 			m_pDlgMenu03->SetLed(4, TRUE);
@@ -25709,9 +25737,9 @@ void CGvisR2R_PunchView::MonPlcSignal()
 			m_pDlgMenu03->SetLed(4, FALSE);
 	}
 
-	bChk = MpeRead(_T("MB400009")); // GUI 자동 이어가기 운전
-	//if (pDoc->m_pMpeSignal[20] & (0x01 << 9))		// 내층 제품시 이어가기 상태 표시 - MB440125
-	if (bChk)		// 내층 제품시 이어가기 상태 표시 - MB440125
+	//bChk = MpeRead(_T("MB400009")); // GUI 자동 이어가기 운전
+	//if (bChk)		// 내층 제품시 이어가기 상태 표시 - MB440125
+	if (pDoc->m_pMpeSignal[20] & (0x01 << 9))		// 내층 제품시 이어가기 상태 표시 - MB440125
 	{
 		DispContRun(TRUE);
 	}
@@ -25759,9 +25787,9 @@ void CGvisR2R_PunchView::MonDispMain() // PLC의 운전상태 표시
 	if (!pDoc->m_pMpeSignal)
 		return;
 
-	BOOL bChk = MpeRead(_T("MB400206")); // PLC 자동 운전 중
-	//if (pDoc->m_pMpeSignal && pDoc->m_pMpeSignal[0] & (0x01 << 6))		// 운전중(PLC가 PC에 알려주는 설비 상태) - 20141031
-	if (bChk)		// 운전중(PLC가 PC에 알려주는 설비 상태) - 20141031
+	//BOOL bChk = MpeRead(_T("MB400206")); // PLC 자동 운전 중
+	//if (bChk)		// 운전중(PLC가 PC에 알려주는 설비 상태) - 20141031
+	if (pDoc->m_pMpeSignal[0] & (0x01 << 6))		// 운전중(PLC가 PC에 알려주는 설비 상태) - 20141031
 	{
 		if (m_sDispMain != _T("운전중"))
 		{
@@ -25772,9 +25800,12 @@ void CGvisR2R_PunchView::MonDispMain() // PLC의 운전상태 표시
 		}
 	}
 
-	BOOL bChkReady = MpeRead(_T("MB400203")); // PLC 운전 준비 완료
-	BOOL bChkOnStopping = MpeRead(_T("MB400200")); // PLC 정지 중
-	BOOL bChkAutoInit = MpeRead(_T("MB400208")); // PLC 자동 초기 모드 중
+	//BOOL bChkReady = MpeRead(_T("MB400203")); // PLC 운전 준비 완료
+	//BOOL bChkOnStopping = MpeRead(_T("MB400200")); // PLC 정지 중
+	//BOOL bChkAutoInit = MpeRead(_T("MB400208")); // PLC 자동 초기 모드 중
+	BOOL bChkReady = pDoc->m_pMpeSignal[0] & (0x01 << 3); // PLC 운전 준비 완료
+	BOOL bChkOnStopping = pDoc->m_pMpeSignal[0] & (0x01 << 0); // PLC 정지 중
+	BOOL bChkAutoInit = pDoc->m_pMpeSignal[0] & (0x01 << 8); // PLC 자동 초기 모드 중
 
 	//if (pDoc->m_pMpeSignal && pDoc->m_pMpeSignal[0] & (0x01 << 3))		// 운전준비(PLC가 PC에 알려주는 설비 상태) - 20141031
 	if (bChkReady)		// 운전준비(PLC가 PC에 알려주는 설비 상태) - 20141031
@@ -27431,7 +27462,8 @@ void CGvisR2R_PunchView::DoAutoMarkingEngrave()
 {	
 	// 각인부 마킹중 ON (PC가 ON, OFF)
 	CString sVal;
-	BOOL bChk = MpeRead(Plc.DlgMenu01.MarkingOnEngrave); // PLC 각인기 작업 중 _T("MB40023B")
+	//BOOL bChk = MpeRead(Plc.DlgMenu01.MarkingOnEngrave); // PLC 각인기 작업 중 _T("MB40023B")
+	BOOL bChk = pDoc->m_pMpeSignal[3] & (0x01 << 11);
 	//if ( pDoc->BtnStatus.EngAuto.IsOnMking && !(pDoc->m_pMpeSignal[10] & (0x01 << 11)) ) // 각인부 마킹중 ON (PC가 ON, OFF)
 	if ( pDoc->BtnStatus.EngAuto.IsOnMking && !bChk ) // 각인부 마킹중 ON (PC가 ON, OFF)
 	{
@@ -27459,7 +27491,8 @@ void CGvisR2R_PunchView::DoAutoMarkingEngrave()
 	}
 
 	// 각인부 마킹완료 ON (PC가 ON, OFF)
-	bChk = MpeRead(Plc.DlgMenu01.MarkingDoneEngrave); // PLC 각인기 마킹 작업 완료 _T("MB400245")
+	//bChk = MpeRead(Plc.DlgMenu01.MarkingDoneEngrave); // PLC 각인기 마킹 작업 완료 _T("MB400245")
+	bChk = pDoc->m_pMpeSignal[4] & (0x01 << 5);
 	//if (pDoc->BtnStatus.EngAuto.IsMkDone && !(pDoc->m_pMpeSignal[4] & (0x01 << 5))) // 각인부 작업완료.(PC가 On, PLC가 확인 후 Off)
 	//if (pDoc->BtnStatus.EngAuto.IsMkDone && !bChk) // 각인부 작업완료.(PC가 On, PLC가 확인 후 Off)
 	if (pDoc->BtnStatus.EngAuto.MkDone && !bChk) // 각인부 작업완료.(PC가 On, PLC가 확인 후 Off)
@@ -27503,7 +27536,8 @@ void CGvisR2R_PunchView::DoAutoMarkingEngrave()
 	}
 
 	// 각인부 2D 리더 작업중 신호
-	bChk = MpeRead(Plc.DlgMenu01.Reading2dOnEngrave); // GUI 각인기 리딩 중 _T("MB400034")
+	//bChk = MpeRead(Plc.DlgMenu01.Reading2dOnEngrave); // GUI 각인기 리딩 중 _T("MB400034")
+	bChk = pDoc->m_pMpeSignal[23] & (0x01 << 4);
 	//if (pDoc->BtnStatus.EngAuto.IsOnRead2d && !(pDoc->m_pMpeSignal[23] & (0x01 << 4))) // 각인부 2D 리더 작업중 신호(PC On->PC Off)
 	if (pDoc->BtnStatus.EngAuto.IsOnRead2d && !bChk) // 각인부 2D 리더 작업중 신호(PC On->PC Off)
 	{
@@ -27531,7 +27565,8 @@ void CGvisR2R_PunchView::DoAutoMarkingEngrave()
 	}
 
 	// 각인부 2D 리더 작업완료 신호
-	bChk = MpeRead(Plc.DlgMenu01.Reading2dDoneEngrave); // GUI 각인기 리딩 완료(PLC Off) _T("MB400035")
+	//bChk = MpeRead(Plc.DlgMenu01.Reading2dDoneEngrave); // GUI 각인기 리딩 완료(PLC Off) _T("MB400035")
+	bChk = pDoc->m_pMpeSignal[23] & (0x01 << 5);
 	//if (pDoc->BtnStatus.EngAuto.IsRead2dDone && !(pDoc->m_pMpeSignal[23] & (0x01 << 5))) // 각인부 2D 리더 작업완료 신호.(PC가 On, PLC가 확인 후 Off)
 	//if (pDoc->BtnStatus.EngAuto.IsRead2dDone && !bChk) // 각인부 2D 리더 작업완료 신호.(PC가 On, PLC가 확인 후 Off)
 	if (pDoc->BtnStatus.EngAuto.Read2dDone && !bChk) // 각인부 2D 리더 작업완료 신호.(PC가 On, PLC가 확인 후 Off)
@@ -27671,6 +27706,7 @@ void CGvisR2R_PunchView::CheckCurrentInfoSignal(int nMsgID, int nData)
 
 void CGvisR2R_PunchView::CheckMonDispMainSignal()
 {
+	return;
 	if (m_pEngrave)
 		m_pEngrave->SetMonDispMainSignal();
 
@@ -32517,7 +32553,9 @@ void CGvisR2R_PunchView::ClampOn()
 
 BOOL CGvisR2R_PunchView::IsClampOff()
 {
-	if (!pView->MpeRead(_T("MB40034B")))
+	//if (!pView->MpeRead(_T("MB40034B")))
+	BOOL bClampDown = pDoc->m_pMpeSignal[14] & (0x01 << 11);
+	if(!bClampDown)
 	{
 		if(!m_bTIM_INIT_VIEW)
 			MsgBox(_T("마킹부 클램프 테이블 척이 올라와 있습니다."));
@@ -34313,7 +34351,8 @@ void CGvisR2R_PunchView::Mk4PtShift2Mk() // MODE_INNER
 		case MK_ST + (Mk4PtIdx::Shift2Mk) + 1:
 			if (!m_bTHREAD_UPDATAE_YIELD[0] && !m_bTHREAD_UPDATAE_YIELD[1])
 			{
-				if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN)
+				// 2025.03.21
+				//if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN)
 				{
 					if (!m_bTHREAD_UPDATE_YIELD_UP && !m_bTHREAD_UPDATE_YIELD_DN && !m_bTHREAD_UPDATE_YIELD_INNER_UP && !m_bTHREAD_UPDATE_YIELD_INNER_DN
 						&& !m_bTHREAD_UPDATE_YIELD_ALLUP && !m_bTHREAD_UPDATE_YIELD_ALLDN && !m_bTHREAD_UPDATE_YIELD_INNER_ALLUP && !m_bTHREAD_UPDATE_YIELD_INNER_ALLDN)	// Left Shot의 수율과 Right Shot의 수율을 업데이트함.
@@ -34323,11 +34362,11 @@ void CGvisR2R_PunchView::Mk4PtShift2Mk() // MODE_INNER
 											//pDoc->UpdateYieldOnRmap(); // 20241115
 						m_nMkStAuto++;
 					}
-					else
-						Sleep(100);
+					//else
+					//	Sleep(100);
 				}
-				else
-					Sleep(100);
+				//else
+				//	Sleep(100);
 			}
 			break;
 
@@ -34339,9 +34378,9 @@ void CGvisR2R_PunchView::Mk4PtShift2Mk() // MODE_INNER
 			break;
 
 		case MK_ST + (Mk4PtIdx::Shift2Mk) + 3:
-			bChk = MpeRead(_T("MB400243")); // PLC 마킹 피딩 완료
-											//if (pDoc->m_pMpeSignal && pDoc->m_pMpeSignal[4] & (0x01 << 3))	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)-20141030
-			if (bChk)	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)-20141030
+			//bChk = MpeRead(_T("MB400243")); // PLC 마킹 피딩 완료
+			//if (bChk)	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)-20141030
+			if (pDoc->m_pMpeSignal && pDoc->m_pMpeSignal[4] & (0x01 << 3))	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)-20141030
 			{
 				//pDoc->LogAuto(_T("PLC: 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)"));
 				m_nMkStAuto++;
