@@ -864,10 +864,11 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 			m_nStepInitView++;
 			DispMsg(_T("화면구성을 생성합니다.-MENU_01"), _T("알림"), RGB_GREEN, DELAY_TIME_MSG);
 			ShowDlg(IDD_DLG_MENU_01);
-				if (bDualTest)
-					pView->m_pDlgMenu01->SelMap(ALL);
-				else
-					pView->m_pDlgMenu01->SelMap(UP);
+			if (bDualTest)
+				pView->m_pDlgMenu01->SelMap(ALL);
+			else
+				pView->m_pDlgMenu01->SelMap(UP);
+			pView->m_pDlgMenu01->UpdateData();
 			break;
 		case 9:
 			m_nStepInitView++;
@@ -934,7 +935,8 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 			ClampOn(); // 마킹부 테이블 클램프 하강 스위치
 			break;
 		case 16:
-			if (IsClampOff())
+			//if (IsClampOff())
+			if (!pView->MpeRead(_T("MB40034B")))
 			{
 				break;
 			}
@@ -1155,7 +1157,7 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 		DoIO();
 		ChkMyMsg();
 		if (m_bTIM_MPE_IO)
-			SetTimer(TIM_MPE_IO, 50, NULL);
+			SetTimer(TIM_MPE_IO, 100, NULL);
 	}
 
 	if (nIDEvent == TIM_TOWER_WINKER)
@@ -1229,10 +1231,10 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 	{
 		KillTimer(TIM_CHK_TEMP_STOP);
 #ifdef USE_MPE
-		bTempStop = MpeRead(_T("MB40000B")); // 일시정지사용
 
-		//if (!(pDoc->m_pMpeSignal[20] & (0x01 << 11)))	// 일시정지사용(PC가 On시키고, PLC가 확인하고 Off시킴)-20141031
-		if (!bTempStop)	// 일시정지사용(PC가 On시키고, PLC가 확인하고 Off시킴)-20141031
+		//bTempStop = MpeRead(_T("MB40000B")); // 일시정지사용
+		//if (!bTempStop)	// 일시정지사용(PC가 On시키고, PLC가 확인하고 Off시킴)-20141031
+		if (!(pDoc->m_pMpeSignal[20] & (0x01 << 11)))	// 일시정지사용(PC가 On시키고, PLC가 확인하고 Off시킴)-20141031
 		{
 			//pDoc->LogAuto(_T("마킹부 일시정지 OFF"));
 			m_bTIM_CHK_TEMP_STOP = FALSE;
@@ -17440,6 +17442,7 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 						if (m_pDlgMenu01)
 							m_pDlgMenu01->ChkAoiVsStatus();
 						pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
+						ApplyListTorq();
 
 						if (m_pEngrave)
 							m_pEngrave->SwMenu01UpdateWorking(TRUE);
@@ -17708,6 +17711,7 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 						if (m_pDlgMenu01)
 							m_pDlgMenu01->ChkAoiVsStatus();
 						pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
+						ApplyListTorq();
 
 						if (m_pEngrave)
 							m_pEngrave->SwMenu01UpdateWorking(TRUE);
@@ -18304,7 +18308,7 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 						if (m_pDlgMenu01)
 							m_pDlgMenu01->ChkAoiVsStatus();
 						pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
-
+						ApplyListTorq();
 
 						if (m_pEngrave)
 							m_pEngrave->SwMenu01UpdateWorking(TRUE);
@@ -18575,7 +18579,7 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 						if (m_pDlgMenu01)
 							m_pDlgMenu01->ChkAoiVsStatus();
 						pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
-
+						ApplyListTorq();
 
 						if (m_pEngrave)
 							m_pEngrave->SwMenu01UpdateWorking(TRUE);
@@ -19344,7 +19348,7 @@ void CGvisR2R_PunchView::Mk2PtInit()
 				//	m_pVision[0]->ArMkMtRst.RemoveAll();
 				//if (m_pVision[1])
 				//	m_pVision[1]->ArMkMtRst.RemoveAll();
-
+				ResetTargetPos();
 				m_nMkStAuto = MK_ST + (Mk2PtIdx::Move0Cam1); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);	// Move - Cam1 - Pt0
 			}
 			break;
@@ -21220,6 +21224,7 @@ void CGvisR2R_PunchView::Mk4PtInit()
 		case MK_ST + (Mk4PtIdx::InitMk) + 1:
 			if (IsRun())
 			{
+				ResetTargetPos();
 				m_nMkStAuto = MK_ST + (Mk4PtIdx::Move0Cam1); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);	// Move - Cam1 - Pt0
 			}
 			break;
@@ -24654,14 +24659,21 @@ void CGvisR2R_PunchView::GetPlcParam()
 	if (!m_pMpe)
 		return;
 	// Main
-	pDoc->BtnStatus.Main.Ready = MpeRead(Plc.DlgMenu03.LampReady) ? TRUE : FALSE;	// 마킹부 운전준비 스위치
-	pDoc->BtnStatus.Main.Run = MpeRead(Plc.DlgMenu03.LampRun) ? TRUE : FALSE;		// 마킹부 운전 스위치
-	pDoc->BtnStatus.Main.Reset = MpeRead(Plc.DlgMenu03.LampReset) ? TRUE : FALSE;	// 마킹부 리셋 스위치
-	pDoc->BtnStatus.Main.Stop = MpeRead(Plc.DlgMenu03.LampStop) ? TRUE : FALSE;	// 마킹부 정지 스위치
-	//pDoc->BtnStatus.Main.Auto = MpeRead(_T("MB005505")) ? TRUE : FALSE;	// 마킹부 자동/수동 (ON)
-	//pDoc->BtnStatus.Main.Manual = MpeRead(_T("MB005505")) ? FALSE : TRUE;	// 마킹부 자동/수동 (OFF)
-	pDoc->BtnStatus.Main.Auto = MpeRead(Plc.DlgMenu03.LampAuto) ? TRUE : FALSE;	// 마킹부 자동 상태 스위치 램프
-	pDoc->BtnStatus.Main.Manual = MpeRead(Plc.DlgMenu03.LampAuto) ? FALSE : TRUE;	// 마킹부 자동 상태 스위치 램프
+	//pDoc->BtnStatus.Main.Ready = MpeRead(Plc.DlgMenu03.LampReady) ? TRUE : FALSE;	// 마킹부 운전준비 스위치
+	//pDoc->BtnStatus.Main.Run = MpeRead(Plc.DlgMenu03.LampRun) ? TRUE : FALSE;		// 마킹부 운전 스위치
+	//pDoc->BtnStatus.Main.Reset = MpeRead(Plc.DlgMenu03.LampReset) ? TRUE : FALSE;	// 마킹부 리셋 스위치
+	//pDoc->BtnStatus.Main.Stop = MpeRead(Plc.DlgMenu03.LampStop) ? TRUE : FALSE;	// 마킹부 정지 스위치
+	////pDoc->BtnStatus.Main.Auto = MpeRead(_T("MB005505")) ? TRUE : FALSE;	// 마킹부 자동/수동 (ON)
+	////pDoc->BtnStatus.Main.Manual = MpeRead(_T("MB005505")) ? FALSE : TRUE;	// 마킹부 자동/수동 (OFF)
+	//pDoc->BtnStatus.Main.Auto = MpeRead(Plc.DlgMenu03.LampAuto) ? TRUE : FALSE;	// 마킹부 자동 상태 스위치 램프
+	//pDoc->BtnStatus.Main.Manual = MpeRead(Plc.DlgMenu03.LampAuto) ? FALSE : TRUE;	// 마킹부 자동 상태 스위치 램프
+	
+	pDoc->BtnStatus.Main.Ready = pDoc->m_pMpeSignal[0] & (0x01 << 3);			// 마킹부 운전준비 스위치			LampReady = _T("MB400203");
+	pDoc->BtnStatus.Main.Run = pDoc->m_pMpeSignal[0] & (0x01 << 6);				// 마킹부 운전 스위치				LampRun = _T("MB400206");
+	pDoc->BtnStatus.Main.Reset = pDoc->m_pMpeSignal[18] & (0x01 << 2);			// 마킹부 리셋 스위치				LampReset = _T("MB400382");
+	pDoc->BtnStatus.Main.Stop = pDoc->m_pMpeSignal[0] & (0x01 << 7);			// 마킹부 정지 스위치				LampStop = _T("MB400207");
+	pDoc->BtnStatus.Main.Auto = pDoc->m_pMpeSignal[0] & (0x01 << 5);			// 마킹부 자동 상태 스위치 램프		LampAuto = _T("MB400205");
+	pDoc->BtnStatus.Main.Manual = pDoc->BtnStatus.Main.Auto ? FALSE : TRUE;		// 마킹부 자동 상태 스위치 램프
 
 	if (pDoc->BtnStatus.Main.PrevReady != pDoc->BtnStatus.Main.Ready)
 	{
@@ -24699,8 +24711,10 @@ void CGvisR2R_PunchView::GetPlcParam()
 	}
 
 	// RunMode
-	pDoc->BtnStatus.RunMode.ConnectModule = MpeRead(Plc.DlgMenu03.LampConnectModule) ? TRUE : FALSE;
-	pDoc->BtnStatus.RunMode.FeedOnePanel = MpeRead(Plc.DlgMenu03.LampFeedOnePanel) ? TRUE : FALSE;
+	pDoc->BtnStatus.RunMode.ConnectModule = pDoc->m_pMpeSignal[0] & (0x01 << 15);	// LampConnectModule = _T("MB40020F");
+	pDoc->BtnStatus.RunMode.FeedOnePanel = pDoc->m_pMpeSignal[0] & (0x01 << 14);	// LampFeedOnePanel = _T("MB40020E");
+	//pDoc->BtnStatus.RunMode.ConnectModule = MpeRead(Plc.DlgMenu03.LampConnectModule) ? TRUE : FALSE;
+	//pDoc->BtnStatus.RunMode.FeedOnePanel = MpeRead(Plc.DlgMenu03.LampFeedOnePanel) ? TRUE : FALSE;
 
 	if (pDoc->BtnStatus.RunMode.ConnectModule != pDoc->BtnStatus.RunMode.ConnectModule)
 	{
@@ -24714,9 +24728,12 @@ void CGvisR2R_PunchView::GetPlcParam()
 	}
 
 	// Laser
-	pDoc->BtnStatus.Lsr.Laser340mm = MpeRead(Plc.DlgInfo.LampLaser340mm) ? TRUE : FALSE;
-	pDoc->BtnStatus.Lsr.Laser346mm = MpeRead(Plc.DlgInfo.LampLaser346mm) ? TRUE : FALSE;
-	pDoc->BtnStatus.Lsr.Laser380mm = MpeRead(Plc.DlgInfo.LampLaser380mm) ? TRUE : FALSE;
+	pDoc->BtnStatus.Lsr.Laser340mm = pDoc->m_pMpeSignal[5] & (0x01 << 2);	// LampLaser340mm = _T("MB400252");
+	pDoc->BtnStatus.Lsr.Laser346mm = pDoc->m_pMpeSignal[5] & (0x01 << 3);	// LampLaser346mm = _T("MB400253");
+	pDoc->BtnStatus.Lsr.Laser380mm = pDoc->m_pMpeSignal[5] & (0x01 << 4);	// LampLaser380mm = _T("MB400254");
+	//pDoc->BtnStatus.Lsr.Laser340mm = MpeRead(Plc.DlgInfo.LampLaser340mm) ? TRUE : FALSE;
+	//pDoc->BtnStatus.Lsr.Laser346mm = MpeRead(Plc.DlgInfo.LampLaser346mm) ? TRUE : FALSE;
+	//pDoc->BtnStatus.Lsr.Laser380mm = MpeRead(Plc.DlgInfo.LampLaser380mm) ? TRUE : FALSE;
 
 	if (pDoc->BtnStatus.Lsr.PrevLaser340mm != pDoc->BtnStatus.Lsr.Laser340mm)
 	{
@@ -24735,9 +24752,12 @@ void CGvisR2R_PunchView::GetPlcParam()
 	}
 
 	// TorqueMotor
-	pDoc->BtnStatus.Tq.Mk = MpeRead(Plc.DlgMenu03.LampTensionCcwPunch) ? TRUE : FALSE;
-	pDoc->BtnStatus.Tq.Aoi = MpeRead(Plc.DlgMenu03.LampTensionCcwAoiUp) ? TRUE : FALSE;
-	pDoc->BtnStatus.Tq.Eng = MpeRead(Plc.DlgMenu03.LampTensionCcwEngrave) ? TRUE : FALSE;
+	//pDoc->BtnStatus.Tq.Mk = MpeRead(Plc.DlgMenu03.LampTensionCcwPunch) ? TRUE : FALSE;
+	//pDoc->BtnStatus.Tq.Aoi = MpeRead(Plc.DlgMenu03.LampTensionCcwAoiUp) ? TRUE : FALSE;
+	//pDoc->BtnStatus.Tq.Eng = MpeRead(Plc.DlgMenu03.LampTensionCcwEngrave) ? TRUE : FALSE;
+	pDoc->BtnStatus.Tq.Mk = pDoc->m_pMpeSignal[14] & (0x01 << 3);		// LampTensionCcwPunch = _T("MB400343");
+	pDoc->BtnStatus.Tq.Aoi = pDoc->m_pMpeSignal[10] & (0x01 << 13);		// LampTensionCcwAoiUp = _T("MB40030D");
+	pDoc->BtnStatus.Tq.Eng = pDoc->m_pMpeSignal[8] & (0x01 << 9);		// LampTensionCcwEngrave = _T("MB400289");
 
 	if (pDoc->BtnStatus.Tq.PrevMk != pDoc->BtnStatus.Tq.Mk)
 	{
@@ -24756,8 +24776,10 @@ void CGvisR2R_PunchView::GetPlcParam()
 	}
 
 	// 회전방향	
-	pDoc->WorkingInfo.LastJob.bFeedCcwRecoiler = pDoc->BtnStatus.FeedDir.FeedCcwRecoiler = pView->MpeRead(pView->Plc.DlgInfo.LampFeedCcwRecoiler) ? TRUE : FALSE;
-	pDoc->WorkingInfo.LastJob.bFeedCcwUncoiler = pDoc->BtnStatus.FeedDir.FeedCcwUncoiler = pView->MpeRead(pView->Plc.DlgInfo.LampFeedCcwUncoiler) ? TRUE : FALSE;
+	pDoc->WorkingInfo.LastJob.bFeedCcwRecoiler = pDoc->BtnStatus.FeedDir.FeedCcwRecoiler = pDoc->m_pMpeSignal[5] & (0x01 << 1);	// LampFeedCcwRecoiler = _T("MB400251");
+	pDoc->WorkingInfo.LastJob.bFeedCcwUncoiler = pDoc->BtnStatus.FeedDir.FeedCcwUncoiler = pDoc->m_pMpeSignal[5] & (0x01 << 0);	// LampFeedCcwUncoiler = _T("MB400250");
+	//pDoc->WorkingInfo.LastJob.bFeedCcwRecoiler = pDoc->BtnStatus.FeedDir.FeedCcwRecoiler = pView->MpeRead(pView->Plc.DlgInfo.LampFeedCcwRecoiler) ? TRUE : FALSE;
+	//pDoc->WorkingInfo.LastJob.bFeedCcwUncoiler = pDoc->BtnStatus.FeedDir.FeedCcwUncoiler = pView->MpeRead(pView->Plc.DlgInfo.LampFeedCcwUncoiler) ? TRUE : FALSE;
 	
 	if (pDoc->BtnStatus.FeedDir.PrevFeedCcwRecoiler != pDoc->BtnStatus.FeedDir.FeedCcwRecoiler)
 	{
@@ -24771,8 +24793,10 @@ void CGvisR2R_PunchView::GetPlcParam()
 	}
 
 	// 댄서롤/버퍼롤
-	pDoc->BtnStatus.Dancer.AllDancerUpDn = pView->MpeRead(pView->Plc.DlgMenu03.LampAllDancerUpDn) ? TRUE : FALSE;
-	pDoc->BtnStatus.Dancer.AllDancerFixOnOff = pView->MpeRead(pView->Plc.DlgMenu03.LampAllDancerFixOnOff) ? TRUE : FALSE;
+	pDoc->BtnStatus.Dancer.AllDancerUpDn = pDoc->m_pMpeSignal[5] & (0x01 << 11);		// LampAllDancerUpDn = _T("MB40025B");
+	pDoc->BtnStatus.Dancer.AllDancerFixOnOff = pDoc->m_pMpeSignal[5] & (0x01 << 12);	// LampAllDancerFixOnOff = _T("MB40025C");
+	//pDoc->BtnStatus.Dancer.AllDancerUpDn = pView->MpeRead(pView->Plc.DlgMenu03.LampAllDancerUpDn) ? TRUE : FALSE;
+	//pDoc->BtnStatus.Dancer.AllDancerFixOnOff = pView->MpeRead(pView->Plc.DlgMenu03.LampAllDancerFixOnOff) ? TRUE : FALSE;
 
 	if (pDoc->BtnStatus.Dancer.PrevAllDancerUpDn != pDoc->BtnStatus.Dancer.AllDancerUpDn)
 	{
@@ -24816,25 +24840,44 @@ void CGvisR2R_PunchView::GetPlcParam()
 	//}
 
 	// Recoiler
-	pDoc->BtnStatus.Rc.ChuckPcb = MpeRead(Plc.DlgMenu03.LampChuckPcbRecoiler) ? TRUE : FALSE;					// 리코일러 제품척 클램프 스위치 램프
-	pDoc->BtnStatus.Rc.ChuckPaper = MpeRead(Plc.DlgMenu03.LampChuckPaperRecoiler) ? TRUE : FALSE;				// 리코일러 간지척 클램프 스위치 램프
-	pDoc->BtnStatus.Rc.JoinClamp = MpeRead(Plc.DlgMenu03.LampJoinClampRecoiler) ? TRUE : FALSE;					// 리코일러 이음매 클램프 스위치 램프
-	pDoc->BtnStatus.Rc.PcbShaftSupport = MpeRead(Plc.DlgMenu03.LampPcbShaftSupportRecoiler) ? TRUE : FALSE;		// 리코일러 제품샤프트 지지대 스위치 램프
-	pDoc->BtnStatus.Rc.EpcActHome = MpeRead(Plc.DlgMenu03.LampEpcActHomeRecoiler) ? TRUE : FALSE;				// 리코일러 EPC 액추에이터 HOME 스위치 램프
-	pDoc->BtnStatus.Rc.EpcActFirst = MpeRead(Plc.DlgMenu03.LampEpcActFirstRecoiler) ? TRUE : FALSE;				// 리코일러 EPC 액추에이터 #1 스위치 램프
-	pDoc->BtnStatus.Rc.EpcActSecond = MpeRead(Plc.DlgMenu03.LampEpcActSecondRecoiler) ? TRUE : FALSE;			// 리코일러 EPC 액추에이터 #2 스위치 램프
-	pDoc->BtnStatus.Rc.EpcActThird = MpeRead(Plc.DlgMenu03.LampEpcActThirdRecoiler) ? TRUE : FALSE;				// 리코일러 EPC 액추에이터 #3 스위치 램프
-	pDoc->BtnStatus.Rc.EpcAuto = MpeRead(Plc.DlgMenu03.LampEpcAutoRecoiler) ? TRUE : FALSE;						// 리코일러 EPC 자동 스위치 램프
-	pDoc->BtnStatus.Rc.EpcManual = MpeRead(Plc.DlgMenu03.LampEpcManualRecoiler) ? TRUE : FALSE;					// 리코일러 EPC 수동 스위치 램프
-	pDoc->BtnStatus.Rc.EpcHome = MpeRead(Plc.DlgMenu03.LampEpcHomeRecoiler) ? TRUE : FALSE;						// 리코일러 EPC 원점 스위치 램프
-	pDoc->BtnStatus.Rc.EpcIn = MpeRead(Plc.DlgMenu03.LampEpcInRecoiler) ? TRUE : FALSE;							// 리코일러 EPC In 스위치 램프
-	pDoc->BtnStatus.Rc.EpcOut = MpeRead(Plc.DlgMenu03.LampEpcOutRecoiler) ? TRUE : FALSE;						// 리코일러 EPC Out 스위치 램프
-	pDoc->BtnStatus.Rc.PcbInverterCw = MpeRead(Plc.DlgMenu03.LampPcbInverterCwRecoiler) ? TRUE : FALSE;			// 리코일러 제품 인버터 정방향 스위치 램프
-	pDoc->BtnStatus.Rc.PcbInverterCcw = MpeRead(Plc.DlgMenu03.LampPcbInverterCcwRecoiler) ? TRUE : FALSE;		// 리코일러 제품 인버터 역방향 스위치 램프
-	pDoc->BtnStatus.Rc.PaperInverterCw = MpeRead(Plc.DlgMenu03.LampPaperInverterCwRecoiler) ? TRUE : FALSE;		// 리코일러 간지 인버터 정방향 스위치 램프
-	pDoc->BtnStatus.Rc.PaperInverterCcw = MpeRead(Plc.DlgMenu03.LampPaperInverterCcwRecoiler) ? TRUE : FALSE;	// 리코일러 간지 인버터 역방향 스위치 램프
-	pDoc->BtnStatus.Rc.DancerUpper = MpeRead(Plc.DlgMenu03.LampDancerUpperRecoiler) ? TRUE : FALSE;				// 리코일러 댄서롤 상승 스위치 램프
-	pDoc->BtnStatus.Rc.DancerFixer = MpeRead(Plc.DlgMenu03.LampDancerFixerRecoiler) ? TRUE : FALSE;				// 리코일러 댄서롤 고정 스위치 램프
+	pDoc->BtnStatus.Rc.ChuckPcb = pDoc->m_pMpeSignal[16] & (0x01 << 0);					// 리코일러 제품척 클램프 스위치 램프			LampChuckPcbRecoiler = _T("MB400360");
+	pDoc->BtnStatus.Rc.ChuckPaper = pDoc->m_pMpeSignal[16] & (0x01 << 1);				// 리코일러 간지척 클램프 스위치 램프			LampChuckPaperRecoiler = _T("MB400361");
+	pDoc->BtnStatus.Rc.JoinClamp = pDoc->m_pMpeSignal[16] & (0x01 << 2);				// 리코일러 이음매 클램프 스위치 램프			LampJoinClampRecoiler = _T("MB400362");
+	pDoc->BtnStatus.Rc.PcbShaftSupport = pDoc->m_pMpeSignal[16] & (0x01 << 3);			// 리코일러 제품샤프트 지지대 스위치 램프		LampPcbShaftSupportRecoiler = _T("MB400363");
+	pDoc->BtnStatus.Rc.EpcActHome = pDoc->m_pMpeSignal[16] & (0x01 << 4);				// 리코일러 EPC 액추에이터 HOME 스위치 램프		LampEpcActHomeRecoiler = _T("MB400364");
+	pDoc->BtnStatus.Rc.EpcActFirst = pDoc->m_pMpeSignal[16] & (0x01 << 5);				// 리코일러 EPC 액추에이터 #1 스위치 램프		LampEpcActFirstRecoiler = _T("MB400365");
+	pDoc->BtnStatus.Rc.EpcActSecond = pDoc->m_pMpeSignal[16] & (0x01 << 6);				// 리코일러 EPC 액추에이터 #2 스위치 램프		LampEpcActSecondRecoiler = _T("MB400366");
+	pDoc->BtnStatus.Rc.EpcActThird = pDoc->m_pMpeSignal[16] & (0x01 << 7);				// 리코일러 EPC 액추에이터 #3 스위치 램프		LampEpcActThirdRecoiler = _T("MB400367");
+	pDoc->BtnStatus.Rc.EpcAuto = pDoc->m_pMpeSignal[16] & (0x01 << 9);					// 리코일러 EPC 자동 스위치 램프				LampEpcAutoRecoiler = _T("MB400369");
+	pDoc->BtnStatus.Rc.EpcManual = pDoc->m_pMpeSignal[16] & (0x01 << 10);				// 리코일러 EPC 수동 스위치 램프				LampEpcManualRecoiler = _T("MB40036A");
+	pDoc->BtnStatus.Rc.EpcHome = pDoc->m_pMpeSignal[16] & (0x01 << 11);					// 리코일러 EPC 원점 스위치 램프				LampEpcHomeRecoiler = _T("MB40036B");
+	pDoc->BtnStatus.Rc.EpcIn = pDoc->m_pMpeSignal[16] & (0x01 << 12);					// 리코일러 EPC In 스위치 램프					LampEpcInRecoiler = _T("MB40036C");
+	pDoc->BtnStatus.Rc.EpcOut = pDoc->m_pMpeSignal[16] & (0x01 << 13);					// 리코일러 EPC Out 스위치 램프					LampEpcOutRecoiler = _T("MB40036D");
+	pDoc->BtnStatus.Rc.PcbInverterCw = pDoc->m_pMpeSignal[17] & (0x01 << 0);			// 리코일러 제품 인버터 정방향 스위치 램프		LampPcbInverterCwRecoiler = _T("MB400370");
+	pDoc->BtnStatus.Rc.PcbInverterCcw = pDoc->m_pMpeSignal[17] & (0x01 << 1);			// 리코일러 제품 인버터 역방향 스위치 램프		LampPcbInverterCcwRecoiler = _T("MB400371");
+	pDoc->BtnStatus.Rc.PaperInverterCw = pDoc->m_pMpeSignal[17] & (0x01 << 2);			// 리코일러 간지 인버터 정방향 스위치 램프		LampPaperInverterCwRecoiler = _T("MB400372");
+	pDoc->BtnStatus.Rc.PaperInverterCcw = pDoc->m_pMpeSignal[17] & (0x01 << 3);			// 리코일러 간지 인버터 역방향 스위치 램프		LampPaperInverterCcwRecoiler = _T("MB400373");
+	pDoc->BtnStatus.Rc.DancerUpper = pDoc->m_pMpeSignal[17] & (0x01 << 4);				// 리코일러 댄서롤 상승 스위치 램프				LampDancerUpperRecoiler = _T("MB400374");
+	pDoc->BtnStatus.Rc.DancerFixer = pDoc->m_pMpeSignal[17] & (0x01 << 5);				// 리코일러 댄서롤 고정 스위치 램프				LampDancerFixerRecoiler = _T("MB400375");
+	//pDoc->BtnStatus.Rc.ChuckPcb = MpeRead(Plc.DlgMenu03.LampChuckPcbRecoiler) ? TRUE : FALSE;					// 리코일러 제품척 클램프 스위치 램프
+	//pDoc->BtnStatus.Rc.ChuckPaper = MpeRead(Plc.DlgMenu03.LampChuckPaperRecoiler) ? TRUE : FALSE;				// 리코일러 간지척 클램프 스위치 램프
+	//pDoc->BtnStatus.Rc.JoinClamp = MpeRead(Plc.DlgMenu03.LampJoinClampRecoiler) ? TRUE : FALSE;					// 리코일러 이음매 클램프 스위치 램프
+	//pDoc->BtnStatus.Rc.PcbShaftSupport = MpeRead(Plc.DlgMenu03.LampPcbShaftSupportRecoiler) ? TRUE : FALSE;		// 리코일러 제품샤프트 지지대 스위치 램프
+	//pDoc->BtnStatus.Rc.EpcActHome = MpeRead(Plc.DlgMenu03.LampEpcActHomeRecoiler) ? TRUE : FALSE;				// 리코일러 EPC 액추에이터 HOME 스위치 램프
+	//pDoc->BtnStatus.Rc.EpcActFirst = MpeRead(Plc.DlgMenu03.LampEpcActFirstRecoiler) ? TRUE : FALSE;				// 리코일러 EPC 액추에이터 #1 스위치 램프
+	//pDoc->BtnStatus.Rc.EpcActSecond = MpeRead(Plc.DlgMenu03.LampEpcActSecondRecoiler) ? TRUE : FALSE;			// 리코일러 EPC 액추에이터 #2 스위치 램프
+	//pDoc->BtnStatus.Rc.EpcActThird = MpeRead(Plc.DlgMenu03.LampEpcActThirdRecoiler) ? TRUE : FALSE;				// 리코일러 EPC 액추에이터 #3 스위치 램프
+	//pDoc->BtnStatus.Rc.EpcAuto = MpeRead(Plc.DlgMenu03.LampEpcAutoRecoiler) ? TRUE : FALSE;						// 리코일러 EPC 자동 스위치 램프
+	//pDoc->BtnStatus.Rc.EpcManual = MpeRead(Plc.DlgMenu03.LampEpcManualRecoiler) ? TRUE : FALSE;					// 리코일러 EPC 수동 스위치 램프
+	//pDoc->BtnStatus.Rc.EpcHome = MpeRead(Plc.DlgMenu03.LampEpcHomeRecoiler) ? TRUE : FALSE;						// 리코일러 EPC 원점 스위치 램프
+	//pDoc->BtnStatus.Rc.EpcIn = MpeRead(Plc.DlgMenu03.LampEpcInRecoiler) ? TRUE : FALSE;							// 리코일러 EPC In 스위치 램프
+	//pDoc->BtnStatus.Rc.EpcOut = MpeRead(Plc.DlgMenu03.LampEpcOutRecoiler) ? TRUE : FALSE;						// 리코일러 EPC Out 스위치 램프
+	//pDoc->BtnStatus.Rc.PcbInverterCw = MpeRead(Plc.DlgMenu03.LampPcbInverterCwRecoiler) ? TRUE : FALSE;			// 리코일러 제품 인버터 정방향 스위치 램프
+	//pDoc->BtnStatus.Rc.PcbInverterCcw = MpeRead(Plc.DlgMenu03.LampPcbInverterCcwRecoiler) ? TRUE : FALSE;		// 리코일러 제품 인버터 역방향 스위치 램프
+	//pDoc->BtnStatus.Rc.PaperInverterCw = MpeRead(Plc.DlgMenu03.LampPaperInverterCwRecoiler) ? TRUE : FALSE;		// 리코일러 간지 인버터 정방향 스위치 램프
+	//pDoc->BtnStatus.Rc.PaperInverterCcw = MpeRead(Plc.DlgMenu03.LampPaperInverterCcwRecoiler) ? TRUE : FALSE;	// 리코일러 간지 인버터 역방향 스위치 램프
+	//pDoc->BtnStatus.Rc.DancerUpper = MpeRead(Plc.DlgMenu03.LampDancerUpperRecoiler) ? TRUE : FALSE;				// 리코일러 댄서롤 상승 스위치 램프
+	//pDoc->BtnStatus.Rc.DancerFixer = MpeRead(Plc.DlgMenu03.LampDancerFixerRecoiler) ? TRUE : FALSE;				// 리코일러 댄서롤 고정 스위치 램프
 
 	if (pDoc->BtnStatus.Rc.PrevChuckPcb != pDoc->BtnStatus.Rc.ChuckPcb)
 	{
@@ -24927,20 +24970,34 @@ void CGvisR2R_PunchView::GetPlcParam()
 	}
 
 	// Punch
-	pDoc->BtnStatus.Mk.FeedCw = MpeRead(Plc.DlgMenu03.LampFeedCwPunch) ? TRUE : FALSE;							// 마킹부 피딩 정방향 스위치 램프
-	pDoc->BtnStatus.Mk.FeedCcw = MpeRead(Plc.DlgMenu03.LampFeedCcwPunch) ? TRUE : FALSE;						// 마킹부 피딩 역방향 스위치 램프
-	pDoc->BtnStatus.Mk.TensionCw = MpeRead(Plc.DlgMenu03.LampTensionCwPunch) ? TRUE : FALSE;					// 마킹부 텐션 정방향 스위치 램프
-	pDoc->BtnStatus.Mk.TensionCcw = MpeRead(Plc.DlgMenu03.LampTensionCcwPunch) ? TRUE : FALSE;					// 마킹부 텐션 역방향 스위치 램프
-	pDoc->BtnStatus.Mk.FeedHome = MpeRead(Plc.DlgMenu03.LampFeedHomePunch) ? TRUE : FALSE;						// 마킹부 피딩 HOME 스위치 램프
-	pDoc->BtnStatus.Mk.FeedVacuum = MpeRead(Plc.DlgMenu03.LampFeedVacuumPunch) ? TRUE : FALSE;					// 마킹부 피딩 진공 스위치 램프
-	pDoc->BtnStatus.Mk.FeedClamp = MpeRead(Plc.DlgMenu03.LampFeedClampPunch) ? TRUE : FALSE;					// 마킹부 피딩 클램프 스위치 램프	
-	pDoc->BtnStatus.Mk.TensionClamp = MpeRead(Plc.DlgMenu03.LampTensionClampPunch) ? TRUE : FALSE;				// 마킹부 텐션 클램프 스위치 램프  
-	pDoc->BtnStatus.Mk.TableVacuum = MpeRead(Plc.DlgMenu03.LampTableVacuumPunch) ? TRUE : FALSE;				// 마킹부 테이블 진공 스위치 램프
-	pDoc->BtnStatus.Mk.TableBlower = MpeRead(Plc.DlgMenu03.LampTableBlowerPunch) ? TRUE : FALSE;				// 마킹부 테이블 에어블로어 스위치 
-	pDoc->BtnStatus.Mk.TableCylinder = MpeRead(Plc.DlgMenu03.LampTableCylinderPunch) ? TRUE : FALSE;			// 마킹부 테이블 실린더 스위치 램프
-	pDoc->BtnStatus.Mk.TableClampDn = MpeRead(Plc.DlgMenu03.LampTableClampDnPunch) ? TRUE : FALSE;				// 마킹부 테이블 클램프 하강 스위치 램프
-	pDoc->BtnStatus.Mk.TableClampForward = MpeRead(Plc.DlgMenu03.LampTableClampForwardPunch) ? TRUE : FALSE;	// 마킹부 테이블 클램프 전진 스위치 램프
-	pDoc->BtnStatus.Mk.PunchStart = MpeRead(Plc.DlgMenu03.LampPunchStartPunch) ? TRUE : FALSE;					// 마킹부 마킹 시작 스위치 램프
+	pDoc->BtnStatus.Mk.FeedCw = pDoc->m_pMpeSignal[14] & (0x01 << 0);						// 마킹부 피딩 정방향 스위치 램프			LampFeedCwPunch = _T("MB400340");
+	pDoc->BtnStatus.Mk.FeedCcw = pDoc->m_pMpeSignal[14] & (0x01 << 1);						// 마킹부 피딩 역방향 스위치 램프			LampFeedCcwPunch = _T("MB400341");
+	pDoc->BtnStatus.Mk.TensionCw = pDoc->m_pMpeSignal[14] & (0x01 << 2);					// 마킹부 텐션 정방향 스위치 램프			LampTensionCwPunch = _T("MB400342");
+	pDoc->BtnStatus.Mk.TensionCcw = pDoc->m_pMpeSignal[14] & (0x01 << 3);					// 마킹부 텐션 역방향 스위치 램프			LampTensionCcwPunch = _T("MB400343");
+	pDoc->BtnStatus.Mk.FeedHome = pDoc->m_pMpeSignal[14] & (0x01 << 4);						// 마킹부 피딩 HOME 스위치 램프				LampFeedHomePunch = _T("MB400344");
+	pDoc->BtnStatus.Mk.FeedVacuum = pDoc->m_pMpeSignal[14] & (0x01 << 5);					// 마킹부 피딩 진공 스위치 램프				LampFeedVacuumPunch = _T("MB400345");
+	pDoc->BtnStatus.Mk.FeedClamp = pDoc->m_pMpeSignal[14] & (0x01 << 6);					// 마킹부 피딩 클램프 스위치 램프			LampFeedClampPunch = _T("MB400346");
+	pDoc->BtnStatus.Mk.TensionClamp = pDoc->m_pMpeSignal[14] & (0x01 << 7);					// 마킹부 텐션 클램프 스위치 램프			LampTensionClampPunch = _T("MB400347");
+	pDoc->BtnStatus.Mk.TableVacuum = pDoc->m_pMpeSignal[14] & (0x01 << 8);					// 마킹부 테이블 진공 스위치 램프			LampTableVacuumPunch = _T("MB400348");
+	pDoc->BtnStatus.Mk.TableBlower = pDoc->m_pMpeSignal[14] & (0x01 << 9);					// 마킹부 테이블 에어블로어 스위치			LampTableBlowerPunch = _T("MB400349");
+	pDoc->BtnStatus.Mk.TableCylinder = pDoc->m_pMpeSignal[14] & (0x01 << 10);				// 마킹부 테이블 실린더 스위치 램프			LampTableCylinderPunch = _T("MB40034A");
+	pDoc->BtnStatus.Mk.TableClampDn = pDoc->m_pMpeSignal[14] & (0x01 << 11);				// 마킹부 테이블 클램프 하강 스위치 램프	LampTableClampDnPunch = _T("MB40034B");
+	pDoc->BtnStatus.Mk.TableClampForward = pDoc->m_pMpeSignal[14] & (0x01 << 12);			// 마킹부 테이블 클램프 전진 스위치 램프	LampTableClampForwardPunch = _T("MB40034C");
+	pDoc->BtnStatus.Mk.PunchStart = pDoc->m_pMpeSignal[15] & (0x01 << 0);					// 마킹부 마킹 시작 스위치 램프				LampPunchStartPunch = _T("MB400350");
+	//pDoc->BtnStatus.Mk.FeedCw = MpeRead(Plc.DlgMenu03.LampFeedCwPunch) ? TRUE : FALSE;							// 마킹부 피딩 정방향 스위치 램프
+	//pDoc->BtnStatus.Mk.FeedCcw = MpeRead(Plc.DlgMenu03.LampFeedCcwPunch) ? TRUE : FALSE;						// 마킹부 피딩 역방향 스위치 램프
+	//pDoc->BtnStatus.Mk.TensionCw = MpeRead(Plc.DlgMenu03.LampTensionCwPunch) ? TRUE : FALSE;					// 마킹부 텐션 정방향 스위치 램프
+	//pDoc->BtnStatus.Mk.TensionCcw = MpeRead(Plc.DlgMenu03.LampTensionCcwPunch) ? TRUE : FALSE;					// 마킹부 텐션 역방향 스위치 램프
+	//pDoc->BtnStatus.Mk.FeedHome = MpeRead(Plc.DlgMenu03.LampFeedHomePunch) ? TRUE : FALSE;						// 마킹부 피딩 HOME 스위치 램프
+	//pDoc->BtnStatus.Mk.FeedVacuum = MpeRead(Plc.DlgMenu03.LampFeedVacuumPunch) ? TRUE : FALSE;					// 마킹부 피딩 진공 스위치 램프
+	//pDoc->BtnStatus.Mk.FeedClamp = MpeRead(Plc.DlgMenu03.LampFeedClampPunch) ? TRUE : FALSE;					// 마킹부 피딩 클램프 스위치 램프	
+	//pDoc->BtnStatus.Mk.TensionClamp = MpeRead(Plc.DlgMenu03.LampTensionClampPunch) ? TRUE : FALSE;				// 마킹부 텐션 클램프 스위치 램프  
+	//pDoc->BtnStatus.Mk.TableVacuum = MpeRead(Plc.DlgMenu03.LampTableVacuumPunch) ? TRUE : FALSE;				// 마킹부 테이블 진공 스위치 램프
+	//pDoc->BtnStatus.Mk.TableBlower = MpeRead(Plc.DlgMenu03.LampTableBlowerPunch) ? TRUE : FALSE;				// 마킹부 테이블 에어블로어 스위치 
+	//pDoc->BtnStatus.Mk.TableCylinder = MpeRead(Plc.DlgMenu03.LampTableCylinderPunch) ? TRUE : FALSE;			// 마킹부 테이블 실린더 스위치 램프
+	//pDoc->BtnStatus.Mk.TableClampDn = MpeRead(Plc.DlgMenu03.LampTableClampDnPunch) ? TRUE : FALSE;				// 마킹부 테이블 클램프 하강 스위치 램프
+	//pDoc->BtnStatus.Mk.TableClampForward = MpeRead(Plc.DlgMenu03.LampTableClampForwardPunch) ? TRUE : FALSE;	// 마킹부 테이블 클램프 전진 스위치 램프
+	//pDoc->BtnStatus.Mk.PunchStart = MpeRead(Plc.DlgMenu03.LampPunchStartPunch) ? TRUE : FALSE;					// 마킹부 마킹 시작 스위치 램프
 
 	if (pDoc->BtnStatus.Mk.PrevFeedCw != pDoc->BtnStatus.Mk.FeedCw)
 	{
@@ -25000,23 +25057,40 @@ void CGvisR2R_PunchView::GetPlcParam()
 	}
 
 	// AOIDn
-	pDoc->BtnStatus.AoiDn.FeedCw = MpeRead(Plc.DlgMenu03.LampFeedCwAoiDn) ? TRUE : FALSE;						// 검사부 하 피딩 정방향 스위치 램프
-	pDoc->BtnStatus.AoiDn.FeedCcw = MpeRead(Plc.DlgMenu03.LampFeedCcwAoiDn) ? TRUE : FALSE;						// 검사부 하 피딩 역방향 스위치 램프
-	pDoc->BtnStatus.AoiDn.TensionCw = MpeRead(Plc.DlgMenu03.LampTensionCwAoiDn) ? TRUE : FALSE;					// 검사부 하 텐션 정방향 스위치 램프
-	pDoc->BtnStatus.AoiDn.TensionCcw = MpeRead(Plc.DlgMenu03.LampTensionCcwAoiDn) ? TRUE : FALSE;				// 검사부 하 텐션 역방향 스위치 램프
-	pDoc->BtnStatus.AoiDn.FeedHome = MpeRead(Plc.DlgMenu03.LampFeedHomeAoiDn) ? TRUE : FALSE;					// 검사부 하 피딩 HOME 스위치 램프
-	pDoc->BtnStatus.AoiDn.FeedVacuum = MpeRead(Plc.DlgMenu03.LampFeedVacuumAoiDn) ? TRUE : FALSE;				// 검사부 하 피딩 진공 스위치 램프
-	pDoc->BtnStatus.AoiDn.FeedClamp = MpeRead(Plc.DlgMenu03.LampFeedClampAoiDn) ? TRUE : FALSE;					// 검사부 하 피딩 클램프 스위치 램프
-	pDoc->BtnStatus.AoiDn.TensionClamp = MpeRead(Plc.DlgMenu03.LampTensionClampAoiDn) ? TRUE : FALSE;			// 검사부 하 텐션 클램프 스위치 램프
-	pDoc->BtnStatus.AoiDn.TableVacuum = MpeRead(Plc.DlgMenu03.LampTableVacuumAoiDn) ? TRUE : FALSE;				// 검사부 하 테이블 진공 스위치 램프
-	pDoc->BtnStatus.AoiDn.TableBlower = MpeRead(Plc.DlgMenu03.LampTableBlowerAoiDn) ? TRUE : FALSE;				// 검사부 하 테이블 에어블로어 스위치 램프
-	pDoc->BtnStatus.AoiDn.TableCylinder = MpeRead(Plc.DlgMenu03.LampTableCylinderAoiDn) ? TRUE : FALSE;			// 검사부 하 테이블 실린더 스위치 램프
-	pDoc->BtnStatus.AoiDn.CleanRollerUp = MpeRead(Plc.DlgMenu03.LampCleanRollerUpAoiDn) ? TRUE : FALSE;			// 검사부 하 클린롤러 상부 스위치 램프
-	pDoc->BtnStatus.AoiDn.CleanRollerDn = MpeRead(Plc.DlgMenu03.LampCleanRollerDnAoiDn) ? TRUE : FALSE;			// 검사부 하 클린롤러 하부 스위치 램프
-	pDoc->BtnStatus.AoiDn.CleanRollerPush = MpeRead(Plc.DlgMenu03.LampCleanRollerPushAoiDn) ? TRUE : FALSE;		// 검사부 하 클린롤러 누름 스위치 램프
-	pDoc->BtnStatus.AoiDn.TestStart = MpeRead(Plc.DlgMenu03.LampTestStartAoiDn) ? TRUE : FALSE;					// 검사부 하 AOI 상면 검사 시작 스위치 램프
-	pDoc->BtnStatus.AoiDn.BufferRollerUp = MpeRead(Plc.DlgMenu03.LampBufferRollerUpAoiDn) ? TRUE : FALSE;		// 검사부 하 버퍼롤 상승 스위치 램프
-	pDoc->BtnStatus.AoiDn.BufferRollerFix = MpeRead(Plc.DlgMenu03.LampBufferRollerFixAoiDn) ? TRUE : FALSE;		// 검사부 하 버퍼롤 고정 스위치 램프
+	pDoc->BtnStatus.AoiDn.FeedCw = pDoc->m_pMpeSignal[10] & (0x01 << 10);						// 검사부 하 피딩 정방향 스위치 램프			LampFeedCwAoiDn = _T("MB40030A");
+	pDoc->BtnStatus.AoiDn.FeedCcw = pDoc->m_pMpeSignal[10] & (0x01 << 11);						// 검사부 하 피딩 역방향 스위치 램프			LampFeedCcwAoiDn = _T("MB40030B");
+	pDoc->BtnStatus.AoiDn.TensionCw = pDoc->m_pMpeSignal[10] & (0x01 << 12);					// 검사부 하 텐션 정방향 스위치 램프			LampTensionCwAoiDn = _T("MB40030C");
+	pDoc->BtnStatus.AoiDn.TensionCcw = pDoc->m_pMpeSignal[10] & (0x01 << 13);					// 검사부 하 텐션 역방향 스위치 램프			LampTensionCcwAoiDn = _T("MB40030D");
+	pDoc->BtnStatus.AoiDn.FeedHome = pDoc->m_pMpeSignal[10] & (0x01 << 14);						// 검사부 하 피딩 HOME 스위치 램프				LampFeedHomeAoiDn = _T("MB40030E");
+	pDoc->BtnStatus.AoiDn.FeedVacuum = pDoc->m_pMpeSignal[12] & (0x01 << 9);					// 검사부 하 피딩 진공 스위치 램프				LampFeedVacuumAoiDn = _T("MB400329");
+	pDoc->BtnStatus.AoiDn.FeedClamp = pDoc->m_pMpeSignal[12] & (0x01 << 10);					// 검사부 하 피딩 클램프 스위치 램프			LampFeedClampAoiDn = _T("MB40032A");
+	pDoc->BtnStatus.AoiDn.TensionClamp = pDoc->m_pMpeSignal[12] & (0x01 << 11);					// 검사부 하 텐션 클램프 스위치 램프			LampTensionClampAoiDn = _T("MB40032B");
+	pDoc->BtnStatus.AoiDn.TableVacuum = pDoc->m_pMpeSignal[12] & (0x01 << 12);					// 검사부 하 테이블 진공 스위치 램프			LampTableVacuumAoiDn = _T("MB40032C");
+	pDoc->BtnStatus.AoiDn.TableBlower = pDoc->m_pMpeSignal[12] & (0x01 << 13);					// 검사부 하 테이블 에어블로어 스위치 램프		LampTableBlowerAoiDn = _T("MB40032D");
+	pDoc->BtnStatus.AoiDn.TableCylinder = pDoc->m_pMpeSignal[13] & (0x01 << 0);					// 검사부 하 테이블 실린더 스위치 램프			LampTableCylinderAoiDn = _T("MB400330");
+	pDoc->BtnStatus.AoiDn.CleanRollerUp = pDoc->m_pMpeSignal[13] & (0x01 << 3);					// 검사부 하 클린롤러 상부 스위치 램프			LampCleanRollerUpAoiDn = _T("MB400333");
+	pDoc->BtnStatus.AoiDn.CleanRollerDn = pDoc->m_pMpeSignal[13] & (0x01 << 4);					// 검사부 하 클린롤러 하부 스위치 램프			LampCleanRollerDnAoiDn = _T("MB400334");
+	pDoc->BtnStatus.AoiDn.CleanRollerPush = pDoc->m_pMpeSignal[13] & (0x01 << 5);				// 검사부 하 클린롤러 누름 스위치 램프			LampCleanRollerPushAoiDn = _T("MB400335");
+	pDoc->BtnStatus.AoiDn.TestStart = pDoc->m_pMpeSignal[13] & (0x01 << 6);						// 검사부 하 AOI 상면 검사 시작 스위치 램프		LampTestStartAoiDn = _T("MB400336");
+	pDoc->BtnStatus.AoiDn.BufferRollerUp = pDoc->m_pMpeSignal[13] & (0x01 << 12);				// 검사부 하 버퍼롤 상승 스위치 램프			LampBufferRollerUpAoiDn = _T("MB40033C");
+	pDoc->BtnStatus.AoiDn.BufferRollerFix = pDoc->m_pMpeSignal[13] & (0x01 << 13);				// 검사부 하 버퍼롤 고정 스위치 램프			LampBufferRollerFixAoiDn = _T("MB40033D");
+	//pDoc->BtnStatus.AoiDn.FeedCw = MpeRead(Plc.DlgMenu03.LampFeedCwAoiDn) ? TRUE : FALSE;						// 검사부 하 피딩 정방향 스위치 램프
+	//pDoc->BtnStatus.AoiDn.FeedCcw = MpeRead(Plc.DlgMenu03.LampFeedCcwAoiDn) ? TRUE : FALSE;						// 검사부 하 피딩 역방향 스위치 램프
+	//pDoc->BtnStatus.AoiDn.TensionCw = MpeRead(Plc.DlgMenu03.LampTensionCwAoiDn) ? TRUE : FALSE;					// 검사부 하 텐션 정방향 스위치 램프
+	//pDoc->BtnStatus.AoiDn.TensionCcw = MpeRead(Plc.DlgMenu03.LampTensionCcwAoiDn) ? TRUE : FALSE;				// 검사부 하 텐션 역방향 스위치 램프
+	//pDoc->BtnStatus.AoiDn.FeedHome = MpeRead(Plc.DlgMenu03.LampFeedHomeAoiDn) ? TRUE : FALSE;					// 검사부 하 피딩 HOME 스위치 램프
+	//pDoc->BtnStatus.AoiDn.FeedVacuum = MpeRead(Plc.DlgMenu03.LampFeedVacuumAoiDn) ? TRUE : FALSE;				// 검사부 하 피딩 진공 스위치 램프
+	//pDoc->BtnStatus.AoiDn.FeedClamp = MpeRead(Plc.DlgMenu03.LampFeedClampAoiDn) ? TRUE : FALSE;					// 검사부 하 피딩 클램프 스위치 램프
+	//pDoc->BtnStatus.AoiDn.TensionClamp = MpeRead(Plc.DlgMenu03.LampTensionClampAoiDn) ? TRUE : FALSE;			// 검사부 하 텐션 클램프 스위치 램프
+	//pDoc->BtnStatus.AoiDn.TableVacuum = MpeRead(Plc.DlgMenu03.LampTableVacuumAoiDn) ? TRUE : FALSE;				// 검사부 하 테이블 진공 스위치 램프
+	//pDoc->BtnStatus.AoiDn.TableBlower = MpeRead(Plc.DlgMenu03.LampTableBlowerAoiDn) ? TRUE : FALSE;				// 검사부 하 테이블 에어블로어 스위치 램프
+	//pDoc->BtnStatus.AoiDn.TableCylinder = MpeRead(Plc.DlgMenu03.LampTableCylinderAoiDn) ? TRUE : FALSE;			// 검사부 하 테이블 실린더 스위치 램프
+	//pDoc->BtnStatus.AoiDn.CleanRollerUp = MpeRead(Plc.DlgMenu03.LampCleanRollerUpAoiDn) ? TRUE : FALSE;			// 검사부 하 클린롤러 상부 스위치 램프
+	//pDoc->BtnStatus.AoiDn.CleanRollerDn = MpeRead(Plc.DlgMenu03.LampCleanRollerDnAoiDn) ? TRUE : FALSE;			// 검사부 하 클린롤러 하부 스위치 램프
+	//pDoc->BtnStatus.AoiDn.CleanRollerPush = MpeRead(Plc.DlgMenu03.LampCleanRollerPushAoiDn) ? TRUE : FALSE;		// 검사부 하 클린롤러 누름 스위치 램프
+	//pDoc->BtnStatus.AoiDn.TestStart = MpeRead(Plc.DlgMenu03.LampTestStartAoiDn) ? TRUE : FALSE;					// 검사부 하 AOI 상면 검사 시작 스위치 램프
+	//pDoc->BtnStatus.AoiDn.BufferRollerUp = MpeRead(Plc.DlgMenu03.LampBufferRollerUpAoiDn) ? TRUE : FALSE;		// 검사부 하 버퍼롤 상승 스위치 램프
+	//pDoc->BtnStatus.AoiDn.BufferRollerFix = MpeRead(Plc.DlgMenu03.LampBufferRollerFixAoiDn) ? TRUE : FALSE;		// 검사부 하 버퍼롤 고정 스위치 램프
 
 	if (pDoc->BtnStatus.AoiDn.PrevFeedCw != pDoc->BtnStatus.AoiDn.FeedCw)
 	{
@@ -25088,24 +25162,42 @@ void CGvisR2R_PunchView::GetPlcParam()
 	}
 
 	// AOIUp
-	pDoc->BtnStatus.AoiUp.FeedCw = MpeRead(Plc.DlgMenu03.LampFeedCwAoiUp) ? TRUE : FALSE;						// 검사부 상 피딩 정방향 스위치 램프
-	pDoc->BtnStatus.AoiUp.FeedCcw = MpeRead(Plc.DlgMenu03.LampFeedCcwAoiUp) ? TRUE : FALSE;						// 검사부 상 피딩 역방향 스위치 램프
-	pDoc->BtnStatus.AoiUp.TensionCw = MpeRead(Plc.DlgMenu03.LampTensionCwAoiUp) ? TRUE : FALSE;					// 검사부 상 텐션 정방향 스위치 램프
-	pDoc->BtnStatus.AoiUp.TensionCcw = MpeRead(Plc.DlgMenu03.LampTensionCcwAoiUp) ? TRUE : FALSE;				// 검사부 상 텐션 역방향 스위치 램프
-	pDoc->BtnStatus.AoiUp.FeedHome = MpeRead(Plc.DlgMenu03.LampFeedHomeAoiUp) ? TRUE : FALSE;					// 검사부 상 피딩 HOME 스위치 램프
-	pDoc->BtnStatus.AoiUp.FeedVacuum = MpeRead(Plc.DlgMenu03.LampFeedVacuumAoiUp) ? TRUE : FALSE;				// 검사부 상 피딩 진공 스위치 램프
-	pDoc->BtnStatus.AoiUp.FeedClamp = MpeRead(Plc.DlgMenu03.LampFeedClampAoiUp) ? TRUE : FALSE;					// 검사부 상 피딩 클램프 스위치 램프
-	pDoc->BtnStatus.AoiUp.TensionClamp = MpeRead(Plc.DlgMenu03.LampTensionClampAoiUp) ? TRUE : FALSE;			// 검사부 상 텐션 클램프 스위치 램프
-	pDoc->BtnStatus.AoiUp.TableVacuum = MpeRead(Plc.DlgMenu03.LampTableVacuumAoiUp) ? TRUE : FALSE;				// 검사부 상 테이블 진공 스위치 램프
-	pDoc->BtnStatus.AoiUp.TableBlower = MpeRead(Plc.DlgMenu03.LampTableBlowerAoiUp) ? TRUE : FALSE;				// 검사부 상 테이블 에어블로어 스위치 램프
-	pDoc->BtnStatus.AoiUp.TableCylinder = MpeRead(Plc.DlgMenu03.LampTableCylinderAoiUp) ? TRUE : FALSE;			// 검사부 상 테이블 실린더 스위치 램프
-	pDoc->BtnStatus.AoiUp.CleanRollerUp = MpeRead(Plc.DlgMenu03.LampCleanRollerUpAoiUp) ? TRUE : FALSE;			// 검사부 상 클린롤러 상부 스위치 램프
-	pDoc->BtnStatus.AoiUp.CleanRollerDn = MpeRead(Plc.DlgMenu03.LampCleanRollerDnAoiUp) ? TRUE : FALSE;			// 검사부 상 클린롤러 하부 스위치 램프
-	pDoc->BtnStatus.AoiUp.CleanRollerPush = MpeRead(Plc.DlgMenu03.LampCleanRollerPushAoiUp) ? TRUE : FALSE;		// 검사부 상 클린롤러 누름 스위치 램프
-	pDoc->BtnStatus.AoiUp.TestStart = MpeRead(Plc.DlgMenu03.LampTestStartAoiUp) ? TRUE : FALSE;					// 검사부 상 검사 시작 스위치 램프
-	pDoc->BtnStatus.AoiUp.UltrasonicDn = MpeRead(Plc.DlgMenu03.LampUltrasonicDnAoiUp) ? TRUE : FALSE;			// 검사부 상 초음파 세정기 하강 스위치 램프
-	pDoc->BtnStatus.AoiUp.UltrasonicRun = MpeRead(Plc.DlgMenu03.LampUltrasonicRunAoiUp) ? TRUE : FALSE;			// 검사부 상 초음파 세정기 운전 스위치 램프
-	pDoc->BtnStatus.AoiUp.UltrasonicSpeed = MpeRead(Plc.DlgMenu03.LampUltrasonicSpeedAoiUp) ? TRUE : FALSE;		// 검사부 상 초음파 세정기 속도 스위치 램프
+	pDoc->BtnStatus.AoiUp.FeedCw = pDoc->m_pMpeSignal[10] & (0x01 << 10);						// 검사부 상 피딩 정방향 스위치 램프			LampFeedCwAoiUp = _T("MB40030A");
+	pDoc->BtnStatus.AoiUp.FeedCcw = pDoc->m_pMpeSignal[10] & (0x01 << 11);						// 검사부 상 피딩 역방향 스위치 램프			LampFeedCcwAoiUp = _T("MB40030B");
+	pDoc->BtnStatus.AoiUp.TensionCw = pDoc->m_pMpeSignal[10] & (0x01 << 12);					// 검사부 상 텐션 정방향 스위치 램프			LampTensionCwAoiUp = _T("MB40030C");
+	pDoc->BtnStatus.AoiUp.TensionCcw = pDoc->m_pMpeSignal[10] & (0x01 << 13);					// 검사부 상 텐션 역방향 스위치 램프			LampTensionCcwAoiUp = _T("MB40030D");
+	pDoc->BtnStatus.AoiUp.FeedHome = pDoc->m_pMpeSignal[10] & (0x01 << 14);						// 검사부 상 피딩 HOME 스위치 램프				LampFeedHomeAoiUp = _T("MB40030E");
+	pDoc->BtnStatus.AoiUp.FeedVacuum = pDoc->m_pMpeSignal[12] & (0x01 << 9);					// 검사부 상 피딩 진공 스위치 램프				LampFeedVacuumAoiUp = _T("MB400329");
+	pDoc->BtnStatus.AoiUp.FeedClamp = pDoc->m_pMpeSignal[11] & (0x01 << 1);						// 검사부 상 피딩 클램프 스위치 램프			LampFeedClampAoiUp = _T("MB400311");
+	pDoc->BtnStatus.AoiUp.TensionClamp = pDoc->m_pMpeSignal[11] & (0x01 << 2);					// 검사부 상 텐션 클램프 스위치 램프			LampTensionClampAoiUp = _T("MB400312");
+	pDoc->BtnStatus.AoiUp.TableVacuum = pDoc->m_pMpeSignal[11] & (0x01 << 3);					// 검사부 상 테이블 진공 스위치 램프			LampTableVacuumAoiUp = _T("MB400313");
+	pDoc->BtnStatus.AoiUp.TableBlower = pDoc->m_pMpeSignal[11] & (0x01 << 4);					// 검사부 상 테이블 에어블로어 스위치 램프		LampTableBlowerAoiUp = _T("MB400314");
+	pDoc->BtnStatus.AoiUp.TableCylinder = pDoc->m_pMpeSignal[11] & (0x01 << 5);					// 검사부 상 테이블 실린더 스위치 램프			LampTableCylinderAoiUp = _T("MB400315");
+	pDoc->BtnStatus.AoiUp.CleanRollerUp = pDoc->m_pMpeSignal[11] & (0x01 << 8);					// 검사부 상 클린롤러 상부 스위치 램프			LampCleanRollerUpAoiUp = _T("MB400318");
+	pDoc->BtnStatus.AoiUp.CleanRollerDn = pDoc->m_pMpeSignal[11] & (0x01 << 9);					// 검사부 상 클린롤러 하부 스위치 램프			LampCleanRollerDnAoiUp = _T("MB400319");
+	pDoc->BtnStatus.AoiUp.CleanRollerPush = pDoc->m_pMpeSignal[11] & (0x01 << 10);				// 검사부 상 클린롤러 누름 스위치 램프			LampCleanRollerPushAoiUp = _T("MB40031A");
+	pDoc->BtnStatus.AoiUp.TestStart = pDoc->m_pMpeSignal[12] & (0x01 << 0);						// 검사부 상 검사 시작 스위치 램프				LampTestStartAoiUp = _T("MB400320");
+	pDoc->BtnStatus.AoiUp.UltrasonicDn = pDoc->m_pMpeSignal[12] & (0x01 << 6);					// 검사부 상 초음파 세정기 하강 스위치 램프		LampUltrasonicDnAoiUp = _T("MB400326");
+	pDoc->BtnStatus.AoiUp.UltrasonicRun = pDoc->m_pMpeSignal[12] & (0x01 << 7);					// 검사부 상 초음파 세정기 운전 스위치 램프		LampUltrasonicRunAoiUp = _T("MB400327");
+	pDoc->BtnStatus.AoiUp.UltrasonicSpeed = pDoc->m_pMpeSignal[12] & (0x01 << 8);				// 검사부 상 초음파 세정기 속도 스위치 램프		LampUltrasonicSpeedAoiUp = _T("MB400328");
+	//pDoc->BtnStatus.AoiUp.FeedCw = MpeRead(Plc.DlgMenu03.LampFeedCwAoiUp) ? TRUE : FALSE;						// 검사부 상 피딩 정방향 스위치 램프
+	//pDoc->BtnStatus.AoiUp.FeedCcw = MpeRead(Plc.DlgMenu03.LampFeedCcwAoiUp) ? TRUE : FALSE;						// 검사부 상 피딩 역방향 스위치 램프
+	//pDoc->BtnStatus.AoiUp.TensionCw = MpeRead(Plc.DlgMenu03.LampTensionCwAoiUp) ? TRUE : FALSE;					// 검사부 상 텐션 정방향 스위치 램프
+	//pDoc->BtnStatus.AoiUp.TensionCcw = MpeRead(Plc.DlgMenu03.LampTensionCcwAoiUp) ? TRUE : FALSE;				// 검사부 상 텐션 역방향 스위치 램프
+	//pDoc->BtnStatus.AoiUp.FeedHome = MpeRead(Plc.DlgMenu03.LampFeedHomeAoiUp) ? TRUE : FALSE;					// 검사부 상 피딩 HOME 스위치 램프
+	//pDoc->BtnStatus.AoiUp.FeedVacuum = MpeRead(Plc.DlgMenu03.LampFeedVacuumAoiUp) ? TRUE : FALSE;				// 검사부 상 피딩 진공 스위치 램프
+	//pDoc->BtnStatus.AoiUp.FeedClamp = MpeRead(Plc.DlgMenu03.LampFeedClampAoiUp) ? TRUE : FALSE;					// 검사부 상 피딩 클램프 스위치 램프
+	//pDoc->BtnStatus.AoiUp.TensionClamp = MpeRead(Plc.DlgMenu03.LampTensionClampAoiUp) ? TRUE : FALSE;			// 검사부 상 텐션 클램프 스위치 램프
+	//pDoc->BtnStatus.AoiUp.TableVacuum = MpeRead(Plc.DlgMenu03.LampTableVacuumAoiUp) ? TRUE : FALSE;				// 검사부 상 테이블 진공 스위치 램프
+	//pDoc->BtnStatus.AoiUp.TableBlower = MpeRead(Plc.DlgMenu03.LampTableBlowerAoiUp) ? TRUE : FALSE;				// 검사부 상 테이블 에어블로어 스위치 램프
+	//pDoc->BtnStatus.AoiUp.TableCylinder = MpeRead(Plc.DlgMenu03.LampTableCylinderAoiUp) ? TRUE : FALSE;			// 검사부 상 테이블 실린더 스위치 램프
+	//pDoc->BtnStatus.AoiUp.CleanRollerUp = MpeRead(Plc.DlgMenu03.LampCleanRollerUpAoiUp) ? TRUE : FALSE;			// 검사부 상 클린롤러 상부 스위치 램프
+	//pDoc->BtnStatus.AoiUp.CleanRollerDn = MpeRead(Plc.DlgMenu03.LampCleanRollerDnAoiUp) ? TRUE : FALSE;			// 검사부 상 클린롤러 하부 스위치 램프
+	//pDoc->BtnStatus.AoiUp.CleanRollerPush = MpeRead(Plc.DlgMenu03.LampCleanRollerPushAoiUp) ? TRUE : FALSE;		// 검사부 상 클린롤러 누름 스위치 램프
+	//pDoc->BtnStatus.AoiUp.TestStart = MpeRead(Plc.DlgMenu03.LampTestStartAoiUp) ? TRUE : FALSE;					// 검사부 상 검사 시작 스위치 램프
+	//pDoc->BtnStatus.AoiUp.UltrasonicDn = MpeRead(Plc.DlgMenu03.LampUltrasonicDnAoiUp) ? TRUE : FALSE;			// 검사부 상 초음파 세정기 하강 스위치 램프
+	//pDoc->BtnStatus.AoiUp.UltrasonicRun = MpeRead(Plc.DlgMenu03.LampUltrasonicRunAoiUp) ? TRUE : FALSE;			// 검사부 상 초음파 세정기 운전 스위치 램프
+	//pDoc->BtnStatus.AoiUp.UltrasonicSpeed = MpeRead(Plc.DlgMenu03.LampUltrasonicSpeedAoiUp) ? TRUE : FALSE;		// 검사부 상 초음파 세정기 속도 스위치 램프
 
 	if (pDoc->BtnStatus.AoiUp.PrevFeedCw != pDoc->BtnStatus.AoiUp.FeedCw)
 	{
@@ -25181,25 +25273,44 @@ void CGvisR2R_PunchView::GetPlcParam()
 	}
 
 	// Engrave
-	pDoc->BtnStatus.Eng.FeedCw = MpeRead(Plc.DlgMenu03.LampFeedCwEngrave) ? TRUE : FALSE;						// 각인부 피딩 정방향 스위치 램프
-	pDoc->BtnStatus.Eng.FeedCcw = MpeRead(Plc.DlgMenu03.LampFeedCcwEngrave) ? TRUE : FALSE;						// 각인부 피딩 역방향 스위치 램프
-	pDoc->BtnStatus.Eng.TensionCw = MpeRead(Plc.DlgMenu03.LampTensionCwEngrave) ? TRUE : FALSE;					// 각인부 텐션 정방향 스위치 램프
-	pDoc->BtnStatus.Eng.TensionCcw = MpeRead(Plc.DlgMenu03.LampTensionCcwEngrave) ? TRUE : FALSE;				// 각인부 텐션 역방향 스위치 램프
-	pDoc->BtnStatus.Eng.FeedHome = MpeRead(Plc.DlgMenu03.LampFeedHomeEngrave) ? TRUE : FALSE;					// 각인부 피딩 HOME 스위치 램프
-	pDoc->BtnStatus.Eng.FeedVacuum = MpeRead(Plc.DlgMenu03.LampFeedVacuumEngrave) ? TRUE : FALSE;				// 각인부 피딩 진공 스위치 램프
-	pDoc->BtnStatus.Eng.FeedClamp = MpeRead(Plc.DlgMenu03.LampFeedClampEngrave) ? TRUE : FALSE;					// 각인부 피딩 클램프 스위치 램프
-	pDoc->BtnStatus.Eng.TensionClamp = MpeRead(Plc.DlgMenu03.LampTensionClampEngrave) ? TRUE : FALSE;			// 각인부 텐션 클램프 스위치 램프
-	pDoc->BtnStatus.Eng.TableVacuum = MpeRead(Plc.DlgMenu03.LampTableVacuumEngrave) ? TRUE : FALSE;				// 각인부 테이블 진공 스위치 램프
-	pDoc->BtnStatus.Eng.TableBlower = MpeRead(Plc.DlgMenu03.LampTableBlowerEngrave) ? TRUE : FALSE;				// 각인부 테이블 에어블로어 스위치 램프
-	pDoc->BtnStatus.Eng.TableCylinder = MpeRead(Plc.DlgMenu03.LampTableCylinderEngrave) ? TRUE : FALSE;			// 각인부 테이블 실린더 스위치 램프
-	pDoc->BtnStatus.Eng.UltrasonicDown = MpeRead(Plc.DlgMenu03.LampUltrasonicDownEngrave) ? TRUE : FALSE;		// 각인부 초음파 세정기 하강 스위치 램프
-	pDoc->BtnStatus.Eng.UltrasonicRun = MpeRead(Plc.DlgMenu03.LampUltrasonicRunEngrave) ? TRUE : FALSE;			// 각인부 초음파 세정기 운전 스위치 램프
-	pDoc->BtnStatus.Eng.UltrasonicSpeed = MpeRead(Plc.DlgMenu03.LampUltrasonicSpeedEngrave) ? TRUE : FALSE;		// 각인부 초음파 세정기 속도 스위치 램프
-	pDoc->BtnStatus.Eng.DancerUpper = MpeRead(Plc.DlgMenu03.LampDancerUpperEngrave) ? TRUE : FALSE;				// 각인부 버퍼롤 상승 스위치 램프
-	pDoc->BtnStatus.Eng.DancerFixer = MpeRead(Plc.DlgMenu03.LampDancerFixerEngrave) ? TRUE : FALSE;				// 각인부 버퍼롤 고정 스위치 램프
-	pDoc->BtnStatus.Eng.AlignStart = MpeRead(Plc.DlgMenu03.LampAlignStartEngrave) ? TRUE : FALSE;				// 각인부 정렬 시작 스위치 램프
-	pDoc->BtnStatus.Eng.LaserStart = MpeRead(Plc.DlgMenu03.LampLaserStartEngrave) ? TRUE : FALSE;				// 각인부 각인 시작 스위치 램프
-	pDoc->BtnStatus.Eng.ReadStart = MpeRead(Plc.DlgMenu03.LampReadStartEngrave) ? TRUE : FALSE;					// 각인부 리딩 시작 스위치 램프
+	pDoc->BtnStatus.Eng.FeedCw = pDoc->m_pMpeSignal[8] & (0x01 << 6);						// 각인부 피딩 정방향 스위치 램프			LampFeedCwEngrave = _T("MB400286");
+	pDoc->BtnStatus.Eng.FeedCcw = pDoc->m_pMpeSignal[8] & (0x01 << 7);						// 각인부 피딩 역방향 스위치 램프			LampFeedCcwEngrave = _T("MB400287");
+	pDoc->BtnStatus.Eng.TensionCw = pDoc->m_pMpeSignal[8] & (0x01 << 8);					// 각인부 텐션 정방향 스위치 램프			LampTensionCwEngrave = _T("MB400288");
+	pDoc->BtnStatus.Eng.TensionCcw = pDoc->m_pMpeSignal[8] & (0x01 << 9);					// 각인부 텐션 역방향 스위치 램프			LampTensionCcwEngrave = _T("MB400289");
+	pDoc->BtnStatus.Eng.FeedHome = pDoc->m_pMpeSignal[8] & (0x01 << 10);					// 각인부 피딩 HOME 스위치 램프				LampFeedHomeEngrave = _T("MB40028A");
+	pDoc->BtnStatus.Eng.FeedVacuum = pDoc->m_pMpeSignal[8] & (0x01 << 11);					// 각인부 피딩 진공 스위치 램프				LampFeedVacuumEngrave = _T("MB40028B");
+	pDoc->BtnStatus.Eng.FeedClamp = pDoc->m_pMpeSignal[8] & (0x01 << 12);					// 각인부 피딩 클램프 스위치 램프			LampFeedClampEngrave = _T("MB40028C");
+	pDoc->BtnStatus.Eng.TensionClamp = pDoc->m_pMpeSignal[8] & (0x01 << 13);				// 각인부 텐션 클램프 스위치 램프			LampTensionClampEngrave = _T("MB40028D");
+	pDoc->BtnStatus.Eng.TableVacuum = pDoc->m_pMpeSignal[9] & (0x01 << 0);					// 각인부 테이블 진공 스위치 램프			LampTableVacuumEngrave = _T("MB400290");
+	pDoc->BtnStatus.Eng.TableBlower = pDoc->m_pMpeSignal[9] & (0x01 << 1);					// 각인부 테이블 에어블로어 스위치 램프		LampTableBlowerEngrave = _T("MB400291");
+	pDoc->BtnStatus.Eng.TableCylinder = pDoc->m_pMpeSignal[9] & (0x01 << 2);				// 각인부 테이블 실린더 스위치 램프			LampTableCylinderEngrave = _T("MB400292");
+	pDoc->BtnStatus.Eng.UltrasonicDown = pDoc->m_pMpeSignal[9] & (0x01 << 3);				// 각인부 초음파 세정기 하강 스위치 램프	LampUltrasonicDownEngrave = _T("MB400293");
+	pDoc->BtnStatus.Eng.UltrasonicRun = pDoc->m_pMpeSignal[9] & (0x01 << 4);				// 각인부 초음파 세정기 운전 스위치 램프	LampUltrasonicRunEngrave = _T("MB400294");
+	pDoc->BtnStatus.Eng.UltrasonicSpeed = pDoc->m_pMpeSignal[9] & (0x01 << 5);				// 각인부 초음파 세정기 속도 스위치 램프	LampUltrasonicSpeedEngrave = _T("MB400295");
+	pDoc->BtnStatus.Eng.DancerUpper = pDoc->m_pMpeSignal[9] & (0x01 << 6);					// 각인부 버퍼롤 상승 스위치 램프			LampDancerUpperEngrave = _T("MB400296");
+	pDoc->BtnStatus.Eng.DancerFixer = pDoc->m_pMpeSignal[9] & (0x01 << 7);					// 각인부 버퍼롤 고정 스위치 램프			LampDancerFixerEngrave = _T("MB400297");
+	pDoc->BtnStatus.Eng.AlignStart = pDoc->m_pMpeSignal[10] & (0x01 << 0);					// 각인부 정렬 시작 스위치 램프				LampAlignStartEngrave = _T("MB400300");
+	pDoc->BtnStatus.Eng.LaserStart = pDoc->m_pMpeSignal[10] & (0x01 << 3);					// 각인부 각인 시작 스위치 램프				LampLaserStartEngrave = _T("MB400303");
+	pDoc->BtnStatus.Eng.ReadStart = pDoc->m_pMpeSignal[10] & (0x01 << 6);					// 각인부 리딩 시작 스위치 램프				LampReadStartEngrave = _T("MB400306");
+	//pDoc->BtnStatus.Eng.FeedCw = MpeRead(Plc.DlgMenu03.LampFeedCwEngrave) ? TRUE : FALSE;						// 각인부 피딩 정방향 스위치 램프
+	//pDoc->BtnStatus.Eng.FeedCcw = MpeRead(Plc.DlgMenu03.LampFeedCcwEngrave) ? TRUE : FALSE;						// 각인부 피딩 역방향 스위치 램프
+	//pDoc->BtnStatus.Eng.TensionCw = MpeRead(Plc.DlgMenu03.LampTensionCwEngrave) ? TRUE : FALSE;					// 각인부 텐션 정방향 스위치 램프
+	//pDoc->BtnStatus.Eng.TensionCcw = MpeRead(Plc.DlgMenu03.LampTensionCcwEngrave) ? TRUE : FALSE;				// 각인부 텐션 역방향 스위치 램프
+	//pDoc->BtnStatus.Eng.FeedHome = MpeRead(Plc.DlgMenu03.LampFeedHomeEngrave) ? TRUE : FALSE;					// 각인부 피딩 HOME 스위치 램프
+	//pDoc->BtnStatus.Eng.FeedVacuum = MpeRead(Plc.DlgMenu03.LampFeedVacuumEngrave) ? TRUE : FALSE;				// 각인부 피딩 진공 스위치 램프
+	//pDoc->BtnStatus.Eng.FeedClamp = MpeRead(Plc.DlgMenu03.LampFeedClampEngrave) ? TRUE : FALSE;					// 각인부 피딩 클램프 스위치 램프
+	//pDoc->BtnStatus.Eng.TensionClamp = MpeRead(Plc.DlgMenu03.LampTensionClampEngrave) ? TRUE : FALSE;			// 각인부 텐션 클램프 스위치 램프
+	//pDoc->BtnStatus.Eng.TableVacuum = MpeRead(Plc.DlgMenu03.LampTableVacuumEngrave) ? TRUE : FALSE;				// 각인부 테이블 진공 스위치 램프
+	//pDoc->BtnStatus.Eng.TableBlower = MpeRead(Plc.DlgMenu03.LampTableBlowerEngrave) ? TRUE : FALSE;				// 각인부 테이블 에어블로어 스위치 램프
+	//pDoc->BtnStatus.Eng.TableCylinder = MpeRead(Plc.DlgMenu03.LampTableCylinderEngrave) ? TRUE : FALSE;			// 각인부 테이블 실린더 스위치 램프
+	//pDoc->BtnStatus.Eng.UltrasonicDown = MpeRead(Plc.DlgMenu03.LampUltrasonicDownEngrave) ? TRUE : FALSE;		// 각인부 초음파 세정기 하강 스위치 램프
+	//pDoc->BtnStatus.Eng.UltrasonicRun = MpeRead(Plc.DlgMenu03.LampUltrasonicRunEngrave) ? TRUE : FALSE;			// 각인부 초음파 세정기 운전 스위치 램프
+	//pDoc->BtnStatus.Eng.UltrasonicSpeed = MpeRead(Plc.DlgMenu03.LampUltrasonicSpeedEngrave) ? TRUE : FALSE;		// 각인부 초음파 세정기 속도 스위치 램프
+	//pDoc->BtnStatus.Eng.DancerUpper = MpeRead(Plc.DlgMenu03.LampDancerUpperEngrave) ? TRUE : FALSE;				// 각인부 버퍼롤 상승 스위치 램프
+	//pDoc->BtnStatus.Eng.DancerFixer = MpeRead(Plc.DlgMenu03.LampDancerFixerEngrave) ? TRUE : FALSE;				// 각인부 버퍼롤 고정 스위치 램프
+	//pDoc->BtnStatus.Eng.AlignStart = MpeRead(Plc.DlgMenu03.LampAlignStartEngrave) ? TRUE : FALSE;				// 각인부 정렬 시작 스위치 램프
+	//pDoc->BtnStatus.Eng.LaserStart = MpeRead(Plc.DlgMenu03.LampLaserStartEngrave) ? TRUE : FALSE;				// 각인부 각인 시작 스위치 램프
+	//pDoc->BtnStatus.Eng.ReadStart = MpeRead(Plc.DlgMenu03.LampReadStartEngrave) ? TRUE : FALSE;					// 각인부 리딩 시작 스위치 램프
 
 	if (pDoc->BtnStatus.Eng.PrevFeedCw != pDoc->BtnStatus.Eng.FeedCw)
 	{
@@ -25275,25 +25386,44 @@ void CGvisR2R_PunchView::GetPlcParam()
 	}
 
 	// Uncoiler
-	pDoc->BtnStatus.Uc.ChuckPcb = MpeRead(Plc.DlgMenu03.LampChuckPcbUncoiler) ? TRUE : FALSE;					// 언코일러 제품척 클램프 스위치 램프
-	pDoc->BtnStatus.Uc.ChuckPaper = MpeRead(Plc.DlgMenu03.LampChuckPaperUncoiler) ? TRUE : FALSE;				// 언코일러 간지척 클램프 스위치 램프
-	pDoc->BtnStatus.Uc.JoinClamp = MpeRead(Plc.DlgMenu03.LampJoinClampUncoiler) ? TRUE : FALSE;					// 언코일러 이음매 클램프 스위치 램프
-	pDoc->BtnStatus.Uc.PcbShaftSupport = MpeRead(Plc.DlgMenu03.LampPcbShaftSupportUncoiler) ? TRUE : FALSE;		// 언코일러 제품샤프트 지지대 스위치 램프
-	pDoc->BtnStatus.Uc.EpcActHome = MpeRead(Plc.DlgMenu03.LampEpcActHomeUncoiler) ? TRUE : FALSE;				// 언코일러 EPC 액추에이터 HOME 스위치 램프
-	pDoc->BtnStatus.Uc.EpcActFirst = MpeRead(Plc.DlgMenu03.LampEpcActFirstUncoiler) ? TRUE : FALSE;				// 언코일러 EPC 액추에이터 #1 스위치 램프
-	pDoc->BtnStatus.Uc.EpcActSecond = MpeRead(Plc.DlgMenu03.LampEpcActSecondUncoiler) ? TRUE : FALSE;			// 언코일러 EPC 액추에이터 #2 스위치 램프
-	pDoc->BtnStatus.Uc.EpcActThird = MpeRead(Plc.DlgMenu03.LampEpcActThirdUncoiler) ? TRUE : FALSE;				// 언코일러 EPC 액추에이터 #3 스위치 램프
-	pDoc->BtnStatus.Uc.EpcAuto = MpeRead(Plc.DlgMenu03.LampEpcAutoUncoiler) ? TRUE : FALSE;						// 언코일러 EPC 자동 스위치 램프
-	pDoc->BtnStatus.Uc.EpcManual = MpeRead(Plc.DlgMenu03.LampEpcManualUncoiler) ? TRUE : FALSE;					// 언코일러 EPC 수동 스위치 램프
-	pDoc->BtnStatus.Uc.EpcHome = MpeRead(Plc.DlgMenu03.LampEpcHomeUncoiler) ? TRUE : FALSE;						// 언코일러 EPC 원점 스위치 램프
-	pDoc->BtnStatus.Uc.EpcIn = MpeRead(Plc.DlgMenu03.LampEpcInUncoiler) ? TRUE : FALSE;							// 언코일러 EPC In 스위치 램프
-	pDoc->BtnStatus.Uc.EpcOut = MpeRead(Plc.DlgMenu03.LampEpcOutUncoiler) ? TRUE : FALSE;						// 언코일러 EPC Out 스위치 램프
-	pDoc->BtnStatus.Uc.PcbInverterCw = MpeRead(Plc.DlgMenu03.LampPcbInverterCwUncoiler) ? TRUE : FALSE;			// 언코일러 제품 인버터 정방향 스위치 램프
-	pDoc->BtnStatus.Uc.PcbInverterCcw = MpeRead(Plc.DlgMenu03.LampPcbInverterCcwUncoiler) ? TRUE : FALSE;		// 언코일러 제품 인버터 역방향 스위치 램프
-	pDoc->BtnStatus.Uc.PaperInverterCw = MpeRead(Plc.DlgMenu03.LampPaperInverterCwUncoiler) ? TRUE : FALSE;		// 언코일러 간지 인버터 정방향 스위치 램프
-	pDoc->BtnStatus.Uc.PaperInverterCcw = MpeRead(Plc.DlgMenu03.LampPaperInverterCcwUncoiler) ? TRUE : FALSE;	// 언코일러 간지 인버터 역방향 스위치 램프
-	pDoc->BtnStatus.Uc.DancerUpper = MpeRead(Plc.DlgMenu03.LampDancerUpperUncoiler) ? TRUE : FALSE;				// 언코일러 댄서롤 상승 스위치 램프
-	pDoc->BtnStatus.Uc.DancerFixer = MpeRead(Plc.DlgMenu03.LampDancerFixerUncoiler) ? TRUE : FALSE;				// 언코일러 댄서롤 고정 스위치 램프
+	pDoc->BtnStatus.Uc.ChuckPcb = pDoc->m_pMpeSignal[7] & (0x01 << 0);					// 언코일러 제품척 클램프 스위치 램프			LampChuckPcbUncoiler = _T("MB400270");
+	pDoc->BtnStatus.Uc.ChuckPaper = pDoc->m_pMpeSignal[7] & (0x01 << 1);				// 언코일러 간지척 클램프 스위치 램프			LampChuckPaperUncoiler = _T("MB400271");
+	pDoc->BtnStatus.Uc.JoinClamp = pDoc->m_pMpeSignal[7] & (0x01 << 2);					// 언코일러 이음매 클램프 스위치 램프			LampJoinClampUncoiler = _T("MB400272");
+	pDoc->BtnStatus.Uc.PcbShaftSupport = pDoc->m_pMpeSignal[7] & (0x01 << 3);			// 언코일러 제품샤프트 지지대 스위치 램프		LampPcbShaftSupportUncoiler = _T("MB400273");
+	pDoc->BtnStatus.Uc.EpcActHome = pDoc->m_pMpeSignal[7] & (0x01 << 4);				// 언코일러 EPC 액추에이터 HOME 스위치 램프		LampEpcActHomeUncoiler = _T("MB400274");
+	pDoc->BtnStatus.Uc.EpcActFirst = pDoc->m_pMpeSignal[7] & (0x01 << 5);				// 언코일러 EPC 액추에이터 #1 스위치 램프		LampEpcActFirstUncoiler = _T("MB400275");
+	pDoc->BtnStatus.Uc.EpcActSecond = pDoc->m_pMpeSignal[7] & (0x01 << 6);				// 언코일러 EPC 액추에이터 #2 스위치 램프		LampEpcActSecondUncoiler = _T("MB400276");
+	pDoc->BtnStatus.Uc.EpcActThird = pDoc->m_pMpeSignal[7] & (0x01 << 7);				// 언코일러 EPC 액추에이터 #3 스위치 램프		LampEpcActThirdUncoiler = _T("MB400277");
+	pDoc->BtnStatus.Uc.EpcAuto = pDoc->m_pMpeSignal[7] & (0x01 << 9);					// 언코일러 EPC 자동 스위치 램프				LampEpcAutoUncoiler = _T("MB400279");
+	pDoc->BtnStatus.Uc.EpcManual = pDoc->m_pMpeSignal[7] & (0x01 << 10);				// 언코일러 EPC 수동 스위치 램프				LampEpcManualUncoiler = _T("MB40027A");
+	pDoc->BtnStatus.Uc.EpcHome = pDoc->m_pMpeSignal[7] & (0x01 << 11);					// 언코일러 EPC 원점 스위치 램프				LampEpcHomeUncoiler = _T("MB40027B");
+	pDoc->BtnStatus.Uc.EpcIn = pDoc->m_pMpeSignal[7] & (0x01 << 12);					// 언코일러 EPC In 스위치 램프					LampEpcInUncoiler = _T("MB40027C");
+	pDoc->BtnStatus.Uc.EpcOut = pDoc->m_pMpeSignal[7] & (0x01 << 13);					// 언코일러 EPC Out 스위치 램프					LampEpcOutUncoiler = _T("MB40027D");
+	pDoc->BtnStatus.Uc.PcbInverterCw = pDoc->m_pMpeSignal[8] & (0x01 << 0);			// 언코일러 제품 인버터 정방향 스위치 램프		LampPcbInverterCwUncoiler = _T("MB400280");
+	pDoc->BtnStatus.Uc.PcbInverterCcw = pDoc->m_pMpeSignal[8] & (0x01 << 1);		// 언코일러 제품 인버터 역방향 스위치 램프		LampPcbInverterCcwUncoiler = _T("MB400281");
+	pDoc->BtnStatus.Uc.PaperInverterCw = pDoc->m_pMpeSignal[8] & (0x01 << 2);		// 언코일러 간지 인버터 정방향 스위치 램프		LampPaperInverterCwUncoiler = _T("MB400282");
+	pDoc->BtnStatus.Uc.PaperInverterCcw = pDoc->m_pMpeSignal[8] & (0x01 << 3);	// 언코일러 간지 인버터 역방향 스위치 램프		LampPaperInverterCcwUncoiler = _T("MB400283");
+	pDoc->BtnStatus.Uc.DancerUpper = pDoc->m_pMpeSignal[8] & (0x01 << 4);				// 언코일러 댄서롤 상승 스위치 램프				LampDancerUpperUncoiler = _T("MB400284");
+	pDoc->BtnStatus.Uc.DancerFixer = pDoc->m_pMpeSignal[8] & (0x01 << 5);				// 언코일러 댄서롤 고정 스위치 램프				LampDancerFixerUncoiler = _T("MB400285");
+	//pDoc->BtnStatus.Uc.ChuckPcb = MpeRead(Plc.DlgMenu03.LampChuckPcbUncoiler) ? TRUE : FALSE;					// 언코일러 제품척 클램프 스위치 램프
+	//pDoc->BtnStatus.Uc.ChuckPaper = MpeRead(Plc.DlgMenu03.LampChuckPaperUncoiler) ? TRUE : FALSE;				// 언코일러 간지척 클램프 스위치 램프
+	//pDoc->BtnStatus.Uc.JoinClamp = MpeRead(Plc.DlgMenu03.LampJoinClampUncoiler) ? TRUE : FALSE;					// 언코일러 이음매 클램프 스위치 램프
+	//pDoc->BtnStatus.Uc.PcbShaftSupport = MpeRead(Plc.DlgMenu03.LampPcbShaftSupportUncoiler) ? TRUE : FALSE;		// 언코일러 제품샤프트 지지대 스위치 램프
+	//pDoc->BtnStatus.Uc.EpcActHome = MpeRead(Plc.DlgMenu03.LampEpcActHomeUncoiler) ? TRUE : FALSE;				// 언코일러 EPC 액추에이터 HOME 스위치 램프
+	//pDoc->BtnStatus.Uc.EpcActFirst = MpeRead(Plc.DlgMenu03.LampEpcActFirstUncoiler) ? TRUE : FALSE;				// 언코일러 EPC 액추에이터 #1 스위치 램프
+	//pDoc->BtnStatus.Uc.EpcActSecond = MpeRead(Plc.DlgMenu03.LampEpcActSecondUncoiler) ? TRUE : FALSE;			// 언코일러 EPC 액추에이터 #2 스위치 램프
+	//pDoc->BtnStatus.Uc.EpcActThird = MpeRead(Plc.DlgMenu03.LampEpcActThirdUncoiler) ? TRUE : FALSE;				// 언코일러 EPC 액추에이터 #3 스위치 램프
+	//pDoc->BtnStatus.Uc.EpcAuto = MpeRead(Plc.DlgMenu03.LampEpcAutoUncoiler) ? TRUE : FALSE;						// 언코일러 EPC 자동 스위치 램프
+	//pDoc->BtnStatus.Uc.EpcManual = MpeRead(Plc.DlgMenu03.LampEpcManualUncoiler) ? TRUE : FALSE;					// 언코일러 EPC 수동 스위치 램프
+	//pDoc->BtnStatus.Uc.EpcHome = MpeRead(Plc.DlgMenu03.LampEpcHomeUncoiler) ? TRUE : FALSE;						// 언코일러 EPC 원점 스위치 램프
+	//pDoc->BtnStatus.Uc.EpcIn = MpeRead(Plc.DlgMenu03.LampEpcInUncoiler) ? TRUE : FALSE;							// 언코일러 EPC In 스위치 램프
+	//pDoc->BtnStatus.Uc.EpcOut = MpeRead(Plc.DlgMenu03.LampEpcOutUncoiler) ? TRUE : FALSE;						// 언코일러 EPC Out 스위치 램프
+	//pDoc->BtnStatus.Uc.PcbInverterCw = MpeRead(Plc.DlgMenu03.LampPcbInverterCwUncoiler) ? TRUE : FALSE;			// 언코일러 제품 인버터 정방향 스위치 램프
+	//pDoc->BtnStatus.Uc.PcbInverterCcw = MpeRead(Plc.DlgMenu03.LampPcbInverterCcwUncoiler) ? TRUE : FALSE;		// 언코일러 제품 인버터 역방향 스위치 램프
+	//pDoc->BtnStatus.Uc.PaperInverterCw = MpeRead(Plc.DlgMenu03.LampPaperInverterCwUncoiler) ? TRUE : FALSE;		// 언코일러 간지 인버터 정방향 스위치 램프
+	//pDoc->BtnStatus.Uc.PaperInverterCcw = MpeRead(Plc.DlgMenu03.LampPaperInverterCcwUncoiler) ? TRUE : FALSE;	// 언코일러 간지 인버터 역방향 스위치 램프
+	//pDoc->BtnStatus.Uc.DancerUpper = MpeRead(Plc.DlgMenu03.LampDancerUpperUncoiler) ? TRUE : FALSE;				// 언코일러 댄서롤 상승 스위치 램프
+	//pDoc->BtnStatus.Uc.DancerFixer = MpeRead(Plc.DlgMenu03.LampDancerFixerUncoiler) ? TRUE : FALSE;				// 언코일러 댄서롤 고정 스위치 램프
 
 	if (pDoc->BtnStatus.Uc.PrevChuckPcb != pDoc->BtnStatus.Uc.ChuckPcb)
 	{
@@ -25467,9 +25597,9 @@ BOOL CGvisR2R_PunchView::MoveAlign0(int nPos)
 			if (fLen > 0.001)
 			{
 				pView->m_pMotion->GetSpeedProfile(TRAPEZOIDAL, AXIS_X0, fLen, fVel, fAcc, fJerk);
-				if (!pView->m_pMotion->Move(MS_X0Y0, pPos, fVel, fAcc, fAcc, ABS, NO_WAIT))
+				if (!pView->m_pMotion->Move0(MS_X0Y0, pPos, fVel, fAcc, fAcc, ABS, NO_WAIT))
 				{
-					if (!pView->m_pMotion->Move(MS_X0Y0, pPos, fVel, fAcc, fAcc, ABS, NO_WAIT))
+					if (!pView->m_pMotion->Move0(MS_X0Y0, pPos, fVel, fAcc, fAcc, ABS, NO_WAIT))
 					{
 						pView->SetAlarmToPlc(UNIT_PUNCH);
 						pView->ClrDispMsg();
@@ -25493,17 +25623,17 @@ BOOL CGvisR2R_PunchView::MoveAlign0(int nPos)
 				pPos[1] = pDoc->m_Master[0].m_stAlignMk.Y1 + m_pMotion->m_dPinPosY[0];
 			}
 
-			if (ChkCollision(AXIS_X0, pPos[0]))
-				return FALSE;
+			//if (ChkCollision(AXIS_X0, pPos[0]))
+			//	return FALSE;
 
 			double fLen, fVel, fAcc, fJerk;
 			fLen = sqrt(((pPos[0] - dCurrX) * (pPos[0] - dCurrX)) + ((pPos[1] - dCurrY) * (pPos[1] - dCurrY)));
 			if (fLen > 0.001)
 			{
 				pView->m_pMotion->GetSpeedProfile(TRAPEZOIDAL, AXIS_X0, fLen, fVel, fAcc, fJerk);
-				if (!pView->m_pMotion->Move(MS_X0Y0, pPos, fVel, fAcc, fAcc, ABS, NO_WAIT))
+				if (!pView->m_pMotion->Move0(MS_X0Y0, pPos, fVel, fAcc, fAcc, ABS, NO_WAIT))
 				{
-					if (!pView->m_pMotion->Move(MS_X0Y0, pPos, fVel, fAcc, fAcc, ABS, NO_WAIT))
+					if (!pView->m_pMotion->Move0(MS_X0Y0, pPos, fVel, fAcc, fAcc, ABS, NO_WAIT))
 					{
 						pView->SetAlarmToPlc(UNIT_PUNCH);
 						pView->ClrDispMsg();
@@ -25559,17 +25689,17 @@ BOOL CGvisR2R_PunchView::MoveAlign1(int nPos)
 				pPos[1] = pDoc->m_Master[0].m_stAlignMk2.Y3 + m_pMotion->m_dPinPosY[1];
 			}
 
-			if (ChkCollision(AXIS_X1, pPos[0]))
-				return FALSE;
+			//if (ChkCollision(AXIS_X1, pPos[0]))
+			//	return FALSE;
 
 			double fLen, fVel, fAcc, fJerk;
 			fLen = sqrt(((pPos[0] - dCurrX) * (pPos[0] - dCurrX)) + ((pPos[1] - dCurrY) * (pPos[1] - dCurrY)));
 			if (fLen > 0.001)
 			{
 				m_pMotion->GetSpeedProfile(TRAPEZOIDAL, AXIS_X1, fLen, fVel, fAcc, fJerk);
-				if (!m_pMotion->Move(MS_X1Y1, pPos, fVel, fAcc, fAcc, ABS, NO_WAIT))
+				if (!m_pMotion->Move1(MS_X1Y1, pPos, fVel, fAcc, fAcc, ABS, NO_WAIT))
 				{
-					if (!m_pMotion->Move(MS_X1Y1, pPos, fVel, fAcc, fAcc, ABS, NO_WAIT))
+					if (!m_pMotion->Move1(MS_X1Y1, pPos, fVel, fAcc, fAcc, ABS, NO_WAIT))
 					{
 						pView->SetAlarmToPlc(UNIT_PUNCH);
 						pView->ClrDispMsg();
@@ -25601,9 +25731,9 @@ BOOL CGvisR2R_PunchView::MoveAlign1(int nPos)
 			if (fLen > 0.001)
 			{
 				m_pMotion->GetSpeedProfile(TRAPEZOIDAL, AXIS_X1, fLen, fVel, fAcc, fJerk);
-				if (!m_pMotion->Move(MS_X1Y1, pPos, fVel, fAcc, fAcc, ABS, NO_WAIT))
+				if (!m_pMotion->Move1(MS_X1Y1, pPos, fVel, fAcc, fAcc, ABS, NO_WAIT))
 				{
-					if (!m_pMotion->Move(MS_X1Y1, pPos, fVel, fAcc, fAcc, ABS, NO_WAIT))
+					if (!m_pMotion->Move1(MS_X1Y1, pPos, fVel, fAcc, fAcc, ABS, NO_WAIT))
 					{
 						pView->SetAlarmToPlc(UNIT_PUNCH);
 						pView->ClrDispMsg();
@@ -26957,9 +27087,9 @@ BOOL CGvisR2R_PunchView::IsEngraveFd()
 	{
 		if (!(m_nShareDnCnt % 2))
 		{
-			bChk = MpeRead(_T("MB400286")); // PLC 각인기 피딩 정방향 Run
-			//if ((pDoc->m_pMpeSignal[8] & (0x01 << 6))/* || (pDoc->m_pMpeSignal[8] & (0x01 << 7))*/)	// 각인부 피딩 CW ON (PLC가 피딩완료 후 OFF)
-			if (bChk)	// 각인부 피딩 CW ON (PLC가 피딩완료 후 OFF)
+			//bChk = MpeRead(_T("MB400286")); // PLC 각인기 피딩 정방향 Run
+			//if (bChk)	// 각인부 피딩 CW ON (PLC가 피딩완료 후 OFF)
+			if ((pDoc->m_pMpeSignal[8] & (0x01 << 6))/* || (pDoc->m_pMpeSignal[8] & (0x01 << 7))*/)	// 각인부 피딩 CW ON (PLC가 피딩완료 후 OFF)
 			{
 				//pDoc->LogAuto(_T("PLC: 각인부 피딩 CW ON (PLC가 피딩완료 후 OFF)"));
 				return TRUE;
@@ -26973,8 +27103,9 @@ BOOL CGvisR2R_PunchView::IsEngraveFd()
 		{
 			if (!(m_nShareUpCnt % 2))
 			{
-				bChk = MpeRead(_T("MB400286")); // PLC 각인기 피딩 정방향 Run
-				if (bChk)	// 각인부 피딩 CW ON (PLC가 피딩완료 후 OFF)
+				//bChk = MpeRead(_T("MB400286")); // PLC 각인기 피딩 정방향 Run
+				//if (bChk)	// 각인부 피딩 CW ON (PLC가 피딩완료 후 OFF)
+				if (pDoc->m_pMpeSignal[8] & (0x01 << 6))
 				{
 					//pDoc->LogAuto(_T("PLC: 각인부 피딩 CW ON (PLC가 피딩완료 후 OFF)"));
 					return TRUE;
@@ -27310,7 +27441,8 @@ void CGvisR2R_PunchView::DoAutoEng()
 void CGvisR2R_PunchView::DoAtuoGetEngStSignal()
 {
 	CString sVal;
-	BOOL bMk = MpeRead(Plc.DlgMenu01.MarkingStartEngrave); // MB400303 : PLC 각인부 마킹 시작
+	BOOL bMk = pDoc->m_pMpeSignal[10] & (0x01 << 3); // MB400303 : PLC 각인부 마킹 시작
+	//BOOL bMk = MpeRead(Plc.DlgMenu01.MarkingStartEngrave); // MB400303 : PLC 각인부 마킹 시작
 	
 	if (m_pDlgMenu02)
 	{
@@ -27337,7 +27469,8 @@ void CGvisR2R_PunchView::DoAtuoGetEngStSignal()
 		//CheckCurrentInfoSignal();
 	}
 
-	BOOL bFdDone = MpeRead(Plc.DlgMenu01.FeedingDoneEngrave); // MB400240 : 각인부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)
+	BOOL bFdDone = pDoc->m_pMpeSignal[4] & (0x01 << 0); // MB400240 : 각인부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)
+	//BOOL bFdDone = MpeRead(Plc.DlgMenu01.FeedingDoneEngrave); // MB400240 : 각인부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)
 
 	if (m_pDlgMenu02)
 	{
@@ -27368,7 +27501,8 @@ void CGvisR2R_PunchView::DoAtuoGetEngStSignal()
 void CGvisR2R_PunchView::DoAtuoGet2dReadStSignal()
 {
 	CString sVal;
-	BOOL bRead = MpeRead(Plc.DlgMenu01.Reading2dStartEngrave); // MB400306 : PLC 각인부 Reading 시작
+	BOOL bRead = pDoc->m_pMpeSignal[10] & (0x01 << 6); // MB400306 : PLC 각인부 Reading 시작
+	//BOOL bRead = MpeRead(Plc.DlgMenu01.Reading2dStartEngrave); // MB400306 : PLC 각인부 Reading 시작
 
 	if (m_pDlgMenu02)
 	{
@@ -27418,8 +27552,9 @@ void CGvisR2R_PunchView::DoAutoSetFdOffsetEngrave()
 		//pDoc->LogAuto(_T("PC: 각인부 Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)"));
 	}
 
-	BOOL bChk = MpeRead(Plc.DlgFrameHigh.FeedOffsetWriteDoneEngrave); // PLC 각인기 피딩 Offset Write(GUI Off) _T("MB40024C")
+	//BOOL bChk = MpeRead(Plc.DlgFrameHigh.FeedOffsetWriteDoneEngrave); // PLC 각인기 피딩 Offset Write(GUI Off) _T("MB40024C")
 	//if (pDoc->m_pMpeSignal && pDoc->m_pMpeSignal[4] & (0x01 << 12) && !m_bEngFdWrite)		// 각인부 Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)
+	BOOL bChk = pDoc->m_pMpeSignal && pDoc->m_pMpeSignal[4] & (0x01 << 12);
 	if (bChk && !m_bEngFdWrite)		// 각인부 Feeding Offset Write 완료(PC가 확인하고 Reset시킴.)
 	{
 		m_bEngFdWrite = TRUE; pDoc->SetStatus(_T("General"), _T("bEngFdWrite"), m_bEngFdWrite);
@@ -34778,4 +34913,17 @@ CString CGvisR2R_PunchView::GetMkMtInfo1(int nSerial, int nMkPcs) // return Cam1
 	}
 
 	return sInfo;
+}
+
+void CGvisR2R_PunchView::ResetTargetPos()
+{
+	m_dTarget[AXIS_X0] = _tstof(pDoc->WorkingInfo.Motion.sStPosX[0]);
+	m_dTarget[AXIS_Y0] = _tstof(pDoc->WorkingInfo.Motion.sStPosY[0]);
+	m_dNextTarget[AXIS_X0] = _tstof(pDoc->WorkingInfo.Motion.sStPosX[0]);
+	m_dNextTarget[AXIS_Y0] = _tstof(pDoc->WorkingInfo.Motion.sStPosY[0]);
+
+	m_dTarget[AXIS_X1] = _tstof(pDoc->WorkingInfo.Motion.sStPosX[1]);
+	m_dTarget[AXIS_Y1] = _tstof(pDoc->WorkingInfo.Motion.sStPosY[1]);
+	m_dNextTarget[AXIS_X1] = _tstof(pDoc->WorkingInfo.Motion.sStPosX[1]);
+	m_dNextTarget[AXIS_Y1] = _tstof(pDoc->WorkingInfo.Motion.sStPosY[1]);
 }

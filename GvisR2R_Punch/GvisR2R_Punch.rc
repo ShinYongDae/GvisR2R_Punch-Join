@@ -166,7 +166,7 @@ FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,14,7,20,20
     LTEXT           "GvisR2R_Punch, 버전 2.1.0",IDC_STATIC,42,7,114,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2024.03.21",IDC_STATIC,42,16,114,8
+    LTEXT           "Copyright (C) 2024.03.24",IDC_STATIC,42,16,114,8
     DEFPUSHBUTTON   "확인",IDOK,113,43,50,14,WS_GROUP
     LTEXT           "Tack Time 최적화",IDC_STATIC,9,29,139,8
     LTEXT           "Log 추가 (미마킹 검사 결과)",IDC_STATIC,9,38,96,8

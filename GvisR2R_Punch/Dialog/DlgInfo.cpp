@@ -677,31 +677,36 @@ void CDlgInfo::Disp()
 	str.Format(_T("%d"), pDoc->m_nJudgeMkModelSize); // [um]
 	myStcData[23].SetText(str);
 
-	pDoc->WorkingInfo.LastJob.bRclDrSen = pView->MpeRead(pView->Plc.DlgInfo.LampDoorSensorRecoiler) ? TRUE : FALSE;
+	//pDoc->WorkingInfo.LastJob.bRclDrSen = pView->MpeRead(pView->Plc.DlgInfo.LampDoorSensorRecoiler) ? TRUE : FALSE; // LampDoorSensorRecoiler = _T("MB400219");
+	pDoc->WorkingInfo.LastJob.bRclDrSen = pDoc->m_pMpeSignal[1] & (0x01 << 9);
 	if(pDoc->WorkingInfo.LastJob.bRclDrSen)
 		myBtn[4].SetCheck(TRUE);
 	else
 		myBtn[4].SetCheck(FALSE);
 
-	pDoc->WorkingInfo.LastJob.bAoiUpDrSen = pView->MpeRead(pView->Plc.DlgInfo.LampDoorSensorAoiUp) ? TRUE : FALSE;
+	//pDoc->WorkingInfo.LastJob.bAoiUpDrSen = pView->MpeRead(pView->Plc.DlgInfo.LampDoorSensorAoiUp) ? TRUE : FALSE; // LampDoorSensorAoiUp = _T("MB400216");
+	pDoc->WorkingInfo.LastJob.bAoiUpDrSen = pDoc->m_pMpeSignal[1] & (0x01 << 6);
 	if(pDoc->WorkingInfo.LastJob.bAoiUpDrSen)
 		myBtn[5].SetCheck(TRUE);
 	else
 		myBtn[5].SetCheck(FALSE);
 
-	pDoc->WorkingInfo.LastJob.bMkDrSen = pView->MpeRead(pView->Plc.DlgInfo.LampDoorSensorPunch) ? TRUE : FALSE;
+	//pDoc->WorkingInfo.LastJob.bMkDrSen = pView->MpeRead(pView->Plc.DlgInfo.LampDoorSensorPunch) ? TRUE : FALSE; // LampDoorSensorPunch = _T("MB400218");
+	pDoc->WorkingInfo.LastJob.bMkDrSen = pDoc->m_pMpeSignal[1] & (0x01 << 8);
 	if(pDoc->WorkingInfo.LastJob.bMkDrSen)
 		myBtn[6].SetCheck(TRUE);
 	else
 		myBtn[6].SetCheck(FALSE);
 
-	pDoc->WorkingInfo.LastJob.bUclDrSen = pView->MpeRead(pView->Plc.DlgInfo.LampDoorSensorUncoiler) ? TRUE : FALSE;
+	//pDoc->WorkingInfo.LastJob.bUclDrSen = pView->MpeRead(pView->Plc.DlgInfo.LampDoorSensorUncoiler) ? TRUE : FALSE; // LampDoorSensorUncoiler = _T("MB400214");
+	pDoc->WorkingInfo.LastJob.bUclDrSen = pDoc->m_pMpeSignal[1] & (0x01 << 4);
 	if(pDoc->WorkingInfo.LastJob.bUclDrSen)
 		myBtn[7].SetCheck(TRUE);
 	else
 		myBtn[7].SetCheck(FALSE);
 
-	pDoc->WorkingInfo.LastJob.bUse380mm = pView->MpeRead(pView->Plc.DlgMenu03.LampLaser380mm) ? TRUE : FALSE;
+	//pDoc->WorkingInfo.LastJob.bUse380mm = pView->MpeRead(pView->Plc.DlgMenu03.LampLaser380mm) ? TRUE : FALSE; // LampLaser380mm = _T("MB400254");
+	pDoc->WorkingInfo.LastJob.bUse380mm = pDoc->m_pMpeSignal[5] & (0x01 << 4);
 	if (pDoc->WorkingInfo.LastJob.bUse380mm)
 		myBtn[8].SetCheck(TRUE);
 	else
@@ -717,13 +722,15 @@ void CDlgInfo::Disp()
 	else
 		myBtn[10].SetCheck(FALSE);
 
-	pDoc->WorkingInfo.LastJob.bAoiDnDrSen = pView->MpeRead(pView->Plc.DlgInfo.LampDoorSensorAoiDn) ? TRUE : FALSE;
+	//pDoc->WorkingInfo.LastJob.bAoiDnDrSen = pView->MpeRead(pView->Plc.DlgInfo.LampDoorSensorAoiDn) ? TRUE : FALSE; // LampDoorSensorAoiDn = _T("MB400217");
+	pDoc->WorkingInfo.LastJob.bAoiDnDrSen = pDoc->WorkingInfo.LastJob.bUclDrSen = pDoc->m_pMpeSignal[1] & (0x01 << 7);
 	if (pDoc->WorkingInfo.LastJob.bAoiDnDrSen)
 		myBtn[11].SetCheck(TRUE);
 	else
 		myBtn[11].SetCheck(FALSE);
 	
-	pDoc->WorkingInfo.LastJob.bTwoMetal = pView->MpeRead(pView->Plc.DlgInfo.LampTwoMetal) ? TRUE : FALSE;
+	//pDoc->WorkingInfo.LastJob.bTwoMetal = pView->MpeRead(pView->Plc.DlgInfo.LampTwoMetal) ? TRUE : FALSE; // LampTwoMetal = _T("MB400220");
+	pDoc->WorkingInfo.LastJob.bTwoMetal = pDoc->m_pMpeSignal[2] & (0x01 << 0);
 	if(pDoc->WorkingInfo.LastJob.bDualTest)
 	{
 		myBtn[12].SetCheck(TRUE);
@@ -735,13 +742,15 @@ void CDlgInfo::Disp()
 		myBtn[13].SetCheck(TRUE);
 	}
 
-	pDoc->WorkingInfo.LastJob.bSampleTest = pView->MpeRead(pView->Plc.DlgInfo.LampSampleTest) ? TRUE : FALSE;		// Sample 검사 On
+	//pDoc->WorkingInfo.LastJob.bSampleTest = pView->MpeRead(pView->Plc.DlgInfo.LampSampleTest) ? TRUE : FALSE;		// Sample 검사 On	LampSampleTest = _T("MB400222");
+	pDoc->WorkingInfo.LastJob.bSampleTest = pDoc->m_pMpeSignal[2] & (0x01 << 2);		// Sample 검사 On
 	if(pDoc->WorkingInfo.LastJob.bSampleTest)
 		myBtn[14].SetCheck(TRUE);
 	else
 		myBtn[14].SetCheck(FALSE);
 
-	pDoc->WorkingInfo.LastJob.bFeedCcwRecoiler = pView->MpeRead(pView->Plc.DlgInfo.LampFeedCcwRecoiler) ? TRUE : FALSE;
+	//pDoc->WorkingInfo.LastJob.bFeedCcwRecoiler = pView->MpeRead(pView->Plc.DlgInfo.LampFeedCcwRecoiler) ? TRUE : FALSE; // LampFeedCcwRecoiler = _T("MB400251");
+	pDoc->WorkingInfo.LastJob.bFeedCcwRecoiler = pDoc->m_pMpeSignal[5] & (0x01 << 1);
 	if(pDoc->WorkingInfo.LastJob.bFeedCcwRecoiler)
 	{
 		myBtn[15].SetCheck(TRUE);
@@ -755,7 +764,8 @@ void CDlgInfo::Disp()
 		myBtn[15].SetTextColor(RGB_BLUE);
 	}
 
-	pDoc->WorkingInfo.LastJob.bFeedCcwUncoiler = pView->MpeRead(pView->Plc.DlgInfo.LampFeedCcwUncoiler) ? TRUE : FALSE;
+	//pDoc->WorkingInfo.LastJob.bFeedCcwUncoiler = pView->MpeRead(pView->Plc.DlgInfo.LampFeedCcwUncoiler) ? TRUE : FALSE; // LampFeedCcwUncoiler = _T("MB400250");
+	pDoc->WorkingInfo.LastJob.bFeedCcwUncoiler = pDoc->m_pMpeSignal[5] & (0x01 << 0);
 	if(pDoc->WorkingInfo.LastJob.bFeedCcwUncoiler)
 	{
 		myBtn[16].SetCheck(TRUE);
@@ -769,25 +779,29 @@ void CDlgInfo::Disp()
 		myBtn[16].SetTextColor(RGB_BLUE);
 	}
 
-	pDoc->WorkingInfo.LastJob.bUseAoiDnCleanRoler = pView->MpeRead(pView->Plc.DlgInfo.LampCleanRollerAoiDn) ? TRUE : FALSE;
+	//pDoc->WorkingInfo.LastJob.bUseAoiDnCleanRoler = pView->MpeRead(pView->Plc.DlgInfo.LampCleanRollerAoiDn) ? TRUE : FALSE; // LampCleanRollerAoiDn = _T("MB400266");
+	pDoc->WorkingInfo.LastJob.bUseAoiDnCleanRoler = pDoc->m_pMpeSignal[6] & (0x01 << 6);
 	if (pDoc->WorkingInfo.LastJob.bUseAoiDnCleanRoler)
 		myBtn[19].SetCheck(TRUE);
 	else
 		myBtn[19].SetCheck(FALSE);
 
-	pDoc->WorkingInfo.LastJob.bUseAoiUpCleanRoler = pView->MpeRead(pView->Plc.DlgInfo.LampCleanRollerAoiUp) ? TRUE : FALSE;
+	//pDoc->WorkingInfo.LastJob.bUseAoiUpCleanRoler = pView->MpeRead(pView->Plc.DlgInfo.LampCleanRollerAoiUp) ? TRUE : FALSE; // LampCleanRollerAoiUp = _T("MB400265");
+	pDoc->WorkingInfo.LastJob.bUseAoiUpCleanRoler = pDoc->m_pMpeSignal[6] & (0x01 << 5);
 	if (pDoc->WorkingInfo.LastJob.bUseAoiUpCleanRoler)
 		myBtn[20].SetCheck(TRUE);
 	else
 		myBtn[20].SetCheck(FALSE);
 
-	pDoc->WorkingInfo.LastJob.bUseAoiDnUltrasonic = pView->MpeRead(pView->Plc.DlgInfo.LampUltraSonicAoi) ? TRUE : FALSE;
+	//pDoc->WorkingInfo.LastJob.bUseAoiDnUltrasonic = pView->MpeRead(pView->Plc.DlgInfo.LampUltraSonicAoi) ? TRUE : FALSE; // LampUltraSonicAoi = _T("MB400267");
+	pDoc->WorkingInfo.LastJob.bUseAoiDnUltrasonic = pDoc->m_pMpeSignal[6] & (0x01 << 7);
 	if (pDoc->WorkingInfo.LastJob.bUseAoiDnUltrasonic) //AOI초음파세정기
 		myBtn[21].SetCheck(TRUE);
 	else
 		myBtn[21].SetCheck(FALSE);
 
-	pDoc->WorkingInfo.LastJob.bUseEngraveUltrasonic = pView->MpeRead(pView->Plc.DlgInfo.LampUltraSonicEngrave) ? TRUE : FALSE;
+	//pDoc->WorkingInfo.LastJob.bUseEngraveUltrasonic = pView->MpeRead(pView->Plc.DlgInfo.LampUltraSonicEngrave) ? TRUE : FALSE; // LampUltraSonicEngrave = _T("MB400262");
+	pDoc->WorkingInfo.LastJob.bUseEngraveUltrasonic = pDoc->m_pMpeSignal[6] & (0x01 << 2);
 	if (pDoc->WorkingInfo.LastJob.bUseEngraveUltrasonic) //각인부초음파세정기
 		myBtn[22].SetCheck(TRUE);
 	else
@@ -851,14 +865,16 @@ void CDlgInfo::Disp()
 		GetDlgItem(IDC_CHK_UNCOILER_CCW)->EnableWindow(TRUE); // myBtn[16] IDC_CHK_TWO_METAL - Uncoiler\r정방향 CW : FALSE
 	}
 
-	pDoc->WorkingInfo.LastJob.bUse340mm = pView->MpeRead(pView->Plc.DlgMenu03.LampLaser340mm) ? TRUE : FALSE;
+	//pDoc->WorkingInfo.LastJob.bUse340mm = pView->MpeRead(pView->Plc.DlgMenu03.LampLaser340mm) ? TRUE : FALSE; // LampLaser340mm = _T("MB400252");
+	pDoc->WorkingInfo.LastJob.bUse340mm = pDoc->m_pMpeSignal[5] & (0x01 << 2);
 	if (pDoc->WorkingInfo.LastJob.bUse340mm)
 		myBtn[26].SetCheck(TRUE);
 	else
 		myBtn[26].SetCheck(FALSE);
 
 
-	pDoc->WorkingInfo.LastJob.bUse346mm = pView->MpeRead(pView->Plc.DlgMenu03.LampLaser346mm) ? TRUE : FALSE;
+	//pDoc->WorkingInfo.LastJob.bUse346mm = pView->MpeRead(pView->Plc.DlgMenu03.LampLaser346mm) ? TRUE : FALSE; // LampLaser346mm = _T("MB400253");
+	pDoc->WorkingInfo.LastJob.bUse346mm = pDoc->m_pMpeSignal[5] & (0x01 << 3);
 	if (pDoc->WorkingInfo.LastJob.bUse346mm)
 		myBtn[27].SetCheck(TRUE);
 	else
@@ -913,9 +929,11 @@ void CDlgInfo::Disp()
 int CDlgInfo::GetTestModeFromPlc()
 {
 	// MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2 .
-	if (pView->MpeRead(pView->Plc.DlgInfo.LampModeInner))
+	//if (pView->MpeRead(pView->Plc.DlgInfo.LampModeInner))	// LampModeInner = _T("MB400223");
+	if (pDoc->m_pMpeSignal[2] & (0x01 << 3))	// LampModeInner = _T("MB400223");
 		pDoc->WorkingInfo.LastJob.nTestMode = MODE_INNER;	
-	else if (pView->MpeRead(pView->Plc.DlgInfo.LampModeOutter))
+	//else if (pView->MpeRead(pView->Plc.DlgInfo.LampModeOutter))	// LampModeOutter = _T("MB400224");
+	else if (pDoc->m_pMpeSignal[2] & (0x01 << 4))	// LampModeOutter = _T("MB400224");
 		pDoc->WorkingInfo.LastJob.nTestMode = MODE_OUTER;
 	//else
 	//	pDoc->WorkingInfo.LastJob.nTestMode = MODE_NONE;

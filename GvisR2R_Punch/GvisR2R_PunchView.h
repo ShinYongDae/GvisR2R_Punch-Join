@@ -818,6 +818,7 @@ public:
 	void SetTest1(BOOL bOn);
 	BOOL SetMk(BOOL bRun = TRUE);
 	void SetReMk(BOOL bMk0 = FALSE, BOOL bMk1 = FALSE);
+	void ResetTargetPos();
 	BOOL InitMk();
 	void InitAuto(BOOL bInit = TRUE);
 	void Mk0();
