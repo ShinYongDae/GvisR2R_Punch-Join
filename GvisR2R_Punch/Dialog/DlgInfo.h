@@ -12,7 +12,7 @@
 
 #define MAX_INFO_STC				76
 #define MAX_INFO_STC_DATA			24
-#define MAX_INFO_BTN				29
+#define MAX_INFO_BTN				31
 
 #define TIM_DISP_STS				450
 
@@ -55,6 +55,7 @@ public:
 
 	void UpdateData();
 	void InitMkInfo();
+	void DispDualTest();
 
 // Dialog Data
 	//{{AFX_DATA(CDlgInfo)
@@ -135,6 +136,8 @@ public:
 	afx_msg void OnBnClickedChkUseAoiMiddle();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnStnClickedStc89();
+	afx_msg void OnBnClickedChkUseAoiDualIts();
+	afx_msg void OnBnClickedChkUseAoiDual2dIts();
 };
 
 //{{AFX_INSERT_LOCATION}}

@@ -1557,7 +1557,9 @@
 #define IDC_PIC_MODEL_R                 1432
 #define IDC_STC_DEF_16                  1433
 #define IDC_CHK_125                     1433
+#define IDC_CHK_USE_AOI_DUAL_ITS        1433
 #define IDC_STC_DEF_17                  1434
+#define IDC_CHK_USE_AOI_DUAL_2D_ITS     1434
 #define IDC_STC_DEF_18                  1435
 #define IDC_STC_DEF_19                  1436
 #define IDC_STC_DEF_20                  1437

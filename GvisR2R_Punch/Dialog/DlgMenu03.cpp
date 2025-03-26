@@ -1955,7 +1955,7 @@ void CDlgMenu03::OnTimer(UINT_PTR nIDEvent)//(UINT nIDEvent)
 		KillTimer(TIM_MENU03_DISP);
 		UpdateSignal();
 		if (m_bTIM_MENU03_DISP)
-			SetTimer(TIM_MENU03_DISP, 500, NULL);
+			SetTimer(TIM_MENU03_DISP, 300, NULL);
 	}
 
 	//if(nIDEvent == TIM_CHK_DONE_MKAOI)

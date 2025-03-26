@@ -4994,7 +4994,7 @@ BOOL CVision::LoadRejectBuf()
 	if (!MilRejectImgBuf)
 		return FALSE;
 
-	UCHAR *pRejectImg;
+	UCHAR *pRejectImg=0;
 	if (m_nIdx == 0 || m_nIdx == 1)
 	{
 		if (pDoc->m_Master[0].m_pRejectImg)
@@ -5005,6 +5005,7 @@ BOOL CVision::LoadRejectBuf()
 		{
 			if (pView->m_pDlgMenu02->m_pRejectImg)
 				pRejectImg = pView->m_pDlgMenu02->m_pRejectImg;
+			return FALSE;
 		}
 		else
 			return FALSE;
@@ -5023,6 +5024,11 @@ BOOL CVision::LoadRejectBuf()
 		else
 			return FALSE;
 	}
+
+	//250324 lgh mod
+	//할당이 안되고 온다..
+	if (pRejectImg == 0)
+		return FALSE;
 
 	TiffData tdat;
 	MIL_ID MilBufCamMstModelCrop = M_NULL, MilBufCamMstModelCropCopy = M_NULL;

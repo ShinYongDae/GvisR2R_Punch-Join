@@ -1271,6 +1271,20 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 		WorkingInfo.System.bUseITS = FALSE;
 	}
 
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("UseDualIts"), NULL, szData, sizeof(szData), sPath))
+		WorkingInfo.System.bUseDualIts = _ttoi(szData);
+	else
+	{
+		WorkingInfo.System.bUseDualIts = FALSE;
+	}
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("UseDual2dIts"), NULL, szData, sizeof(szData), sPath))
+		WorkingInfo.System.bUseDual2dIts = _ttoi(szData);
+	else
+	{
+		WorkingInfo.System.bUseDual2dIts = FALSE;
+	}
+
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("AOIUpDtsPath"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.System.sPathAoiUpDts = CString(szData);
 	else

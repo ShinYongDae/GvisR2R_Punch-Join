@@ -628,7 +628,7 @@ enum MAIN_BTN { MN_RST=0, MN_RDY=1, MN_STOP=2, MN_RUN=3 };
 enum IMG_KIND { CAD_IMG=0, DEF_IMG=1 };
 enum ALIGN_METHODE { ONE_POINT = 1, TWO_POINT, THREE_POINT, FOUR_POINT };
 
-enum WORK_MODE { MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2, MODE_MIDDLE = 3 };
+enum WORK_MODE { MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2, MODE_LASER = 3, MODE_MIDDLE = 4 };
 
 
 struct stSystem
@@ -671,6 +671,8 @@ struct stSystem
 	BOOL bSaveMkImg, bSaveGrabImg;
 	BOOL bStripPcsRgnBin;
 	BOOL bUseDTS, bUseITS;
+	BOOL bUseDualIts, bUseDual2dIts;
+
 
 	stSystem()
 	{
@@ -730,6 +732,8 @@ struct stSystem
 		bStripPcsRgnBin = FALSE;
 		bUseDTS = FALSE;
 		bUseITS = FALSE;
+		bUseDualIts = FALSE;
+		bUseDual2dIts = FALSE;
 	}
 };
 

@@ -1139,6 +1139,10 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 				UpdateLotTime();
 			}
 
+			InitInfo();
+			//if (m_pDlgMenu01)
+			//	m_pDlgMenu01->UpdateData();
+
 			m_bTIM_INIT_VIEW = FALSE;
 			break;
 		}
@@ -1151,7 +1155,7 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 	{
 		KillTimer(TIM_MPE_IO);
 
-		CntMk();
+		//CntMk();
 		GetMpeIO();
 		GetMpeSignal();
 		DoIO();
@@ -1541,7 +1545,7 @@ void CGvisR2R_PunchView::InitIO()
 {
 	int i, k;
 
-#ifdef USE_MPE
+//#ifdef USE_MPE
 	pDoc->m_nMpeIo = pDoc->MkIo.MpeIo.nMaxSeg;
 	pDoc->m_nMpeIb = pDoc->MkIo.MpeIo.nMaxSeg;
 
@@ -1612,7 +1616,7 @@ void CGvisR2R_PunchView::InitIO()
 			}
 		}
 	}
-#endif
+//#endif
 }
 
 BOOL CGvisR2R_PunchView::InitAct()
@@ -8600,7 +8604,7 @@ BOOL CGvisR2R_PunchView::IsStop()
 }
 
 BOOL CGvisR2R_PunchView::IsRun()
-{	
+{
 	if (m_sDispMain == _T("정 지"))
 		return FALSE;
 	return TRUE;
@@ -11408,7 +11412,8 @@ int CGvisR2R_PunchView::GetMkStripIdx1(int nDefPcsId) // 0 : Fail , 1~4 : Strip 
 
 CString CGvisR2R_PunchView::GetMkInfo0(int nSerial, int nMkPcs) // return Cam0 : "Serial_Strip_Col_Row"
 {
-	CString sInfo;
+	CString sInfo = _T("");
+#ifdef USE_VISION
 	int nRef = 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0];
 	int nJudge = 0;
 
@@ -11485,13 +11490,14 @@ CString CGvisR2R_PunchView::GetMkInfo0(int nSerial, int nMkPcs) // return Cam0 :
 		sInfo.Format(_T("%04d_%c_%d_%d_%d_%d"), nSerial, '?', 0, 0, nRef, 0);
 		MsgBox(_T("좌측 마킹위치 정보 실패."));
 	}
-
+#endif
 	return sInfo;
 }
 
 CString CGvisR2R_PunchView::GetMkInfo1(int nSerial, int nMkPcs) // return Cam1 : "Serial_Strip_Col_Row"
 {
-	CString sInfo;
+	CString sInfo = _T("");
+#ifdef USE_VISION
 	int nRef = 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1];
 	int nJudge = 0;
 
@@ -11567,7 +11573,7 @@ CString CGvisR2R_PunchView::GetMkInfo1(int nSerial, int nMkPcs) // return Cam1 :
 		sInfo.Format(_T("%04d_%c_%d_%d_%d_%d"), nSerial, '?', 0, 0, nRef, 0);
 		MsgBox(_T("우측 마킹위치 정보 실패."));
 	}
-
+#endif
 	return sInfo;
 }
 
@@ -12752,6 +12758,7 @@ void CGvisR2R_PunchView::MoveMkEdPos1()
 
 void CGvisR2R_PunchView::LotEnd()
 {
+	//MB400205 PLC 자동모드 중
 	if (m_pDlgMenu01)
 		m_pDlgMenu01->LotEnd();
 
@@ -17922,6 +17929,26 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 				}
 			}
 		}
+		else if (bDualTest)
+		{
+			if (pDoc->WorkingInfo.System.bUseDualIts || pDoc->WorkingInfo.System.bUseDual2dIts)
+			{
+				if (m_nShareUpS > 0)
+				{
+					if (pDoc->m_ListBuf[0].nTot <= pDoc->m_ListBuf[1].nTot)
+					{
+						MakeItsFile(m_nShareUpS); // BOOL CReelMap::MakeItsFile(int nSerial, int nLayer) // RMAP_UP, RMAP_DN, RMAP_INNER_UP, RMAP_INNER_DN
+					}
+				}
+				if (m_nShareDnS > 0)
+				{
+					if (pDoc->m_ListBuf[1].nTot <= pDoc->m_ListBuf[0].nTot)
+					{
+						MakeItsFile(m_nShareDnS); // BOOL CReelMap::MakeItsFile(int nSerial, int nLayer) // RMAP_UP, RMAP_DN, RMAP_INNER_UP, RMAP_INNER_DN
+					}
+				}
+			}
+		}
 
 		m_nStepAuto++;
 		break;
@@ -18796,6 +18823,13 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 					}
 				}
 			}
+			else if (bDualTest)
+			{
+				if (m_nShareDnS > 0)
+				{
+					MakeItsFile(m_nShareDnS);
+				}
+			}
 
 			m_nStepAuto++;
 		}
@@ -18999,7 +19033,8 @@ void CGvisR2R_PunchView::Mk2PtReady()
 						break;
 					}
 
-					m_nMkStAuto++;
+					//m_nMkStAuto++;
+					m_nMkStAuto = MK_ST + (Mk2PtIdx::ChkSn); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
 
 					if (m_bMkSt[1]) // Right
 					{
@@ -19049,7 +19084,8 @@ void CGvisR2R_PunchView::Mk2PtReady()
 						break;
 					}
 
-					m_nMkStAuto++;
+					//m_nMkStAuto++;
+					m_nMkStAuto = MK_ST + (Mk2PtIdx::ChkSn); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
 
 					if (m_bMkSt[1]) // Right
 					{
@@ -19334,21 +19370,27 @@ void CGvisR2R_PunchView::Mk2PtInit()
 				MsgBox(_T("Serial 연속 되지않습니다."));
 				TowerLamp(RGB_YELLOW, TRUE);
 			}
-			m_nMkStAuto++;
+			//m_nMkStAuto++;
+			m_sLogAuto[0] = _T("");
+			m_sLogAuto[1] = _T("");
+			m_bFailMkJudge[0] = FALSE;
+			m_bFailMkJudge[1] = FALSE;
+			ResetTargetPos();
+			m_nMkStAuto = MK_ST + (Mk2PtIdx::Move0Cam1); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);	// Move - Cam1 - Pt0
 			break;
 
 		case MK_ST + (Mk2PtIdx::InitMk) + 1:
 			if (IsRun())
 			{
-				m_sLogAuto[0] = _T("");
-				m_sLogAuto[1] = _T("");
-				m_bFailMkJudge[0] = FALSE;
-				m_bFailMkJudge[1] = FALSE;
-				//if (m_pVision[0])
-				//	m_pVision[0]->ArMkMtRst.RemoveAll();
-				//if (m_pVision[1])
-				//	m_pVision[1]->ArMkMtRst.RemoveAll();
-				ResetTargetPos();
+				//m_sLogAuto[0] = _T("");
+				//m_sLogAuto[1] = _T("");
+				//m_bFailMkJudge[0] = FALSE;
+				//m_bFailMkJudge[1] = FALSE;
+				////if (m_pVision[0])
+				////	m_pVision[0]->ArMkMtRst.RemoveAll();
+				////if (m_pVision[1])
+				////	m_pVision[1]->ArMkMtRst.RemoveAll();
+				//ResetTargetPos();
 				m_nMkStAuto = MK_ST + (Mk2PtIdx::Move0Cam1); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);	// Move - Cam1 - Pt0
 			}
 			break;
@@ -19388,7 +19430,8 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 							m_bSkipAlign[1][3] = TRUE;	pDoc->SetStatus(_T("General"), _T("bSkipAlign[1][3]"), m_bSkipAlign[1][3]);
 							m_bDoMk[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bDoMk[1]"), m_bDoMk[1]);
 							m_bDoneMk[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[1]"), m_bDoneMk[1]);
-							m_nMkStAuto++;
+							//m_nMkStAuto++;
+							m_nMkStAuto = MK_ST + (Mk2PtIdx::Move0Cam0); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
 						}
 						else if (m_nBufDnSerial[1] == 0)
 						{
@@ -19398,12 +19441,14 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 							m_bSkipAlign[1][3] = TRUE;	pDoc->SetStatus(_T("General"), _T("bSkipAlign[1][3]"), m_bSkipAlign[1][3]);
 							m_bDoMk[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bDoMk[1]"), m_bDoMk[1]);
 							m_bDoneMk[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[1]"), m_bDoneMk[1]);
-							m_nMkStAuto++;
+							//m_nMkStAuto++;
+							m_nMkStAuto = MK_ST + (Mk2PtIdx::Move0Cam0); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
 						}
 						else
 						{
 							if (MoveAlign1(0))	// Move - Cam1 - Pt0
-								m_nMkStAuto++;
+								m_nMkStAuto = MK_ST + (Mk2PtIdx::Move0Cam0); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
+								//m_nMkStAuto++;
 						}
 					}
 					else
@@ -19416,7 +19461,8 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 							m_bSkipAlign[1][3] = TRUE;	pDoc->SetStatus(_T("General"), _T("bSkipAlign[1][3]"), m_bSkipAlign[1][3]);
 							m_bDoMk[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bDoMk[1]"), m_bDoMk[1]);
 							m_bDoneMk[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[1]"), m_bDoneMk[1]);
-							m_nMkStAuto++;
+							//m_nMkStAuto++;
+							m_nMkStAuto = MK_ST + (Mk2PtIdx::Move0Cam0); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
 						}
 						else if (m_nBufDnSerial[1] == 0)
 						{
@@ -19426,12 +19472,14 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 							m_bSkipAlign[1][3] = TRUE;	pDoc->SetStatus(_T("General"), _T("bSkipAlign[1][3]"), m_bSkipAlign[1][3]);
 							m_bDoMk[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bDoMk[1]"), m_bDoMk[1]);
 							m_bDoneMk[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[1]"), m_bDoneMk[1]);
-							m_nMkStAuto++;
+							//m_nMkStAuto++;
+							m_nMkStAuto = MK_ST + (Mk2PtIdx::Move0Cam0); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
 						}
 						else
 						{
 							if (MoveAlign1(0))	// Move - Cam1 - Pt0
-								m_nMkStAuto++;
+								m_nMkStAuto = MK_ST + (Mk2PtIdx::Move0Cam0); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
+								//m_nMkStAuto++;
 						}
 					}
 				}
@@ -19443,7 +19491,8 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 					m_bSkipAlign[1][3] = TRUE;	pDoc->SetStatus(_T("General"), _T("bSkipAlign[1][3]"), m_bSkipAlign[1][3]);
 					m_bDoMk[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bDoMk[1]"), m_bDoMk[1]);
 					m_bDoneMk[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[1]"), m_bDoneMk[1]);
-					m_nMkStAuto++;
+					//m_nMkStAuto++;
+					m_nMkStAuto = MK_ST + (Mk2PtIdx::Move0Cam0); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
 				}
 			}
 			else
@@ -19460,7 +19509,8 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 							m_bSkipAlign[1][3] = TRUE;	pDoc->SetStatus(_T("General"), _T("bSkipAlign[1][3]"), m_bSkipAlign[1][3]);
 							m_bDoMk[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bDoMk[1]"), m_bDoMk[1]);
 							m_bDoneMk[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[1]"), m_bDoneMk[1]);
-							m_nMkStAuto++;
+							//m_nMkStAuto++;
+							m_nMkStAuto = MK_ST + (Mk2PtIdx::Move0Cam0); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
 						}
 						else if (m_nBufUpSerial[1] == 0)
 						{
@@ -19470,12 +19520,14 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 							m_bSkipAlign[1][3] = TRUE;	pDoc->SetStatus(_T("General"), _T("bSkipAlign[1][3]"), m_bSkipAlign[1][3]);
 							m_bDoMk[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bDoMk[1]"), m_bDoMk[1]);
 							m_bDoneMk[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[1]"), m_bDoneMk[1]);
-							m_nMkStAuto++;
+							//m_nMkStAuto++;
+							m_nMkStAuto = MK_ST + (Mk2PtIdx::Move0Cam0); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
 						}
 						else
 						{
 							if (MoveAlign1(0)) 	// Move - Cam1 - Pt0
-								m_nMkStAuto++;
+								m_nMkStAuto = MK_ST + (Mk2PtIdx::Move0Cam0); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
+								//m_nMkStAuto++;
 						}
 					}
 					else
@@ -19488,7 +19540,8 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 							m_bSkipAlign[1][3] = TRUE;	pDoc->SetStatus(_T("General"), _T("bSkipAlign[1][3]"), m_bSkipAlign[1][3]);
 							m_bDoMk[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bDoMk[1]"), m_bDoMk[1]);
 							m_bDoneMk[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[1]"), m_bDoneMk[1]);
-							m_nMkStAuto++;
+							m_nMkStAuto = MK_ST + (Mk2PtIdx::Move0Cam0); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
+							//m_nMkStAuto++;
 						}
 						else if (m_nBufUpSerial[1] == 0)
 						{
@@ -19503,7 +19556,8 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 						else
 						{
 							if (MoveAlign1(0)) 	// Move - Cam1 - Pt0
-								m_nMkStAuto++;
+								m_nMkStAuto = MK_ST + (Mk2PtIdx::Move0Cam0); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
+								//m_nMkStAuto++;
 						}
 					}
 				}
@@ -19515,7 +19569,8 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 					m_bSkipAlign[1][3] = TRUE;	pDoc->SetStatus(_T("General"), _T("bSkipAlign[1][3]"), m_bSkipAlign[1][3]);
 					m_bDoMk[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bDoMk[1]"), m_bDoMk[1]);
 					m_bDoneMk[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[1]"), m_bDoneMk[1]);
-					m_nMkStAuto++;
+					//m_nMkStAuto++;
+					m_nMkStAuto = MK_ST + (Mk2PtIdx::Move0Cam0); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
 				}
 			}
 			break;
@@ -19772,7 +19827,8 @@ void CGvisR2R_PunchView::Mk2PtAlignPt1()
 							m_bSkipAlign[1][3] = TRUE;	pDoc->SetStatus(_T("General"), _T("bSkipAlign[1][3]"), m_bSkipAlign[1][3]);
 							m_bDoMk[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bDoMk[1]"), m_bDoMk[1]);
 							m_bDoneMk[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[1]"), m_bDoneMk[1]);
-							m_nMkStAuto++;
+							//m_nMkStAuto++;
+							m_nMkStAuto = MK_ST + (Mk2PtIdx::Move1Cam0);
 						}
 						else if (m_nBufDnSerial[1] == 0)
 						{
@@ -19782,12 +19838,14 @@ void CGvisR2R_PunchView::Mk2PtAlignPt1()
 							m_bSkipAlign[1][3] = TRUE;	pDoc->SetStatus(_T("General"), _T("bSkipAlign[1][3]"), m_bSkipAlign[1][3]);
 							m_bDoMk[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bDoMk[1]"), m_bDoMk[1]);
 							m_bDoneMk[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[1]"), m_bDoneMk[1]);
-							m_nMkStAuto++;
+							//m_nMkStAuto++;
+							m_nMkStAuto = MK_ST + (Mk2PtIdx::Move1Cam0);
 						}
 						else
 						{
 							if (MoveAlign1(1))	// Move - Cam1 - Pt1
-								m_nMkStAuto++;
+								m_nMkStAuto = MK_ST + (Mk2PtIdx::Move1Cam0);
+								//m_nMkStAuto++;
 						}
 					}
 					else
@@ -19800,7 +19858,8 @@ void CGvisR2R_PunchView::Mk2PtAlignPt1()
 							m_bSkipAlign[1][3] = TRUE;	pDoc->SetStatus(_T("General"), _T("bSkipAlign[1][3]"), m_bSkipAlign[1][3]);
 							m_bDoMk[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bDoMk[1]"), m_bDoMk[1]);
 							m_bDoneMk[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[1]"), m_bDoneMk[1]);
-							m_nMkStAuto++;
+							//m_nMkStAuto++;
+							m_nMkStAuto = MK_ST + (Mk2PtIdx::Move1Cam0);
 						}
 						else if (m_nBufDnSerial[1] == 0)
 						{
@@ -19810,12 +19869,14 @@ void CGvisR2R_PunchView::Mk2PtAlignPt1()
 							m_bSkipAlign[1][3] = TRUE;	pDoc->SetStatus(_T("General"), _T("bSkipAlign[1][3]"), m_bSkipAlign[1][3]);
 							m_bDoMk[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bDoMk[1]"), m_bDoMk[1]);
 							m_bDoneMk[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[1]"), m_bDoneMk[1]);
-							m_nMkStAuto++;
+							//m_nMkStAuto++;
+							m_nMkStAuto = MK_ST + (Mk2PtIdx::Move1Cam0);
 						}
 						else
 						{
 							if (MoveAlign1(1))	// Move - Cam1 - Pt1
-								m_nMkStAuto++;
+								m_nMkStAuto = MK_ST + (Mk2PtIdx::Move1Cam0);
+								//m_nMkStAuto++;
 						}
 					}
 				}
@@ -19827,7 +19888,8 @@ void CGvisR2R_PunchView::Mk2PtAlignPt1()
 					m_bSkipAlign[1][3] = TRUE;	pDoc->SetStatus(_T("General"), _T("bSkipAlign[1][3]"), m_bSkipAlign[1][3]);
 					m_bDoMk[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bDoMk[1]"), m_bDoMk[1]);
 					m_bDoneMk[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[1]"), m_bDoneMk[1]);
-					m_nMkStAuto++;
+					//m_nMkStAuto++;
+					m_nMkStAuto = MK_ST + (Mk2PtIdx::Move1Cam0);
 				}
 			}
 			else
@@ -19844,7 +19906,8 @@ void CGvisR2R_PunchView::Mk2PtAlignPt1()
 							m_bSkipAlign[1][3] = TRUE;	pDoc->SetStatus(_T("General"), _T("bSkipAlign[1][3]"), m_bSkipAlign[1][3]);
 							m_bDoMk[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bDoMk[1]"), m_bDoMk[1]);
 							m_bDoneMk[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[1]"), m_bDoneMk[1]);
-							m_nMkStAuto++;
+							//m_nMkStAuto++;
+							m_nMkStAuto = MK_ST + (Mk2PtIdx::Move1Cam0);
 						}
 						else if (m_nBufUpSerial[1] == 0)
 						{
@@ -19854,12 +19917,14 @@ void CGvisR2R_PunchView::Mk2PtAlignPt1()
 							m_bSkipAlign[1][3] = TRUE;	pDoc->SetStatus(_T("General"), _T("bSkipAlign[1][3]"), m_bSkipAlign[1][3]);
 							m_bDoMk[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bDoMk[1]"), m_bDoMk[1]);
 							m_bDoneMk[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[1]"), m_bDoneMk[1]);
-							m_nMkStAuto++;
+							//m_nMkStAuto++;
+							m_nMkStAuto = MK_ST + (Mk2PtIdx::Move1Cam0);
 						}
 						else
 						{
 							if (MoveAlign1(1))	// Move - Cam1 - Pt1
-								m_nMkStAuto++;
+								m_nMkStAuto = MK_ST + (Mk2PtIdx::Move1Cam0);
+								//m_nMkStAuto++;
 						}
 					}
 					else
@@ -19872,7 +19937,8 @@ void CGvisR2R_PunchView::Mk2PtAlignPt1()
 							m_bSkipAlign[1][3] = TRUE;	pDoc->SetStatus(_T("General"), _T("bSkipAlign[1][3]"), m_bSkipAlign[1][3]);
 							m_bDoMk[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bDoMk[1]"), m_bDoMk[1]);
 							m_bDoneMk[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[1]"), m_bDoneMk[1]);
-							m_nMkStAuto++;
+							//m_nMkStAuto++;
+							m_nMkStAuto = MK_ST + (Mk2PtIdx::Move1Cam0);
 						}
 						else if (m_nBufUpSerial[1] == 0)
 						{
@@ -19887,7 +19953,8 @@ void CGvisR2R_PunchView::Mk2PtAlignPt1()
 						else
 						{
 							if (MoveAlign1(1))	// Move - Cam1 - Pt1
-								m_nMkStAuto++;
+								m_nMkStAuto = MK_ST + (Mk2PtIdx::Move1Cam0);
+								//m_nMkStAuto++;
 						}
 					}
 				}
@@ -19899,7 +19966,8 @@ void CGvisR2R_PunchView::Mk2PtAlignPt1()
 					m_bSkipAlign[1][3] = TRUE;	pDoc->SetStatus(_T("General"), _T("bSkipAlign[1][3]"), m_bSkipAlign[1][3]);
 					m_bDoMk[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bDoMk[1]"), m_bDoMk[1]);
 					m_bDoneMk[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[1]"), m_bDoneMk[1]);
-					m_nMkStAuto++;
+					//m_nMkStAuto++;
+					m_nMkStAuto = MK_ST + (Mk2PtIdx::Move1Cam0);
 				}
 			}
 		   break;
@@ -20122,13 +20190,14 @@ void CGvisR2R_PunchView::Mk2PtMoveInitPos()
 			m_nMkStAuto++;
 			break;
 		case MK_ST + (Mk2PtIdx::MoveInitPt) + 1:
-			m_nMkStAuto++;
-			break;
-		case MK_ST + (Mk2PtIdx::MoveInitPt) + 2:
 			if (IsMoveDone())
 			{
-				m_nMkStAuto = MK_ST + (Mk2PtIdx::ChkElec); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
+				m_nMkStAuto = MK_ST + (Mk2PtIdx::DoMk);
+				//m_nMkStAuto = MK_ST + (Mk2PtIdx::ChkElec); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
 			}
+			break;
+		case MK_ST + (Mk2PtIdx::MoveInitPt) + 2:
+			m_nMkStAuto++;
 			break;
 		}
 	}
@@ -20486,15 +20555,15 @@ void CGvisR2R_PunchView::Mk2PtDoMarking()
 			}
 			break;
 		case MK_ST + (Mk2PtIdx::DoneMk) + 6:
+			::WritePrivateProfileString(_T("Last Job"), _T("MkSt"), _T("0"), PATH_WORKING_INFO);
+			m_bMkSt[0] = FALSE; pDoc->SetStatus(_T("General"), _T("bMkSt0"), m_bMkSt[0]);
+			m_bMkSt[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bMkSt1"), m_bMkSt[1]);
 			m_nMkStAuto++;
 			break;
 		case MK_ST + (Mk2PtIdx::DoneMk) + 7:
 			m_nMkStAuto++;
-			::WritePrivateProfileString(_T("Last Job"), _T("MkSt"), _T("0"), PATH_WORKING_INFO);
 			break;
 		case MK_ST + (Mk2PtIdx::DoneMk) + 8:
-			m_bMkSt[0] = FALSE; pDoc->SetStatus(_T("General"), _T("bMkSt0"), m_bMkSt[0]);
-			m_bMkSt[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bMkSt1"), m_bMkSt[1]);
 			break;
 		}
 	}
@@ -25623,8 +25692,8 @@ BOOL CGvisR2R_PunchView::MoveAlign0(int nPos)
 				pPos[1] = pDoc->m_Master[0].m_stAlignMk.Y1 + m_pMotion->m_dPinPosY[0];
 			}
 
-			//if (ChkCollision(AXIS_X0, pPos[0]))
-			//	return FALSE;
+			if (ChkCollision(AXIS_X0, pPos[0]))
+				return FALSE;
 
 			double fLen, fVel, fAcc, fJerk;
 			fLen = sqrt(((pPos[0] - dCurrX) * (pPos[0] - dCurrX)) + ((pPos[1] - dCurrY) * (pPos[1] - dCurrY)));
@@ -25689,8 +25758,8 @@ BOOL CGvisR2R_PunchView::MoveAlign1(int nPos)
 				pPos[1] = pDoc->m_Master[0].m_stAlignMk2.Y3 + m_pMotion->m_dPinPosY[1];
 			}
 
-			//if (ChkCollision(AXIS_X1, pPos[0]))
-			//	return FALSE;
+			if (ChkCollision(AXIS_X1, pPos[0]))
+				return FALSE;
 
 			double fLen, fVel, fAcc, fJerk;
 			fLen = sqrt(((pPos[0] - dCurrX) * (pPos[0] - dCurrX)) + ((pPos[1] - dCurrY) * (pPos[1] - dCurrY)));
@@ -32384,13 +32453,14 @@ UINT CGvisR2R_PunchView::ThreadProc40(LPVOID lpContext)	// MakeItsFileDn()
 void CGvisR2R_PunchView::ChkRcvSig()
 {
 	if (!m_pEngrave) return;
+	if (!m_bContEngraveF) return;
 
 	long lData = 0;
 	int nMsgID = 0;
 
 	for (nMsgID = 0; nMsgID < _SigInx::_EndIdx; nMsgID++)
 	{
-		GetCurrentInfoSignal();
+		//GetCurrentInfoSignal(); // 20250325 deleted for tack time
 
 		if (m_pEngrave->m_bRcvSig[nMsgID])
 		{
@@ -34586,180 +34656,180 @@ BOOL CGvisR2R_PunchView::SetArMkMtRstOnLogAuto(int nCam)
 {
 	return  FALSE;
 
-	if (!m_pVision[nCam])
-		return FALSE;
-	if (!pDoc->WorkingInfo.LastJob.bUseJudgeMk)
-		return FALSE;
-	if (pDoc->m_bOffLogAuto)
-		return  FALSE;
+	//if (!m_pVision[nCam])
+	//	return FALSE;
+	//if (!pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+	//	return FALSE;
+	//if (pDoc->m_bOffLogAuto)
+	//	return  FALSE;
 
-	CString sTemp[2];
-	int nRef[2], nAvg[2], nMin[2], nMax[2];
+	//CString sTemp[2];
+	//int nRef[2], nAvg[2], nMin[2], nMax[2];
 
-	if (nCam == 0)			// Left
-	{
-		if (GetArMkMtRst(0, nRef[0], nAvg[0], nMin[0], nMax[0]))
-		{
-			sTemp[0].Format(_T("미마킹 테스트 결과 SN:%d "), m_nBufUpSerial[0]);
-			m_sLogAuto[0] = sTemp[0];
-			if (m_bFailMkJudge[0])
-				m_sLogAuto[0] += _T("비정상 ");
-			else
-				m_sLogAuto[0] += _T("정상 ");
-			sTemp[0].Format(_T("Ref %d, Avg %d, Min %d, Max %d "), nRef[0], nAvg[0], nMin[0], nMax[0]);
-			m_sLogAuto[0] += sTemp[0];
-			m_sLogAuto[0] += GetMarkedPcsList(0);
-			pDoc->LogAuto(m_sLogAuto[0]);
-		}
-		else
-			return FALSE;
-	}
-	else if (nCam == 1)		// Right
-	{
-		if (GetArMkMtRst(1, nRef[1], nAvg[1], nMin[1], nMax[1]))
-		{
-			sTemp[1].Format(_T("미마킹 테스트 결과 SN:%d "), m_nBufUpSerial[1]);
-			m_sLogAuto[1] = sTemp[1];
-			if (m_bFailMkJudge[1])
-				m_sLogAuto[1] += _T("비정상 ");
-			else
-				m_sLogAuto[1] += _T("정상 ");
-			sTemp[1].Format(_T("Ref %d, Avg %d, Min %d, Max %d "), nRef[1], nAvg[1], nMin[1], nMax[1]);
-			m_sLogAuto[1] += sTemp[1];
-			m_sLogAuto[1] += GetMarkedPcsList(1);
-			pDoc->LogAuto(m_sLogAuto[1]);
-		}
-		else
-			return FALSE;
-	}
+	//if (nCam == 0)			// Left
+	//{
+	//	if (GetArMkMtRst(0, nRef[0], nAvg[0], nMin[0], nMax[0]))
+	//	{
+	//		sTemp[0].Format(_T("미마킹 테스트 결과 SN:%d "), m_nBufUpSerial[0]);
+	//		m_sLogAuto[0] = sTemp[0];
+	//		if (m_bFailMkJudge[0])
+	//			m_sLogAuto[0] += _T("비정상 ");
+	//		else
+	//			m_sLogAuto[0] += _T("정상 ");
+	//		sTemp[0].Format(_T("Ref %d, Avg %d, Min %d, Max %d "), nRef[0], nAvg[0], nMin[0], nMax[0]);
+	//		m_sLogAuto[0] += sTemp[0];
+	//		m_sLogAuto[0] += GetMarkedPcsList(0);
+	//		pDoc->LogAuto(m_sLogAuto[0]);
+	//	}
+	//	else
+	//		return FALSE;
+	//}
+	//else if (nCam == 1)		// Right
+	//{
+	//	if (GetArMkMtRst(1, nRef[1], nAvg[1], nMin[1], nMax[1]))
+	//	{
+	//		sTemp[1].Format(_T("미마킹 테스트 결과 SN:%d "), m_nBufUpSerial[1]);
+	//		m_sLogAuto[1] = sTemp[1];
+	//		if (m_bFailMkJudge[1])
+	//			m_sLogAuto[1] += _T("비정상 ");
+	//		else
+	//			m_sLogAuto[1] += _T("정상 ");
+	//		sTemp[1].Format(_T("Ref %d, Avg %d, Min %d, Max %d "), nRef[1], nAvg[1], nMin[1], nMax[1]);
+	//		m_sLogAuto[1] += sTemp[1];
+	//		m_sLogAuto[1] += GetMarkedPcsList(1);
+	//		pDoc->LogAuto(m_sLogAuto[1]);
+	//	}
+	//	else
+	//		return FALSE;
+	//}
 
-	return TRUE;
+	//return TRUE;
 }
 
 BOOL CGvisR2R_PunchView::GetArMkMtRst(int nCam, int &nRef, int &nAvg, int &nMin, int &nMax)
 {
 	return FALSE;
-	if (!m_pVision[nCam])
-		return FALSE;
-	if (!pDoc->WorkingInfo.LastJob.bUseJudgeMk)
-		return FALSE;
+	//if (!m_pVision[nCam])
+	//	return FALSE;
+	//if (!pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+	//	return FALSE;
 
-	int nTotalRst[2], nTotalScore[2], nMinScore[2], nMaxScore[2], nScore[2];
-	stPtMtRst MkMtRst[2];
+	//int nTotalRst[2], nTotalScore[2], nMinScore[2], nMaxScore[2], nScore[2];
+	//stPtMtRst MkMtRst[2];
 
-	if (nCam == 0)			// Left
-	{
-		nRef = 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0];
-		nTotalRst[0] = m_pVision[0]->ArMkMtRst.GetCount();
-		nTotalScore[0] = 0;
-		nMinScore[0] = 100;
-		nMaxScore[0] = 0;
+	//if (nCam == 0)			// Left
+	//{
+	//	nRef = 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0];
+	//	nTotalRst[0] = m_pVision[0]->ArMkMtRst.GetCount();
+	//	nTotalScore[0] = 0;
+	//	nMinScore[0] = 100;
+	//	nMaxScore[0] = 0;
 
-		if (nTotalRst[0] < 1)
-			return FALSE;
+	//	if (nTotalRst[0] < 1)
+	//		return FALSE;
 
-		for (int i = 0; i < nTotalRst[0]; i++)
-		{
-			MkMtRst[0] = m_pVision[0]->ArMkMtRst.GetAt(i);
-			nScore[0] = int(MkMtRst[0].dScore);
-			nTotalScore[0] += nScore[0];
-			nMinScore[0] = (nMinScore[0] > nScore[0]) ? nScore[0] : nMinScore[0];
-			nMaxScore[0] = (nMaxScore[0] < nScore[0]) ? nScore[0] : nMaxScore[0];
-		}
+	//	for (int i = 0; i < nTotalRst[0]; i++)
+	//	{
+	//		MkMtRst[0] = m_pVision[0]->ArMkMtRst.GetAt(i);
+	//		nScore[0] = int(MkMtRst[0].dScore);
+	//		nTotalScore[0] += nScore[0];
+	//		nMinScore[0] = (nMinScore[0] > nScore[0]) ? nScore[0] : nMinScore[0];
+	//		nMaxScore[0] = (nMaxScore[0] < nScore[0]) ? nScore[0] : nMaxScore[0];
+	//	}
 
-		nAvg = int(nTotalScore[0] / nTotalRst[0]);
-		nMin = nMinScore[0];
-		nMax = nMaxScore[0];
-	}
-	else if (nCam == 1)		// Right
-	{
-		nRef = 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1];
-		nTotalRst[1] = m_pVision[1]->ArMkMtRst.GetCount();
-		nTotalScore[1] = 0;
-		nMinScore[1] = 100;
-		nMaxScore[1] = 0;
+	//	nAvg = int(nTotalScore[0] / nTotalRst[0]);
+	//	nMin = nMinScore[0];
+	//	nMax = nMaxScore[0];
+	//}
+	//else if (nCam == 1)		// Right
+	//{
+	//	nRef = 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1];
+	//	nTotalRst[1] = m_pVision[1]->ArMkMtRst.GetCount();
+	//	nTotalScore[1] = 0;
+	//	nMinScore[1] = 100;
+	//	nMaxScore[1] = 0;
 
-		if (nTotalRst[1] < 1)
-			return FALSE;
+	//	if (nTotalRst[1] < 1)
+	//		return FALSE;
 
-		for (int i = 0; i < nTotalRst[1]; i++)
-		{
-			MkMtRst[1] = m_pVision[1]->ArMkMtRst.GetAt(i);
-			nScore[1] = int(MkMtRst[1].dScore);
-			nTotalScore[1] += nScore[1];
-			nMinScore[1] = (nMinScore[1] > nScore[1]) ? nScore[1] : nMinScore[1];
-			nMaxScore[1] = (nMaxScore[1] < nScore[1]) ? nScore[1] : nMaxScore[1];
-		}
+	//	for (int i = 0; i < nTotalRst[1]; i++)
+	//	{
+	//		MkMtRst[1] = m_pVision[1]->ArMkMtRst.GetAt(i);
+	//		nScore[1] = int(MkMtRst[1].dScore);
+	//		nTotalScore[1] += nScore[1];
+	//		nMinScore[1] = (nMinScore[1] > nScore[1]) ? nScore[1] : nMinScore[1];
+	//		nMaxScore[1] = (nMaxScore[1] < nScore[1]) ? nScore[1] : nMaxScore[1];
+	//	}
 
-		nAvg = int(nTotalScore[1] / nTotalRst[1]);
-		nMin = nMinScore[1];
-		nMax = nMaxScore[1];
-	}
+	//	nAvg = int(nTotalScore[1] / nTotalRst[1]);
+	//	nMin = nMinScore[1];
+	//	nMax = nMaxScore[1];
+	//}
 
-	return TRUE;
+	//return TRUE;
 }
 
 CString CGvisR2R_PunchView::GetMarkedPcsList(int nCam)
 {
 	return _T("");
-	if (!m_pVision[nCam])
-		return _T("");
-	if (!pDoc->WorkingInfo.LastJob.bUseJudgeMk)
-		return _T("");
+	//if (!m_pVision[nCam])
+	//	return _T("");
+	//if (!pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+	//	return _T("");
 
-	CString sData[2];
-	CString sTemp[2];
-	int nSerial[2], nTotalRst[2], nRef[2], nScore[2];
-	stPtMtRst MkMtRst[2];
+	//CString sData[2];
+	//CString sTemp[2];
+	//int nSerial[2], nTotalRst[2], nRef[2], nScore[2];
+	//stPtMtRst MkMtRst[2];
 
-	if (nCam == 0)			// Left
-	{
-		nRef[0] = 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0];
-		nSerial[0] = m_nBufUpSerial[0];
-		nTotalRst[0] = m_pVision[0]->ArMkMtRst.GetCount();
-		//nTotalRst[0] = GetTotDefPcs0(nSerial[0]);
-		if (nTotalRst[0] < 1)
-			return _T("");
+	//if (nCam == 0)			// Left
+	//{
+	//	nRef[0] = 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0];
+	//	nSerial[0] = m_nBufUpSerial[0];
+	//	nTotalRst[0] = m_pVision[0]->ArMkMtRst.GetCount();
+	//	//nTotalRst[0] = GetTotDefPcs0(nSerial[0]);
+	//	if (nTotalRst[0] < 1)
+	//		return _T("");
 
-		sData[0] = _T("(");
-		for (int i = 0; i < nTotalRst[0]; i++)
-		{
-			MkMtRst[0] = m_pVision[0]->ArMkMtRst.GetAt(i);
-			nScore[0] = int(MkMtRst[0].dScore);
-			sData[0] += GetMkMtInfo0(nSerial[0], i);
-			sTemp[0].Format(_T("_%d_%d"), nRef[0], nScore[0]);
-			sData[0] += sTemp[0];
-			if (i < nTotalRst[0] - 1)
-				sData[0] += _T(", ");
-		}
-		sData[0] += _T(")");
-		return sData[0];
-	}
-	else if (nCam == 1)		// Right
-	{
-		nRef[1] = 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1];
-		nSerial[1] = m_nBufUpSerial[1];
-		nTotalRst[1] = m_pVision[1]->ArMkMtRst.GetCount();
-		//nTotalRst[1] = GetTotDefPcs0(nSerial[1]);
-		if (nTotalRst[1] < 1)
-			return _T("");
+	//	sData[0] = _T("(");
+	//	for (int i = 0; i < nTotalRst[0]; i++)
+	//	{
+	//		MkMtRst[0] = m_pVision[0]->ArMkMtRst.GetAt(i);
+	//		nScore[0] = int(MkMtRst[0].dScore);
+	//		sData[0] += GetMkMtInfo0(nSerial[0], i);
+	//		sTemp[0].Format(_T("_%d_%d"), nRef[0], nScore[0]);
+	//		sData[0] += sTemp[0];
+	//		if (i < nTotalRst[0] - 1)
+	//			sData[0] += _T(", ");
+	//	}
+	//	sData[0] += _T(")");
+	//	return sData[0];
+	//}
+	//else if (nCam == 1)		// Right
+	//{
+	//	nRef[1] = 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1];
+	//	nSerial[1] = m_nBufUpSerial[1];
+	//	nTotalRst[1] = m_pVision[1]->ArMkMtRst.GetCount();
+	//	//nTotalRst[1] = GetTotDefPcs0(nSerial[1]);
+	//	if (nTotalRst[1] < 1)
+	//		return _T("");
 
-		sData[1] = _T("(");
-		for (int i = 0; i < nTotalRst[1]; i++)
-		{
-			MkMtRst[1] = m_pVision[1]->ArMkMtRst.GetAt(i);
-			nScore[1] = int(MkMtRst[1].dScore);
-			sData[1] += GetMkMtInfo0(nSerial[1], i);
-			sTemp[1].Format(_T("_%d_%d"), nRef[1], nScore[1]);
-			sData[1] += sTemp[1];
-			if (i < nTotalRst[1] - 1)
-				sData[1] += _T(", ");
-		}
-		sData[1] += _T(")");
-		return sData[1];
-	}
+	//	sData[1] = _T("(");
+	//	for (int i = 0; i < nTotalRst[1]; i++)
+	//	{
+	//		MkMtRst[1] = m_pVision[1]->ArMkMtRst.GetAt(i);
+	//		nScore[1] = int(MkMtRst[1].dScore);
+	//		sData[1] += GetMkMtInfo0(nSerial[1], i);
+	//		sTemp[1].Format(_T("_%d_%d"), nRef[1], nScore[1]);
+	//		sData[1] += sTemp[1];
+	//		if (i < nTotalRst[1] - 1)
+	//			sData[1] += _T(", ");
+	//	}
+	//	sData[1] += _T(")");
+	//	return sData[1];
+	//}
 
-	return _T("");
+	//return _T("");
 }
 
 CString CGvisR2R_PunchView::GetMkMtInfo0(int nSerial, int nMkPcs) // return Cam0 : "Serial_Strip_Col_Row"
