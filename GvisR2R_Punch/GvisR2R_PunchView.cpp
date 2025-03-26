@@ -8606,8 +8606,27 @@ BOOL CGvisR2R_PunchView::IsStop()
 BOOL CGvisR2R_PunchView::IsRun()
 {
 	if (m_sDispMain == _T("정 지"))
+	{
+		//MB400205 : PLC 자동모드 중 : (pDoc->m_pMpeSignal[0] & (0x01 << 5)) , MB40039F : PLC 작업종료 : (pDoc->m_pMpeSignal[19] & (0x01 << 15))
+		if (pDoc->m_pMpeSignal[0] & (0x01 << 5) && pDoc->m_pMpeSignal[19] & (0x01 << 15))
+		{
+			if (pDoc->WorkingInfo.LastJob.nAlignMethode == TWO_POINT)
+			{
+				if (pView->m_nMkStAuto > MK_ST + (Mk2PtIdx::DoneMk) && pView->m_nMkStAuto < MK_ST + MK_ST + (Mk2PtIdx::DoneMk) + 7)
+					return TRUE; // Last Shot의 마지막 처리가 될 때까지 작업을 계속함.
+			}
+			else if (pDoc->WorkingInfo.LastJob.nAlignMethode == FOUR_POINT)
+			{
+				if (pView->m_nMkStAuto > MK_ST + (Mk4PtIdx::DoneMk) && pView->m_nMkStAuto < MK_ST + MK_ST + (Mk4PtIdx::DoneMk) + 7)
+					return TRUE; // Last Shot의 마지막 처리가 될 때까지 작업을 계속함.
+			}
+		}
+
 		return FALSE;
+	}
+
 	return TRUE;
+
 	//if ( m_sDispMain == _T("초기운전")
 	//	|| m_sDispMain == _T("운전중") || m_sDispMain == _T("운전준비")  
 	//	|| m_sDispMain == _T("단면검사") || m_sDispMain == _T("단면샘플")
@@ -12758,7 +12777,6 @@ void CGvisR2R_PunchView::MoveMkEdPos1()
 
 void CGvisR2R_PunchView::LotEnd()
 {
-	//MB400205 PLC 자동모드 중
 	if (m_pDlgMenu01)
 		m_pDlgMenu01->LotEnd();
 
@@ -16229,6 +16247,7 @@ void CGvisR2R_PunchView::DoAuto()
 
 BOOL CGvisR2R_PunchView::DoAutoGetLotEndSignal()
 {
+	//MB400205 : PLC 자동모드 중 : (pDoc->m_pMpeSignal[0] & (0x01 << 5)) , MB40039F : PLC 작업종료 : (pDoc->m_pMpeSignal[19] & (0x01 << 15))
 	int nSerial;
 
 	//if (MpeRead(_T("MB40039F"))) // PLC 작업종료 신호 - Last Shot 피딩 후 신호 On
@@ -23169,16 +23188,16 @@ void CGvisR2R_PunchView::Mk4PtDoMarking()
 			//m_nMkStAuto++;
 			break;
 		case MK_ST + (Mk4PtIdx::DoneMk) + 6:
+			::WritePrivateProfileString(_T("Last Job"), _T("MkSt"), _T("0"), PATH_WORKING_INFO);
+			m_bMkSt[0] = FALSE; pDoc->SetStatus(_T("General"), _T("bMkSt0"), m_bMkSt[0]);
+			m_bMkSt[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bMkSt1"), m_bMkSt[1]);
 			m_nMkStAuto++;
 			break;
 		case MK_ST + (Mk4PtIdx::DoneMk) + 7:
 			m_nMkStAuto++;
-			::WritePrivateProfileString(_T("Last Job"), _T("MkSt"), _T("0"), PATH_WORKING_INFO);
 			break;
 
 		case MK_ST + (Mk4PtIdx::DoneMk) + 8:
-			m_bMkSt[0] = FALSE; pDoc->SetStatus(_T("General"), _T("bMkSt0"), m_bMkSt[0]);
-			m_bMkSt[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bMkSt1"), m_bMkSt[1]);
 			break;
 		}
 	}

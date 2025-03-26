@@ -2527,7 +2527,7 @@ void CDlgInfo::OnBnClickedChkUseAoiDual2dIts()
 	if (bOn)
 	{
 		pDoc->WorkingInfo.System.bUseDual2dIts = TRUE;
-		pView->MpeWrite(_T("MB40009A"), 1);															// 각인부\r미사용
+		pView->MpeWrite(_T("MB40009A"), 0);															// 각인부 사용
 		SetTestMode(MODE_LASER);
 		
 		myBtn[29].SetCheck(FALSE);

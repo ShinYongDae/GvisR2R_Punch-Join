@@ -2458,9 +2458,9 @@ void CDlgMenu02::OnBtnPinSave()
 
 	SetPinPos(0, ptPnt);
 
-	if (pView->m_nMkStAuto > MK_ST + 11 && pView->m_nMkStAuto < MK_ST + 29)
+	if (pView->m_nMkStAuto > MK_ST + (Mk2PtIdx::InitMk) + 1 && pView->m_nMkStAuto < MK_ST + (Mk2PtIdx::MoveInitPt))
 	{
-		pView->m_nMkStAuto = MK_ST + 11; pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
+		pView->m_nMkStAuto = MK_ST + (Mk2PtIdx::InitMk) + 1; pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
 	}
 
  	if(pDoc->m_pSpecLocal)
@@ -2522,9 +2522,9 @@ void CDlgMenu02::OnBtnPinSave2()
 	//	SetModelMarkImage();
 	//}
 
-	if (pView->m_nMkStAuto > MK_ST + 11 && pView->m_nMkStAuto < MK_ST + 29)
+	if (pView->m_nMkStAuto > MK_ST + (Mk2PtIdx::InitMk) + 1 && pView->m_nMkStAuto < MK_ST + (Mk2PtIdx::MoveInitPt))
 	{
-		pView->m_nMkStAuto = MK_ST + 11; pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
+		pView->m_nMkStAuto = MK_ST + (Mk2PtIdx::InitMk) + 1; pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
 	}
 }
 
