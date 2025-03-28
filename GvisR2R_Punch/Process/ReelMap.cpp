@@ -1335,7 +1335,7 @@ BOOL CReelMap::Disp(int nMkPnl, BOOL bDumy)
 				}
 				else
 				{
-					Sleep(300);
+					//Sleep(300);
 
 					if (0 < ::GetPrivateProfileString(sPnl, sRow, NULL, szData, sizeof(szData), m_sPathBuf))
 					{
@@ -4307,7 +4307,7 @@ BOOL CReelMap::MakeItsFile(int nSerial, int nLayer) // RMAP_UP, RMAP_DN, RMAP_IN
 	}
 	else
 	{
-		Sleep(300);
+		//Sleep(300);
 
 		fp = fopen(FileName, "w+");
 		if (fp != NULL)
@@ -5841,7 +5841,7 @@ BOOL CReelMap::FinalCopyItsFiles()
 
 	if (pDoc->GetTestMode() == MODE_INNER)
 		sPathSrcDir.Format(_T("%s\\Inner"), sItsFolderSrcPath);
-	else if (pDoc->GetTestMode() == MODE_OUTER)
+	else if (pDoc->GetTestMode() == MODE_OUTER || pDoc->WorkingInfo.System.bUseDualIts || pDoc->WorkingInfo.System.bUseDual2dIts)
 		sPathSrcDir.Format(_T("%s\\Outer"), sItsFolderSrcPath);
 	else
 		return FALSE;
@@ -5874,6 +5874,27 @@ BOOL CReelMap::FinalCopyItsFiles()
 	pDoc->DelItsAll(sPathSrcDir);
 	return TRUE;
 }
+
+BOOL CReelMap::DeleteItsFilesInBuffer()
+{
+	CString sPathSrcDir;
+	CString sItsFolderSrcPath = pDoc->GetItsFolderPath();
+
+	if (pDoc->GetTestMode() == MODE_INNER)
+		sPathSrcDir.Format(_T("%s\\Inner"), sItsFolderSrcPath);
+	else if (pDoc->GetTestMode() == MODE_OUTER || pDoc->WorkingInfo.System.bUseDualIts || pDoc->WorkingInfo.System.bUseDual2dIts)
+		sPathSrcDir.Format(_T("%s\\Outer"), sItsFolderSrcPath);
+	else
+		return FALSE;
+
+	CFileFind cFile;
+	BOOL bExist = cFile.FindFile(sPathSrcDir + _T("\\*.dat"));
+	if (bExist)
+		pDoc->DelItsAll(sPathSrcDir);
+
+	return TRUE;
+}
+
 
 BOOL CReelMap::CopyItsFile(CString sPathSrc, CString sPathDest)
 {

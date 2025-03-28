@@ -4715,7 +4715,7 @@ BOOL CVision::Judge(MIL_ID &GrabImgId, stPtMtRst &stRst)
 		MkMtRst.dX = stRst.dX = 50.0;
 		MkMtRst.dY = stRst.dY = 50.0;
 		MkMtRst.dAngle = stRst.dAngle = 0.0;
-		MkMtRst.dScore = stRst.dScore = 100.0;
+		MkMtRst.dScore = stRst.dScore = 0.0;	// 패턴이 인식되지 않으므로 "마킹 됨"으로 판단 
 		return TRUE;
 		//m_pMilBufModel->ChildBuffer2d(25, 25, 50, 50);
 		//MilPtModelImg = m_pMil->AllocBuf(50, 50, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
@@ -4737,9 +4737,9 @@ BOOL CVision::Judge(MIL_ID &GrabImgId, stPtMtRst &stRst)
 		MkMtRst.dX = stRst.dX = 50.0;
 		MkMtRst.dY = stRst.dY = 50.0;
 		MkMtRst.dAngle = stRst.dAngle = 0.0;
-		MkMtRst.dScore = stRst.dScore = 100.0;
+		MkMtRst.dScore = stRst.dScore = 0.0;	// 패턴이 인식되지 않으므로 "마킹 됨"으로 판단 
 
-		return FALSE;
+		return TRUE;
 	}
 
 	MkMtRst.dX = stRst.dX = m_pMil->m_dPatternMatchingResultSelectPosX;
@@ -4758,7 +4758,7 @@ BOOL CVision::Judge(MIL_ID &GrabImgId, stPtMtRst &stRst)
 		MkMtRst.dX = stRst.dX = 50.0;
 		MkMtRst.dY = stRst.dY = 50.0;
 		MkMtRst.dAngle = stRst.dAngle = 0.0;
-		MkMtRst.dScore = stRst.dScore = 100.0;
+		MkMtRst.dScore = stRst.dScore = 0.0;
 	}
 
 	return TRUE;

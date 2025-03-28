@@ -618,19 +618,19 @@ void CEngrave::GetSignalMyMsg(SOCKET_DATA SockData)
 		{
 		case _SigInx::_MyMsgYes:
 			pDoc->SetCurrentInfoSignal(_SigInx::_MyMsgYes, FALSE);
-			//m_bRcvSig[_SigInx::_MyMsgYes] = TRUE;
+			m_bRcvSig[_SigInx::_MyMsgYes] = TRUE;
 			//pView->SetMyMsgYes();
 			//Sleep(500);
 			break;
 		case _SigInx::_MyMsgNo:
 			pDoc->SetCurrentInfoSignal(_SigInx::_MyMsgNo, FALSE);
-			//m_bRcvSig[_SigInx::_MyMsgNo] = TRUE;
+			m_bRcvSig[_SigInx::_MyMsgNo] = TRUE;
 			//pView->SetMyMsgNo();
 			//Sleep(500);
 			break;
 		case _SigInx::_MyMsgOk:
 			pDoc->SetCurrentInfoSignal(_SigInx::_MyMsgOk, FALSE);
-			//m_bRcvSig[_SigInx::_MyMsgOk] = TRUE;
+			m_bRcvSig[_SigInx::_MyMsgOk] = TRUE;
 			//pView->SetMyMsgOk();
 			//Sleep(500);
 			break;

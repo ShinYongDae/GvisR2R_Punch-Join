@@ -415,7 +415,7 @@ void CDlgMenu05::ModifyModelData()
 	((CComboBox*)GetDlgItem(IDC_COMBO_MODEL))->Dir(0x8010, FN);
 	int t=0;
 	
-//	"[..]"를 제거 
+	//"[..]"를 제거 
 	((CComboBox*)GetDlgItem(IDC_COMBO_MODEL))->DeleteString(0);
 	int nIndex = ((CComboBox*)GetDlgItem(IDC_COMBO_MODEL))->FindStringExact(-1, _T("[..]"));
 	((CComboBox*)GetDlgItem(IDC_COMBO_MODEL))->DeleteString(nIndex);
@@ -429,7 +429,7 @@ void CDlgMenu05::ModifyModelData()
 
 		if (strBuf.GetLength() < 3)
 			continue;
-//		기종이름에서 "["를 제거 
+		//기종이름에서 "["를 제거 
 		CString strBuf2 = strBuf.Mid(1, strBuf.GetLength() - 2);
 		((CComboBox*)GetDlgItem(IDC_COMBO_MODEL))->InsertString(t, strBuf2);
 		((CComboBox*)GetDlgItem(IDC_COMBO_MODEL))->DeleteString(t + 1);
@@ -450,7 +450,7 @@ void CDlgMenu05::ModifyLotData()
 	((CListBox*)GetDlgItem(IDC_LIST_LOT))->Dir(0x8010, FN);
 	int t=0;
 	
-//	"[..]"를 제거 
+	//"[..]"를 제거 
 	((CListBox*)GetDlgItem(IDC_LIST_LOT))->DeleteString(0);
 	int nIndex = ((CListBox*)GetDlgItem(IDC_LIST_LOT))->FindStringExact(-1, _T("[..]"));
 	((CListBox*)GetDlgItem(IDC_LIST_LOT))->DeleteString(nIndex);
@@ -466,7 +466,7 @@ void CDlgMenu05::ModifyLotData()
 
 		if (strBuf.GetLength() < 3)
 			continue;
-//		기종이름에서 "[]"를 제거 
+		//기종이름에서 "[]"를 제거 
 		CString strBuf2 = strBuf.Mid(1, strBuf.GetLength() - 2);
 		((CListBox*)GetDlgItem(IDC_LIST_LOT))->InsertString(t+nCount, strBuf2);	//090211-ndy
 		t++;
@@ -4024,7 +4024,7 @@ int CDlgMenu05::LoadPCRUpFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 	strFileData.Delete(0, nTemp + 1);
 	nFileSize = nFileSize - nTemp - 1;
 
-	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
+	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER)
 	{
 		pDoc->m_sEngModel = strModel;
 		pDoc->m_sEngLotNum = strLot;
@@ -4248,7 +4248,7 @@ int CDlgMenu05::LoadPCRDnFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 	nFileSize = nFileSize - nTemp - 1;
 
 
-	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
+	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER)
 	{
 		pDoc->m_sEngModel = strModel;
 		pDoc->m_sEngLotNum = strLot;

@@ -2761,6 +2761,9 @@ void CDlgMenu01::OnTimer(UINT_PTR nIDEvent)//(UINT nIDEvent)
 	if(nIDEvent == TIM_DISP_MK_CNT)
 	{
 		KillTimer(TIM_DISP_MK_CNT);
+		pView->GetMpeIO();
+		pView->GetMpeSignal();
+
 		DispMkCnt();
 		DispTqVal();
 		ChkMkLimit();
@@ -2768,7 +2771,7 @@ void CDlgMenu01::OnTimer(UINT_PTR nIDEvent)//(UINT nIDEvent)
 		//ChkAoiVsStatus();
 
 		if(m_bTIM_DISP_MK_CNT)
-			SetTimer(TIM_DISP_MK_CNT, 500, NULL);
+			SetTimer(TIM_DISP_MK_CNT, 100, NULL);
 	}
 	if(nIDEvent == TIM_WINK_MK_L)
 	{
@@ -3174,7 +3177,7 @@ void CDlgMenu01::ResetSerial()
 	if(myBtn[3].GetCheck())
 	{
 		myBtn[3].SetCheck(FALSE);
-		if (MODE_INNER != pDoc->GetTestMode())
+		if (MODE_INNER != pDoc->GetTestMode() && MODE_LASER != pDoc->GetTestMode())
 		{
 			m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
 			pView->m_bWaitPcr[0] = FALSE;
@@ -3210,7 +3213,7 @@ void CDlgMenu01::UpdateData()
 	
 	myStcData[1].SetText(pDoc->WorkingInfo.LastJob.sModel);		// 모델
 	pDoc->SetMkMenu01(_T("Info"), _T("Model"), pDoc->WorkingInfo.LastJob.sModel);
-	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
+	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER)
 		myStcData[91].SetText(pDoc->m_sItsCode);					// ITS CODE
 	else
 		myStcData[91].SetText(_T(""));
@@ -4094,7 +4097,7 @@ void CDlgMenu01::LotEnd()
 
 	if (m_bLastProc)
 	{
-		if (MODE_INNER != pDoc->GetTestMode())
+		if (MODE_INNER != pDoc->GetTestMode() && MODE_LASER != pDoc->GetTestMode())
 		{
 			m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
 			pView->m_bWaitPcr[0] = FALSE;
@@ -4126,7 +4129,7 @@ void CDlgMenu01::SetLastProc()
 {
 	if(!m_bLastProc)
 	{
-		if (MODE_INNER != pDoc->GetTestMode())
+		if (MODE_INNER != pDoc->GetTestMode() && MODE_LASER != pDoc->GetTestMode())
 		{
 			m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
 			pView->m_bWaitPcr[0] = FALSE;
@@ -4161,7 +4164,7 @@ void CDlgMenu01::OnChkEjectBuffer()
 			//pView->MpeWrite(pView->Plc.DlgMenu01.LastJobFromAoiUp, 0);			// 잔량처리 AOI(상) 부터(PC가 On시키고, PLC가 확인하고 Off시킴)-20141112
 			//pView->MpeWrite(pView->Plc.DlgMenu01.LastJobFromAoiDn, 0);			// 잔량처리 AOI(하) 부터(PC가 On시키고, PLC가 확인하고 Off시킴)-20141112
 
-			if(MODE_INNER != pDoc->GetTestMode())
+			if(MODE_INNER != pDoc->GetTestMode() && MODE_LASER != pDoc->GetTestMode())
 			{ 
 				if(IDNO == pView->MsgBox(_T("AOI 상면부터 잔량처리를 하시겠습니까?"), 0, MB_YESNO))
 				{
@@ -5933,7 +5936,7 @@ void CDlgMenu01::DispChangedModel()
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
 
 	myStcData[1].SetText(pDoc->WorkingInfo.LastJob.sModel);		// 모델
-	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
+	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER)
 		myStcData[91].SetText(pDoc->m_sItsCode);					// ITS CODE
 	else
 		myStcData[91].SetText(_T(""));

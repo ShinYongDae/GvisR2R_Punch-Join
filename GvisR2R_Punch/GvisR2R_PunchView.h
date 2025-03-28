@@ -244,9 +244,9 @@ class CGvisR2R_PunchView : public CFormView
 	void ThreadInit();
 	void ThreadKill();
 	//void GetSliceIO();
-	void GetMpeIO();
-	void GetMpeSignal();
-	void GetMpeData();
+	//void GetMpeIO();
+	//void GetMpeSignal();
+	//void GetMpeData();
 	//void DispThreadTick();
 	void DispTime();
 	void Init();
@@ -428,6 +428,10 @@ public:
 
 	BOOL m_nAoiUpAutoSerial, m_nAoiUpAutoSerialPrev;
 	BOOL m_nAoiDnAutoSerial, m_nAoiDnAutoSerialPrev;
+
+	void GetMpeIO();
+	void GetMpeSignal();
+	void GetMpeData();
 
 	// Auto Sequence
 	BOOL m_bAuto, m_bManual;// , m_bOneCycle;

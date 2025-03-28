@@ -1676,6 +1676,9 @@ void CDlgUtil03::InitMkInfo()
 
 BOOL CDlgUtil03::InitCadImg()
 {
+	if (!pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+		return TRUE;
+
 #ifdef USE_VISION
 	if (pView->m_pVision[0])
 	{

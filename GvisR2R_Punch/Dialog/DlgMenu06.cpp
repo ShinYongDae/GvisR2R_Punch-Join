@@ -2996,7 +2996,7 @@ void CDlgMenu06::ResetSerial()
 	if(myBtn[3].GetCheck())
 	{
 		myBtn[3].SetCheck(FALSE);
-		if (MODE_INNER != pDoc->GetTestMode())
+		if (MODE_INNER != pDoc->GetTestMode() && MODE_LASER != pDoc->GetTestMode())
 		{
 			m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
 			pView->m_bWaitPcr[0] = FALSE;
@@ -3865,7 +3865,7 @@ void CDlgMenu06::LotEnd()
 
 	if(m_bLastProc)
 	{
-		if (MODE_INNER != pDoc->GetTestMode())
+		if (MODE_INNER != pDoc->GetTestMode() && MODE_LASER != pDoc->GetTestMode())
 		{
 			m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
 			pView->m_bWaitPcr[0] = FALSE;
@@ -3897,7 +3897,7 @@ void CDlgMenu06::SetLastProc()
 {
 	if(!m_bLastProc)
 	{
-		if (MODE_INNER != pDoc->GetTestMode())
+		if (MODE_INNER != pDoc->GetTestMode() && MODE_LASER != pDoc->GetTestMode())
 		{
 			m_bLastProcFromUp = TRUE; pDoc->SetStatus(_T("General"), _T("bLastProcFromUp"), m_bLastProcFromUp);
 			pView->m_bWaitPcr[0] = FALSE;

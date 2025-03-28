@@ -822,7 +822,9 @@ void CDlgInfo::Disp()
 	else
 		myBtn[22].SetCheck(FALSE);
 
-	pDoc->WorkingInfo.LastJob.nTestMode = GetTestModeFromPlc();
+	if(pDoc->WorkingInfo.LastJob.nTestMode == MODE_NONE || pDoc->WorkingInfo.LastJob.nTestMode == MODE_INNER || pDoc->WorkingInfo.LastJob.nTestMode == MODE_OUTER)
+		pDoc->WorkingInfo.LastJob.nTestMode = GetTestModeFromPlc();
+
 	switch (pDoc->WorkingInfo.LastJob.nTestMode) // GetTestMode()
 	{
 	case MODE_NONE:		// 0 
@@ -2503,7 +2505,7 @@ void CDlgInfo::OnBnClickedChkUseAoiDualIts()
 		myBtn[30].SetCheck(FALSE);
 		pDoc->WorkingInfo.System.bUseDual2dIts = FALSE;
 		pView->MpeWrite(_T("MB40009A"), 1);															// 각인부\r미사용
-		SetTestMode(MODE_NONE);
+		SetTestMode(MODE_ITS);
 		sData = pDoc->WorkingInfo.System.bUseDual2dIts ? _T("1") : _T("0");
 		::WritePrivateProfileString(_T("System"), _T("UseDual2dIts"), sData, PATH_WORKING_INFO);
 		pDoc->SetMkInfo(_T("Signal"), _T("UseDual2dIts"), pDoc->WorkingInfo.System.bUseDual2dIts);	// 펀칭부만\r사용Off
@@ -2511,6 +2513,7 @@ void CDlgInfo::OnBnClickedChkUseAoiDualIts()
 	else
 	{
 		pDoc->WorkingInfo.System.bUseDualIts = FALSE;
+		SetTestMode(MODE_NONE);
 	}
 
 	sData = pDoc->WorkingInfo.System.bUseDualIts ? _T("1") : _T("0");
@@ -2556,7 +2559,7 @@ void CDlgInfo::DispDualTest()
 //	bDualTest = pView->MpeRead(pView->Plc.DlgInfo.TwoMetal) > 0 ? TRUE : FALSE;
 //#endif
 
-	if (!pDoc->WorkingInfo.LastJob.nTestMode && bDualTest)
+	if ((pDoc->WorkingInfo.LastJob.nTestMode == MODE_NONE || pDoc->WorkingInfo.LastJob.nTestMode == MODE_LASER || pDoc->WorkingInfo.LastJob.nTestMode == MODE_ITS) && bDualTest)
 	{
 		GetDlgItem(IDC_CHK_USE_AOI_DUAL_ITS)->ShowWindow(SW_SHOW);
 		GetDlgItem(IDC_CHK_USE_AOI_DUAL_2D_ITS)->ShowWindow(SW_SHOW);
@@ -2569,7 +2572,7 @@ void CDlgInfo::DispDualTest()
 			myBtn[30].SetCheck(FALSE);
 			pDoc->WorkingInfo.System.bUseDual2dIts = FALSE;
 			pView->MpeWrite(_T("MB40009A"), 1);															// 각인부\r미사용
-			SetTestMode(MODE_NONE);
+			SetTestMode(MODE_ITS);
 			pDoc->SetMkInfo(_T("Signal"), _T("UseDual2dIts"), pDoc->WorkingInfo.System.bUseDual2dIts);	
 		}
 		else if (pDoc->WorkingInfo.System.bUseDual2dIts)

@@ -259,6 +259,7 @@ public:
 	BOOL MakeItsFile(int nSerial, int nLayer);		// RMAP_UP, RMAP_DN, RMAP_INNER_UP, RMAP_INNER_DN
 	CString GetItsFileData(int nSerial, int nLayer);	// RMAP_UP, RMAP_DN, RMAP_INNER_UP, RMAP_INNER_DN
 	BOOL MakeDirIts(); // ITS, ITS1, ItsFile 폴더를 생성함.
+	BOOL DeleteItsFilesInBuffer();
 
 	stResult m_stResult;
 	void ResetReelmapPath();

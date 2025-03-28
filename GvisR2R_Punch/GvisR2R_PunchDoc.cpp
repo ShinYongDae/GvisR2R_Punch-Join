@@ -5170,33 +5170,45 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoUp(int nSerial, int *pNewLot, BOOL bFromBuf) /
 	BOOL bUpdate = FALSE;
 	CString sMsg;
 
-	if (WorkingInfo.LastJob.sLot != Status.PcrShare[0].sLot || WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[0].sItsCode)
+	if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[0].sItsCode && !Status.PcrShare[0].sItsCode.IsEmpty())
+	{
+		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[0].sItsCode;
+		sMsg.Format(_T("ITS Change %s"), Status.PcrShare[0].sItsCode);
+		pDoc->LogAuto(sMsg);
+	}
+	else if (Status.PcrShare[0].sItsCode.IsEmpty())
+	{
+		sMsg.Format(_T("%d Serial의 pcr파일 정보에서 로트번호와 ITS코드 위치가 비었습니다."), nSerial);
+		pView->MsgBox(sMsg);
+	}
+
+	if (WorkingInfo.LastJob.sLot != Status.PcrShare[0].sLot)
 	{
 		bUpdate = TRUE;
-		if (WorkingInfo.LastJob.sLot != Status.PcrShare[0].sLot)
-		{
+		//if (WorkingInfo.LastJob.sLot != Status.PcrShare[0].sLot)
+		//{
 			WorkingInfo.LastJob.sLot = Status.PcrShare[0].sLot;
-			if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[0].sItsCode)
-			{
-				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[0].sItsCode;
-				sMsg.Format(_T("ITS%s Lot%s SN:%d"), Status.PcrShare[0].sItsCode, Status.PcrShare[0].sLot, nSerial);
-				pDoc->LogAuto(sMsg);
-			}
-			else
-			{
+			//if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[0].sItsCode)
+			//{
+			//	m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[0].sItsCode;
+			//	sMsg.Format(_T("ITS%s Lot%s SN:%d"), Status.PcrShare[0].sItsCode, Status.PcrShare[0].sLot, nSerial);
+			//	pDoc->LogAuto(sMsg);
+			//}
+			//else
+			//{
 				sMsg.Format(_T("Lot Change %s"), Status.PcrShare[0].sLot);
 				pDoc->LogAuto(sMsg);
-			}
-		}
-		else
-		{
-			if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[0].sItsCode)
-			{
-				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[0].sItsCode;
-				sMsg.Format(_T("ITS Change %s"), Status.PcrShare[0].sItsCode);
-				pDoc->LogAuto(sMsg);
-			}
-		}
+			//}
+		//}
+		//else
+		//{
+		//	if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[0].sItsCode)
+		//	{
+		//		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[0].sItsCode;
+		//		sMsg.Format(_T("ITS Change %s"), Status.PcrShare[0].sItsCode);
+		//		pDoc->LogAuto(sMsg);
+		//	}
+		//}
 		*pNewLot = 1;
 	}
 
@@ -5391,35 +5403,47 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoDn(int nSerial, int *pNewLot, BOOL bFromBuf) /
 	}
 
 	BOOL bUpdate = FALSE;
-	CString sMsg;
+	CString sMsg; 
+	
+	if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[1].sItsCode && !Status.PcrShare[1].sItsCode.IsEmpty())
+	{
+		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[1].sItsCode;
+		sMsg.Format(_T("ITS Change %s"), Status.PcrShare[1].sItsCode);
+		pDoc->LogAuto(sMsg);
+	}
+	else if (Status.PcrShare[1].sItsCode.IsEmpty())
+	{
+		sMsg.Format(_T("%d Serial의 pcr파일 정보에서 로트번호와 ITS코드 위치가 비었습니다."), nSerial);
+		pView->MsgBox(sMsg);
+	}
 
-	if (WorkingInfo.LastJob.sLot != Status.PcrShare[1].sLot || WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[1].sItsCode)
+	if (WorkingInfo.LastJob.sLot != Status.PcrShare[1].sLot)
 	{
 		bUpdate = TRUE;
-		if (WorkingInfo.LastJob.sLot != Status.PcrShare[1].sLot)
-		{
-			if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[1].sItsCode)
-			{
-				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[1].sItsCode;
-				sMsg.Format(_T("ITS%s Lot%s SN:%d"), Status.PcrShare[1].sItsCode, Status.PcrShare[1].sLot, nSerial);
-				pDoc->LogAuto(sMsg);
-			}
-			else
-			{
-				WorkingInfo.LastJob.sLot = Status.PcrShare[1].sLot;
-				sMsg.Format(_T("Lot Change %s"), Status.PcrShare[1].sLot);
-				pDoc->LogAuto(sMsg);
-			}
-		}
-		else
-		{
-			if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[1].sItsCode)
-			{
-				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[1].sItsCode;
-				sMsg.Format(_T("ITS Change %s"), Status.PcrShare[1].sItsCode);
-				pDoc->LogAuto(sMsg);
-			}
-		}
+		//if (WorkingInfo.LastJob.sLot != Status.PcrShare[1].sLot)
+		//{
+		//	if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[1].sItsCode)
+		//	{
+		//		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[1].sItsCode;
+		//		sMsg.Format(_T("ITS%s Lot%s SN:%d"), Status.PcrShare[1].sItsCode, Status.PcrShare[1].sLot, nSerial);
+		//		pDoc->LogAuto(sMsg);
+		//	}
+		//	else
+		//	{
+		WorkingInfo.LastJob.sLot = Status.PcrShare[1].sLot;
+		sMsg.Format(_T("Lot Change %s"), Status.PcrShare[1].sLot);
+		pDoc->LogAuto(sMsg);
+		//	}
+		//}
+		//else
+		//{
+		//	if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[1].sItsCode)
+		//	{
+		//		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[1].sItsCode;
+		//		sMsg.Format(_T("ITS Change %s"), Status.PcrShare[1].sItsCode);
+		//		pDoc->LogAuto(sMsg);
+		//	}
+		//}
 		*pNewLot = 1;
 	}
 
@@ -6149,7 +6173,7 @@ int CGvisR2R_PunchDoc::LoadPCRUp(int nSerial, BOOL bFromShare)	// return : 2(Fai
 	strFileData.Delete(0, nTemp + 1);
 	nFileSize = nFileSize - nTemp - 1;
 
-	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
+	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER)
 	{
 		pDoc->m_sEngModel = strModel;
 		pDoc->m_sEngLotNum = strLot;
@@ -6161,35 +6185,47 @@ int CGvisR2R_PunchDoc::LoadPCRUp(int nSerial, BOOL bFromShare)	// return : 2(Fai
 	BOOL bUpdate = FALSE;
 	CString sMsg;
 
-	if (WorkingInfo.LastJob.sLot != strLot || WorkingInfo.LastJob.sEngItsCode != sItsCode)
+	if (WorkingInfo.LastJob.sEngItsCode != sItsCode && !sItsCode.IsEmpty())
+	{
+		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		sMsg.Format(_T("ITS Change %s"), sItsCode);
+		pDoc->LogAuto(sMsg);
+	}
+	else if (sItsCode.IsEmpty())
+	{
+		sMsg.Format(_T("%d Serial의 pcr파일 정보에서 로트번호와 ITS코드 위치가 비었습니다."), nSerial);
+		pView->MsgBox(sMsg);
+	}
+
+	if (WorkingInfo.LastJob.sLot != strLot)
 	{
 		bUpdate = TRUE;
-		if (WorkingInfo.LastJob.sLot != strLot)
-		{
+		//if (WorkingInfo.LastJob.sLot != strLot)
+		//{
 			WorkingInfo.LastJob.sLot = strLot;
 			if(pView->m_pEngrave)
 				pView->m_pEngrave->SetLotName();
-			if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
-			{
-				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
-				sMsg.Format(_T("ITS%s Lot%s SN:%d"), sItsCode, strLot, nSerial);
-				pDoc->LogAuto(sMsg);
-			}
-			else
-			{
+			//if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
+			//{
+			//	m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+			//	sMsg.Format(_T("ITS%s Lot%s SN:%d"), sItsCode, strLot, nSerial);
+			//	pDoc->LogAuto(sMsg);
+			//}
+			//else
+			//{
 				sMsg.Format(_T("Lot Change %s"), strLot);
 				pDoc->LogAuto(sMsg);
-			}
-		}
-		else
-		{
-			if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
-			{
-				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
-				sMsg.Format(_T("ITS Change %s"), sItsCode);
-				pDoc->LogAuto(sMsg);
-			}
-		}
+			//}
+		//}
+		//else
+		//{
+		//	if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
+		//	{
+		//		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		//		sMsg.Format(_T("ITS Change %s"), sItsCode);
+		//		pDoc->LogAuto(sMsg);
+		//	}
+		//}
 	}
 
 	if (WorkingInfo.LastJob.sModel != strModel || WorkingInfo.LastJob.sLayerUp != strLayer)
@@ -6459,7 +6495,7 @@ int CGvisR2R_PunchDoc::LoadPCRDn(int nSerial, BOOL bFromShare)	// return : 2(Fai
 	nFileSize = nFileSize - nTemp - 1;
 
 
-	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
+	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER)
 	{
 		pDoc->m_sEngModel = strModel;
 		pDoc->m_sEngLotNum = strLot;
@@ -6471,35 +6507,48 @@ int CGvisR2R_PunchDoc::LoadPCRDn(int nSerial, BOOL bFromShare)	// return : 2(Fai
 	BOOL bUpdate = FALSE;
 	CString sMsg;
 
-	if (WorkingInfo.LastJob.sLot != strLot || WorkingInfo.LastJob.sEngItsCode != sItsCode)
+	if (WorkingInfo.LastJob.sEngItsCode != sItsCode && !sItsCode.IsEmpty())
+	{
+		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		sMsg.Format(_T("ITS Change %s"), sItsCode);
+		pDoc->LogAuto(sMsg);
+	}
+	else if (sItsCode.IsEmpty())
+	{
+		sMsg.Format(_T("%d Serial의 pcr파일 정보에서 로트번호와 ITS코드 위치가 비었습니다."), nSerial);
+		pView->MsgBox(sMsg);
+	}
+
+	//if (WorkingInfo.LastJob.sLot != strLot || WorkingInfo.LastJob.sEngItsCode != sItsCode)
+	if (WorkingInfo.LastJob.sLot != strLot)
 	{
 		bUpdate = TRUE;
-		if (WorkingInfo.LastJob.sLot != strLot)
-		{
+		//if (WorkingInfo.LastJob.sLot != strLot)
+		//{
 			WorkingInfo.LastJob.sLot = strLot;
 			if (pView->m_pEngrave)
 				pView->m_pEngrave->SetLotName();
-			if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
-			{
-				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
-				sMsg.Format(_T("ITS%s Lot%s SN:%d"), sItsCode, strLot, nSerial);
-				pDoc->LogAuto(sMsg);
-			}
-			else
-			{
-				sMsg.Format(_T("Lot Change %s"), strLot);
-				pDoc->LogAuto(sMsg);
-			}
-		}
-		else
-		{
-			if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
-			{
-				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
-				sMsg.Format(_T("ITS Change %s"), sItsCode);
-				pDoc->LogAuto(sMsg);
-			}
-		}
+			//if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
+			//{
+			//	m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+			//	sMsg.Format(_T("ITS%s Lot%s SN:%d"), sItsCode, strLot, nSerial);
+			//	pDoc->LogAuto(sMsg);
+			//}
+			//else
+			//{
+			sMsg.Format(_T("Lot Change %s"), strLot);
+			pDoc->LogAuto(sMsg);
+			//}
+		//}
+		//else
+		//{
+		//	if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
+		//	{
+		//		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		//		sMsg.Format(_T("ITS Change %s"), sItsCode);
+		//		pDoc->LogAuto(sMsg);
+		//	}
+		//}
 	}
 
 	if (WorkingInfo.LastJob.sModel != strModel || WorkingInfo.LastJob.sLayerDn != strLayer)
@@ -10940,7 +10989,7 @@ CString CGvisR2R_PunchDoc::GetItsTargetFolderPath()
 	CString sItsPath = _T("");// = WorkingInfo.System.sPathIts;
 	if (GetTestMode() == MODE_INNER)
 		sItsPath = pDoc->WorkingInfo.System.sPathItsInner;
-	else if(GetTestMode() == MODE_OUTER)
+	else if(GetTestMode() == MODE_OUTER || pDoc->WorkingInfo.System.bUseDualIts || pDoc->WorkingInfo.System.bUseDual2dIts)
 		sItsPath = pDoc->WorkingInfo.System.sPathItsOuter;
 
 	if (sItsPath.IsEmpty())
@@ -13056,7 +13105,7 @@ int CGvisR2R_PunchDoc::LoadPcrUp(CString sPath)	// return : 2(Failed), 1(정상), 
 	strFileData.Delete(0, nTemp + 1);
 	nFileSize = nFileSize - nTemp - 1;
 
-	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
+	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER)
 	{
 		pDoc->m_sEngModel = strModel;
 		pDoc->m_sEngLotNum = strLot;
@@ -13067,35 +13116,47 @@ int CGvisR2R_PunchDoc::LoadPcrUp(CString sPath)	// return : 2(Failed), 1(정상), 
 
 	BOOL bUpdate = FALSE;
 	CString sMsg;
+ 
+	if (WorkingInfo.LastJob.sEngItsCode != sItsCode && !sItsCode.IsEmpty())
+	{
+		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		sMsg.Format(_T("ITS Change %s"), sItsCode);
+		pDoc->LogAuto(sMsg);
+	}
+	else if (sItsCode.IsEmpty())
+	{
+		sMsg.Format(_T("%d Serial의 pcr파일 정보에서 로트번호와 ITS코드 위치가 비었습니다."), nSerial);
+		pView->MsgBox(sMsg);
+	}
 
-	if (WorkingInfo.LastJob.sLot != strLot || WorkingInfo.LastJob.sEngItsCode != sItsCode)
+	if (WorkingInfo.LastJob.sLot != strLot)
 	{
 		bUpdate = TRUE;
-		if (WorkingInfo.LastJob.sLot != strLot)
-		{
+		//if (WorkingInfo.LastJob.sLot != strLot)
+		//{
 			WorkingInfo.LastJob.sLot = strLot;
 			pView->m_pEngrave->SetLotName();
-			if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
-			{
-				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
-				sMsg.Format(_T("ITS%s Lot%s SN:%d"), sItsCode, strLot, nSerial);
-				pDoc->LogAuto(sMsg);
-			}
-			else
-			{
+			//if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
+			//{
+			//	m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+			//	sMsg.Format(_T("ITS%s Lot%s SN:%d"), sItsCode, strLot, nSerial);
+			//	pDoc->LogAuto(sMsg);
+			//}
+			//else
+			//{
 				sMsg.Format(_T("Lot Change %s"), strLot);
 				pDoc->LogAuto(sMsg);
-			}
-		}
-		else
-		{
-			if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
-			{
-				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
-				sMsg.Format(_T("ITS Change %s"), sItsCode);
-				pDoc->LogAuto(sMsg);
-			}
-		}
+			//}
+		//}
+		//else
+		//{
+		//	if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
+		//	{
+		//		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		//		sMsg.Format(_T("ITS Change %s"), sItsCode);
+		//		pDoc->LogAuto(sMsg);
+		//	}
+		//}
 	}
 
 	if (WorkingInfo.LastJob.sModel != strModel || WorkingInfo.LastJob.sLayerUp != strLayer)
@@ -13363,7 +13424,7 @@ int CGvisR2R_PunchDoc::LoadPcrDn(CString sPath)	// return : 2(Failed), 1(정상), 
 	nFileSize = nFileSize - nTemp - 1;
 
 
-	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
+	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER)
 	{
 		pDoc->m_sEngModel = strModel;
 		pDoc->m_sEngLotNum = strLot;
@@ -13374,35 +13435,47 @@ int CGvisR2R_PunchDoc::LoadPcrDn(CString sPath)	// return : 2(Failed), 1(정상), 
 
 	BOOL bUpdate = FALSE;
 	CString sMsg;
+	
+	if (WorkingInfo.LastJob.sEngItsCode != sItsCode && !sItsCode.IsEmpty())
+	{
+		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		sMsg.Format(_T("ITS Change %s"), sItsCode);
+		pDoc->LogAuto(sMsg);
+	}
+	else if (sItsCode.IsEmpty())
+	{
+		sMsg.Format(_T("%d Serial의 pcr파일 정보에서 로트번호와 ITS코드 위치가 비었습니다."), nSerial);
+		pView->MsgBox(sMsg);
+	}
 
-	if (WorkingInfo.LastJob.sLot != strLot || WorkingInfo.LastJob.sEngItsCode != sItsCode)
+	if (WorkingInfo.LastJob.sLot != strLot) 
 	{
 		bUpdate = TRUE;
-		if (WorkingInfo.LastJob.sLot != strLot)
-		{
+		//if (WorkingInfo.LastJob.sLot != strLot)
+		//{
 			WorkingInfo.LastJob.sLot = strLot;
 			pView->m_pEngrave->SetLotName();
-			if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
-			{
-				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
-				sMsg.Format(_T("ITS%s Lot%s SN:%d"), sItsCode, strLot, nSerial);
-				pDoc->LogAuto(sMsg);
-			}
-			else
-			{
-				sMsg.Format(_T("Lot Change %s"), strLot);
-				pDoc->LogAuto(sMsg);
-			}
-		}
-		else
-		{
-			if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
-			{
-				m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
-				sMsg.Format(_T("ITS Change %s"), sItsCode);
-				pDoc->LogAuto(sMsg);
-			}
-		}
+		//	if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
+		//	{
+		//		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		//		sMsg.Format(_T("ITS%s Lot%s SN:%d"), sItsCode, strLot, nSerial);
+		//		pDoc->LogAuto(sMsg);
+		//	}
+		//	else
+		//	{
+			sMsg.Format(_T("Lot Change %s"), strLot);
+			pDoc->LogAuto(sMsg);
+		//	}
+		//}
+		//else
+		//{
+		//	if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
+		//	{
+		//		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		//		sMsg.Format(_T("ITS Change %s"), sItsCode);
+		//		pDoc->LogAuto(sMsg);
+		//	}
+		//}
 	}
 
 	if (WorkingInfo.LastJob.sModel != strModel || WorkingInfo.LastJob.sLayerDn != strLayer)
@@ -15578,7 +15651,24 @@ void CGvisR2R_PunchDoc::SetTestMode()
 	CString sVal, sPath = PATH_WORKING_INFO;
 
 	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Test Mode"), NULL, szData, sizeof(szData), sPath))
+	{
 		WorkingInfo.LastJob.nTestMode = _ttoi(szData);
+		if (WorkingInfo.LastJob.nTestMode == MODE_LASER)
+		{
+			WorkingInfo.System.bUseDual2dIts = TRUE;
+			WorkingInfo.System.bUseDualIts = FALSE;
+		}
+		else if(WorkingInfo.LastJob.nTestMode == MODE_ITS)
+		{
+			WorkingInfo.System.bUseDual2dIts = FALSE;
+			WorkingInfo.System.bUseDualIts = TRUE;
+		}
+		else
+		{
+			WorkingInfo.System.bUseDual2dIts = FALSE;
+			WorkingInfo.System.bUseDualIts = FALSE;
+		}
+	}
 	else
 		return;
 
