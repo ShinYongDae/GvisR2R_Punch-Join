@@ -4722,10 +4722,15 @@ BOOL CReelMap::RemakeReelmap()
 		}
 		fprintf(fp, "양폐 스트립 수율[%%] : %.1f\n", _tstof(pDoc->WorkingInfo.LastJob.sStripOutRatio)); if (pRtn) delete pRtn; pRtn = NULL;//atof
 
-		for (i = 1; i<DEF_UPPER; i++)
+		//for (i = 1; i<DEF_UPPER; i++)
+		//{
+		//	fprintf(fp, "%c - %s\n", pDoc->m_cBigDefCode[i], pRtn = StrToChar(m_sKorDef[i])); if (pRtn) delete pRtn; pRtn = NULL;
+		//}
+		for (i = 1; i < MAX_DEF; i++)
 		{
-			fprintf(fp, "%c - %s\n", pDoc->m_cBigDefCode[i], pRtn = StrToChar(m_sKorDef[i])); if (pRtn) delete pRtn; pRtn = NULL;
+			fprintf(fp, "%c -> %s\n", pDoc->m_cBigDefCode[i], pRtn = StrToChar(m_sKorDef[i])); if (pRtn) delete pRtn; pRtn = NULL; // m_cBigDef[i]
 		}
+
 		fprintf(fp, "? - Missed Align Panel(i.e 노광불량)\r\n\n");
 
 		// Reload Reelmap.....

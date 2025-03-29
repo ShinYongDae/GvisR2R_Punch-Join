@@ -1422,7 +1422,7 @@ int CGvisR2R_PunchView::MsgBox(CString sMsg, int nThreadIdx, int nType, int nTim
 		{
 			if (m_pEngrave)
 			{
-				//if (pDoc->m_sMsgBox != sMsg)
+				if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_LASER)
 				{
 					pDoc->m_sMsgBox = sMsg;
 					if (m_pEngrave)
@@ -10223,13 +10223,15 @@ void CGvisR2R_PunchView::InitAuto(BOOL bInit)
 	{
 		if ((pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_LASER) && pDoc->WorkingInfo.LastJob.bDispLotEnd)
 		{
-			if (IDYES == MsgBox(_T("각인부에서 레이저 각인부터 시작하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, FALSE))
+			if (pView->m_bContEngraveF) Sleep(300);
+			if (IDYES == MsgBox(_T("각인부에서 레이저 각인부터 시작하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, TRUE))
 			{
 				MpeWrite(Plc.DlgMenu01.JoinJob, 0); // 이어가기(PC가 On시키고, PLC가 확인하고 Off시킴)-레이저 가공부터 시작
 			}
 			else
 			{
-				if (IDYES == MsgBox(_T("각인부에서 2D 코드를 읽고 난 후 Last Shot을 확인하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, FALSE))
+				if (pView->m_bContEngraveF) Sleep(300);
+				if (IDYES == MsgBox(_T("각인부에서 2D 코드를 읽고 난 후 Last Shot을 확인하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, TRUE))
 				{
 					MpeWrite(Plc.DlgMenu01.JoinJob, 1); // 이어가기(PC가 On시키고, PLC가 확인하고 Off시킴)-2D 코드 읽기부터 시작
 				}
@@ -10241,13 +10243,15 @@ void CGvisR2R_PunchView::InitAuto(BOOL bInit)
 		}
 		else if ((pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_LASER) && !pDoc->WorkingInfo.LastJob.bDispLotEnd)
 		{
-			if (IDYES == MsgBox(_T("각인부에서 2D 코드를 읽고 난 후 Last Shot을 확인하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, FALSE))
+			if (pView->m_bContEngraveF) Sleep(300);
+			if (IDYES == MsgBox(_T("각인부에서 2D 코드를 읽고 난 후 Last Shot을 확인하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, TRUE))
 			{
 				MpeWrite(Plc.DlgMenu01.JoinJob, 1); // 이어가기(PC가 On시키고, PLC가 확인하고 Off시킴)-2D 코드 읽기부터 시작
 			}
 			else
 			{
-				if (IDYES == MsgBox(_T("각인부에서 레이저 각인부터 시작하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, FALSE))
+				if (pView->m_bContEngraveF) Sleep(300);
+				if (IDYES == MsgBox(_T("각인부에서 레이저 각인부터 시작하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, TRUE))
 				{
 					MpeWrite(Plc.DlgMenu01.JoinJob, 0); // 이어가기(PC가 On시키고, PLC가 확인하고 Off시킴)-레이저 가공부터 시작
 				}
@@ -18857,13 +18861,13 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 	case AT_LP + 8:
 		if (IsRun())
 		{
-			if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
+			if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->WorkingInfo.System.bUseDualIts || pDoc->WorkingInfo.System.bUseDual2dIts)
 			{
 				if (!bDualTest)
 				{
 					if (m_nShareUpS > 0)
 					{
-						//MakeItsFile(m_nShareUpS);
+						MakeItsFile(m_nShareUpS);
 						if (pDoc->GetTestMode() == MODE_OUTER)
 							UpdateReelmapInner(m_nShareUpS);
 					}
@@ -18872,7 +18876,7 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 				{
 					if (m_nShareDnS > 0)
 					{
-						//MakeItsFile(m_nShareDnS);
+						MakeItsFile(m_nShareDnS);
 						if (pDoc->GetTestMode() == MODE_OUTER)
 							UpdateReelmapInner(m_nShareDnS);
 					}
@@ -25998,11 +26002,11 @@ void CGvisR2R_PunchView::MonPlcSignal()
 
 	//bChk = MpeRead(_T("MB400009")); // GUI 자동 이어가기 운전
 	//if (bChk)		// 내층 제품시 이어가기 상태 표시 - MB440125
-	if (pDoc->m_pMpeSignal[20] & (0x01 << 9))		// 내층 제품시 이어가기 상태 표시 - MB440125
+	if (pDoc->m_pMpeSignal[20] & (0x01 << 9) && !pDoc->WorkingInfo.LastJob.bDispContRun)		// 내층 제품시 이어가기 상태 표시 - MB440125
 	{
 		DispContRun(TRUE);
 	}
-	else
+	else if (!pDoc->m_pMpeSignal[20] & (0x01 << 9) && pDoc->WorkingInfo.LastJob.bDispContRun)
 	{
 		DispContRun(FALSE);
 	}

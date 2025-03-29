@@ -6964,6 +6964,17 @@ void CEngrave::SwEngAutoInit(BOOL bOn) // 각인부 초기화(Reset)
 	SendCommand(SocketData);
 }
 
+void CEngrave::SwEngAutoInitCont(BOOL bOn) // 각인부 초기화(Reset)
+{
+	SOCKET_DATA SocketData;
+	SocketData.nCmdCode = _SetSig;
+
+	//pDoc->BtnStatus.EngAuto.Init = bOn;
+	SocketData.nMsgID = _SigInx::_EngAutoInitCont;
+	SocketData.nData1 = bOn ? 1 : 0;
+	SendCommand(SocketData);
+}
+
 void CEngrave::IsSwEngAutoInit(BOOL bOn) // 각인부 초기화(Reset)
 {
 	SOCKET_DATA SocketData;

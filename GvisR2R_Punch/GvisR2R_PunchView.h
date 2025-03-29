@@ -583,7 +583,7 @@ public:
 
 	void ReloadYield();
 	void SetLastSerialEng(int nSerial);
-	int MsgBox(CString sMsg, int nThreadIdx = 0, int nType = MB_OK, int nTimOut = DEFAULT_TIME_OUT, BOOL bEngave = TRUE);		// SyncMsgBox
+	int MsgBox(CString sMsg, int nThreadIdx = 0, int nType = MB_OK, int nTimOut = DEFAULT_TIME_OUT, BOOL bEngave = FALSE);		// SyncMsgBox
 	int AsyncMsgBox(CString sMsg, int nThreadIdx = 1, int nType = MB_OK, int nTimOut = DEFAULT_TIME_OUT);						// AsyncMsgBox
 	int WaitRtnVal(int nThreadIdx = 1);
 	afx_msg LRESULT OnMyMsgExit(WPARAM wPara, LPARAM lPara);

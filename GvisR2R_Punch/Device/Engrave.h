@@ -579,6 +579,7 @@ public:
 	// Engrave Auto Sequence
 	void EngDispAlarm(BOOL bOn = TRUE); // 각인부에 Alarm 표시
 	void IsEngDispAlarm(BOOL bOn = TRUE); // 각인부에 Alarm 표시 Return 확인
+	void SwEngAutoInitCont(BOOL bOn); // 각인부 초기화(Reset)
 	void SwEngAutoInit(BOOL bOn); // 각인부 초기화(Reset)
 	void SwEngAutoMkSt(BOOL bOn);
 	void SwEngAutoOnMking(BOOL bOn);

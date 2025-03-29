@@ -15657,11 +15657,13 @@ void CGvisR2R_PunchDoc::SetTestMode()
 		{
 			WorkingInfo.System.bUseDual2dIts = TRUE;
 			WorkingInfo.System.bUseDualIts = FALSE;
+			pView->MpeWrite(_T("MB40009A"), 0);															// 각인부 사용
 		}
 		else if(WorkingInfo.LastJob.nTestMode == MODE_ITS)
 		{
 			WorkingInfo.System.bUseDual2dIts = FALSE;
 			WorkingInfo.System.bUseDualIts = TRUE;
+			pView->MpeWrite(_T("MB40009A"), 1);															// 각인부 미사용
 		}
 		else
 		{

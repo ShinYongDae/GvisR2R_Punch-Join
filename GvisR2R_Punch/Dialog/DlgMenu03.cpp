@@ -3161,11 +3161,14 @@ BOOL CDlgMenu03::DoReset()
 
 		if(!bInit)
 		{
+			if (pView->m_bContEngraveF)	Sleep(300);
+
 			if(IDNO == pView->MsgBox(_T("이어가기를 하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, TRUE))
 			{
 				pView->m_bCont = FALSE; pDoc->SetStatus(_T("General"), _T("bCont"), pView->m_bCont);
 				return FALSE;
 			}
+			pView->m_pEngrave->SwEngAutoInitCont(TRUE);
 			pView->m_bCont = TRUE; pDoc->SetStatus(_T("General"), _T("bCont"), pView->m_bCont);
 		}
 

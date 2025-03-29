@@ -4156,7 +4156,7 @@ void CDlgMenu01::OnChkEjectBuffer()
 
 	if(bOn && !m_bLastProc)// && pView->IsBufferUp())
 	{
-		if(IDNO == pView->MsgBox(_T("잔량처리를 하시겠습니까?"), 0, MB_YESNO))
+		if(IDNO == pView->MsgBox(_T("잔량처리를 하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, FALSE))
 			myBtn[3].SetCheck(FALSE);
 		else
 		{
