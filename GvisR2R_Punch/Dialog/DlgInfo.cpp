@@ -2514,6 +2514,7 @@ void CDlgInfo::OnBnClickedChkUseAoiDualIts()
 	{
 		pDoc->WorkingInfo.System.bUseDualIts = FALSE;
 		SetTestMode(MODE_NONE);
+		SetDualTest(TRUE);
 	}
 
 	sData = pDoc->WorkingInfo.System.bUseDualIts ? _T("1") : _T("0");
@@ -2544,6 +2545,7 @@ void CDlgInfo::OnBnClickedChkUseAoiDual2dIts()
 		pDoc->WorkingInfo.System.bUseDual2dIts = FALSE;
 		pView->MpeWrite(_T("MB40009A"), 1);															// 각인부\r미사용
 		SetTestMode(MODE_NONE);
+		SetDualTest(TRUE);
 	}
 
 	sData = pDoc->WorkingInfo.System.bUseDual2dIts ? _T("1") : _T("0");
@@ -2593,6 +2595,11 @@ void CDlgInfo::DispDualTest()
 		GetDlgItem(IDC_CHK_USE_AOI_DUAL_2D_ITS)->ShowWindow(SW_HIDE);
 		pView->MpeWrite(_T("MB40009A"), 1);															// 각인부\r미사용
 		SetTestMode(MODE_NONE);
+		//if(bDualTest)
+		//	SetDualTest(TRUE);
+		//else
+		//	SetDualTest(FALSE);
+
 		pDoc->WorkingInfo.System.bUseDualIts = FALSE;
 		pDoc->WorkingInfo.System.bUseDual2dIts = FALSE;
 		pDoc->SetMkInfo(_T("Signal"), _T("UseDualIts"), pDoc->WorkingInfo.System.bUseDualIts);
