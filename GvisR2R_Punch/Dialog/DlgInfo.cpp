@@ -897,7 +897,7 @@ void CDlgInfo::Disp()
 	else
 		myBtn[27].SetCheck(FALSE);
 
-
+#ifndef TEST_MODE
 	int nAlignMethodeOnCamMst = pDoc->m_Master[0].GetAlignMethode();
 	int nAlignMethode = pDoc->WorkingInfo.LastJob.nAlignMethode;
 	BOOL b2PointAlign = nAlignMethodeOnCamMst & TWO_POINT;
@@ -941,7 +941,7 @@ void CDlgInfo::Disp()
 		sMsg.Format(_T("캠마스터에 %s 모델의 Align 설정이 없습니다."), pDoc->WorkingInfo.LastJob.sModel);
 		pView->MsgBox(sMsg);
 	}
-
+#endif
 	DispDualTest();
 }
 
@@ -2370,7 +2370,18 @@ void CDlgInfo::OnChk26()
 			pDoc->WorkingInfo.LastJob.bUseJudgeMk = FALSE;
 		}
 		else
-			pDoc->WorkingInfo.LastJob.bUseJudgeMk = TRUE;
+		{
+			if (IDYES == pView->MsgBox(_T("CamMaster에서 해당 모델의 데이터를 다시 업로드 할까요?"), 0, MB_YESNO))
+			{
+				pView->m_bLoadMstInfo = TRUE; pDoc->SetStatus(_T("General"), _T("bLoadMstInfo"), pView->m_bLoadMstInfo);
+				pDoc->WorkingInfo.LastJob.bUseJudgeMk = TRUE;
+			}
+			else
+			{
+				myBtn[28].SetCheck(FALSE);
+				pDoc->WorkingInfo.LastJob.bUseJudgeMk = FALSE;
+			}
+		}
 	}
 	else
 		pDoc->WorkingInfo.LastJob.bUseJudgeMk = FALSE;

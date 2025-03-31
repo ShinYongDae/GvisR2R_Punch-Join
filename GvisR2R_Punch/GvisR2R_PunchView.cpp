@@ -936,11 +936,12 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 			break;
 		case 16:
 			//if (IsClampOff())
+#ifndef TEST_MODE
 			if (!pView->MpeRead(_T("MB40034B")))
 			{
 				break;
 			}
-
+#endif
 			if (m_pMotion)
 			{
 				MpeWrite(_T("MB40015F"), 1); // Motion Busy

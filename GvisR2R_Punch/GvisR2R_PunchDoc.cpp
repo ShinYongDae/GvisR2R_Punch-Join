@@ -13677,9 +13677,15 @@ int CGvisR2R_PunchDoc::LoadPcrAllUp(CString sPath)	// return : 2(Failed), 1(정상
 	int nTotPcs = m_Master[0].m_pPcsRgn->m_nTotPcs;
 	int nNodeX = m_Master[0].m_pPcsRgn->m_nCol;
 	int nNodeY = m_Master[0].m_pPcsRgn->m_nRow;
-	int nTotPcsInner = m_MasterInner[0].m_pPcsRgn->m_nTotPcs;
-	int nNodeXInner = m_MasterInner[0].m_pPcsRgn->m_nCol;
-	int nNodeYInner = m_MasterInner[0].m_pPcsRgn->m_nRow;
+	int nTotPcsInner = nTotPcs;
+	int nNodeXInner = nNodeX;
+	int nNodeYInner = nNodeY;
+	if (m_MasterInner[0].m_pPcsRgn)
+	{
+		nTotPcsInner = m_MasterInner[0].m_pPcsRgn->m_nTotPcs;
+		nNodeXInner = m_MasterInner[0].m_pPcsRgn->m_nCol;
+		nNodeYInner = m_MasterInner[0].m_pPcsRgn->m_nRow;
+	}
 	if (nTotPcs < 0 || nTotPcsInner < 0 || nTotPcsInner != nTotPcs || nNodeXInner != nNodeX || nNodeYInner != nNodeY)
 	{
 		str.Format(_T("It is trouble to run LoadPcrAllUp()."));
@@ -13866,9 +13872,16 @@ int CGvisR2R_PunchDoc::LoadPcrAllDn(CString sPath)	// return : 2(Failed), 1(정상
 	int nTotPcs = m_Master[0].m_pPcsRgn->m_nTotPcs;
 	int nNodeX = m_Master[0].m_pPcsRgn->m_nCol;
 	int nNodeY = m_Master[0].m_pPcsRgn->m_nRow;
-	int nTotPcsInner = m_MasterInner[0].m_pPcsRgn->m_nTotPcs;
-	int nNodeXInner = m_MasterInner[0].m_pPcsRgn->m_nCol;
-	int nNodeYInner = m_MasterInner[0].m_pPcsRgn->m_nRow;
+
+	int nTotPcsInner = nTotPcs;
+	int nNodeXInner = nNodeX;
+	int nNodeYInner = nNodeY;
+	if (m_MasterInner[0].m_pPcsRgn)
+	{
+		nTotPcsInner = m_MasterInner[0].m_pPcsRgn->m_nTotPcs;
+		nNodeXInner = m_MasterInner[0].m_pPcsRgn->m_nCol;
+		nNodeYInner = m_MasterInner[0].m_pPcsRgn->m_nRow;
+	}
 	if (nTotPcs < 0 || nTotPcsInner < 0 || nTotPcsInner != nTotPcs || nNodeXInner != nNodeX || nNodeYInner != nNodeY)
 	{
 		str.Format(_T("It is trouble to run LoadPcrAllDn()."));
@@ -13974,6 +13987,8 @@ int CGvisR2R_PunchDoc::LoadPcrAllDn(CString sPath)	// return : 2(Failed), 1(정상
 
 int CGvisR2R_PunchDoc::IsOfflineFolder() // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
 {
+	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
+
 	int nRtn = 0;
 	CString sPath, str;
 	BOOL bWorking;
@@ -13994,18 +14009,21 @@ int CGvisR2R_PunchDoc::IsOfflineFolder() // 0 : Not exist, 1 : Exist only Up, 2 
 	if (bWorking)
 		nRtn |= 0x01;
 
-	str = _T("OFFLINE");
-	sPath.Format(_T("%s%s\\%s\\%s\\%s\\*.*"), pDoc->WorkingInfo.System.sPathOldFile,
-		pDoc->WorkingInfo.LastJob.sModel,
-		pDoc->WorkingInfo.LastJob.sLot,
-		pDoc->WorkingInfo.LastJob.sLayerDn,
-		str);
+	if (bDualTest)
+	{
+		str = _T("OFFLINE");
+		sPath.Format(_T("%s%s\\%s\\%s\\%s\\*.*"), pDoc->WorkingInfo.System.sPathOldFile,
+			pDoc->WorkingInfo.LastJob.sModel,
+			pDoc->WorkingInfo.LastJob.sLot,
+			pDoc->WorkingInfo.LastJob.sLayerDn,
+			str);
 
-	//CFileFind는 파일, 디렉터리가 존재하면 TRUE 를 반환함 
-	bWorking = finder.FindFile(sPath);
+		//CFileFind는 파일, 디렉터리가 존재하면 TRUE 를 반환함 
+		bWorking = finder.FindFile(sPath);
 
-	if (bWorking)
-		nRtn |= 0x02;
+		if (bWorking)
+			nRtn |= 0x02;
+	}
 
 	return nRtn;
 }

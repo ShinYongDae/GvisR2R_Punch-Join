@@ -6163,7 +6163,18 @@ void CDlgMenu01::OnBnClickedChkMkJudge()
 			pDoc->WorkingInfo.LastJob.bUseJudgeMk = FALSE;
 		}
 		else
-			pDoc->WorkingInfo.LastJob.bUseJudgeMk = TRUE;
+		{
+			if (IDYES == pView->MsgBox(_T("CamMaster에서 해당 모델의 데이터를 다시 업로드 할까요?"), 0, MB_YESNO))
+			{
+				pView->m_bLoadMstInfo = TRUE; pDoc->SetStatus(_T("General"), _T("bLoadMstInfo"), pView->m_bLoadMstInfo);
+				pDoc->WorkingInfo.LastJob.bUseJudgeMk = TRUE;
+			}
+			else
+			{
+				myBtn[23].SetCheck(FALSE);
+				pDoc->WorkingInfo.LastJob.bUseJudgeMk = FALSE;
+			}
+		}
 	}
 	else
 		pDoc->WorkingInfo.LastJob.bUseJudgeMk = FALSE;

@@ -52,15 +52,17 @@
 	#define PATH_ORDERING_Mk		_T("C:\\R2RSet\\Test\\WriteOrderingMkRotate90ccw.txt")
 	#define PATH_ORDERING_Mk_MIRROR	_T("C:\\R2RSet\\Test\\WriteOrderingMkRotate90ccwMirror.txt")
 	#define PATH_REJECT_IMG_		_T("C:\\R2RSet\\Test\\Reject.TIF")
+	#define PATH_REJECT_IMG			_T("C:\\R2RSet\\Reject\\Reject.TIF")
 
-	//#define	USE_MIL
-	//#define	USE_VISION
 
-	//#define USE_TCPIP
-	//#define USE_ENGRAVE
-	//#define USE_DTS
+	#define	USE_MIL
+	#define	USE_VISION
 
-	//#define USE_CAM_MASTER
+	#define USE_TCPIP
+	#define USE_ENGRAVE
+	#define USE_DTS
+
+	#define USE_CAM_MASTER
 	//#define	USE_NMC
 	//#define	USE_MPE
 	//#define	USE_IRAYPLE

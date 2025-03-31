@@ -252,7 +252,7 @@ int CDlgMenu05::GetIdxTopLayer()
 				if (m_sLayer == sLayer)
 					return 1;
 
-				m_sLayer = _T("");
+				//m_sLayer = _T("");
 				return -1;
 			}
 		}
@@ -1665,7 +1665,7 @@ void CDlgMenu05::SelchangeComboLayer(int nIndex)
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
 
 	CFileFind findfile;
-		
+
 	m_nCurSelLayerIdx = nIndex;
 	((CComboBox*)GetDlgItem(IDC_COMBO_LAYER))->SetCurSel(nIndex);
 
@@ -1676,7 +1676,7 @@ void CDlgMenu05::SelchangeComboLayer(int nIndex)
 		CString sRes, sLayer, sRemain;
 		int nPos;
 
-		if (m_sLayer.Find(_T("TOP")) >= 0)
+		if (m_sLayer.Find(_T("TOP-0-")) >= 0) // 2Layer 상면
 		{
 			m_sLayerUp = m_sLayer;
 			sRemain = m_sLayer;
@@ -1693,13 +1693,10 @@ void CDlgMenu05::SelchangeComboLayer(int nIndex)
 					sRemain.Delete(nPos, sRemain.GetLength() - nPos);
 				}
 
-				if (sLayer == _T("1"))
-					m_sLayerDn.Format(_T("BOTTOM-2-%s"), sRes);
-				else
-					m_sLayerDn.Format(_T("BOTTOM-4-%s"), sRes);
+				m_sLayerDn.Format(_T("BOTTOM-0-%s"), sRes);
 			}
 		}
-		else if (m_sLayer.Find(_T("BOTTOM")) >= 0)
+		else if (m_sLayer.Find(_T("BOTTOM-0-")) >= 0)
 		{
 			m_sLayerDn = m_sLayer;
 			sRemain = m_sLayer;
@@ -1716,10 +1713,87 @@ void CDlgMenu05::SelchangeComboLayer(int nIndex)
 					sRemain.Delete(nPos, sRemain.GetLength() - nPos);
 				}
 
-				if (sLayer == _T("2"))
-					m_sLayerUp.Format(_T("TOP-1-%s"), sRes);
-				else
-					m_sLayerUp.Format(_T("TOP-3-%s"), sRes);
+				m_sLayerUp.Format(_T("TOP-0-%s"), sRes);
+			}
+		}
+		if (m_sLayer.Find(_T("TOP-1-")) >= 0)
+		{
+			m_sLayerUp = m_sLayer;
+			sRemain = m_sLayer;
+			nPos = m_sLayerUp.ReverseFind(_T('-'));
+			if (nPos >= 0)
+			{
+				sRes = sRemain.Right(sRemain.GetLength() - nPos - 1);
+				sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+
+				nPos = sRemain.ReverseFind(_T('-'));
+				if (nPos >= 0)
+				{
+					sLayer = sRemain.Right(sRemain.GetLength() - nPos - 1);
+					sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+				}
+
+				m_sLayerDn.Format(_T("BOTTOM-2-%s"), sRes);
+			}
+		}
+		else if (m_sLayer.Find(_T("BOTTOM-2-")) >= 0)
+		{
+			m_sLayerDn = m_sLayer;
+			sRemain = m_sLayer;
+			nPos = m_sLayerUp.ReverseFind(_T('-'));
+			if (nPos >= 0)
+			{
+				sRes = sRemain.Right(sRemain.GetLength() - nPos - 1);
+				sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+
+				nPos = sRemain.ReverseFind(_T('-'));
+				if (nPos >= 0)
+				{
+					sLayer = sRemain.Right(sRemain.GetLength() - nPos - 1);
+					sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+				}
+
+				m_sLayerUp.Format(_T("TOP-1-%s"), sRes);
+			}
+		}
+		if (m_sLayer.Find(_T("TOP-3-")) >= 0)
+		{
+			m_sLayerUp = m_sLayer;
+			sRemain = m_sLayer;
+			nPos = m_sLayerUp.ReverseFind(_T('-'));
+			if (nPos >= 0)
+			{
+				sRes = sRemain.Right(sRemain.GetLength() - nPos - 1);
+				sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+
+				nPos = sRemain.ReverseFind(_T('-'));
+				if (nPos >= 0)
+				{
+					sLayer = sRemain.Right(sRemain.GetLength() - nPos - 1);
+					sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+				}
+
+				m_sLayerDn.Format(_T("BOTTOM-4-%s"), sRes);
+			}
+		}
+		else if (m_sLayer.Find(_T("BOTTOM-4-")) >= 0)
+		{
+			m_sLayerDn = m_sLayer;
+			sRemain = m_sLayer;
+			nPos = m_sLayerUp.ReverseFind(_T('-'));
+			if (nPos >= 0)
+			{
+				sRes = sRemain.Right(sRemain.GetLength() - nPos - 1);
+				sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+
+				nPos = sRemain.ReverseFind(_T('-'));
+				if (nPos >= 0)
+				{
+					sLayer = sRemain.Right(sRemain.GetLength() - nPos - 1);
+					sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+				}
+
+				m_sLayerUp.Format(_T("TOP-3-%s"), sRes);
 			}
 		}
 
@@ -1735,10 +1809,10 @@ void CDlgMenu05::SelchangeComboLayer(int nIndex)
 			m_sRmapPath.Format(_T("%s\\OFFLINE\\ReelMapDataUp.txt"), sPath);
 			if (!findfile.FindFile(m_sRmapPath))
 			{
-		if (bDualTest)
-			m_sRmapPath.Format(_T("%s\\ReelMapDataAll.txt"), sPath);
-		else
-			m_sRmapPath.Format(_T("%s\\ReelMapDataUp.txt"), sPath);
+				if (bDualTest)
+					m_sRmapPath.Format(_T("%s\\ReelMapDataAll.txt"), sPath);
+				else
+					m_sRmapPath.Format(_T("%s\\ReelMapDataUp.txt"), sPath);
 			}
 			else
 			{
@@ -1749,7 +1823,7 @@ void CDlgMenu05::SelchangeComboLayer(int nIndex)
 		{
 			bDualTest = TRUE;
 		}
-		
+
 		TCHAR szData[MAX_PATH];
 		if (0 < ::GetPrivateProfileString(_T("Info"), _T("Start Serial"), NULL, szData, sizeof(szData), m_sRmapPath))
 			m_nSerialSt = _tstoi(szData);
@@ -1809,7 +1883,7 @@ void CDlgMenu05::SelchangeComboLayer(int nIndex)
 	}
 }
 
-void CDlgMenu05::OnSelchangeComboLayer() 
+void CDlgMenu05::OnSelchangeComboLayer()
 {
 	// TODO: Add your control notification handler code here
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
@@ -1821,7 +1895,7 @@ void CDlgMenu05::OnSelchangeComboLayer()
 		CString sRes, sLayer, sRemain;
 		int nPos;
 
-		if (m_sLayer.Find(_T("TOP")) >= 0)
+		if (m_sLayer.Find(_T("TOP-0-")) >= 0)
 		{
 			m_sLayerUp = m_sLayer;
 			sRemain = m_sLayer;
@@ -1838,13 +1912,10 @@ void CDlgMenu05::OnSelchangeComboLayer()
 					sRemain.Delete(nPos, sRemain.GetLength() - nPos);
 				}
 
-				if(sLayer == _T("1"))
-					m_sLayerDn.Format(_T("BOTTOM-2-%s"), sRes);
-				else
-					m_sLayerDn.Format(_T("BOTTOM-4-%s"), sRes);
+				m_sLayerDn.Format(_T("BOTTOM-0-%s"), sRes);
 			}
 		}
-		else if (m_sLayer.Find(_T("BOTTOM")) >= 0)
+		else if (m_sLayer.Find(_T("BOTTOM-0-")) >= 0)
 		{
 			m_sLayerDn = m_sLayer;
 			sRemain = m_sLayer;
@@ -1861,19 +1932,96 @@ void CDlgMenu05::OnSelchangeComboLayer()
 					sRemain.Delete(nPos, sRemain.GetLength() - nPos);
 				}
 
-				if (sLayer == _T("2"))
-					m_sLayerUp.Format(_T("TOP-1-%s"), sRes);
-				else
-					m_sLayerUp.Format(_T("TOP-3-%s"), sRes);
+				m_sLayerUp.Format(_T("TOP-0-%s"), sRes);
+			}
+		}
+		if (m_sLayer.Find(_T("TOP-1-")) >= 0)
+		{
+			m_sLayerUp = m_sLayer;
+			sRemain = m_sLayer;
+			nPos = m_sLayerUp.ReverseFind(_T('-'));
+			if (nPos >= 0)
+			{
+				sRes = sRemain.Right(sRemain.GetLength() - nPos - 1);
+				sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+
+				nPos = sRemain.ReverseFind(_T('-'));
+				if (nPos >= 0)
+				{
+					sLayer = sRemain.Right(sRemain.GetLength() - nPos - 1);
+					sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+				}
+
+				m_sLayerDn.Format(_T("BOTTOM-2-%s"), sRes);
+			}
+		}
+		else if (m_sLayer.Find(_T("BOTTOM-2-")) >= 0)
+		{
+			m_sLayerDn = m_sLayer;
+			sRemain = m_sLayer;
+			nPos = m_sLayerDn.ReverseFind(_T('-'));
+			if (nPos >= 0)
+			{
+				sRes = sRemain.Right(sRemain.GetLength() - nPos - 1);
+				sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+
+				nPos = sRemain.ReverseFind(_T('-'));
+				if (nPos >= 0)
+				{
+					sLayer = sRemain.Right(sRemain.GetLength() - nPos - 1);
+					sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+				}
+
+				m_sLayerUp.Format(_T("TOP-1-%s"), sRes);
+			}
+		}
+		if (m_sLayer.Find(_T("TOP-3-")) >= 0)
+		{
+			m_sLayerUp = m_sLayer;
+			sRemain = m_sLayer;
+			nPos = m_sLayerUp.ReverseFind(_T('-'));
+			if (nPos >= 0)
+			{
+				sRes = sRemain.Right(sRemain.GetLength() - nPos - 1);
+				sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+
+				nPos = sRemain.ReverseFind(_T('-'));
+				if (nPos >= 0)
+				{
+					sLayer = sRemain.Right(sRemain.GetLength() - nPos - 1);
+					sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+				}
+
+				m_sLayerDn.Format(_T("BOTTOM-4-%s"), sRes);
+			}
+		}
+		else if (m_sLayer.Find(_T("BOTTOM-4-")) >= 0)
+		{
+			m_sLayerDn = m_sLayer;
+			sRemain = m_sLayer;
+			nPos = m_sLayerDn.ReverseFind(_T('-'));
+			if (nPos >= 0)
+			{
+				sRes = sRemain.Right(sRemain.GetLength() - nPos - 1);
+				sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+
+				nPos = sRemain.ReverseFind(_T('-'));
+				if (nPos >= 0)
+				{
+					sLayer = sRemain.Right(sRemain.GetLength() - nPos - 1);
+					sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+				}
+
+				m_sLayerUp.Format(_T("TOP-3-%s"), sRes);
 			}
 		}
 
 
 		CString sPath, sVal;
-		sPath.Format(_T("%s%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathOldFile, 
+		sPath.Format(_T("%s%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathOldFile,
 			m_sModel, m_sLot, m_sLayerUp);
-		
-		if(bDualTest)
+
+		if (bDualTest)
 			m_sRmapPath.Format(_T("%s\\ReelMapDataAll.txt"), sPath);
 		else
 			m_sRmapPath.Format(_T("%s\\ReelMapDataUp.txt"), sPath);
@@ -1885,17 +2033,17 @@ void CDlgMenu05::OnSelchangeComboLayer()
 			m_nSerialSt = 1;
 
 		sVal = _T("");
-		if(m_nSerialSt > 0)
+		if (m_nSerialSt > 0)
 			sVal.Format(_T("%d"), m_nSerialSt);
 		myStcSerialSt.SetText(sVal);
 
 		if (0 < ::GetPrivateProfileString(_T("Info"), _T("Completed Shot"), NULL, szData, sizeof(szData), m_sRmapPath))
-			m_nCompletedShot = _tstoi(szData); 
+			m_nCompletedShot = _tstoi(szData);
 		else
 			m_nCompletedShot = 0; // Failed.
 
 		if (0 < ::GetPrivateProfileString(_T("Info"), _T("Marked Shot"), NULL, szData, sizeof(szData), m_sRmapPath))
-			m_nMarkedShot = _tstoi(szData); 
+			m_nMarkedShot = _tstoi(szData);
 		else
 			m_nMarkedShot = 0; // Failed.
 
@@ -1905,22 +2053,22 @@ void CDlgMenu05::OnSelchangeComboLayer()
 			m_nSerialEd = (m_nMarkedShot > m_nCompletedShot) ? m_nMarkedShot : m_nCompletedShot;
 
 		sVal = _T("");
-		if(m_nSerialEd > 0)
+		if (m_nSerialEd > 0)
 			sVal.Format(_T("%d"), m_nSerialEd);
 		myStcSerialEd.SetText(sVal);
 
 		ReloadReelmap();
 		DispProcCode(m_sRmapPath);
-		
-		if(((CButton*)GetDlgItem(IDC_CHK_REELMAP))->GetCheck())
+
+		if (((CButton*)GetDlgItem(IDC_CHK_REELMAP))->GetCheck())
 		{
-			if(m_nCurSelLotIdx < 0)
+			if (m_nCurSelLotIdx < 0)
 			{
 				pView->MsgBox(_T("로트를 선택해 주세요."));
 				((CButton*)GetDlgItem(IDC_CHK_REELMAP))->SetCheck(FALSE);
 				return;
 			}
-			if(m_nCurSelLayerIdx < 0)
+			if (m_nCurSelLayerIdx < 0)
 			{
 				pView->MsgBox(_T("레이어를 선택해 주세요."));
 				((CButton*)GetDlgItem(IDC_CHK_REELMAP))->SetCheck(FALSE);
@@ -1937,6 +2085,285 @@ void CDlgMenu05::OnSelchangeComboLayer()
 
 	}
 }
+
+//void CDlgMenu05::SelchangeComboLayer(int nIndex)
+//{
+//	// TODO: Add your control notification handler code here
+//	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
+//
+//	CFileFind findfile;
+//		
+//	m_nCurSelLayerIdx = nIndex;
+//	((CComboBox*)GetDlgItem(IDC_COMBO_LAYER))->SetCurSel(nIndex);
+//
+//	if (nIndex != LB_ERR)
+//	{
+//		((CComboBox*)GetDlgItem(IDC_COMBO_LAYER))->GetLBText(nIndex, m_sLayer);
+//
+//		CString sRes, sLayer, sRemain;
+//		int nPos;
+//
+//		if (m_sLayer.Find(_T("TOP")) >= 0)
+//		{
+//			m_sLayerUp = m_sLayer;
+//			sRemain = m_sLayer;
+//			nPos = m_sLayerUp.ReverseFind(_T('-'));
+//			if (nPos >= 0)
+//			{
+//				sRes = sRemain.Right(sRemain.GetLength() - nPos - 1);
+//				sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+//
+//				nPos = sRemain.ReverseFind(_T('-'));
+//				if (nPos >= 0)
+//				{
+//					sLayer = sRemain.Right(sRemain.GetLength() - nPos - 1);
+//					sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+//				}
+//
+//				if (sLayer == _T("1"))
+//					m_sLayerDn.Format(_T("BOTTOM-2-%s"), sRes);
+//				else
+//					m_sLayerDn.Format(_T("BOTTOM-4-%s"), sRes);
+//			}
+//		}
+//		else if (m_sLayer.Find(_T("BOTTOM")) >= 0)
+//		{
+//			m_sLayerDn = m_sLayer;
+//			sRemain = m_sLayer;
+//			nPos = m_sLayerUp.ReverseFind(_T('-'));
+//			if (nPos >= 0)
+//			{
+//				sRes = sRemain.Right(sRemain.GetLength() - nPos - 1);
+//				sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+//
+//				nPos = sRemain.ReverseFind(_T('-'));
+//				if (nPos >= 0)
+//				{
+//					sLayer = sRemain.Right(sRemain.GetLength() - nPos - 1);
+//					sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+//				}
+//
+//				if (sLayer == _T("2"))
+//					m_sLayerUp.Format(_T("TOP-1-%s"), sRes);
+//				else
+//					m_sLayerUp.Format(_T("TOP-3-%s"), sRes);
+//			}
+//		}
+//
+//
+//		CString sPath, sVal;
+//
+//		sPath.Format(_T("%s%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathOldFile,
+//			m_sModel, m_sLot, m_sLayerUp);
+//
+//		m_sRmapPath.Format(_T("%s\\OFFLINE\\ReelMapDataAll.txt"), sPath);
+//		if (!findfile.FindFile(m_sRmapPath))
+//		{
+//			m_sRmapPath.Format(_T("%s\\OFFLINE\\ReelMapDataUp.txt"), sPath);
+//			if (!findfile.FindFile(m_sRmapPath))
+//			{
+//		if (bDualTest)
+//			m_sRmapPath.Format(_T("%s\\ReelMapDataAll.txt"), sPath);
+//		else
+//			m_sRmapPath.Format(_T("%s\\ReelMapDataUp.txt"), sPath);
+//			}
+//			else
+//			{
+//				bDualTest = FALSE;
+//			}
+//		}
+//		else
+//		{
+//			bDualTest = TRUE;
+//		}
+//		
+//		TCHAR szData[MAX_PATH];
+//		if (0 < ::GetPrivateProfileString(_T("Info"), _T("Start Serial"), NULL, szData, sizeof(szData), m_sRmapPath))
+//			m_nSerialSt = _tstoi(szData);
+//		else
+//			m_nSerialSt = 1;
+//
+//		sVal = _T("");
+//		if (m_nSerialSt > 0)
+//			sVal.Format(_T("%d"), m_nSerialSt);
+//		myStcSerialSt.SetText(sVal);
+//
+//		if (0 < ::GetPrivateProfileString(_T("Info"), _T("Completed Shot"), NULL, szData, sizeof(szData), m_sRmapPath))
+//			m_nCompletedShot = _tstoi(szData);
+//		else
+//			m_nCompletedShot = 0; // Failed.
+//
+//		if (0 < ::GetPrivateProfileString(_T("Info"), _T("Marked Shot"), NULL, szData, sizeof(szData), m_sRmapPath))
+//			m_nMarkedShot = _tstoi(szData);
+//		else
+//			m_nMarkedShot = 0; // Failed.
+//
+//		if (0 < ::GetPrivateProfileString(_T("Info"), _T("End Serial"), NULL, szData, sizeof(szData), m_sRmapPath))
+//			m_nSerialEd = _tstoi(szData);
+//		else
+//			m_nSerialEd = (m_nMarkedShot > m_nCompletedShot) ? m_nMarkedShot : m_nCompletedShot;
+//
+//		sVal = _T("");
+//		if (m_nSerialEd > 0)
+//			sVal.Format(_T("%d"), m_nSerialEd);
+//		myStcSerialEd.SetText(sVal);
+//
+//		ReloadReelmap();
+//		DispProcCode(m_sRmapPath);
+//
+//		if (((CButton*)GetDlgItem(IDC_CHK_REELMAP))->GetCheck())
+//		{
+//			if (m_nCurSelLotIdx < 0)
+//			{
+//				pView->MsgBox(_T("로트를 선택해 주세요."));
+//				((CButton*)GetDlgItem(IDC_CHK_REELMAP))->SetCheck(FALSE);
+//				return;
+//			}
+//			if (m_nCurSelLayerIdx < 0)
+//			{
+//				pView->MsgBox(_T("레이어를 선택해 주세요."));
+//				((CButton*)GetDlgItem(IDC_CHK_REELMAP))->SetCheck(FALSE);
+//				return;
+//			}
+//			((CListBox*)GetDlgItem(IDC_LIST_LOT))->SetCurSel(m_nCurSelLotIdx);
+//			((CComboBox*)GetDlgItem(IDC_COMBO_LAYER))->SetCurSel(m_nCurSelLayerIdx);
+//			DisplayReelMapUser();
+//		}
+//		else
+//		{
+//			DisplayResultData();
+//		}
+//	}
+//}
+
+//void CDlgMenu05::OnSelchangeComboLayer() 
+//{
+//	// TODO: Add your control notification handler code here
+//	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
+//	int nIndex = m_nCurSelLayerIdx = ((CComboBox*)GetDlgItem(IDC_COMBO_LAYER))->GetCurSel();
+//	if (nIndex != LB_ERR)
+//	{
+//		((CComboBox*)GetDlgItem(IDC_COMBO_LAYER))->GetLBText(nIndex, m_sLayer);
+//
+//		CString sRes, sLayer, sRemain;
+//		int nPos;
+//
+//		if (m_sLayer.Find(_T("TOP")) >= 0)
+//		{
+//			m_sLayerUp = m_sLayer;
+//			sRemain = m_sLayer;
+//			nPos = m_sLayerUp.ReverseFind(_T('-'));
+//			if (nPos >= 0)
+//			{
+//				sRes = sRemain.Right(sRemain.GetLength() - nPos - 1);
+//				sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+//
+//				nPos = sRemain.ReverseFind(_T('-'));
+//				if (nPos >= 0)
+//				{
+//					sLayer = sRemain.Right(sRemain.GetLength() - nPos - 1);
+//					sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+//				}
+//
+//				if(sLayer == _T("1"))
+//					m_sLayerDn.Format(_T("BOTTOM-2-%s"), sRes);
+//				else
+//					m_sLayerDn.Format(_T("BOTTOM-4-%s"), sRes);
+//			}
+//		}
+//		else if (m_sLayer.Find(_T("BOTTOM")) >= 0)
+//		{
+//			m_sLayerDn = m_sLayer;
+//			sRemain = m_sLayer;
+//			nPos = m_sLayerDn.ReverseFind(_T('-'));
+//			if (nPos >= 0)
+//			{
+//				sRes = sRemain.Right(sRemain.GetLength() - nPos - 1);
+//				sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+//
+//				nPos = sRemain.ReverseFind(_T('-'));
+//				if (nPos >= 0)
+//				{
+//					sLayer = sRemain.Right(sRemain.GetLength() - nPos - 1);
+//					sRemain.Delete(nPos, sRemain.GetLength() - nPos);
+//				}
+//
+//				if (sLayer == _T("2"))
+//					m_sLayerUp.Format(_T("TOP-1-%s"), sRes);
+//				else
+//					m_sLayerUp.Format(_T("TOP-3-%s"), sRes);
+//			}
+//		}
+//
+//
+//		CString sPath, sVal;
+//		sPath.Format(_T("%s%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathOldFile, 
+//			m_sModel, m_sLot, m_sLayerUp);
+//		
+//		if(bDualTest)
+//			m_sRmapPath.Format(_T("%s\\ReelMapDataAll.txt"), sPath);
+//		else
+//			m_sRmapPath.Format(_T("%s\\ReelMapDataUp.txt"), sPath);
+//
+//		TCHAR szData[MAX_PATH];
+//		if (0 < ::GetPrivateProfileString(_T("Info"), _T("Start Serial"), NULL, szData, sizeof(szData), m_sRmapPath))
+//			m_nSerialSt = _tstoi(szData);
+//		else
+//			m_nSerialSt = 1;
+//
+//		sVal = _T("");
+//		if(m_nSerialSt > 0)
+//			sVal.Format(_T("%d"), m_nSerialSt);
+//		myStcSerialSt.SetText(sVal);
+//
+//		if (0 < ::GetPrivateProfileString(_T("Info"), _T("Completed Shot"), NULL, szData, sizeof(szData), m_sRmapPath))
+//			m_nCompletedShot = _tstoi(szData); 
+//		else
+//			m_nCompletedShot = 0; // Failed.
+//
+//		if (0 < ::GetPrivateProfileString(_T("Info"), _T("Marked Shot"), NULL, szData, sizeof(szData), m_sRmapPath))
+//			m_nMarkedShot = _tstoi(szData); 
+//		else
+//			m_nMarkedShot = 0; // Failed.
+//
+//		if (0 < ::GetPrivateProfileString(_T("Info"), _T("End Serial"), NULL, szData, sizeof(szData), m_sRmapPath))
+//			m_nSerialEd = _tstoi(szData);
+//		else
+//			m_nSerialEd = (m_nMarkedShot > m_nCompletedShot) ? m_nMarkedShot : m_nCompletedShot;
+//
+//		sVal = _T("");
+//		if(m_nSerialEd > 0)
+//			sVal.Format(_T("%d"), m_nSerialEd);
+//		myStcSerialEd.SetText(sVal);
+//
+//		ReloadReelmap();
+//		DispProcCode(m_sRmapPath);
+//		
+//		if(((CButton*)GetDlgItem(IDC_CHK_REELMAP))->GetCheck())
+//		{
+//			if(m_nCurSelLotIdx < 0)
+//			{
+//				pView->MsgBox(_T("로트를 선택해 주세요."));
+//				((CButton*)GetDlgItem(IDC_CHK_REELMAP))->SetCheck(FALSE);
+//				return;
+//			}
+//			if(m_nCurSelLayerIdx < 0)
+//			{
+//				pView->MsgBox(_T("레이어를 선택해 주세요."));
+//				((CButton*)GetDlgItem(IDC_CHK_REELMAP))->SetCheck(FALSE);
+//				return;
+//			}
+//			((CListBox*)GetDlgItem(IDC_LIST_LOT))->SetCurSel(m_nCurSelLotIdx);
+//			((CComboBox*)GetDlgItem(IDC_COMBO_LAYER))->SetCurSel(m_nCurSelLayerIdx);
+//			DisplayReelMapUser();
+//		}
+//		else
+//		{
+//			DisplayResultData();
+//		}
+//
+//	}
+//}
 
 void CDlgMenu05::OnBtnSave() 
 {
@@ -2513,49 +2940,106 @@ void CDlgMenu05::OnBtnSave4()
 
 void CDlgMenu05::MakeIts()
 {
+	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
 	CString sItsPath = pDoc->GetItsTargetFolderPath();
 	//CString sItsPath = pDoc->WorkingInfo.System.sPathIts;
 
 	if (sItsPath.IsEmpty())
+	{
+		pView->MsgBox(_T("ITS 저장폴더가 정해지지않았습니다."));
 		return;
+	}
 
-	int pos = sItsPath.ReverseFind('\\');
-	if (pos != -1)
-		sItsPath.Delete(pos, sItsPath.GetLength() - pos);
+	//int pos = sItsPath.ReverseFind('\\');
+	//if (pos != -1)
+	//	sItsPath.Delete(pos, sItsPath.GetLength() - pos);
 
 	if (!pDoc->DirectoryExists(sItsPath))
 		CreateDirectory(sItsPath, NULL);
 
-	CFileFind cFile;
-	CString sPathPcr;
+	CFileFind cFile[2];
+	CString sPathPcr[2];
+	CString sMsg;
 
-	sPathPcr.Format(_T("%s%s\\%s\\%s\\OFFLINE\\*.pcr"), 
-		pDoc->WorkingInfo.System.sPathOldFile, m_sModel, m_sLot, m_sLayer);
+	if (m_sModel.IsEmpty())
+	{
+		pView->MsgBox(_T("Model이 정해지지않았습니다."));
+		return;
+	}
 
-	BOOL bExist = cFile.FindFile(sPathPcr);
+	if (m_sLot.IsEmpty())
+	{
+		pView->MsgBox(_T("Lot가 정해지지않았습니다."));
+		return;
+	}
+
+	if (m_sLayerUp.IsEmpty())
+	{
+		pView->MsgBox(_T("LayerUp이 정해지지않았습니다."));
+		return;
+	}
+	pDoc->WorkingInfo.LastJob.sModel = m_sModel;
+	pDoc->WorkingInfo.LastJob.sLot = m_sLot;
+	pDoc->WorkingInfo.LastJob.sLayerUp = m_sLayerUp;
+
+	sPathPcr[0].Format(_T("%s%s\\%s\\%s\\OFFLINE\\*.pcr"), 
+		pDoc->WorkingInfo.System.sPathOldFile, m_sModel, m_sLot, m_sLayerUp);
+
+	BOOL bExist = cFile[0].FindFile(sPathPcr[0]);
 	if (!bExist)
 	{
-		sPathPcr.Format(_T("%s%s\\%s\\%s\\*.pcr"),
-			pDoc->WorkingInfo.System.sPathOldFile, m_sModel, m_sLot, m_sLayer);
+		sPathPcr[0].Format(_T("%s%s\\%s\\%s\\*.pcr"),
+			pDoc->WorkingInfo.System.sPathOldFile, m_sModel, m_sLot, m_sLayerUp);
 
-		bExist = cFile.FindFile(sPathPcr);
+		bExist = cFile[0].FindFile(sPathPcr[0]);
 		if (!bExist)
 		{
+			sMsg.Format(_T("상면 PCR파일이 존재하지않았습니다.\r\n%s"), sPathPcr[0]);
+			pView->MsgBox(sMsg);
 			return; // pcr파일이 존재하지 않음.
 		}
 	}
 
-	int nLayer = GetLayer(m_sLayer);
-
-	if (pDoc->GetTestMode() == MODE_OUTER)
+	if (bDualTest)
 	{
-		if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+		if (m_sLayerDn.IsEmpty())
 		{
-			pView->MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
+			pView->MsgBox(_T("LayerDn이 정해지지않았습니다."));
+			return;
+		}
+
+		pDoc->WorkingInfo.LastJob.sLayerDn = m_sLayerDn;
+
+		sPathPcr[1].Format(_T("%s%s\\%s\\%s\\OFFLINE\\*.pcr"), 
+			pDoc->WorkingInfo.System.sPathOldFile, m_sModel, m_sLot, m_sLayerDn);
+
+		bExist = cFile[1].FindFile(sPathPcr[1]);
+		if (!bExist)
+		{
+			sPathPcr[1].Format(_T("%s%s\\%s\\%s\\*.pcr"),
+				pDoc->WorkingInfo.System.sPathOldFile, m_sModel, m_sLot, m_sLayerDn);
+
+			bExist = cFile[1].FindFile(sPathPcr[1]);
+			if (!bExist)
+			{
+				sMsg.Format(_T("하면 PCR파일이 존재하지않았습니다.\r\n%s"), sPathPcr[1]);
+				pView->MsgBox(sMsg);
+				return; // pcr파일이 존재하지 않음.
+			}
 		}
 	}
 
-	pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir, m_sModel, m_sLayer);
+	int nLayer = GetLayer(m_sLayerUp);
+
+	if (pDoc->GetTestMode() == MODE_OUTER || pDoc->WorkingInfo.System.bUseDualIts || pDoc->WorkingInfo.System.bUseDual2dIts)
+	{
+		if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+		{
+			pView->MsgBox(_T("OFFLINE 폴더가 없습니다."));
+		}
+	}
+
+	pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir, m_sModel, m_sLayerUp);
 	pDoc->m_Master[0].LoadMstInfo();
 
 	int nPos, nSerial;
@@ -2568,23 +3052,52 @@ void CDlgMenu05::MakeIts()
 	int nTot = 0;
 	while (bExist)
 	{
-		bExist = cFile.FindNextFile();
-		if (cFile.IsDots()) continue;
-		if (!cFile.IsDirectory())
+		bExist = cFile[0].FindNextFile();
+		if (cFile[0].IsDots()) continue;
+		if (!cFile[0].IsDirectory())
 		{
-			sFileName = cFile.GetFileName();
+			sFileName = cFile[0].GetFileName();
 			nPos = sFileName.ReverseFind('.');
 			if (nPos > 0)
 				sSerial = sFileName.Left(nPos);
 
 			nSerial = _tstoi(sSerial);
 
-			if(nLayer == RMAP_UP || nLayer == RMAP_INNER_UP)
-				LoadPCRUpFromMk(nSerial);
-			else
-				LoadPCRDnFromMk(nSerial);
-
+			LoadPCRUpFromMk(nSerial);
 			MakeItsFile(nSerial, nLayer);
+			//if(nLayer == RMAP_UP || nLayer == RMAP_INNER_UP)
+			//	LoadPCRUpFromMk(nSerial);
+			//else
+			//	LoadPCRDnFromMk(nSerial);
+			//MakeItsFile(nSerial, nLayer);
+
+			nTot++;
+		}
+	}
+
+	nLayer = GetLayer(m_sLayerDn);
+	nTot = 0;
+	bExist = cFile[0].FindFile(sPathPcr[1]);
+	while (bExist)
+	{
+		bExist = cFile[1].FindNextFile();
+		if (cFile[1].IsDots()) continue;
+		if (!cFile[1].IsDirectory())
+		{
+			sFileName = cFile[1].GetFileName();
+			nPos = sFileName.ReverseFind('.');
+			if (nPos > 0)
+				sSerial = sFileName.Left(nPos);
+
+			nSerial = _tstoi(sSerial);
+
+			LoadPCRUpFromMk(nSerial);
+			MakeItsFile(nSerial, nLayer);
+			//if(nLayer == RMAP_UP || nLayer == RMAP_INNER_UP)
+			//	LoadPCRUpFromMk(nSerial);
+			//else
+			//	LoadPCRDnFromMk(nSerial);
+			//MakeItsFile(nSerial, nLayer);
 
 			nTot++;
 		}
