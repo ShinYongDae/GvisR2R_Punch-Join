@@ -17236,6 +17236,8 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 				if (nSerial > 0)
 				{
 					CheckShareUp(nSerial);
+					if (m_bPcrInShare[0])
+						SetFeedingEnableToPlc(nSerial, 0);
 				}
 			}
 
@@ -17247,17 +17249,13 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 					if (nSerial > 0)
 					{
 						CheckShareDn(nSerial);
+						if (m_bPcrInShare[1])
+							SetFeedingEnableToPlc(nSerial, 1);
 					}
 				}
 
 				if (m_bPcrInShare[0] || m_bPcrInShare[1])
 				{
-					if (m_bPcrInShare[0] && m_bPcrInShare[1])
-						SetFeedingEnableToPlc(nSerial, 2);
-					else if (m_bPcrInShare[0])
-						SetFeedingEnableToPlc(nSerial, 0);
-					else if (m_bPcrInShare[1])
-						SetFeedingEnableToPlc(nSerial, 1);
 					m_nStepAuto++;
 				}
 			}
@@ -18140,6 +18138,8 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 				if (nSerial > 0)
 				{
 					CheckShareUp(nSerial);
+					if (m_bPcrInShare[0])
+						SetFeedingEnableToPlc(nSerial, 0);
 				}
 				else
 				{
@@ -18158,6 +18158,8 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 					if (nSerial > 0)
 					{
 						CheckShareDn(nSerial);
+						if (m_bPcrInShare[1])
+							SetFeedingEnableToPlc(nSerial, 1);
 					}
 					else
 					{
@@ -18169,12 +18171,6 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 
 				if (m_bPcrInShare[0] || m_bPcrInShare[1])
 				{
-					if(m_bPcrInShare[0] && m_bPcrInShare[1])
-						SetFeedingEnableToPlc(nSerial, 2);
-					else if (m_bPcrInShare[0])
-						SetFeedingEnableToPlc(nSerial, 0);
-					else if (m_bPcrInShare[1])
-						SetFeedingEnableToPlc(nSerial, 1);
 					m_nStepAuto++;
 				}
 			}
@@ -35077,13 +35073,13 @@ void CGvisR2R_PunchView::SetFeedingEnableToPlc(int nSerial, int nUpDn) // 0(Up),
 		Sleep(30);
 		MpeWrite(Plc.DlgMenu03.PcrReceivedAoiDn, 1); // AOI 하 : PCR파일 Received
 		break;
-	case 2:
-		MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiUp, (long)nSerial);	// 검사한 Panel의 AOI 상 Serial
-		MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn, (long)nSerial);	// 검사한 Panel의 AOI 하 Serial
-		Sleep(30);
-		MpeWrite(Plc.DlgMenu03.PcrReceivedAoiUp, 1); // AOI 상 : PCR파일 Received
-		MpeWrite(Plc.DlgMenu03.PcrReceivedAoiDn, 1); // AOI 하 : PCR파일 Received
-		break;
+	//case 2:
+	//	MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiUp, (long)nSerial);	// 검사한 Panel의 AOI 상 Serial
+	//	MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn, (long)nSerial);	// 검사한 Panel의 AOI 하 Serial
+	//	Sleep(30);
+	//	MpeWrite(Plc.DlgMenu03.PcrReceivedAoiUp, 1); // AOI 상 : PCR파일 Received
+	//	MpeWrite(Plc.DlgMenu03.PcrReceivedAoiDn, 1); // AOI 하 : PCR파일 Received
+	//	break;
 	}
 	//BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
 	//sSrc = pDoc->WorkingInfo.System.sPathVrsShareUp;
