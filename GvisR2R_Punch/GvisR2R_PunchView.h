@@ -790,6 +790,7 @@ public:
 
 
 	// Auto Sequence
+	void SetFeedingEnableToPlc(int nSerial, int nUpDn); // 0(Up), 1(Dn), 2(All)
 	BOOL IsReady();
 	void DoShift2Mk();
 	void RunShift2Mk();

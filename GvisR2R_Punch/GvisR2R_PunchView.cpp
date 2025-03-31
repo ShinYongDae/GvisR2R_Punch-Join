@@ -8217,44 +8217,32 @@ void CGvisR2R_PunchView::Shift2DummyBuf()
 
 	sSrc = pDoc->WorkingInfo.System.sPathVrsShareUp;
 	sDest = pDoc->WorkingInfo.System.sPathVsDummyBufUp;
-	//sSrc.Format(_T("%s*.*"), pDoc->WorkingInfo.System.sPathVrsShareUp);
-	//sDest.Format(_T("%s*.*"), pDoc->WorkingInfo.System.sPathVsDummyBufUp);
-
-	//if (findfile.FindFile(sSrc))
+	if (pDoc->m_pFile)
 	{
-		if (pDoc->m_pFile)
-		{
-			nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
-			pDoc->m_pFile->DelPcr(sSrc, nSerial);
-			if (nSerial > 0)
-			{
-				MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiUp, (long)nSerial);	// 검사한 Panel의 AOI 상 Serial
-				Sleep(30);
-				MpeWrite(Plc.DlgMenu03.PcrReceivedAoiUp, 1); // AOI 상 : PCR파일 Received
-			}
-		}
+		nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
+		pDoc->m_pFile->DelPcr(sSrc, nSerial);
+		//if (nSerial > 0)
+		//{
+		//	MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiUp, (long)nSerial);	// 검사한 Panel의 AOI 상 Serial
+		//	Sleep(30);
+		//	MpeWrite(Plc.DlgMenu03.PcrReceivedAoiUp, 1); // AOI 상 : PCR파일 Received
+		//}
 	}
 
 	if (bDualTest)
 	{
 		sSrc = pDoc->WorkingInfo.System.sPathVrsShareDn;
 		sDest = pDoc->WorkingInfo.System.sPathVsDummyBufDn;
-		//sSrc.Format(_T("%s*.*"), pDoc->WorkingInfo.System.sPathVrsShareDn);
-		//sDest.Format(_T("%s*.*"), pDoc->WorkingInfo.System.sPathVsDummyBufDn);
-
-		//if (findfile.FindFile(sSrc))
+		if (pDoc->m_pFile)
 		{
-			if (pDoc->m_pFile)
-			{
-				nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
-				pDoc->m_pFile->DelPcr(sSrc, nSerial);
-				if (nSerial > 0)
-				{
-					MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn, (long)nSerial);	// 검사한 Panel의 AOI 하 Serial
-					Sleep(30);
-					MpeWrite(Plc.DlgMenu03.PcrReceivedAoiDn, 1); // AOI 하 : PCR파일 Received
-				}
-			}
+			nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
+			pDoc->m_pFile->DelPcr(sSrc, nSerial);
+			//if (nSerial > 0)
+			//{
+			//	MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn, (long)nSerial);	// 검사한 Panel의 AOI 하 Serial
+			//	Sleep(30);
+			//	MpeWrite(Plc.DlgMenu03.PcrReceivedAoiDn, 1); // AOI 하 : PCR파일 Received
+			//}
 		}
 	}
 }
@@ -8270,36 +8258,26 @@ void CGvisR2R_PunchView::Shift2Buf()	// 버퍼폴더의 마지막 시리얼과 Share폴더의 �
 	{
 		sSrc = pDoc->WorkingInfo.System.sPathVsShareUp;
 		sDest = pDoc->WorkingInfo.System.sPathVrsBufUp;
-		//sSrc.Format(_T("%s*.*"), pDoc->WorkingInfo.System.sPathVsShareUp);
-		//sDest.Format(_T("%s*.*"), pDoc->WorkingInfo.System.sPathVrsBufUp);
-
-		//if (findfile.FindFile(sSrc))
+		if (pDoc->m_pFile)
 		{
-			if (pDoc->m_pFile)
-			{
-				nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
-				if (nSerial > 0)
-					m_nShareUpS = nSerial;
-				pDoc->m_pFile->DelPcr(sSrc, nSerial);
-				SetListBuf();
-			}
+			nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
+			if (nSerial > 0)
+				m_nShareUpS = nSerial;
+			pDoc->m_pFile->DelPcr(sSrc, nSerial);
+			SetListBuf();
 		}
+
 		if (bDualTest)
 		{
 			sSrc = pDoc->WorkingInfo.System.sPathVsShareDn;
 			sDest = pDoc->WorkingInfo.System.sPathVrsBufDn;
-			//sSrc.Format(_T("%s*.*"), pDoc->WorkingInfo.System.sPathVsShareDn);
-			//sDest.Format(_T("%s*.*"), pDoc->WorkingInfo.System.sPathVrsBufDn);
-			//if (findfile.FindFile(sSrc))
+			if (pDoc->m_pFile)
 			{
-				if (pDoc->m_pFile)
-				{
-					nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
-					if (nSerial > 0)
-						m_nShareDnS = nSerial;
-					pDoc->m_pFile->DelPcr(sSrc, nSerial);
-					SetListBuf();
-				}
+				nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
+				if (nSerial > 0)
+					m_nShareDnS = nSerial;
+				pDoc->m_pFile->DelPcr(sSrc, nSerial);
+				SetListBuf();
 			}
 		}
 
@@ -8307,55 +8285,45 @@ void CGvisR2R_PunchView::Shift2Buf()	// 버퍼폴더의 마지막 시리얼과 Share폴더의 �
 	}
 	else
 	{
+		
 		sSrc = pDoc->WorkingInfo.System.sPathVrsShareUp;
 		sDest = pDoc->WorkingInfo.System.sPathVrsBufUp;
-		//sSrc.Format(_T("%s*.*"), pDoc->WorkingInfo.System.sPathVrsShareUp);
-		//sDest.Format(_T("%s*.*"), pDoc->WorkingInfo.System.sPathVrsBufUp);
 
-		//if (findfile.FindFile(sSrc))
+		if (pDoc->m_pFile)
 		{
-			if (pDoc->m_pFile)
+			nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
+			pDoc->m_pFile->DelPcr(sSrc, nSerial);
+			if (nSerial > 0)
 			{
-				nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
-				pDoc->m_pFile->DelPcr(sSrc, nSerial);
-				if (nSerial > 0)
-				{
-					m_nShareUpS = nSerial;
-					MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiUp, (long)nSerial);	// 검사한 Panel의 AOI 상 Serial
-					Sleep(30);
-					MpeWrite(Plc.DlgMenu03.PcrReceivedAoiUp, 1); // AOI 상 : PCR파일 Received
-				}
-				SetListBuf();
+				m_nShareUpS = nSerial;
+				//MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiUp, (long)nSerial);	// 검사한 Panel의 AOI 상 Serial
+				//Sleep(30);
+				//MpeWrite(Plc.DlgMenu03.PcrReceivedAoiUp, 1); // AOI 상 : PCR파일 Received
 			}
+			SetListBuf();
 		}
 
 		if (bDualTest)
 		{
 			sSrc = pDoc->WorkingInfo.System.sPathVrsShareDn;
 			sDest = pDoc->WorkingInfo.System.sPathVrsBufDn;
-			//sSrc.Format(_T("%s*.*"), pDoc->WorkingInfo.System.sPathVrsShareDn);
-			//sDest.Format(_T("%s*.*"), pDoc->WorkingInfo.System.sPathVrsBufDn);
 
-			//if (findfile.FindFile(sSrc))
+			if (pDoc->m_pFile)
 			{
-				if (pDoc->m_pFile)
+				nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
+				pDoc->m_pFile->DelPcr(sSrc, nSerial);
+				if (nSerial > 0)
 				{
-					nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
-					pDoc->m_pFile->DelPcr(sSrc, nSerial);
-					if (nSerial > 0)
-					{
-						m_nShareDnS = nSerial;
-						MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn, (long)nSerial);	// 검사한 Panel의 AOI 하 Serial
-						//MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn , (long)GetAoiDnAutoSerial() - 1);	// 검사한 Panel의 AOI 하 Serial
-						Sleep(30);
-						MpeWrite(Plc.DlgMenu03.PcrReceivedAoiDn, 1); // AOI 하 : PCR파일 Received
-					}
-					SetListBuf();
+					m_nShareDnS = nSerial;
+					//MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn, (long)nSerial);	// 검사한 Panel의 AOI 하 Serial
+					////MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn , (long)GetAoiDnAutoSerial() - 1);	// 검사한 Panel의 AOI 하 Serial
+					//Sleep(30);
+					//MpeWrite(Plc.DlgMenu03.PcrReceivedAoiDn, 1); // AOI 하 : PCR파일 Received
 				}
+				SetListBuf();
 			}
 		}
-
-		//SetListBuf();
+		SetListBuf();
 	}
 }
 
@@ -17283,12 +17251,23 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 				}
 
 				if (m_bPcrInShare[0] || m_bPcrInShare[1])
+				{
+					if (m_bPcrInShare[0] && m_bPcrInShare[1])
+						SetFeedingEnableToPlc(nSerial, 2);
+					else if (m_bPcrInShare[0])
+						SetFeedingEnableToPlc(nSerial, 0);
+					else if (m_bPcrInShare[1])
+						SetFeedingEnableToPlc(nSerial, 1);
 					m_nStepAuto++;
+				}
 			}
 			else
 			{
 				if (m_bPcrInShare[0])
+				{
+					SetFeedingEnableToPlc(nSerial, 0);
 					m_nStepAuto++;
+				}
 			}
 		}
 		else // if (IsShare())
@@ -18189,12 +18168,23 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 					m_bLoadShare[1] = FALSE;
 
 				if (m_bPcrInShare[0] || m_bPcrInShare[1])
+				{
+					if(m_bPcrInShare[0] && m_bPcrInShare[1])
+						SetFeedingEnableToPlc(nSerial, 2);
+					else if (m_bPcrInShare[0])
+						SetFeedingEnableToPlc(nSerial, 0);
+					else if (m_bPcrInShare[1])
+						SetFeedingEnableToPlc(nSerial, 1);
 					m_nStepAuto++;
+				}
 			}
 			else
 			{
 				if (m_bPcrInShare[0])
+				{
+					SetFeedingEnableToPlc(nSerial, 0);
 					m_nStepAuto++;
+				}
 			}
 		}
 		else // if (IsShare())
@@ -19850,7 +19840,11 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 				}
 			}
 			else
-				m_nMkStAuto++;
+			{
+				//m_nMkStAuto++;
+				if (IsRun())
+					m_nMkStAuto = MK_ST + (Mk2PtIdx::Move1Cam1); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
+			}
 
 			break;
 		case MK_ST + (Mk2PtIdx::Align0_0) + 2:
@@ -35064,4 +35058,70 @@ void CGvisR2R_PunchView::ResetTargetPos()
 	m_dTarget[AXIS_Y1] = _tstof(pDoc->WorkingInfo.Motion.sStPosY[1]);
 	m_dNextTarget[AXIS_X1] = _tstof(pDoc->WorkingInfo.Motion.sStPosX[1]);
 	m_dNextTarget[AXIS_Y1] = _tstof(pDoc->WorkingInfo.Motion.sStPosY[1]);
+}
+
+void CGvisR2R_PunchView::SetFeedingEnableToPlc(int nSerial, int nUpDn) // 0(Up), 1(Dn), 2(All)
+{
+	//if (pDoc->m_bVsStatusUp)
+	//	return;
+
+	switch (nUpDn)
+	{
+	case 0:
+		MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiUp, (long)nSerial);	// 검사한 Panel의 AOI 상 Serial
+		Sleep(30);
+		MpeWrite(Plc.DlgMenu03.PcrReceivedAoiUp, 1); // AOI 상 : PCR파일 Received
+		break;
+	case 1:
+		MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn, (long)nSerial);	// 검사한 Panel의 AOI 하 Serial
+		Sleep(30);
+		MpeWrite(Plc.DlgMenu03.PcrReceivedAoiDn, 1); // AOI 하 : PCR파일 Received
+		break;
+	case 2:
+		MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiUp, (long)nSerial);	// 검사한 Panel의 AOI 상 Serial
+		MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn, (long)nSerial);	// 검사한 Panel의 AOI 하 Serial
+		Sleep(30);
+		MpeWrite(Plc.DlgMenu03.PcrReceivedAoiUp, 1); // AOI 상 : PCR파일 Received
+		MpeWrite(Plc.DlgMenu03.PcrReceivedAoiDn, 1); // AOI 하 : PCR파일 Received
+		break;
+	}
+	//BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
+	//sSrc = pDoc->WorkingInfo.System.sPathVrsShareUp;
+	//sDest = pDoc->WorkingInfo.System.sPathVrsBufUp;
+
+		//if (pDoc->m_pFile)
+		//{
+		//	nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
+		//	pDoc->m_pFile->DelPcr(sSrc, nSerial);
+			//if (nSerial > 0)
+			//{
+		//		m_nShareUpS = nSerial;
+				//MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiUp, (long)nSerial);	// 검사한 Panel의 AOI 상 Serial
+				//Sleep(30);
+				//MpeWrite(Plc.DlgMenu03.PcrReceivedAoiUp, 1); // AOI 상 : PCR파일 Received
+		//}
+		//	SetListBuf();
+		//}
+
+	//if (bDualTest)
+	//{
+		//sSrc = pDoc->WorkingInfo.System.sPathVrsShareDn;
+		//sDest = pDoc->WorkingInfo.System.sPathVrsBufDn;
+
+			//if (pDoc->m_pFile)
+			//{
+			//	nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
+			//	pDoc->m_pFile->DelPcr(sSrc, nSerial);
+				//if (nSerial > 0)
+				//{
+			//		m_nShareDnS = nSerial;
+			//		MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn, (long)nSerial);	// 검사한 Panel의 AOI 하 Serial
+			//																		//MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn , (long)GetAoiDnAutoSerial() - 1);	// 검사한 Panel의 AOI 하 Serial
+			//		Sleep(30);
+			//		MpeWrite(Plc.DlgMenu03.PcrReceivedAoiDn, 1); // AOI 하 : PCR파일 Received
+			//}
+			//	SetListBuf();
+			//}
+	//}
+
 }
