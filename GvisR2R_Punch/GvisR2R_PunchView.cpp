@@ -8258,30 +8258,38 @@ void CGvisR2R_PunchView::Shift2Buf()	// 버퍼폴더의 마지막 시리얼과 Share폴더의 �
 	{
 		sSrc = pDoc->WorkingInfo.System.sPathVsShareUp;
 		sDest = pDoc->WorkingInfo.System.sPathVrsBufUp;
-		if (pDoc->m_pFile)
+		if (m_bPcrInShare[0])
 		{
-			nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
-			if (nSerial > 0)
-				m_nShareUpS = nSerial;
-			pDoc->m_pFile->DelPcr(sSrc, nSerial);
-			SetListBuf();
+			if (pDoc->m_pFile)
+			{
+				nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
+				if (nSerial > 0)
+					m_nShareUpS = nSerial;
+				pDoc->m_pFile->DelPcr(sSrc, nSerial);
+				m_bPcrInShare[0] = FALSE;
+				//SetListBuf();
+			}
 		}
 
 		if (bDualTest)
 		{
 			sSrc = pDoc->WorkingInfo.System.sPathVsShareDn;
 			sDest = pDoc->WorkingInfo.System.sPathVrsBufDn;
-			if (pDoc->m_pFile)
+			if (m_bPcrInShare[1])
 			{
-				nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
-				if (nSerial > 0)
-					m_nShareDnS = nSerial;
-				pDoc->m_pFile->DelPcr(sSrc, nSerial);
-				SetListBuf();
+				if (pDoc->m_pFile)
+				{
+					nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
+					if (nSerial > 0)
+						m_nShareDnS = nSerial;
+					pDoc->m_pFile->DelPcr(sSrc, nSerial);
+					m_bPcrInShare[1] = FALSE;
+					//SetListBuf();
+				}
 			}
 		}
 
-		//SetListBuf();
+		SetListBuf();
 	}
 	else
 	{
@@ -8289,18 +8297,22 @@ void CGvisR2R_PunchView::Shift2Buf()	// 버퍼폴더의 마지막 시리얼과 Share폴더의 �
 		sSrc = pDoc->WorkingInfo.System.sPathVrsShareUp;
 		sDest = pDoc->WorkingInfo.System.sPathVrsBufUp;
 
-		if (pDoc->m_pFile)
+		if (m_bPcrInShare[0])
 		{
-			nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
-			pDoc->m_pFile->DelPcr(sSrc, nSerial);
-			if (nSerial > 0)
+			if (pDoc->m_pFile)
 			{
-				m_nShareUpS = nSerial;
-				//MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiUp, (long)nSerial);	// 검사한 Panel의 AOI 상 Serial
-				//Sleep(30);
-				//MpeWrite(Plc.DlgMenu03.PcrReceivedAoiUp, 1); // AOI 상 : PCR파일 Received
+				nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
+				pDoc->m_pFile->DelPcr(sSrc, nSerial);
+				m_bPcrInShare[0] = FALSE;
+				if (nSerial > 0)
+				{
+					m_nShareUpS = nSerial;
+					//MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiUp, (long)nSerial);	// 검사한 Panel의 AOI 상 Serial
+					//Sleep(30);
+					//MpeWrite(Plc.DlgMenu03.PcrReceivedAoiUp, 1); // AOI 상 : PCR파일 Received
+				}
+				//SetListBuf();
 			}
-			SetListBuf();
 		}
 
 		if (bDualTest)
@@ -8308,19 +8320,23 @@ void CGvisR2R_PunchView::Shift2Buf()	// 버퍼폴더의 마지막 시리얼과 Share폴더의 �
 			sSrc = pDoc->WorkingInfo.System.sPathVrsShareDn;
 			sDest = pDoc->WorkingInfo.System.sPathVrsBufDn;
 
-			if (pDoc->m_pFile)
+			if (m_bPcrInShare[1])
 			{
-				nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
-				pDoc->m_pFile->DelPcr(sSrc, nSerial);
-				if (nSerial > 0)
+				if (pDoc->m_pFile)
 				{
-					m_nShareDnS = nSerial;
-					//MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn, (long)nSerial);	// 검사한 Panel의 AOI 하 Serial
-					////MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn , (long)GetAoiDnAutoSerial() - 1);	// 검사한 Panel의 AOI 하 Serial
-					//Sleep(30);
-					//MpeWrite(Plc.DlgMenu03.PcrReceivedAoiDn, 1); // AOI 하 : PCR파일 Received
+					nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
+					pDoc->m_pFile->DelPcr(sSrc, nSerial);
+					m_bPcrInShare[1] = FALSE;
+					if (nSerial > 0)
+					{
+						m_nShareDnS = nSerial;
+						//MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn, (long)nSerial);	// 검사한 Panel의 AOI 하 Serial
+						////MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn , (long)GetAoiDnAutoSerial() - 1);	// 검사한 Panel의 AOI 하 Serial
+						//Sleep(30);
+						//MpeWrite(Plc.DlgMenu03.PcrReceivedAoiDn, 1); // AOI 하 : PCR파일 Received
+					}
+					//SetListBuf();
 				}
-				SetListBuf();
 			}
 		}
 		SetListBuf();
@@ -18190,7 +18206,46 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 				if (ChkLastProc())
 				{
 					TurnLastProc();
+					pDoc->LogAuto(_T("TurnLastProc()"));
 					m_nStepAuto++;
+
+					if (IsShareUp())
+					{
+						nSerial = GetShareUp();
+						if (nSerial > 0)
+						{
+							CheckShareUp(nSerial);
+							if (m_bPcrInShare[0])
+								SetFeedingEnableToPlc(nSerial, 0);
+						}
+						else
+						{
+							m_bLoadShare[0] = FALSE;
+						}
+					}
+					else
+						m_bLoadShare[0] = FALSE;
+
+
+					if (bDualTest)
+					{
+						if (IsShareDn())
+						{
+							nSerial = GetShareDn();
+							if (nSerial > 0)
+							{
+								CheckShareDn(nSerial);
+								if (m_bPcrInShare[1])
+									SetFeedingEnableToPlc(nSerial, 1);
+							}
+							else
+							{
+								m_bLoadShare[1] = FALSE;
+							}
+						}
+						else
+							m_bLoadShare[1] = FALSE;
+					}
 				}
 			}
 			else
@@ -18206,6 +18261,46 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 					{
 						SetLotEnd(nSerial);
 					}
+				}
+
+				if (IsShareUp())
+				{
+					nSerial = GetShareUp();
+					if (nSerial > 0)
+					{
+						pDoc->LogAuto(_T("LastProc..."));
+						CheckShareUp(nSerial);
+						if (m_bPcrInShare[0])
+							SetFeedingEnableToPlc(nSerial, 0);
+					}
+					else
+					{
+						m_bLoadShare[0] = FALSE;
+					}
+				}
+				else
+					m_bLoadShare[0] = FALSE;
+
+
+				if (bDualTest)
+				{
+					if (IsShareDn())
+					{
+						nSerial = GetShareDn();
+						if (nSerial > 0)
+						{
+							pDoc->LogAuto(_T("LastProc..."));
+							CheckShareDn(nSerial);
+							if (m_bPcrInShare[1])
+								SetFeedingEnableToPlc(nSerial, 1);
+						}
+						else
+						{
+							m_bLoadShare[1] = FALSE;
+						}
+					}
+					else
+						m_bLoadShare[1] = FALSE;
 				}
 
 				m_bWaitPcr[0] = FALSE; pDoc->SetStatus(_T("General"), _T("bWaitPcr[0]"), m_bWaitPcr[0]);
@@ -20032,7 +20127,10 @@ void CGvisR2R_PunchView::Mk2PtAlignPt1()
 			break;
 		case MK_ST + (Mk2PtIdx::Move1Cam0) :
 			if (MoveAlign0(1))	// Move - Cam0 - Pt1
-				m_nMkStAuto++;
+			{
+				//m_nMkStAuto++;
+				m_nMkStAuto = MK_ST + (Mk2PtIdx::Move1Cam0) + 2;
+			}
 			break;
 		case MK_ST + (Mk2PtIdx::Move1Cam0) + 1:
 			if (IsRun())
@@ -20041,8 +20139,9 @@ void CGvisR2R_PunchView::Mk2PtAlignPt1()
 		case MK_ST + (Mk2PtIdx::Move1Cam0) + 2:
 			if (IsMoveDone())
 			{
-				Sleep(30);
-				m_nMkStAuto = MK_ST + (Mk2PtIdx::Align1_1); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
+				//Sleep(30);
+				if (IsRun())
+					m_nMkStAuto = MK_ST + (Mk2PtIdx::Align1_1); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
 			}
 			break;
 		case MK_ST + (Mk2PtIdx::Align1_1) :	// 2PtAlign - Cam1 - Pt1
@@ -20248,7 +20347,7 @@ void CGvisR2R_PunchView::Mk2PtMoveInitPos()
 			if (IsMoveDone())
 			{
 				//m_nMkStAuto = MK_ST + (Mk2PtIdx::DoMk);
-				m_nMkStAuto = MK_ST + (Mk2PtIdx::ChkElec); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
+				m_nMkStAuto = MK_ST + (Mk2PtIdx::ChkElec) + 1; pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
 			}
 			break;
 		case MK_ST + (Mk2PtIdx::MoveInitPt) + 2:
@@ -20295,7 +20394,7 @@ void CGvisR2R_PunchView::Mk2PtElecChk()
 		   break;
 
 		case MK_ST + (Mk2PtIdx::ChkElec) + 1:
-			if (ChkLightErr())
+			if (ChkLightErr()) // 노광불량
 			{
 				m_bChkLightErr = FALSE;
 				m_nMkStAuto++;
@@ -26047,7 +26146,8 @@ void CGvisR2R_PunchView::MonDispMain() // PLC의 운전상태 표시
 	{
 		if (m_sDispMain != _T("운전중"))
 		{
-			pDoc->LogAuto(_T("재가동, 운전 버튼 누름"));
+			if(!IsRun())
+				pDoc->LogAuto(_T("재가동, 운전 버튼 누름"));
 			DispMain(_T("운전중"), RGB_GREEN);	
 			pDoc->SetMkMenu03(_T("Main"), _T("Run"), TRUE);
 			pDoc->SetMkMenu03(_T("Main"), _T("Stop"), FALSE);
@@ -35060,6 +35160,7 @@ void CGvisR2R_PunchView::SetFeedingEnableToPlc(int nSerial, int nUpDn) // 0(Up),
 {
 	//if (pDoc->m_bVsStatusUp)
 	//	return;
+	CString sMsg;
 
 	switch (nUpDn)
 	{
@@ -35067,11 +35168,15 @@ void CGvisR2R_PunchView::SetFeedingEnableToPlc(int nSerial, int nUpDn) // 0(Up),
 		MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiUp, (long)nSerial);	// 검사한 Panel의 AOI 상 Serial
 		Sleep(30);
 		MpeWrite(Plc.DlgMenu03.PcrReceivedAoiUp, 1); // AOI 상 : PCR파일 Received
+		sMsg.Format(_T("%d 상면 피딩가능 ON"), nSerial);
+		pDoc->LogAuto(sMsg);
 		break;
 	case 1:
 		MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn, (long)nSerial);	// 검사한 Panel의 AOI 하 Serial
 		Sleep(30);
 		MpeWrite(Plc.DlgMenu03.PcrReceivedAoiDn, 1); // AOI 하 : PCR파일 Received
+		sMsg.Format(_T("%d 하면 피딩가능 ON"), nSerial);
+		pDoc->LogAuto(sMsg);
 		break;
 	//case 2:
 	//	MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiUp, (long)nSerial);	// 검사한 Panel의 AOI 상 Serial

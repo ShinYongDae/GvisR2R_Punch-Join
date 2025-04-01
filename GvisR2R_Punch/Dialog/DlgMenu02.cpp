@@ -2979,9 +2979,9 @@ void CDlgMenu02::Grab2PntAlign()
 	pPos[3] = pDoc->m_Master[0].m_stAlignMk.Y1 + pView->m_pMotion->m_dPinPosY[0];
 
 	int nPos = -1;
-	if ((dCurrX > pPos[0] - 0.1 && dCurrX < pPos[0] + 0.1) && (dCurrY > pPos[1] - 0.1 && dCurrY < pPos[1] + 0.1))
+	if ((dCurrX > pPos[0] - 10.1 && dCurrX < pPos[0] + 10.1) && (dCurrY > pPos[1] - 10.1 && dCurrY < pPos[1] + 10.1))
 		nPos = 0;
-	else if ((dCurrX > pPos[2] - 0.1 && dCurrX < pPos[2] + 0.1) && (dCurrY > pPos[3] - 0.1 && dCurrY < pPos[3] + 0.1))
+	else if ((dCurrX > pPos[2] - 10.1 && dCurrX < pPos[2] + 10.1) && (dCurrY > pPos[3] - 10.1 && dCurrY < pPos[3] + 10.1))
 		nPos = 1;
 
 	if (nPos == -1)
@@ -3119,13 +3119,13 @@ void CDlgMenu02::Grab4PntAlign()
 	pPos[7] = pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[0];
 
 	int nPos = -1;
-	if ((dCurrX > pPos[0] - 0.1 && dCurrX < pPos[0] + 0.1) && (dCurrY > pPos[1] - 0.1 && dCurrY < pPos[1] + 0.1))
+	if ((dCurrX > pPos[0] - 10.1 && dCurrX < pPos[0] + 10.1) && (dCurrY > pPos[1] - 10.1 && dCurrY < pPos[1] + 10.1))
 		nPos = 0;
-	else if ((dCurrX > pPos[2] - 0.1 && dCurrX < pPos[2] + 0.1) && (dCurrY > pPos[3] - 0.1 && dCurrY < pPos[3] + 0.1))
+	else if ((dCurrX > pPos[2] - 10.1 && dCurrX < pPos[2] + 10.1) && (dCurrY > pPos[3] - 10.1 && dCurrY < pPos[3] + 10.1))
 		nPos = 1;
-	else if ((dCurrX > pPos[4] - 0.1 && dCurrX < pPos[4] + 0.1) && (dCurrY > pPos[5] - 0.1 && dCurrY < pPos[5] + 0.1))
+	else if ((dCurrX > pPos[4] - 10.1 && dCurrX < pPos[4] + 10.1) && (dCurrY > pPos[5] - 10.1 && dCurrY < pPos[5] + 10.1))
 		nPos = 2;
-	else if ((dCurrX > pPos[6] - 0.1 && dCurrX < pPos[6] + 0.1) && (dCurrY > pPos[7] - 0.1 && dCurrY < pPos[7] + 0.1))
+	else if ((dCurrX > pPos[6] - 10.1 && dCurrX < pPos[6] + 10.1) && (dCurrY > pPos[7] - 10.1 && dCurrY < pPos[7] + 10.1))
 		nPos = 3;
 
 	if (nPos == -1)
@@ -4584,9 +4584,9 @@ void CDlgMenu02::Grab2PntAlign2()
 	pPos[3] = pDoc->m_Master[0].m_stAlignMk.Y1 + pView->m_pMotion->m_dPinPosY[1];
 
 	int nPos = -1;
-	if ((dCurrX > pPos[0] - 0.1 && dCurrX < pPos[0] + 0.1) && (dCurrY > pPos[1] - 0.1 && dCurrY < pPos[1] + 0.1))
+	if ((dCurrX > pPos[0] - 10.1 && dCurrX < pPos[0] + 10.1) && (dCurrY > pPos[1] - 10.1 && dCurrY < pPos[1] + 10.1))
 		nPos = 0;
-	else if ((dCurrX > pPos[2] - 0.1 && dCurrX < pPos[2] + 0.1) && (dCurrY > pPos[3] - 0.1 && dCurrY < pPos[3] + 0.1))
+	else if ((dCurrX > pPos[2] - 10.1 && dCurrX < pPos[2] + 10.1) && (dCurrY > pPos[3] - 10.1 && dCurrY < pPos[3] + 10.1))
 		nPos = 1;
 
 	if (nPos == -1)
@@ -4726,13 +4726,13 @@ void CDlgMenu02::Grab4PntAlign2()
 	pPos[7] = pDoc->m_Master[0].m_stAlignMk2.Y3 + pView->m_pMotion->m_dPinPosY[1];
 
 	int nPos = -1;
-	if ((dCurrX > pPos[0] - 0.1 && dCurrX < pPos[0] + 0.1) && (dCurrY > pPos[1] - 0.1 && dCurrY < pPos[1] + 0.1))
+	if ((dCurrX > pPos[0] - 10.1 && dCurrX < pPos[0] + 10.1) && (dCurrY > pPos[1] - 10.1 && dCurrY < pPos[1] + 10.1))
 		nPos = 0;
-	else if ((dCurrX > pPos[2] - 0.1 && dCurrX < pPos[2] + 0.1) && (dCurrY > pPos[3] - 0.1 && dCurrY < pPos[3] + 0.1))
+	else if ((dCurrX > pPos[2] - 10.1 && dCurrX < pPos[2] + 10.1) && (dCurrY > pPos[3] - 10.1 && dCurrY < pPos[3] + 10.1))
 		nPos = 1;
-	else if ((dCurrX > pPos[4] - 0.1 && dCurrX < pPos[4] + 0.1) && (dCurrY > pPos[5] - 0.1 && dCurrY < pPos[5] + 0.1))
+	else if ((dCurrX > pPos[4] - 10.1 && dCurrX < pPos[4] + 10.1) && (dCurrY > pPos[5] - 10.1 && dCurrY < pPos[5] + 10.1))
 		nPos = 2;
-	else if ((dCurrX > pPos[6] - 0.1 && dCurrX < pPos[6] + 0.1) && (dCurrY > pPos[7] - 0.1 && dCurrY < pPos[7] + 0.1))
+	else if ((dCurrX > pPos[6] - 10.1 && dCurrX < pPos[6] + 10.1) && (dCurrY > pPos[7] - 10.1 && dCurrY < pPos[7] + 10.1))
 		nPos = 3;
 
 

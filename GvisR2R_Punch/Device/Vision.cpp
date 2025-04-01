@@ -3741,6 +3741,247 @@ double CVision::CalcCameraPixelSize()
 
 BOOL CVision::GrabIRayple(int nPos, BOOL bDraw) // set Model from cam master for pattern matching
 {
+	int i = 0;
+	double dAngle = 0.0, dScore = 0.0;
+	double dPosX, dPosY;
+	dPosX = 0.0;
+	dPosY = 0.0;
+
+#ifdef USE_IRAYPLE
+	if (!m_pIRayple)
+		return FALSE;
+
+#ifdef USE_MIL
+	int nSizeX = m_pIRayple->GetImgWidth();
+	int nSizeY = m_pIRayple->GetImgHeight();
+	CLibMilBuf *MilGrabImg = NULL, *MilGrabBinImg = NULL, *MilPatImg = NULL, *MilPatRzImg = NULL;//, *MilPatRtImg=NULL;
+	MilGrabImg = m_pMil->AllocBuf(nSizeX, nSizeY, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
+	MilGrabBinImg = m_pMil->AllocBuf(nSizeX, nSizeY, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
+
+	DWORD dwSt = GetTickCount();
+
+
+	double dRsRtoX = (_tstof(pDoc->WorkingInfo.Vision[m_nIdx].sCamPxlRes) / 10000.0) / _tstof(pDoc->WorkingInfo.Vision[m_nIdx].sResX);
+	double dRsRtoY = (_tstof(pDoc->WorkingInfo.Vision[m_nIdx].sCamPxlRes) / 10000.0) / _tstof(pDoc->WorkingInfo.Vision[m_nIdx].sResY);
+	long lSzX = (long)((double)ALIGN_IMG_DISP_SIZEX * dRsRtoX);
+	long lSzY = (long)((double)ALIGN_IMG_DISP_SIZEY * dRsRtoY);
+	MilPatImg = m_pMil->AllocBuf(ALIGN_IMG_DISP_SIZEX, ALIGN_IMG_DISP_SIZEY, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
+	MilPatRzImg = m_pMil->AllocBuf(lSzX, lSzY, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
+	MimBinarize(MilBufAlignTemp[nPos], MilPatImg->m_MilImage, M_GREATER, 0, 0); // MilBufAlignTemp of CamMaster Model : size 200 x 200 
+	MimResize(MilPatImg->m_MilImage, MilPatRzImg->m_MilImage, dRsRtoX, dRsRtoY, M_DEFAULT);
+
+
+	dScore = _tstof(pDoc->WorkingInfo.Vision[m_nIdx].sStdScr);
+	if (dScore < 10.0)
+		dScore = 10.0;
+
+	m_pMil->PatternMatchingAlloc(MilPatRzImg->m_MilImage, dScore); // (200 x 200)에서 카메라 해상도로 Resized pattern matching model
+
+	CString str;
+	str.Format(_T("%d [mSec]"), GetTickCount() - dwSt);
+
+	/////// 	pView->DispStsBar(str, 0);
+
+//#ifdef _DEBUG
+	TCHAR szFileName[30];
+	_stprintf(szFileName, _T("C:\\AlignPat.tif"));
+	if (pDoc->WorkingInfo.System.bSaveGrabImg)
+		MbufSave(szFileName, MilPatRzImg->m_MilImage);
+//#endif
+
+
+	// Measure Position (Dilate)
+	int nRepeatMeasureNum = 10;
+	dScore = 0.0;
+
+	if (m_pIRayple->OneshotGrab())
+	{
+		if (m_pMil->OneshotGrab(MilGrabImg->m_MilImage, GRAB_COLOR_COLOR) == FALSE)
+		{
+			m_pMil->PatternMatchingFree();
+
+			if (bDraw)
+				pView->MsgBox(_T("Image Grab Fail !!"));
+			SetClrOverlay();
+
+			if (MilGrabImg)
+				delete MilGrabImg;
+			if (MilGrabBinImg)
+				delete MilGrabBinImg;
+			if (MilPatImg)
+				delete MilPatImg;
+			if (MilPatRzImg)
+				delete MilPatRzImg;
+			return FALSE;
+		}
+	}
+
+	MimBinarize(MilGrabImg->m_MilImage, MilGrabBinImg->m_MilImage, M_GREATER, 128, 0);
+
+	for (i = 0; i < nRepeatMeasureNum; i++)
+	{
+		if (i > 0)
+		{
+			m_pMil->Dilate(MilGrabBinImg->m_MilImage, MilGrabBinImg->m_MilImage, 1, M_BINARY);
+		}
+
+		if (m_pMil->PatternMatchingAction(MilGrabBinImg->m_MilImage, bDraw))
+		{
+			dPosX = m_pMil->m_dPatternMatchingResultSelectPosX;
+			dPosY = m_pMil->m_dPatternMatchingResultSelectPosY;
+			dAngle = m_pMil->m_dPatternMatchingResultSelectAngle;
+			dScore = m_pMil->m_dPatternMatchingResultSelectScore;
+
+			if (dScore >= _tstof(pDoc->WorkingInfo.Vision[m_nIdx].sStdScr))
+			{
+				PtMtRst.dX = dPosX;
+				PtMtRst.dY = dPosY;
+				PtMtRst.dAngle = dAngle;
+				PtMtRst.dScore = dScore;
+				break;
+			}
+		}
+	}
+
+	if (dScore >= _tstof(pDoc->WorkingInfo.Vision[m_nIdx].sStdScr))
+	{
+//#ifdef _DEBUG
+		_stprintf(szFileName, _T("C:\\AlignGrab_%d-%d.tif"), m_nIdx, nPos);
+		if (pDoc->WorkingInfo.System.bSaveGrabImg)
+			MbufSave(szFileName, MilGrabImg->m_MilImage);
+
+		_stprintf(szFileName, _T("C:\\AlignGrabBin_%d-%d.tif"), m_nIdx, nPos);
+		if (pDoc->WorkingInfo.System.bSaveGrabImg)
+			MbufSave(szFileName, MilGrabBinImg->m_MilImage);
+//#endif
+
+		m_pMil->PatternMatchingFree();
+
+		if (MilGrabImg)
+			delete MilGrabImg;
+		if (MilGrabBinImg)
+			delete MilGrabBinImg;
+		if (MilPatImg)
+			delete MilPatImg;
+		if (MilPatRzImg)
+			delete MilPatRzImg;
+
+		SetClrOverlay();
+
+		return TRUE;
+	}
+
+
+	// Measure Position (Erode)
+	nRepeatMeasureNum = 10;
+	dScore = 0.0;
+
+	if (m_pIRayple->OneshotGrab())
+	{
+		if (m_pMil->OneshotGrab(MilGrabImg->m_MilImage, GRAB_COLOR_COLOR) == FALSE)
+		{
+			m_pMil->PatternMatchingFree();
+
+			if (bDraw)
+				pView->MsgBox(_T("Image Grab Fail !!"));
+			SetClrOverlay();
+
+			if (MilGrabImg)
+				delete MilGrabImg;
+			if (MilGrabBinImg)
+				delete MilGrabBinImg;
+			if (MilPatImg)
+				delete MilPatImg;
+			if (MilPatRzImg)
+				delete MilPatRzImg;
+			return FALSE;
+		}
+	}
+
+	MimBinarize(MilGrabImg->m_MilImage, MilGrabBinImg->m_MilImage, M_GREATER, 128, 0);
+
+	for (i = 0; i < nRepeatMeasureNum; i++)
+	{
+		if (i > 0)
+		{
+			m_pMil->Erode(MilGrabBinImg->m_MilImage, MilGrabBinImg->m_MilImage, 1, M_BINARY);
+		}
+
+		if (m_pMil->PatternMatchingAction(MilGrabBinImg->m_MilImage, bDraw))
+		{
+			dPosX = m_pMil->m_dPatternMatchingResultSelectPosX;
+			dPosY = m_pMil->m_dPatternMatchingResultSelectPosY;
+			dAngle = m_pMil->m_dPatternMatchingResultSelectAngle;
+			dScore = m_pMil->m_dPatternMatchingResultSelectScore;
+
+			if (dScore >= _tstof(pDoc->WorkingInfo.Vision[m_nIdx].sStdScr))
+			{
+				PtMtRst.dX = dPosX;
+				PtMtRst.dY = dPosY;
+				PtMtRst.dAngle = dAngle;
+				PtMtRst.dScore = dScore;
+				break;
+			}
+		}
+	}
+
+
+//#ifdef _DEBUG
+	_stprintf(szFileName, _T("C:\\AlignGrab_%d-%d.tif"), m_nIdx, nPos);
+	if (pDoc->WorkingInfo.System.bSaveGrabImg)
+		MbufSave(szFileName, MilGrabImg->m_MilImage);
+
+	_stprintf(szFileName, _T("C:\\AlignGrabBin_%d-%d.tif"), m_nIdx, nPos);
+	if (pDoc->WorkingInfo.System.bSaveGrabImg)
+		MbufSave(szFileName, MilGrabBinImg->m_MilImage);
+//#endif
+
+	if (dScore < _tstof(pDoc->WorkingInfo.Vision[m_nIdx].sStdScr))
+	{
+		CString sMsg = _T("Pattern Matching Fail !");
+
+		long lImageSizeX, lImageSizeY;
+		lImageSizeX = MbufInquire(MilPatRzImg->m_MilImage, M_SIZE_X, M_NULL);		//MbufInquire(MilPatRzImg->m_MilImage,M_SIZE_X,&lImageSizeX);
+		lImageSizeY = MbufInquire(MilPatRzImg->m_MilImage, M_SIZE_Y, M_NULL);		//MbufInquire(MilPatRzImg->m_MilImage,M_SIZE_Y,&lImageSizeY);
+																					//MgraText(m_pMilDrawOverlay->m_MilGraphicContextID, m_pMilDrawOverlay->m_MilBuffer, lImageSizeX/2, lImageSizeY/2, szText);
+		m_pMil->DrawText(sMsg, lImageSizeX / 2, lImageSizeY / 2, RGB_RED);
+		m_pMil->PatternMatchingFree();
+
+		if (MilGrabImg)
+			delete MilGrabImg;
+		if (MilGrabBinImg)
+			delete MilGrabBinImg;
+		if (MilPatImg)
+			delete MilPatImg;
+		if (MilPatRzImg)
+			delete MilPatRzImg;
+
+		SetClrOverlay();
+
+		return FALSE;
+	}
+
+	m_pMil->PatternMatchingFree();
+
+	if (MilGrabImg)
+		delete MilGrabImg;
+	if (MilGrabBinImg)
+		delete MilGrabBinImg;
+	if (MilPatImg)
+		delete MilPatImg;
+	if (MilPatRzImg)
+		delete MilPatRzImg;
+
+	SetClrOverlay();
+#endif // USE_MIL
+#endif
+
+	return TRUE;
+}
+
+/*
+BOOL CVision::GrabIRayple(int nPos, BOOL bDraw) // set Model from cam master for pattern matching
+{
 	int i = 0; // , nRepeatMeasureNum = 3, nEffectiveMeasureNum = 1;
 	double dAngle = 0.0, dScore = 0.0;
 	double dPosX, dPosY;
@@ -3977,7 +4218,7 @@ BOOL CVision::GrabIRayple(int nPos, BOOL bDraw) // set Model from cam master for
 
 	return TRUE;
 }
-
+*/
 BOOL CVision::GrabCrevis(int nPos, BOOL bDraw)
 {
 	int i = 0, nRepeatMeasureNum = 1, nEffectiveMeasureNum = 1;
