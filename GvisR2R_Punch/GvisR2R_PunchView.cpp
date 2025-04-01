@@ -19748,7 +19748,7 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 			{
 				if (!m_bSkipAlign[1][0])
 				{
-					sMsg.Format(_T("SN:%d Right 2Point align #1 실행 (조명 2 : %s, 기준 score 2 : %d), marking torque  %s"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Vision[1].sStdScr, pDoc->WorkingInfo.Marking[1].sMarkingToq);
+					sMsg.Format(_T("SN:%d Right 2Point align #1 실행 (조명 2 : %s, 기준 score 2 : %s), marking torque  %s"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Vision[1].sStdScr, pDoc->WorkingInfo.Marking[1].sMarkingToq);
 					pDoc->LogAuto(sMsg);
 
 					if (TwoPointAlign1(0))	// Right
@@ -19780,7 +19780,7 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 			{
 				if (!m_bSkipAlign[0][0])
 				{
-					sMsg.Format(_T("SN:%d Left 2Point align #1 실행, (조명 1 : %s, 기준 score 1 : %d) marking torque  %s"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Vision[0].sStdScr, pDoc->WorkingInfo.Marking[0].sMarkingToq);
+					sMsg.Format(_T("SN:%d Left 2Point align #1 실행, (조명 1 : %s, 기준 score 1 : %s) marking torque  %s"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Vision[0].sStdScr, pDoc->WorkingInfo.Marking[0].sMarkingToq);
 					pDoc->LogAuto(sMsg);
 
 					if (TwoPointAlign0(0))	// Left
@@ -20149,7 +20149,7 @@ void CGvisR2R_PunchView::Mk2PtAlignPt1()
 			{
 				if (!m_bSkipAlign[1][1])	// Right
 				{
-					sMsg.Format(_T("SN:%d Right 2Point align #2 실행 (조명 2 : %s, 기준 score 2 : %d), marking torque  %s"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Vision[1].sStdScr, pDoc->WorkingInfo.Marking[1].sMarkingToq);
+					sMsg.Format(_T("SN:%d Right 2Point align #2 실행 (조명 2 : %s, 기준 score 2 : %s), marking torque  %s"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Vision[1].sStdScr, pDoc->WorkingInfo.Marking[1].sMarkingToq);
 					pDoc->LogAuto(sMsg);
 
 					if (TwoPointAlign1(1))
@@ -20181,7 +20181,7 @@ void CGvisR2R_PunchView::Mk2PtAlignPt1()
 			{
 				if (!m_bSkipAlign[0][1])	// Left
 				{
-					sMsg.Format(_T("SN:%d Left 2Point align #2 실행 (조명 2 : %s, 기준 score 2 : %d), marking torque  %s"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Vision[0].sStdScr, pDoc->WorkingInfo.Marking[0].sMarkingToq);
+					sMsg.Format(_T("SN:%d Left 2Point align #2 실행 (조명 2 : %s, 기준 score 2 : %s), marking torque  %s"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Vision[0].sStdScr, pDoc->WorkingInfo.Marking[0].sMarkingToq);
 					pDoc->LogAuto(sMsg);
 
 					if (TwoPointAlign0(1))
@@ -21644,7 +21644,7 @@ void CGvisR2R_PunchView::Mk4PtAlignPt0()
 			{
 				if (!m_bSkipAlign[1][0])
 				{
-					sMsg.Format(_T("SN:%d Right 4Point align #1 실행 (조명 2 : %s, 기준 score 2 : %d), marking torque  %s"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Vision[1].sStdScr, pDoc->WorkingInfo.Marking[1].sMarkingToq);
+					sMsg.Format(_T("SN:%d Right 4Point align #1 실행 (조명 2 : %s, 기준 score 2 : %s), marking torque  %s"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Vision[1].sStdScr, pDoc->WorkingInfo.Marking[1].sMarkingToq);
 					pDoc->LogAuto(sMsg);
 
 					if (FourPointAlign1(0))
@@ -21676,7 +21676,7 @@ void CGvisR2R_PunchView::Mk4PtAlignPt0()
 			{
 				if (!m_bSkipAlign[0][0])
 				{
-					sMsg.Format(_T("SN:%d Left 4Point align #1 실행 (조명 1 : %s, 기준 score 1 : %d), marking torque  %s"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Vision[0].sStdScr, pDoc->WorkingInfo.Marking[0].sMarkingToq);
+					sMsg.Format(_T("SN:%d Left 4Point align #1 실행 (조명 1 : %s, 기준 score 1 : %s), marking torque  %s"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Vision[0].sStdScr, pDoc->WorkingInfo.Marking[0].sMarkingToq);
 					pDoc->LogAuto(sMsg);
 
 					if (FourPointAlign0(0))
@@ -22023,7 +22023,7 @@ void CGvisR2R_PunchView::Mk4PtAlignPt1()
 			{
 				if (!m_bSkipAlign[1][1])	// Right
 				{
-					sMsg.Format(_T("SN:%d Right 4Point align #2 실행 (조명 2 : %s, 기준 score 2 : %d), marking torque  %s"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Vision[1].sStdScr, pDoc->WorkingInfo.Marking[1].sMarkingToq);
+					sMsg.Format(_T("SN:%d Right 4Point align #2 실행 (조명 2 : %s, 기준 score 2 : %s), marking torque  %s"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Vision[1].sStdScr, pDoc->WorkingInfo.Marking[1].sMarkingToq);
 					pDoc->LogAuto(sMsg);
 
 					if (FourPointAlign1(1))
@@ -22055,7 +22055,7 @@ void CGvisR2R_PunchView::Mk4PtAlignPt1()
 			{
 				if (!m_bSkipAlign[0][1])	// Left
 				{
-					sMsg.Format(_T("SN:%d Left 4Point align #2 실행 (조명 1 : %s, 기준 score 1 : %d), marking torque  %s"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Vision[0].sStdScr, pDoc->WorkingInfo.Marking[0].sMarkingToq);
+					sMsg.Format(_T("SN:%d Left 4Point align #2 실행 (조명 1 : %s, 기준 score 1 : %s), marking torque  %s"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Vision[0].sStdScr, pDoc->WorkingInfo.Marking[0].sMarkingToq);
 					pDoc->LogAuto(sMsg);
 
 					if (FourPointAlign0(1))
@@ -22379,7 +22379,7 @@ void CGvisR2R_PunchView::Mk4PtAlignPt2()
 				{
 					if (!m_bSkipAlign[1][2])	// Right
 					{
-						sMsg.Format(_T("SN:%d Right 4Point align #3 실행 (조명 2 : %s, 기준 score 2 : %d), marking torque  %s"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Vision[1].sStdScr, pDoc->WorkingInfo.Marking[1].sMarkingToq);
+						sMsg.Format(_T("SN:%d Right 4Point align #3 실행 (조명 2 : %s, 기준 score 2 : %s), marking torque  %s"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Vision[1].sStdScr, pDoc->WorkingInfo.Marking[1].sMarkingToq);
 						pDoc->LogAuto(sMsg);
 
 						if (FourPointAlign1(2))
@@ -22418,7 +22418,7 @@ void CGvisR2R_PunchView::Mk4PtAlignPt2()
 				{
 					if (!m_bSkipAlign[0][2])
 					{
-						sMsg.Format(_T("SN:%d Left 4Point align #3 실행 (조명 1 : %s, 기준 score 1 : %d), marking torque  %s"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Vision[0].sStdScr, pDoc->WorkingInfo.Marking[0].sMarkingToq);
+						sMsg.Format(_T("SN:%d Left 4Point align #3 실행 (조명 1 : %s, 기준 score 1 : %s), marking torque  %s"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Vision[0].sStdScr, pDoc->WorkingInfo.Marking[0].sMarkingToq);
 						pDoc->LogAuto(sMsg);
 
 						if (FourPointAlign0(2))
@@ -22755,7 +22755,7 @@ void CGvisR2R_PunchView::Mk4PtAlignPt3()
 					{
 						if (!m_bSkipAlign[1][3])
 						{
-							sMsg.Format(_T("SN:%d Right 4Point align #4 실행 (조명 2 : %s, 기준 score 2 : %d), marking torque  %s"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Vision[1].sStdScr, pDoc->WorkingInfo.Marking[1].sMarkingToq);
+							sMsg.Format(_T("SN:%d Right 4Point align #4 실행 (조명 2 : %s, 기준 score 2 : %s), marking torque  %s"), m_nBufUpSerial[1], pDoc->WorkingInfo.Light.sVal[1], pDoc->WorkingInfo.Vision[1].sStdScr, pDoc->WorkingInfo.Marking[1].sMarkingToq);
 							pDoc->LogAuto(sMsg);
 
 							if (FourPointAlign1(3))
@@ -22802,7 +22802,7 @@ void CGvisR2R_PunchView::Mk4PtAlignPt3()
 					{
 						if (!m_bSkipAlign[0][3])
 						{
-							sMsg.Format(_T("SN:%d Left 4Point align #4 실행 (조명 1 : %s, 기준 score 1 : %d), marking torque  %s"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Vision[0].sStdScr, pDoc->WorkingInfo.Marking[0].sMarkingToq);
+							sMsg.Format(_T("SN:%d Left 4Point align #4 실행 (조명 1 : %s, 기준 score 1 : %s), marking torque  %s"), m_nBufUpSerial[0], pDoc->WorkingInfo.Light.sVal[0], pDoc->WorkingInfo.Vision[0].sStdScr, pDoc->WorkingInfo.Marking[0].sMarkingToq);
 							pDoc->LogAuto(sMsg);
 
 							if (FourPointAlign0(3))
