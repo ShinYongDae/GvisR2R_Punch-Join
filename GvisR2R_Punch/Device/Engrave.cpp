@@ -539,7 +539,7 @@ void CEngrave::GetSignalEngraveAutoSequence(SOCKET_DATA SockData)
 			break;
 		case _SigInx::_EngAutoSeqOnMkIng:
 			//pDoc->BtnStatus.EngAuto.OnMking = (SockData.nData1 > 0) ? TRUE : FALSE;
-			pDoc->BtnStatus.EngAuto.MkSt = pDoc->GetCurrentInfoSignal(_SigInx::_EngAutoSeqOnMkIng);
+			pDoc->BtnStatus.EngAuto.OnMking = pDoc->GetCurrentInfoSignal(_SigInx::_EngAutoSeqOnMkIng);
 			m_bRcvSig[_SigInx::_EngAutoSeqOnMkIng] = TRUE;
 			break;
 		case _SigInx::_EngAutoSeqMkDone:

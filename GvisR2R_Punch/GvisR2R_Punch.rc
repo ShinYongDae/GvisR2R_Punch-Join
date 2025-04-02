@@ -166,10 +166,10 @@ FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,14,7,20,20
     LTEXT           "GvisR2R_Punch, 버전 2.1.0",IDC_STATIC,42,7,114,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2025.04.01",IDC_STATIC,42,16,114,8
+    LTEXT           "Copyright (C) 2025.04.02",IDC_STATIC,42,16,114,8
     DEFPUSHBUTTON   "확인",IDOK,113,43,50,14,WS_GROUP
     LTEXT           "Tack Time 최적화 (시리얼확인시 피딩가능)",IDC_STATIC,7,29,139,8
-    LTEXT           "Log 추가 (미마킹 검사 결과)",IDC_STATIC,7,38,96,8
+    LTEXT           "각인부 통신 최적화",IDC_STATIC,7,38,96,8
     LTEXT           "2Layer Offline모드 ITS파일 생성",IDC_STATIC,7,48,94,8
 END
 

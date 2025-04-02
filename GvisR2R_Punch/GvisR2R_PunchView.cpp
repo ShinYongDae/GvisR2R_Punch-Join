@@ -27861,7 +27861,7 @@ void CGvisR2R_PunchView::DoAutoMarkingEngrave()
 	{
 		pDoc->BtnStatus.EngAuto.MkDone = FALSE;
 		MpeWrite(Plc.DlgMenu01.MarkingDoneEngrave, 1); // 각인부 작업완료.(PC가 On, PLC가 확인 후 Off)
-		pDoc->SetCurrentInfoSignal(_SigInx::_IsEngAutoSeqMkDone, TRUE);
+		pDoc->SetCurrentInfoSignal(_SigInx::_IsEngAutoSeqMkDone, TRUE);// 각인부 작업완료 신호 확인 후 리턴 신호
 		//CheckCurrentInfoSignal();
 		//pDoc->LogAuto(_T("PC: 각인부 작업완료 ON (PC가 On, PLC가 확인 후 Off)"));
 
