@@ -10095,7 +10095,7 @@ void CGvisR2R_PunchView::InitAuto(BOOL bInit)
 
 		m_pDlgMenu01->ResetSerial();
 		m_pDlgMenu01->ResetLastProc();
-		m_pDlgMenu01->ChkAoiVsStatus();
+		//m_pDlgMenu01->ChkAoiVsStatus();
 	}
 
 
@@ -10515,8 +10515,8 @@ void CGvisR2R_PunchView::ResetMkInfo(int nAoi) // 0 : AOI-Up , 1 : AOI-Dn , 2 : 
 				pDoc->WorkingInfo.LastJob.sModel,
 				pDoc->WorkingInfo.LastJob.sLayerUp);
 			pDoc->m_Master[0].LoadMstInfo();
-			if (m_pDlgMenu01)
-				m_pDlgMenu01->ChkAoiVsStatus();
+			//if (m_pDlgMenu01)
+			//	m_pDlgMenu01->ChkAoiVsStatus();
 			pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
 
 			if (m_pEngrave)
@@ -12294,8 +12294,8 @@ BOOL CGvisR2R_PunchView::LoadMstInfo()
 				pDoc->m_sEngModel,
 				pDoc->m_sEngLayerUp);
 			pDoc->m_Master[0].LoadMstInfo();
-			if (m_pDlgMenu01)
-				m_pDlgMenu01->ChkAoiVsStatus();
+			//if (m_pDlgMenu01)
+			//	m_pDlgMenu01->ChkAoiVsStatus();
 			pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
 
 			if (pDoc->GetTestMode() == MODE_OUTER)
@@ -12318,8 +12318,8 @@ BOOL CGvisR2R_PunchView::LoadMstInfo()
 				pDoc->WorkingInfo.LastJob.sModel,
 				pDoc->WorkingInfo.LastJob.sLayerUp);
 			pDoc->m_Master[0].LoadMstInfo();
-			if (m_pDlgMenu01)
-				m_pDlgMenu01->ChkAoiVsStatus();
+			//if (m_pDlgMenu01)
+			//	m_pDlgMenu01->ChkAoiVsStatus();
 			pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
 		}
 	}
@@ -17513,8 +17513,8 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 							pDoc->WorkingInfo.LastJob.sModel,
 							pDoc->WorkingInfo.LastJob.sLayerUp);
 						pDoc->m_Master[0].LoadMstInfo();
-						if (m_pDlgMenu01)
-							m_pDlgMenu01->ChkAoiVsStatus();
+						//if (m_pDlgMenu01)
+						//	m_pDlgMenu01->ChkAoiVsStatus();
 						pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
 						ApplyListTorq();
 
@@ -17782,8 +17782,8 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 							pDoc->WorkingInfo.LastJob.sModel,
 							pDoc->WorkingInfo.LastJob.sLayerUp);
 						pDoc->m_Master[0].LoadMstInfo();
-						if (m_pDlgMenu01)
-							m_pDlgMenu01->ChkAoiVsStatus();
+						//if (m_pDlgMenu01)
+						//	m_pDlgMenu01->ChkAoiVsStatus();
 						pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
 						ApplyListTorq();
 
@@ -18487,8 +18487,8 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 							pDoc->WorkingInfo.LastJob.sModel,
 							pDoc->WorkingInfo.LastJob.sLayerUp);
 						pDoc->m_Master[0].LoadMstInfo();
-						if (m_pDlgMenu01)
-							m_pDlgMenu01->ChkAoiVsStatus();
+						//if (m_pDlgMenu01)
+						//	m_pDlgMenu01->ChkAoiVsStatus();
 						pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
 						ApplyListTorq();
 
@@ -18758,8 +18758,8 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 							pDoc->WorkingInfo.LastJob.sModel,
 							pDoc->WorkingInfo.LastJob.sLayerUp);
 						pDoc->m_Master[0].LoadMstInfo();
-						if (m_pDlgMenu01)
-							m_pDlgMenu01->ChkAoiVsStatus();
+						//if (m_pDlgMenu01)
+						//	m_pDlgMenu01->ChkAoiVsStatus();
 						pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
 						ApplyListTorq();
 
