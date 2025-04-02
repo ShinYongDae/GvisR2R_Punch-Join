@@ -168,7 +168,7 @@ BEGIN
     LTEXT           "GvisR2R_Punch, 버전 2.1.0",IDC_STATIC,42,7,114,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2025.04.02",IDC_STATIC,42,16,114,8
     DEFPUSHBUTTON   "확인",IDOK,113,43,50,14,WS_GROUP
-    LTEXT           "Tack Time 최적화 (시리얼확인시 피딩가능)",IDC_STATIC,7,29,139,8
+    LTEXT           "Tack Time 최적화 (VS Test)",IDC_STATIC,7,29,139,8
     LTEXT           "각인부 통신 최적화",IDC_STATIC,7,38,96,8
     LTEXT           "2Layer Offline모드 ITS파일 생성",IDC_STATIC,7,48,94,8
 END

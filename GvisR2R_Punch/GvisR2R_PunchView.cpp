@@ -8250,7 +8250,7 @@ void CGvisR2R_PunchView::Shift2DummyBuf()
 void CGvisR2R_PunchView::Shift2Buf()	// ¹öÆÛÆú´õÀÇ ¸¶Áö¸· ½Ã¸®¾ó°ú ShareÆú´õÀÇ ½Ã¸®¾óÀÌ ¿¬¼ÓÀÎÁö È®ÀÎ ÈÄ ¿Å±è.
 {
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
-	CString sSrc, sDest;
+	CString sSrc, sDest, sMsg;
 	int nSerial;
 	CFileFind findfile;
 
@@ -8258,13 +8258,17 @@ void CGvisR2R_PunchView::Shift2Buf()	// ¹öÆÛÆú´õÀÇ ¸¶Áö¸· ½Ã¸®¾ó°ú ShareÆú´õÀÇ ½
 	{
 		sSrc = pDoc->WorkingInfo.System.sPathVsShareUp;
 		sDest = pDoc->WorkingInfo.System.sPathVrsBufUp;
-		if (m_bPcrInShare[0])
+		if (m_bPcrInShareVs[0])
 		{
 			if (pDoc->m_pFile)
 			{
 				nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
 				if (nSerial > 0)
+				{
 					m_nShareUpS = nSerial;
+					sMsg.Format(_T("»ó¸é : %d PCR °øÀ¯¿¡¼­ ¹öÆÛ·Î À§Ä¡ ÀÌµ¿"), nSerial);
+					pDoc->LogAuto(sMsg);
+				}
 				pDoc->m_pFile->DelPcr(sSrc, nSerial);
 				m_bPcrInShare[0] = FALSE;
 				//SetListBuf();
@@ -8275,13 +8279,17 @@ void CGvisR2R_PunchView::Shift2Buf()	// ¹öÆÛÆú´õÀÇ ¸¶Áö¸· ½Ã¸®¾ó°ú ShareÆú´õÀÇ ½
 		{
 			sSrc = pDoc->WorkingInfo.System.sPathVsShareDn;
 			sDest = pDoc->WorkingInfo.System.sPathVrsBufDn;
-			if (m_bPcrInShare[1])
+			if (m_bPcrInShareVs[1])
 			{
 				if (pDoc->m_pFile)
 				{
 					nSerial = pDoc->m_pFile->CopyPcr(sSrc, sDest);
 					if (nSerial > 0)
+					{
 						m_nShareDnS = nSerial;
+						sMsg.Format(_T("ÇÏ¸é : %d PCR °øÀ¯¿¡¼­ ¹öÆÛ·Î À§Ä¡ ÀÌµ¿"), nSerial);
+						pDoc->LogAuto(sMsg);
+					}					
 					pDoc->m_pFile->DelPcr(sSrc, nSerial);
 					m_bPcrInShare[1] = FALSE;
 					//SetListBuf();
@@ -8307,6 +8315,9 @@ void CGvisR2R_PunchView::Shift2Buf()	// ¹öÆÛÆú´õÀÇ ¸¶Áö¸· ½Ã¸®¾ó°ú ShareÆú´õÀÇ ½
 				if (nSerial > 0)
 				{
 					m_nShareUpS = nSerial;
+					sMsg.Format(_T("»ó¸é : %d PCR °øÀ¯¿¡¼­ ¹öÆÛ·Î À§Ä¡ ÀÌµ¿"), nSerial);
+					pDoc->LogAuto(sMsg);
+
 					//MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiUp, (long)nSerial);	// °Ë»çÇÑ PanelÀÇ AOI »ó Serial
 					//Sleep(30);
 					//MpeWrite(Plc.DlgMenu03.PcrReceivedAoiUp, 1); // AOI »ó : PCRÆÄÀÏ Received
@@ -8330,6 +8341,9 @@ void CGvisR2R_PunchView::Shift2Buf()	// ¹öÆÛÆú´õÀÇ ¸¶Áö¸· ½Ã¸®¾ó°ú ShareÆú´õÀÇ ½
 					if (nSerial > 0)
 					{
 						m_nShareDnS = nSerial;
+						sMsg.Format(_T("ÇÏ¸é : %d PCR °øÀ¯¿¡¼­ ¹öÆÛ·Î À§Ä¡ ÀÌµ¿"), nSerial);
+						pDoc->LogAuto(sMsg);
+
 						//MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn, (long)nSerial);	// °Ë»çÇÑ PanelÀÇ AOI ÇÏ Serial
 						////MpeWrite(Plc.DlgMenu03.PcrReceivedSerialAoiDn , (long)GetAoiDnAutoSerial() - 1);	// °Ë»çÇÑ PanelÀÇ AOI ÇÏ Serial
 						//Sleep(30);
@@ -10208,14 +10222,14 @@ void CGvisR2R_PunchView::InitAuto(BOOL bInit)
 	{
 		if ((pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_LASER) && pDoc->WorkingInfo.LastJob.bDispLotEnd)
 		{
-			if (pView->m_bContEngraveF) Sleep(300);
+			if (pView->m_bContEngraveF) Sleep(600);
 			if (IDYES == MsgBox(_T("°¢ÀÎºÎ¿¡¼­ ·¹ÀÌÀú °¢ÀÎºÎÅÍ ½ÃÀÛÇÏ½Ã°Ú½À´Ï±î?"), 0, MB_YESNO, DEFAULT_TIME_OUT, TRUE))
 			{
 				MpeWrite(Plc.DlgMenu01.JoinJob, 0); // ÀÌ¾î°¡±â(PC°¡ On½ÃÅ°°í, PLC°¡ È®ÀÎÇÏ°í Off½ÃÅ´)-·¹ÀÌÀú °¡°øºÎÅÍ ½ÃÀÛ
 			}
 			else
 			{
-				if (pView->m_bContEngraveF) Sleep(300);
+				if (pView->m_bContEngraveF) Sleep(600);
 				if (IDYES == MsgBox(_T("°¢ÀÎºÎ¿¡¼­ 2D ÄÚµå¸¦ ÀÐ°í ³­ ÈÄ Last ShotÀ» È®ÀÎÇÏ½Ã°Ú½À´Ï±î?"), 0, MB_YESNO, DEFAULT_TIME_OUT, TRUE))
 				{
 					MpeWrite(Plc.DlgMenu01.JoinJob, 1); // ÀÌ¾î°¡±â(PC°¡ On½ÃÅ°°í, PLC°¡ È®ÀÎÇÏ°í Off½ÃÅ´)-2D ÄÚµå ÀÐ±âºÎÅÍ ½ÃÀÛ
@@ -10228,14 +10242,14 @@ void CGvisR2R_PunchView::InitAuto(BOOL bInit)
 		}
 		else if ((pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_LASER) && !pDoc->WorkingInfo.LastJob.bDispLotEnd)
 		{
-			if (pView->m_bContEngraveF) Sleep(300);
+			if (pView->m_bContEngraveF) Sleep(600);
 			if (IDYES == MsgBox(_T("°¢ÀÎºÎ¿¡¼­ 2D ÄÚµå¸¦ ÀÐ°í ³­ ÈÄ Last ShotÀ» È®ÀÎÇÏ½Ã°Ú½À´Ï±î?"), 0, MB_YESNO, DEFAULT_TIME_OUT, TRUE))
 			{
 				MpeWrite(Plc.DlgMenu01.JoinJob, 1); // ÀÌ¾î°¡±â(PC°¡ On½ÃÅ°°í, PLC°¡ È®ÀÎÇÏ°í Off½ÃÅ´)-2D ÄÚµå ÀÐ±âºÎÅÍ ½ÃÀÛ
 			}
 			else
 			{
-				if (pView->m_bContEngraveF) Sleep(300);
+				if (pView->m_bContEngraveF) Sleep(600);
 				if (IDYES == MsgBox(_T("°¢ÀÎºÎ¿¡¼­ ·¹ÀÌÀú °¢ÀÎºÎÅÍ ½ÃÀÛÇÏ½Ã°Ú½À´Ï±î?"), 0, MB_YESNO, DEFAULT_TIME_OUT, TRUE))
 				{
 					MpeWrite(Plc.DlgMenu01.JoinJob, 0); // ÀÌ¾î°¡±â(PC°¡ On½ÃÅ°°í, PLC°¡ È®ÀÎÇÏ°í Off½ÃÅ´)-·¹ÀÌÀú °¡°øºÎÅÍ ½ÃÀÛ
@@ -17328,8 +17342,8 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// ÀÜ·®Ã³¸® ½Ã °è¼ÓÀûÀ¸·Î ¹Ýº¹
 					if (nSerial > 0)
 					{
 						CheckShareVsDn(nSerial);
-							}
-						}
+					}
+				}
 	
 				if (m_bPcrInShareVs[0] || m_bPcrInShareVs[1])
 					m_nStepAuto++;
