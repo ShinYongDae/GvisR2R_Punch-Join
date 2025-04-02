@@ -19107,7 +19107,14 @@ void CGvisR2R_PunchView::Mk2PtReady()
 			if (IsRun())
 			{
 				//pDoc->LogAuto(_T("PC: 마킹부 마킹중 ON (PC가 ON, OFF)"));
-				MpeWrite(Plc.DlgMenu01.MarkingDoing, 1);// 마킹부 마킹중 ON (PC가 ON, OFF)
+				MpeWrite(Plc.DlgMenu01.MarkingDoing, 1);			// 마킹부 마킹중 ON (PC가 ON, OFF)
+				Sleep(30);
+				MpeWrite(Plc.DlgMenu01.MarkingDoing, 1);			// 마킹부 마킹중 ON (PC가 ON, OFF)
+				Sleep(30);
+				MpeWrite(_T("MB400236"), 0);						// 마킹시작(PC가 확인하고 Reset시킴.)
+				Sleep(30);
+				MpeWrite(_T("MB400237"), 0);						// 마킹시작(PC가 확인하고 Reset시킴.)
+
 #ifdef USE_SR1000W
 				if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
 				{
@@ -21098,7 +21105,13 @@ void CGvisR2R_PunchView::Mk4PtReady()
 			if (IsRun())
 			{
 				//pDoc->LogAuto(_T("PC: 마킹부 마킹중 ON (PC가 ON, OFF)"));
-				MpeWrite(Plc.DlgMenu01.MarkingDoing, 1);// 마킹부 마킹중 ON (PC가 ON, OFF)
+				MpeWrite(Plc.DlgMenu01.MarkingDoing, 1);			// 마킹부 마킹중 ON (PC가 ON, OFF)
+				Sleep(30);
+				MpeWrite(Plc.DlgMenu01.MarkingDoing, 1);			// 마킹부 마킹중 ON (PC가 ON, OFF)
+				Sleep(30);
+				MpeWrite(_T("MB400236"), 0);						// 마킹시작(PC가 확인하고 Reset시킴.)
+				Sleep(30);
+				MpeWrite(_T("MB400237"), 0);						// 마킹시작(PC가 확인하고 Reset시킴.)
 				m_nMkStAuto++;
 			}
 			break;

@@ -5623,7 +5623,7 @@ int CGvisR2R_PunchDoc::LoadPCR1(int nSerial, BOOL bFromShare)	// return : 2(Fail
 
 	if (pDoc->m_bVsStatusUp)
 	{
-		if (pDoc->m_ListBuf[1].nTot < pDoc->m_ListBuf[0].nTot)
+		if (pDoc->m_ListBuf[1].nTot <= pDoc->m_ListBuf[0].nTot)
 		{
 			nRtn[1] = LoadPCRAllDn(nSerial, bFromShare);
 			if (nRtn[1] != 1)

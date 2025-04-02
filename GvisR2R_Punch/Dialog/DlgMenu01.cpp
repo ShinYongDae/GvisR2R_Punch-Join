@@ -2768,7 +2768,11 @@ void CDlgMenu01::OnTimer(UINT_PTR nIDEvent)//(UINT nIDEvent)
 		DispTqVal();
 		ChkMkLimit();
 		ChkPartialSpd();
-		//ChkAoiVsStatus();
+
+		if (!pView->IsRun())
+		{
+			ChkAoiVsStatus();
+		}
 
 		if(m_bTIM_DISP_MK_CNT)
 			SetTimer(TIM_DISP_MK_CNT, 100, NULL);
