@@ -10222,14 +10222,14 @@ void CGvisR2R_PunchView::InitAuto(BOOL bInit)
 	{
 		if ((pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_LASER) && pDoc->WorkingInfo.LastJob.bDispLotEnd)
 		{
-			if (pView->m_bContEngraveF) Sleep(600);
+			if (pView->m_bContEngraveF) Sleep(1000);
 			if (IDYES == MsgBox(_T("각인부에서 레이저 각인부터 시작하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, TRUE))
 			{
 				MpeWrite(Plc.DlgMenu01.JoinJob, 0); // 이어가기(PC가 On시키고, PLC가 확인하고 Off시킴)-레이저 가공부터 시작
 			}
 			else
 			{
-				if (pView->m_bContEngraveF) Sleep(600);
+				if (pView->m_bContEngraveF) Sleep(1000);
 				if (IDYES == MsgBox(_T("각인부에서 2D 코드를 읽고 난 후 Last Shot을 확인하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, TRUE))
 				{
 					MpeWrite(Plc.DlgMenu01.JoinJob, 1); // 이어가기(PC가 On시키고, PLC가 확인하고 Off시킴)-2D 코드 읽기부터 시작
@@ -10242,14 +10242,14 @@ void CGvisR2R_PunchView::InitAuto(BOOL bInit)
 		}
 		else if ((pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_LASER) && !pDoc->WorkingInfo.LastJob.bDispLotEnd)
 		{
-			if (pView->m_bContEngraveF) Sleep(600);
+			if (pView->m_bContEngraveF) Sleep(1000);
 			if (IDYES == MsgBox(_T("각인부에서 2D 코드를 읽고 난 후 Last Shot을 확인하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, TRUE))
 			{
 				MpeWrite(Plc.DlgMenu01.JoinJob, 1); // 이어가기(PC가 On시키고, PLC가 확인하고 Off시킴)-2D 코드 읽기부터 시작
 			}
 			else
 			{
-				if (pView->m_bContEngraveF) Sleep(600);
+				if (pView->m_bContEngraveF) Sleep(1000);
 				if (IDYES == MsgBox(_T("각인부에서 레이저 각인부터 시작하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, TRUE))
 				{
 					MpeWrite(Plc.DlgMenu01.JoinJob, 0); // 이어가기(PC가 On시키고, PLC가 확인하고 Off시킴)-레이저 가공부터 시작

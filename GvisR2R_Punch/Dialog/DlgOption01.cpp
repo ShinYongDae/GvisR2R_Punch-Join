@@ -63,6 +63,7 @@ BEGIN_MESSAGE_MAP(CDlgOption01, CDialog)
 	ON_BN_CLICKED(IDC_CHECK10, &CDlgOption01::OnBnClickedCheck10)
 	ON_BN_CLICKED(IDC_CHECK11, &CDlgOption01::OnBnClickedCheck11)
 	ON_BN_CLICKED(IDC_CHECK12, &CDlgOption01::OnBnClickedCheck12)
+	ON_BN_CLICKED(IDC_CHECK13, &CDlgOption01::OnBnClickedCheck13)
 END_MESSAGE_MAP()
 
 
@@ -330,10 +331,16 @@ void CDlgOption01::DispStatus()
 	((CButton*)GetDlgItem(IDC_CHECK10))->SetCheck(pDoc->WorkingInfo.System.bDebugEngSig);
 	((CButton*)GetDlgItem(IDC_CHECK11))->SetCheck(pDoc->WorkingInfo.System.bHideTotalMarkingTest);
 	((CButton*)GetDlgItem(IDC_CHECK12))->SetCheck(pDoc->m_bDebugJudgeMk);
+	((CButton*)GetDlgItem(IDC_CHECK13))->SetCheck(pDoc->m_bUsePchFile);
 
 	if (pView->m_pMotion)
 	{
-		int nAlignMethodeOnCamMst = pDoc->m_Master[0].GetAlignMethode();
+		int nAlignMethodeOnCamMst;
+		if (pDoc->m_bUsePchFile)
+			nAlignMethodeOnCamMst = pDoc->m_Master[0].GetAlignMethode();
+		else
+			nAlignMethodeOnCamMst = pDoc->m_Master[0].GetAlignMethodeRmpf();
+
 		int nAlignMethode = pDoc->WorkingInfo.LastJob.nAlignMethode;
 		BOOL b2PointAlign = nAlignMethodeOnCamMst & TWO_POINT;
 		BOOL b4PointAlign = nAlignMethodeOnCamMst & FOUR_POINT;
@@ -513,5 +520,22 @@ void CDlgOption01::OnBnClickedCheck12()
 	else
 	{
 		::WritePrivateProfileString(_T("System"), _T("DebugJudgeMk"), _T("0"), PATH_WORKING_INFO);
+	}
+}
+
+
+void CDlgOption01::OnBnClickedCheck13()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	BOOL bOn = ((CButton*)GetDlgItem(IDC_CHECK13))->GetCheck();
+	pDoc->m_bUsePchFile = bOn;
+
+	if (bOn)
+	{
+		::WritePrivateProfileString(_T("System"), _T("UsePchFile"), _T("1"), PATH_WORKING_INFO);
+	}
+	else
+	{
+		::WritePrivateProfileString(_T("System"), _T("UsePchFile"), _T("0"), PATH_WORKING_INFO);
 	}
 }

@@ -1532,6 +1532,7 @@
 #define IDC_CHK_2_POINT_ALIGN           1426
 #define IDC_STC_12_94                   1426
 #define IDC_CHECK_ALIGN                 1426
+#define IDC_CHECK13                     1426
 #define IDC_STC_DEF_10                  1427
 #define IDC_CHK_4_POINT_ALIGN           1427
 #define IDC_CHK_122                     1427

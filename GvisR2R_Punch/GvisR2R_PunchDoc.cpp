@@ -281,6 +281,7 @@ CGvisR2R_PunchDoc::CGvisR2R_PunchDoc()
 
 	m_nEjectBufferLastShot = -1;
 	m_bDebugJudgeMk = FALSE;
+	m_bUsePchFile = FALSE;
 	m_bDebugGrabAlign = FALSE;
 	m_bUseStatus = FALSE;
 
@@ -1066,6 +1067,11 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 		m_bDebugJudgeMk = _ttoi(szData) ? TRUE : FALSE;
 	else
 		m_bDebugJudgeMk = FALSE;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("UsePchFile"), NULL, szData, sizeof(szData), PATH_WORKING_INFO))
+		m_bUsePchFile = _ttoi(szData) ? TRUE : FALSE;
+	else
+		m_bUsePchFile = FALSE;
 
 	//if (0 < ::GetPrivateProfileString(_T("DTS"), _T("UseIts"), NULL, szData, sizeof(szData), PATH_WORKING_INFO))
 	//	m_bUseIts = _ttoi(szData) ? TRUE : FALSE;
@@ -9987,6 +9993,7 @@ void CGvisR2R_PunchDoc::SetTestMode(int nMode)
 		{
 			if (pDoc->GetTestMode() == MODE_INNER)
 			{
+				pView->MpeWrite(_T("MB40009A"), 0);															// 각인부 사용
 				pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 1);// 내층 검사 사용/미사용 
 				pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 0);// 외층 검사 사용/미사용
 				pDoc->SetMkInfo(_T("Signal"), _T("Inner Test On"), TRUE);
@@ -9996,6 +10003,7 @@ void CGvisR2R_PunchDoc::SetTestMode(int nMode)
 			}
 			else if (pDoc->GetTestMode() == MODE_OUTER)
 			{
+				pView->MpeWrite(_T("MB40009A"), 1);															// 각인부 미사용
 				pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 0);// 내층 검사 사용/미사용
 				pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 1);// 외층 검사 사용/미사용
 				pDoc->SetMkInfo(_T("Signal"), _T("Inner Test On"), FALSE);
@@ -10003,8 +10011,19 @@ void CGvisR2R_PunchDoc::SetTestMode(int nMode)
 				if (pView->m_pDlgMenu01)
 					pView->m_pDlgMenu01->EnableItsMode();
 			}
+			else if(pDoc->GetTestMode() == MODE_LASER)
+			{
+				pView->MpeWrite(_T("MB40009A"), 0);															// 각인부 사용
+				pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 0);// 내층 검사 사용/미사용
+				pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 0);// 외층 검사 사용/미사용
+				pDoc->SetMkInfo(_T("Signal"), _T("Inner Test On"), FALSE);
+				pDoc->SetMkInfo(_T("Signal"), _T("Outer Test On"), FALSE);
+				if (pView->m_pDlgMenu01)
+					pView->m_pDlgMenu01->EnableItsMode(FALSE);
+			}
 			else
 			{
+				pView->MpeWrite(_T("MB40009A"), 1);															// 각인부 미사용
 				pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 0);// 내층 검사 사용/미사용
 				pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 0);// 외층 검사 사용/미사용
 				pDoc->SetMkInfo(_T("Signal"), _T("Inner Test On"), FALSE);
@@ -15612,7 +15631,7 @@ void CGvisR2R_PunchDoc::SetDualTest()
 {
 	TCHAR szData[200];
 	CString sVal, sPath = PATH_WORKING_INFO;
-
+	SetTestMode(MODE_NONE);
 	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Use Dual AOI"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.LastJob.bDualTest = _ttoi(szData) ? TRUE : FALSE;
 	else
@@ -15687,6 +15706,7 @@ void CGvisR2R_PunchDoc::SetTestMode()
 		{
 			WorkingInfo.System.bUseDual2dIts = FALSE;
 			WorkingInfo.System.bUseDualIts = FALSE;
+			pView->MpeWrite(_T("MB40009A"), 1);															// 각인부 미사용
 		}
 	}
 	else
@@ -15707,6 +15727,7 @@ void CGvisR2R_PunchDoc::SetTestMode()
 	{
 		if (pDoc->GetTestMode() == MODE_INNER)
 		{
+			pView->MpeWrite(_T("MB40009A"), 0);															// 각인부 사용
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 1);// 내층 검사 사용/미사용 
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 0);// 외층 검사 사용/미사용
 			pDoc->SetMkInfo(_T("Signal"), _T("Inner Test On"), TRUE);
@@ -15716,6 +15737,7 @@ void CGvisR2R_PunchDoc::SetTestMode()
 		}
 		else if (pDoc->GetTestMode() == MODE_OUTER)
 		{
+			pView->MpeWrite(_T("MB40009A"), 1);															// 각인부 미사용
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 0);// 내층 검사 사용/미사용
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 1);// 외층 검사 사용/미사용
 			pDoc->SetMkInfo(_T("Signal"), _T("Inner Test On"), FALSE);

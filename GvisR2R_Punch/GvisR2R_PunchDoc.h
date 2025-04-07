@@ -528,7 +528,7 @@ public:
 	int GetAoiUpCamMstInfo();
 	int GetAoiDnCamMstInfo();
 
-	BOOL m_bDebugGrabAlign, m_bDebugJudgeMk;
+	BOOL m_bDebugGrabAlign, m_bDebugJudgeMk, m_bUsePchFile;
 
 	void DestroyDoc();
 

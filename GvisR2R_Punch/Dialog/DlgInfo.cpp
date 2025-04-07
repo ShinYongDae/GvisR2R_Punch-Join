@@ -898,7 +898,12 @@ void CDlgInfo::Disp()
 		myBtn[27].SetCheck(FALSE);
 
 #ifndef TEST_MODE
-	int nAlignMethodeOnCamMst = pDoc->m_Master[0].GetAlignMethode();
+	int nAlignMethodeOnCamMst;
+	if(pDoc->m_bUsePchFile)
+		nAlignMethodeOnCamMst = pDoc->m_Master[0].GetAlignMethode();
+	else
+		nAlignMethodeOnCamMst = pDoc->m_Master[0].GetAlignMethodeRmpf();
+
 	int nAlignMethode = pDoc->WorkingInfo.LastJob.nAlignMethode;
 	BOOL b2PointAlign = nAlignMethodeOnCamMst & TWO_POINT;
 	BOOL b4PointAlign = nAlignMethodeOnCamMst & FOUR_POINT;
@@ -2023,7 +2028,12 @@ void CDlgInfo::OnBnClickedChk2PointAlign()
 	BOOL bChk = myBtn[17].GetCheck();
 	CString sMsg;
 
-	int nAlignMethodeOnCamMst = pDoc->m_Master[0].GetAlignMethode();
+	int nAlignMethodeOnCamMst;
+	if (pDoc->m_bUsePchFile)
+		nAlignMethodeOnCamMst = pDoc->m_Master[0].GetAlignMethode();
+	else
+		nAlignMethodeOnCamMst = pDoc->m_Master[0].GetAlignMethodeRmpf();
+
 	if (bChk)
 	{
 		if ( !(nAlignMethodeOnCamMst & TWO_POINT) )
@@ -2078,7 +2088,13 @@ void CDlgInfo::OnBnClickedChk4PointAlign()
 	BOOL bChk = myBtn[18].GetCheck();
 	CString sMsg;
 
-	int nAlignMethodeOnCamMst = pDoc->m_Master[0].GetAlignMethode();
+
+	int nAlignMethodeOnCamMst;
+	if (pDoc->m_bUsePchFile)
+		nAlignMethodeOnCamMst = pDoc->m_Master[0].GetAlignMethode();
+	else
+		nAlignMethodeOnCamMst = pDoc->m_Master[0].GetAlignMethodeRmpf();
+
 	if (bChk)
 	{
 		if ( !(nAlignMethodeOnCamMst & FOUR_POINT))

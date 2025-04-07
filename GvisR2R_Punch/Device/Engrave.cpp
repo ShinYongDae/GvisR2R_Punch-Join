@@ -723,13 +723,15 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 		switch (nMsgId)
 		{
 		case _SigInx::_DualTest:
-			if (pDoc->WorkingInfo.LastJob.bDualTest != (SockData.nData1 > 0) ? TRUE : FALSE)
-			{
-				m_bGetOpInfo = TRUE;
-				pDoc->SetDualTest();
-				//pDoc->WorkingInfo.LastJob.bDualTest = (SockData.nData1 > 0) ? TRUE : FALSE;
-				//m_bRcvSig[_SigInx::_DualTest] = TRUE;
-			}
+			//if (pDoc->WorkingInfo.LastJob.bDualTest != (SockData.nData1 > 0) ? TRUE : FALSE)
+			//{
+			//	m_bGetOpInfo = TRUE;
+			//	pDoc->SetDualTest();
+			//	//pDoc->WorkingInfo.LastJob.bDualTest = (SockData.nData1 > 0) ? TRUE : FALSE;
+			//	//m_bRcvSig[_SigInx::_DualTest] = TRUE;
+			//}
+			pDoc->SetDualTest();
+			pDoc->SetTestMode();
 			break;
 		case _SigInx::_SampleTest:
 			//if (pDoc->WorkingInfo.LastJob.bSampleTest != (SockData.nData1 > 0) ? TRUE : FALSE)
@@ -901,13 +903,13 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 		{
 		case _ItemInx::_TestMode:
 			//if (pDoc->GetTestMode() != (int)SockData.nData1) // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2
-			{
+			//{
 				m_bGetOpInfo = TRUE;
 				pDoc->SetTestMode();
 				//pDoc->WorkingInfo.LastJob.nTestMode = (int)SockData.nData1; // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2
 				//m_bRcvSig[_SigInx::_TestMode] = TRUE;
 				//pDoc->SetTestMode(pDoc->WorkingInfo.LastJob.nTestMode); // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2
-			}
+			//}
 			break;
 		case _ItemInx::_OpName:
 			if (pDoc->WorkingInfo.LastJob.sSelUserName != CharToString(SockData.strData))

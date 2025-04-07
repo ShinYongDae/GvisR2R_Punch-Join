@@ -3143,13 +3143,15 @@ BOOL CDlgMenu03::DoReset()
 		{
 			pDoc->BtnStatus.EngAuto.Init = TRUE;
 			pDoc->BtnStatus.EngAuto.IsInit = FALSE;
-			pView->m_pEngrave->SwEngAutoInit(TRUE);
+			//pView->m_pEngrave->SwEngAutoInit(FALSE);
 		}
 		
 		if(IDNO == pView->MsgBox(_T("초기화를 하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, TRUE))
 			bInit = FALSE;
 		else
 		{
+			pView->m_bCont = FALSE;
+			pView->m_pEngrave->SwEngAutoInit(TRUE);
 			pDoc->m_bDoneChgLot = FALSE; pDoc->SetStatus(_T("General"), _T("bDoneChgLot"), pDoc->m_bDoneChgLot);
 			pView->m_nNewLot = 0;
 

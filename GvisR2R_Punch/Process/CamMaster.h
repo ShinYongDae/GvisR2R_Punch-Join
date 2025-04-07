@@ -11,6 +11,9 @@
 #include "PcsRgn.h"
 #include "../Global/GlobalDefine.h"
 
+#include <vector>
+using namespace std;
+
 #define RGN_STRIP_VARIABLE_NUM	23		// REGION_STRIP 구조체에서 배열을 제외한 변수의 갯수
 //#define MAX_NodeNumX			200
 //#define MAX_NodeNumY			200
@@ -28,6 +31,30 @@
 #define MAX_STRIP_X_NUM			10			//2012.08.07 hyk
 #define MAX_STRIP_Y_NUM			10			//2012.08.07 hyk
 #define MAX_PIECE_RGN_NUM		(MAX_PIECE_NODE_X_NUM * MAX_PIECE_NODE_Y_NUM)		// Maximum number of Cell regions
+
+typedef struct tagPointInfo {
+	tagPointInfo()
+	{
+		x = 0.0f;
+		y = 0.0f;
+	}
+	float x;
+	float y;
+}POINT_INFO;
+
+typedef struct tagRMPFFileInfo {
+	tagRMPFFileInfo()
+	{
+		nNumOfAlignPoint = 0;
+		nNumOfMarkPoint = 0;
+		vecAlignPoint.clear();
+		vecMarkPoint.clear();
+	}
+	int nNumOfAlignPoint;
+	int nNumOfMarkPoint;
+	vector <POINT_INFO> vecAlignPoint;
+	vector <POINT_INFO> vecMarkPoint;
+}RMPF_FILE_INFO;
 
 /////////////////////////////////////////////////////////////////////////////
 // CCamMaster window
@@ -129,6 +156,13 @@ public:
 	CString GetModel();
 	CString GetMasterLocation();
 	int GetAlignMethode();	// FOUR_POINT , TWO_POINT
+
+
+	RMPF_FILE_INFO m_rmpfFileInfo;
+	BOOL LoadCadAlignRmpfPos();
+	BOOL LoadRMPFFile(CString strrmpfFile);
+	BOOL ConvertBinaryToTextFile(CString sPathBinFile);
+	int GetAlignMethodeRmpf(); // FOUR_POINT , TWO_POINT
 
 // Overrides
 	// ClassWizard generated virtual function overrides

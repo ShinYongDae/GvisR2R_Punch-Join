@@ -144,7 +144,11 @@ BOOL CCamMaster::LoadMstInfo()
 
 		LoadPcsImg();
 		LoadCadImg();
-		LoadCadAlignMkPos(); //.pch
+
+		if (pDoc->m_bUsePchFile)
+			LoadCadAlignMkPos(); //.pch
+		else
+			LoadCadAlignRmpfPos(); //.rmpf
 
 		//InitOrderingMk();
 
@@ -2342,3 +2346,195 @@ int CCamMaster::GetAlignMethode() // FOUR_POINT , TWO_POINT
 
 	return nAlignMethode;
 }
+
+
+// CamMaster Marking Index, Align Reject Mark Position File. ========================
+BOOL CCamMaster::LoadCadAlignRmpfPos()
+{
+	if (!m_sLayerUp.IsEmpty()) // 하면에서
+		return TRUE;
+
+#ifdef USE_CAM_MASTER
+	BOOL bRtn = TRUE;
+	BOOL b2PointAlign = FALSE;
+	BOOL b4PointAlign = FALSE;
+
+	CFileFind findfile;
+	CString sPath;
+
+	if (m_sPathCamSpecDir.Right(1) != "\\")
+		sPath.Format(_T("%s\\%s\\%s.rmpf"), m_sPathCamSpecDir, m_sModel, m_sLayer);
+	else
+		sPath.Format(_T("%s%s\\%s.rmpf"), m_sPathCamSpecDir, m_sModel, m_sLayer);
+
+	if (!LoadRMPFFile(sPath))
+		return FALSE;
+
+	SetCad2PntAlignMkPos();
+	return TRUE;
+#else
+	return TRUE;
+#endif
+}
+
+BOOL CCamMaster::LoadRMPFFile(CString strrmpfFile)
+{
+	CFile cfile;
+	CFileFind finder;
+
+	m_rmpfFileInfo.nNumOfAlignPoint = 0;
+	m_rmpfFileInfo.nNumOfMarkPoint = 0;
+	m_rmpfFileInfo.vecAlignPoint.clear();
+	m_rmpfFileInfo.vecMarkPoint.clear();
+
+	if (!finder.FindFile(strrmpfFile))
+	{
+		AfxMessageBox(_T("Cannot found the RMPF File!!!"));
+		return FALSE;
+	}
+
+	if (!cfile.Open(strrmpfFile, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone, NULL))
+	{
+		AfxMessageBox(_T("Cannot Open the RMPF File!!!"));
+		return FALSE;
+	}
+
+	cfile.SeekToBegin();
+
+	// Read NumOfAlignPoint
+	cfile.Read(&m_rmpfFileInfo.nNumOfAlignPoint, sizeof(int));
+
+	// Read AlignPoint Data
+	if (m_rmpfFileInfo.nNumOfAlignPoint > 0)
+	{
+		m_rmpfFileInfo.vecAlignPoint.reserve(m_rmpfFileInfo.nNumOfAlignPoint);
+		m_rmpfFileInfo.vecAlignPoint.resize(m_rmpfFileInfo.nNumOfAlignPoint);
+
+		cfile.Read(&m_rmpfFileInfo.vecAlignPoint[0], sizeof(POINT_INFO)*m_rmpfFileInfo.nNumOfAlignPoint);
+
+		// 기존 구조체로 옮김
+		if (m_rmpfFileInfo.nNumOfAlignPoint < 4) // TWO_POINT_ALIGN
+		{
+			m_stAlignMk.X0 = m_rmpfFileInfo.vecAlignPoint[0].x;
+			m_stAlignMk.Y0 = m_rmpfFileInfo.vecAlignPoint[0].y;
+			m_stAlignMk.X1 = m_rmpfFileInfo.vecAlignPoint[1].x;
+			m_stAlignMk.Y1 = m_rmpfFileInfo.vecAlignPoint[1].y;
+		}
+		else									// FOUR_POINT_ALIGN
+		{
+			m_stAlignMk2.X0 = m_rmpfFileInfo.vecAlignPoint[0].x;
+			m_stAlignMk2.Y0 = m_rmpfFileInfo.vecAlignPoint[0].y;
+			m_stAlignMk2.X1 = m_rmpfFileInfo.vecAlignPoint[1].x;
+			m_stAlignMk2.Y1 = m_rmpfFileInfo.vecAlignPoint[1].y;
+			m_stAlignMk2.X2 = m_rmpfFileInfo.vecAlignPoint[2].x;
+			m_stAlignMk2.Y2 = m_rmpfFileInfo.vecAlignPoint[2].y;
+			m_stAlignMk2.X3 = m_rmpfFileInfo.vecAlignPoint[3].x;
+			m_stAlignMk2.Y3 = m_rmpfFileInfo.vecAlignPoint[3].y;
+		}
+	}
+
+	// Read Marking Position Data
+	cfile.Read(&m_lPcsNum, sizeof(int));
+	if (m_lPcsNum > 0)
+	{
+		cfile.Read(&m_stPcsMk, sizeof(stPieceMark)*m_lPcsNum);
+	}
+
+	//cfile.Read(&m_rmpfFileInfo.nNumOfMarkPoint, sizeof(int));
+	//if (m_rmpfFileInfo.nNumOfMarkPoint > 0)
+	//{
+	//	m_rmpfFileInfo.vecMarkPoint.reserve(m_rmpfFileInfo.nNumOfMarkPoint);
+	//	m_rmpfFileInfo.vecMarkPoint.resize(m_rmpfFileInfo.nNumOfMarkPoint);
+	//	cfile.Read(&m_rmpfFileInfo.vecMarkPoint[0], sizeof(POINT_INFO)*m_rmpfFileInfo.nNumOfMarkPoint);
+	//}
+
+	cfile.Close();
+
+	//ConvertBinaryToTextFile(strrmpfFile);
+
+	return TRUE;
+}
+
+BOOL CCamMaster::ConvertBinaryToTextFile(CString sPathBinFile)
+{
+	CFileFind finder;
+	CStdioFile stdfile;
+
+	int i;
+	CString strTextFile, strMsg, strData, strTemp;
+
+	int n = sPathBinFile.ReverseFind(_T('.'));
+	strTextFile = sPathBinFile.Left(n) + _T("_RMPF.txt");
+
+	if (finder.FindFile(strTextFile))
+	{
+		finder.Close();
+		DeleteFile(strTextFile);
+	}
+
+	if (!stdfile.Open(strTextFile, CFile::modeCreate | CFile::modeWrite | CFile::typeText))
+	{
+		strMsg.Format(_T("Cannot Open the [%s] File!!!"), strTextFile);
+		AfxMessageBox(strMsg);
+		return FALSE;
+	}
+
+	strTemp.Empty();
+	strData.Format(_T("Number Of Reject Mark Align Point = %d\n"), m_rmpfFileInfo.nNumOfAlignPoint);
+	strTemp += strData;
+
+	for (i = 0; i < m_rmpfFileInfo.nNumOfAlignPoint; i++)
+	{
+		strData.Format(_T("Align Point%d_(x,y) = %.3f, %.3f\n"), i, m_rmpfFileInfo.vecAlignPoint.at(i).x, m_rmpfFileInfo.vecAlignPoint.at(i).y);
+		strTemp += strData;
+	}
+	strTemp += _T("\n");
+	stdfile.WriteString(strTemp);
+
+	strTemp.Empty();
+	strData.Format(_T("Number Of Reject Mark Point = %d\n"), m_rmpfFileInfo.nNumOfMarkPoint);
+	strTemp += strData;
+	stdfile.WriteString(strTemp);
+
+	strTemp.Empty();
+	for (i = 0; i < m_rmpfFileInfo.nNumOfMarkPoint; i++)
+	{
+		strData.Format(_T("Marking Point%d_(x,y) = %.3f, %.3f\n"), i, m_rmpfFileInfo.vecMarkPoint.at(i).x, m_rmpfFileInfo.vecMarkPoint.at(i).y);
+		strTemp += strData;
+	}
+	strTemp += _T("\n");
+	stdfile.WriteString(strTemp);
+
+	stdfile.Close();
+
+	//AfxMessageBox(_T("Generated Text File!!!"));
+
+	return TRUE;
+}
+
+int CCamMaster::GetAlignMethodeRmpf() // FOUR_POINT , TWO_POINT
+{
+	int nAlignMethode = 0;
+	BOOL b2PointAlign = FALSE;
+	BOOL b4PointAlign = FALSE;
+
+	if (m_rmpfFileInfo.nNumOfAlignPoint < 1)
+		b2PointAlign = FALSE;
+	else if (m_rmpfFileInfo.nNumOfAlignPoint < 4)
+		b4PointAlign = TRUE;
+	else if (m_rmpfFileInfo.nNumOfAlignPoint == 4)
+		b4PointAlign = TRUE;
+	else
+		b4PointAlign = TRUE;
+
+	if (b4PointAlign && b2PointAlign)
+		nAlignMethode = FOUR_POINT + TWO_POINT;
+	else if (b4PointAlign)
+		nAlignMethode = FOUR_POINT;
+	else if (b2PointAlign)
+		nAlignMethode = TWO_POINT;
+
+	return nAlignMethode;
+}
+
+
