@@ -809,8 +809,8 @@ struct stLastJob
 	CString sCurrentShotNum, sSettingShotNum;
 	int nAlarmTimePunch, nAlarmTimeAoi;
 	BOOL bDispContRun, bDispLotEnd;
-	BOOL bUseJudgeMk;
-	int nJudgeMkRatio[2];
+	BOOL bUseJudgeMk, bUseJudgeMkHisto;
+	int nJudgeMkRatio[2], nJudgeMkHistoRatio[2];
 
 	stLastJob()
 	{
@@ -869,9 +869,11 @@ struct stLastJob
 
 		nAlarmTimePunch = 10800; nAlarmTimeAoi = 10800;
 		bDispContRun = FALSE; bDispLotEnd = FALSE;
-		bUseJudgeMk = TRUE;
+		bUseJudgeMk = TRUE; bUseJudgeMkHisto = FALSE;
 		nJudgeMkRatio[0] = 85;
 		nJudgeMkRatio[1] = 85;
+		nJudgeMkHistoRatio[0] = 50;
+		nJudgeMkHistoRatio[1] = 50;
 	}
 };
 

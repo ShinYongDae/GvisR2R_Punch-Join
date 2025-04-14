@@ -38,7 +38,7 @@ public:
 	CfPoint m_pntNoMkLeft[2][4], m_pntNoMkRight[2][4]; // LT, LB, RB, RT
 	BOOL m_bVsStatusUp, m_bVsStatusDn;
 	BOOL m_bOffLogAuto, m_bOffLogPLC;
-	int m_nDelayShow, m_nJudgeMkModelSize;
+	int m_nDelayShow, m_nJudgeMkModelSize, m_nJudgeMkModelHistoSize;
 	BOOL m_bBufEmpty[2]; // [0]: Up, [1]: Dn
 	BOOL m_bBufEmptyF[2]; // [0]: Up, [1]: Dn
 	BOOL m_bUseStatus;
@@ -139,8 +139,13 @@ public:
 public:
 	BOOL MakeDirRmap(int nRmap);
 	double GetVerifyPunchScore();
+	double GetVerifyPunchScore2();
+	double GetVerifyPunchHistoScore();
+	double GetVerifyPunchHistoScore2();
 	void SetVerifyPunchScore(double dScore);
 	void SetVerifyPunchScore2(double dScore);
+	void SetVerifyPunchHistoScore(double dScore);
+	void SetVerifyPunchHistoScore2(double dScore);
 
 	void LogAuto(CString strMsg, int nType = 0);
 	void LogPLC(CString strMsg, int nType = 0);

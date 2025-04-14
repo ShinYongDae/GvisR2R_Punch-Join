@@ -587,24 +587,30 @@
 #define IDC_STC_MK_POS4                 1178
 #define IDC_STC_202                     1178
 #define IDC_CHK_REELMAP                 1178
+#define IDC_STC_192                     1178
 #define IDC_STC_ST_ALL                  1179
 #define IDC_CHK_MK_OFFSET_ED2           1179
 #define IDC_STC_23                      1179
 #define IDC_EDIT_RESULT                 1179
+#define IDC_STC_193                     1179
 #define IDC_STC_AOI_UP                  1180
 #define IDC_GRP_LT9                     1180
 #define IDC_STC_24                      1180
 #define IDC_BTN_SEARCH                  1180
+#define IDC_STC_194                     1180
 #define IDC_CHK_TP_STOP                 1181
 #define IDC_GRP_LT10                    1181
 #define IDC_STC_107                     1181
 #define IDC_COMBO_LAYER                 1181
+#define IDC_STC_195                     1181
 #define IDC_CHK_DEF_UP                  1182
 #define IDC_BTN_PIN_MOVE2               1182
 #define IDC_STC_108                     1182
+#define IDC_STC_196                     1182
 #define IDC_CHK_DEF_DN                  1183
 #define IDC_BTN_PIN_SAVE2               1183
 #define IDC_STC_109                     1183
+#define IDC_STC_197                     1183
 #define IDC_CHK_DEF_ALL                 1184
 #define IDC_BTN_HOME_MOVE2              1184
 #define IDC_GRP_04                      1184
@@ -1556,6 +1562,8 @@
 #define IDC_STC_12_97                   1432
 #define IDC_PIC_MODEL_L2                1432
 #define IDC_PIC_MODEL_R                 1432
+#define IDC_RADIO1                      1432
+#define IDC_RADIO2                      1433
 #define IDC_STC_DEF_16                  1433
 #define IDC_CHK_125                     1433
 #define IDC_CHK_USE_AOI_DUAL_ITS        1433
@@ -1609,7 +1617,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        361
 #define _APS_NEXT_COMMAND_VALUE         32785
-#define _APS_NEXT_CONTROL_VALUE         1432
+#define _APS_NEXT_CONTROL_VALUE         1433
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

@@ -152,6 +152,8 @@ BEGIN_MESSAGE_MAP(CDlgUtil03, CDialog)
 	ON_BN_CLICKED(IDC_BTN_JUDGE_MK, &CDlgUtil03::OnBnClickedBtnJudgeMk)
 	ON_STN_CLICKED(IDC_STC_187, &CDlgUtil03::OnStnClickedStc187)
 	ON_STN_CLICKED(IDC_STC_189, &CDlgUtil03::OnStnClickedStc189)
+	ON_BN_CLICKED(IDC_RADIO1, &CDlgUtil03::OnBnClickedRadio1)
+	ON_BN_CLICKED(IDC_RADIO2, &CDlgUtil03::OnBnClickedRadio2)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -231,14 +233,66 @@ void CDlgUtil03::AtDlgShow()
 		pView->m_pDlgMenu02->SetLight2();
 	}
 
-	CString str;
-	str.Format(_T("%d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0]);
-	myStcData[67].SetText(str);
-
-	str.Format(_T("%d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1]);
-	myStcData[68].SetText(str);
-
 	DispResultBlob();
+
+	((CButton*)GetDlgItem(IDC_BTN_JUDGE_MK))->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_STC_22)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_STC_187)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_STC_189)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_STC_188)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_STC_REJECT_SCR)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_STC_REJECT_SCR2)->ShowWindow(SW_SHOW);
+
+	if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto && pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+	{
+		((CButton*)GetDlgItem(IDC_RADIO1))->ShowWindow(SW_SHOW);
+		((CButton*)GetDlgItem(IDC_RADIO2))->ShowWindow(SW_SHOW);
+	}
+	else if(pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
+	{
+		((CButton*)GetDlgItem(IDC_RADIO1))->ShowWindow(SW_SHOW);
+		((CButton*)GetDlgItem(IDC_RADIO2))->ShowWindow(SW_HIDE);
+	}
+	else if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+	{
+		((CButton*)GetDlgItem(IDC_RADIO1))->ShowWindow(SW_HIDE);
+		((CButton*)GetDlgItem(IDC_RADIO2))->ShowWindow(SW_SHOW);
+	}
+	else
+	{
+		((CButton*)GetDlgItem(IDC_RADIO1))->ShowWindow(SW_HIDE);
+		((CButton*)GetDlgItem(IDC_RADIO2))->ShowWindow(SW_HIDE);
+
+		((CButton*)GetDlgItem(IDC_BTN_JUDGE_MK))->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STC_22)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STC_187)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STC_189)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STC_188)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STC_REJECT_SCR)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STC_REJECT_SCR2)->ShowWindow(SW_HIDE);
+	}
+
+	CString str;
+	if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
+	{
+		((CButton*)GetDlgItem(IDC_RADIO1))->SetCheck(TRUE);
+
+		str.Format(_T("%d"), pDoc->WorkingInfo.LastJob.nJudgeMkHistoRatio[0]);
+		myStcData[67].SetText(str);
+
+		str.Format(_T("%d"), pDoc->WorkingInfo.LastJob.nJudgeMkHistoRatio[1]);
+		myStcData[68].SetText(str);
+	}
+	else if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+	{
+		((CButton*)GetDlgItem(IDC_RADIO2))->SetCheck(TRUE);
+
+		str.Format(_T("%d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0]);
+		myStcData[67].SetText(str);
+
+		str.Format(_T("%d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1]);
+		myStcData[68].SetText(str);
+	}
 
 	m_bTIM_DISP_STS = TRUE;
 	SetTimer(TIM_DISP_STS, 100, NULL);
@@ -1748,6 +1802,17 @@ void CDlgUtil03::DispResultPtScore(int nCam)
 void CDlgUtil03::OnBnClickedBtnJudgeMk()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	BOOL bOn1 = ((CButton*)GetDlgItem(IDC_RADIO1))->GetCheck();
+	BOOL bOn2 = ((CButton*)GetDlgItem(IDC_RADIO2))->GetCheck();
+
+	if (bOn1)
+		JudgeMkHisto();
+	else if (bOn2)
+		JudgeMk();
+}
+
+void CDlgUtil03::JudgeMk()
+{
 	CString sMsg;
 
 	if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
@@ -1794,6 +1859,89 @@ void CDlgUtil03::OnBnClickedBtnJudgeMk()
 			BOOL bJudgeMk;
 			BOOL bRtn = pView->m_pVision[nCam]->TestJudgeMk(bJudgeMk);
 			if(pView->m_pDlgMenu02)
+				pView->m_pDlgMenu02->DispMkPmScore(nCam);
+			if (bRtn && bJudgeMk)
+			{
+				if (nCam == 0)
+				{
+					sMsg.Format(_T("미마킹 테스트 결과 1 : 정상 (%d)"), int(100.0 - pView->m_pVision[0]->MkMtRst.dScore));
+					pDoc->LogAuto(sMsg);
+				}
+				else if (nCam == 1)
+				{
+					sMsg.Format(_T("미마킹 테스트 결과 2 : 정상 (%d)"), int(100.0 - pView->m_pVision[1]->MkMtRst.dScore));
+					pDoc->LogAuto(sMsg);
+				}
+				AfxMessageBox(_T("마킹"));
+			}
+			else if (!bJudgeMk)
+			{
+				if (nCam == 0)
+				{
+					sMsg.Format(_T("미마킹 테스트 결과 1 : 비정상 (%d)"), int(100.0 - pView->m_pVision[0]->MkMtRst.dScore));
+					pDoc->LogAuto(sMsg);
+				}
+				else if (nCam == 1)
+				{
+					sMsg.Format(_T("미마킹 테스트 결과 2 : 비정상 (%d)"), int(100.0 - pView->m_pVision[1]->MkMtRst.dScore));
+					pDoc->LogAuto(sMsg);
+				}
+				AfxMessageBox(_T("미마킹"));
+			}
+		}
+#endif
+
+	}
+}
+
+void CDlgUtil03::JudgeMkHisto()
+{
+	CString sMsg;
+
+	if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+	{
+		int nCam = -1;
+
+		BOOL bOn0 = myBtn[3].GetCheck();	// IDC_CHK_LEFT
+		BOOL bOn1 = myBtn[4].GetCheck();	// IDC_CHK_RIGHT
+
+		if (bOn0)
+			nCam = 0;
+		else if (bOn1)
+			nCam = 1;
+
+		if (nCam < 0)
+		{
+			AfxMessageBox(_T("좌/우 마킹 중 하나를 선택하세요."));
+			return;
+		}
+
+		if (IDNO == pView->MsgBox(_T("미마킹 테스트를 진행하시겠습니까?"), 0, MB_YESNO))
+			return;
+
+#ifdef USE_VISION
+		if (pView->m_pVision[nCam])
+		{
+			if (nCam == 0)
+			{
+				pDoc->LogAuto(_T("Left 미마킹 테스트 클릭"));
+				sMsg.Format(_T("조명 1 : %s"), pDoc->WorkingInfo.Light.sVal[0]);
+				pDoc->LogAuto(sMsg);
+				sMsg.Format(_T("기준값 1 : %d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0]);
+				pDoc->LogAuto(sMsg);
+			}
+			else if (nCam == 1)
+			{
+				pDoc->LogAuto(_T("Right 미마킹 테스트 클릭"));
+				sMsg.Format(_T("조명 2 : %s"), pDoc->WorkingInfo.Light.sVal[1]);
+				pDoc->LogAuto(sMsg);
+				sMsg.Format(_T("기준값 2 : %d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1]);
+				pDoc->LogAuto(sMsg);
+			}
+
+			BOOL bJudgeMk;
+			BOOL bRtn = pView->m_pVision[nCam]->TestJudgeMkHisto(bJudgeMk);
+			if (pView->m_pDlgMenu02)
 				pView->m_pDlgMenu02->DispMkPmScore(nCam);
 			if (bRtn && bJudgeMk)
 			{
@@ -1877,4 +2025,44 @@ void CDlgUtil03::OnStnClickedStc189()
 
 	if (pView->m_pDlgMenu02)
 		pView->m_pDlgMenu02->DispMkPmStdVal();
+}
+
+
+void CDlgUtil03::OnBnClickedRadio1()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CString str;
+	if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
+	{
+		//((CButton*)GetDlgItem(IDC_RADIO1))->SetCheck(TRUE);
+
+		str.Format(_T("%d"), pDoc->WorkingInfo.LastJob.nJudgeMkHistoRatio[0]);
+		myStcData[67].SetText(str);
+
+		str.Format(_T("%d"), pDoc->WorkingInfo.LastJob.nJudgeMkHistoRatio[1]);
+		myStcData[68].SetText(str);
+
+		myStcData[69].SetText(_T("")); // IDC_STC_REJECT_SCR
+		myStcData[70].SetText(_T("")); // IDC_STC_REJECT_SCR2
+	}
+}
+
+
+void CDlgUtil03::OnBnClickedRadio2()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CString str;
+	if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+	{
+		//((CButton*)GetDlgItem(IDC_RADIO2))->SetCheck(TRUE);
+
+		str.Format(_T("%d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0]);
+		myStcData[67].SetText(str);
+
+		str.Format(_T("%d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1]);
+		myStcData[68].SetText(str);
+
+		myStcData[69].SetText(_T("")); // IDC_STC_REJECT_SCR
+		myStcData[70].SetText(_T("")); // IDC_STC_REJECT_SCR2
+	}
 }

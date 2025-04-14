@@ -1336,6 +1336,8 @@ public:
 	CString GetMkMtInfo0(int nSerial, int nMkPcs);
 	CString GetMkMtInfo1(int nSerial, int nMkPcs);
 
+	BOOL ChkRepunching(int nCam);
+
 
 // 재정의입니다.
 public:

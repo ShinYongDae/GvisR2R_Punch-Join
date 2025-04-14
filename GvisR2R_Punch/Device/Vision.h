@@ -127,7 +127,7 @@ class CVision : public CWnd
 
 
 	CLibMilBuf *m_MilGrabModelPunch;
-	double m_dVerifyPunchScore;
+	double m_dVerifyPunchScore, m_dVerifyPunchHistoScore;
 
 	MIL_ID MilCADImgBuf, MilBufCADTemp;
 	MIL_ID MilBufPinTemp, MilPinImgBuf;
@@ -258,12 +258,18 @@ public:
 	BOOL SaveMkImg(int nSerial, int nMkPcsIdx, CString sDest);
 	void SaveCadImg(int nIdxMkInfo, CString sPath); // (화면의 IDC 인덱스, 저장할 파일 Path)
 
-	BOOL m_bMkJudge; // TRUE : Mked, FALSE : NoMked
+	int m_nHistoRst[256];
+	BOOL m_bMkJudge, m_bMkJudgeHisto; // TRUE : Mked, FALSE : NoMked
 	BOOL PrepareVerifyPunching();
 	void SetVerifyPunchScore(double dScore);
+	void SetVerifyPunchHistoScore(double dScore);
 	double GetVerifyPunchScore();
+	double GetVerifyPunchHistoScore();
 	BOOL CheckVerifyPunching(MIL_ID &GrabImgId);
 	BOOL Judge(MIL_ID &GrabImgId, stPtMtRst &stRst);
+	BOOL CheckVerifyPunchingHisto(MIL_ID &GrabImgId);
+	BOOL JudgeHisto(MIL_ID &GrabImgId);
+	void DoHisto(MIL_ID &GrabImgId);
 
 	BOOL ShowDispReject();
 	void InitRejectBuf();
@@ -275,6 +281,7 @@ public:
 	BOOL BlobRejectModel();
 
 	BOOL TestJudgeMk(BOOL &bMkJudge);
+	BOOL TestJudgeMkHisto(BOOL &bMkJudge);
 
 	// ITS
 	//CLibMilBuf *m_pMilBufCad[DEF_VIEW_IMG_NUMBER], *m_pMilBufDef[DEF_VIEW_IMG_NUMBER];

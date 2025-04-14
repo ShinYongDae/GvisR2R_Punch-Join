@@ -14527,7 +14527,7 @@ void CGvisR2R_PunchView::DoMark0()
 	case 3:
 		if (m_bCam)
 		{
-			if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+			if (pDoc->WorkingInfo.LastJob.bUseJudgeMk || pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
 				sMsg.Format(_T("Left 미마킹 테스트 시작 SN:%d"), m_nBufUpSerial[0]);
 			else
 				sMsg.Format(_T("Left verify 시작 SN:%d"), m_nBufUpSerial[0]);
@@ -14760,42 +14760,69 @@ void CGvisR2R_PunchView::DoMark0()
 			{
 				pView->ClrDispMsg();
 				//AfxMessageBox(_T("Error-SaveMk0Img()"));
-				if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+				if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto && pDoc->WorkingInfo.LastJob.bUseJudgeMk)
 				{
-#ifdef USE_VISION
-					if (!m_pVision[0]->m_bMkJudge)
+					if (!m_pVision[0]->m_bMkJudgeHisto && !m_pVision[0]->m_bMkJudge)
 					{
-						pDoc->LogAuto(_T("좌측 펀칭 미마킹 알람 발생"));
-						nRtn = MsgBox(_T("좌측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
-						pDoc->LogAuto(_T("좌측 펀칭 미마킹 알람 해제"));
-						if (IDYES == nRtn)
+						if (ChkRepunching(0)) // 0 : Left, 1 : Right
 						{
-							m_bFailMkJudge[0] = TRUE;
-							ptPnt.x = m_dTarget[AXIS_X0];
-							ptPnt.y = m_dTarget[AXIS_Y0];
-
-							Move0(ptPnt, FALSE, WAIT);
-							Sleep(30);
-							Mk0();
-							Sleep(100);
-							Move0(ptPnt, TRUE, WAIT);
-							m_nMkPcs[0]--; // Repeat Current Position Verify.
-							m_nStepMk[0] = 8; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);
 							Stop();
 							break;
 						}
-						else
-						{
-							//m_pVision[0]->ArMkMtRst.Add(m_pVision[0]->MkMtRst);
-							Stop();
-						}
-
+						Stop();
 					}
-					else
+				}
+				else if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
+				{
+					if (!m_pVision[0]->m_bMkJudgeHisto)
 					{
-						;//m_pVision[0]->ArMkMtRst.Add(m_pVision[0]->MkMtRst);
+						if (ChkRepunching(0)) // 0 : Left, 1 : Right
+						{
+							Stop();
+							break;
+						}
+						Stop();
 					}
-#endif
+				}
+				else if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+				{
+					if (!m_pVision[0]->m_bMkJudge)
+					{
+						if (ChkRepunching(0)) // 0 : Left, 1 : Right
+						{
+							Stop();
+							break;
+						}
+						Stop();
+						//pDoc->LogAuto(_T("좌측 펀칭 미마킹 알람 발생"));
+						//nRtn = MsgBox(_T("좌측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+						//pDoc->LogAuto(_T("좌측 펀칭 미마킹 알람 해제"));
+						//if (IDYES == nRtn)
+						//{
+						//	m_bFailMkJudge[0] = TRUE;
+						//	ptPnt.x = m_dTarget[AXIS_X0];
+						//	ptPnt.y = m_dTarget[AXIS_Y0];
+
+						//	Move0(ptPnt, FALSE, WAIT);
+						//	Sleep(30);
+						//	Mk0();
+						//	Sleep(100);
+						//	Move0(ptPnt, TRUE, WAIT);
+						//	m_nMkPcs[0]--; // Repeat Current Position Verify.
+						//	m_nStepMk[0] = 8; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);
+						//	Stop();
+						//	break;
+						//}
+						//else
+						//{
+						//	//m_pVision[0]->ArMkMtRst.Add(m_pVision[0]->MkMtRst);
+						//	Stop();
+						//}
+					}
+					//else
+					//{
+					//	;//m_pVision[0]->ArMkMtRst.Add(m_pVision[0]->MkMtRst);
+					//}
 				}
 			}
 		}
@@ -15478,41 +15505,69 @@ void CGvisR2R_PunchView::DoMark1()
 			{
 				pView->ClrDispMsg();
 				//AfxMessageBox(_T("Error-SaveMk1Img()"));
-				if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+				if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto && pDoc->WorkingInfo.LastJob.bUseJudgeMk)
 				{
-#ifdef USE_VISION
-					if (!m_pVision[1]->m_bMkJudge)
+					if (!m_pVision[1]->m_bMkJudgeHisto && !m_pVision[1]->m_bMkJudge)
 					{
-						pDoc->LogAuto(_T("우측 펀칭 미마킹 알람 발생"));
-						nRtn = MsgBox(_T("우측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
-						pDoc->LogAuto(_T("우측 펀칭 미마킹 알람 해제"));
-						if (IDYES == nRtn)
+						if (ChkRepunching(1)) // 0 : Left, 1 : Right
 						{
-							m_bFailMkJudge[1] = TRUE;
-							ptPnt.x = m_dTarget[AXIS_X1];
-							ptPnt.y = m_dTarget[AXIS_Y1];
-
-							Move1(ptPnt, FALSE, WAIT);
-							Sleep(30);
-							Mk1();
-							Sleep(100);
-							Move1(ptPnt, TRUE, WAIT);
-							m_nMkPcs[1]--; // Repeat Current Position Verify.
-							m_nStepMk[1] = 8; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);
 							Stop();
 							break;
 						}
-						else
-						{
-							//m_pVision[1]->ArMkMtRst.Add(m_pVision[1]->MkMtRst);
-							Stop();
-						}
+						Stop();
 					}
-					else
+				}
+				else if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
+				{
+					if (!m_pVision[1]->m_bMkJudgeHisto)
 					{
-						;//m_pVision[1]->ArMkMtRst.Add(m_pVision[1]->MkMtRst);
+						if (ChkRepunching(1)) // 0 : Left, 1 : Right
+						{
+							Stop();
+							break;
+						}
+						Stop();
 					}
-#endif
+				}
+				else if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+				{
+					if (!m_pVision[1]->m_bMkJudge)
+					{
+						if (ChkRepunching(1)) // 0 : Left, 1 : Right
+						{
+							Stop();
+							break;
+						}
+						Stop();
+						//pDoc->LogAuto(_T("우측 펀칭 미마킹 알람 발생"));
+						//nRtn = MsgBox(_T("우측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+						//pDoc->LogAuto(_T("우측 펀칭 미마킹 알람 해제"));
+						//if (IDYES == nRtn)
+						//{
+						//	m_bFailMkJudge[1] = TRUE;
+						//	ptPnt.x = m_dTarget[AXIS_X1];
+						//	ptPnt.y = m_dTarget[AXIS_Y1];
+
+						//	Move1(ptPnt, FALSE, WAIT);
+						//	Sleep(30);
+						//	Mk1();
+						//	Sleep(100);
+						//	Move1(ptPnt, TRUE, WAIT);
+						//	m_nMkPcs[1]--; // Repeat Current Position Verify.
+						//	m_nStepMk[1] = 8; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);
+						//	Stop();
+						//	break;
+						//}
+						//else
+						//{
+						//	//m_pVision[1]->ArMkMtRst.Add(m_pVision[1]->MkMtRst);
+						//	Stop();
+						//}
+					}
+					//else
+					//{
+					//	;//m_pVision[1]->ArMkMtRst.Add(m_pVision[1]->MkMtRst);
+					//}
 				}
 			}
 		}
@@ -29184,41 +29239,69 @@ void CGvisR2R_PunchView::DoMark0Its()
 			{
 				pView->ClrDispMsg();
 				//AfxMessageBox(_T("Error-SaveMk0Img()"));
-				if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+				if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto && pDoc->WorkingInfo.LastJob.bUseJudgeMk)
 				{
-#ifdef USE_VISION
-					if (!m_pVision[0]->m_bMkJudge)
+					if (!m_pVision[0]->m_bMkJudgeHisto && !m_pVision[0]->m_bMkJudge)
 					{
-						pDoc->LogAuto(_T("좌측 펀칭 미마킹 알람 발생"));
-						nRtn = MsgBox(_T("좌측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
-						pDoc->LogAuto(_T("좌측 펀칭 미마킹 알람 해제"));
-						if (IDYES == nRtn)
+						if (ChkRepunching(0)) // 0 : Left, 1 : Right
 						{
-							m_bFailMkJudge[0] = TRUE;
-							ptPnt.x = m_dTarget[AXIS_X0];
-							ptPnt.y = m_dTarget[AXIS_Y0];
-
-							Move0(ptPnt, FALSE, WAIT);
-							Sleep(30);
-							Mk0();
-							Sleep(100);
-							Move0(ptPnt, TRUE, WAIT);
-							m_nMkPcs[0]--; // Repeat Current Position Verify.
-							m_nStepMk[0] = 8; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);
 							Stop();
 							break;
 						}
-						else
+						Stop();
+					}
+				}
+				else if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
+				{
+					if (!m_pVision[0]->m_bMkJudgeHisto)
+					{
+						if (ChkRepunching(0)) // 0 : Left, 1 : Right
 						{
 							Stop();
-							//m_pVision[0]->ArMkMtRst.Add(m_pVision[0]->MkMtRst);
+							break;
 						}
+						Stop();
 					}
-					else
+				}
+				else if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+				{
+					if (!m_pVision[0]->m_bMkJudge)
 					{
-						;// m_pVision[0]->ArMkMtRst.Add(m_pVision[0]->MkMtRst);
+						if (ChkRepunching(0)) // 0 : Left, 1 : Right
+						{
+							Stop();
+							break;
+						}
+						Stop();
+						//pDoc->LogAuto(_T("좌측 펀칭 미마킹 알람 발생"));
+						//nRtn = MsgBox(_T("좌측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+						//pDoc->LogAuto(_T("좌측 펀칭 미마킹 알람 해제"));
+						//if (IDYES == nRtn)
+						//{
+						//	m_bFailMkJudge[0] = TRUE;
+						//	ptPnt.x = m_dTarget[AXIS_X0];
+						//	ptPnt.y = m_dTarget[AXIS_Y0];
+
+						//	Move0(ptPnt, FALSE, WAIT);
+						//	Sleep(30);
+						//	Mk0();
+						//	Sleep(100);
+						//	Move0(ptPnt, TRUE, WAIT);
+						//	m_nMkPcs[0]--; // Repeat Current Position Verify.
+						//	m_nStepMk[0] = 8; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);
+						//	Stop();
+						//	break;
+						//}
+						//else
+						//{
+						//	Stop();
+						//	//m_pVision[0]->ArMkMtRst.Add(m_pVision[0]->MkMtRst);
+						//}
 					}
-#endif
+					//else
+					//{
+					//	;// m_pVision[0]->ArMkMtRst.Add(m_pVision[0]->MkMtRst);
+					//}
 				}
 			}
 		}
@@ -29843,41 +29926,69 @@ void CGvisR2R_PunchView::DoMark1Its()
 			{
 				pView->ClrDispMsg();
 				//AfxMessageBox(_T("Error-SaveMk1Img()"));
-				if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+				if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto && pDoc->WorkingInfo.LastJob.bUseJudgeMk)
 				{
-#ifdef USE_VISION
-					if (!m_pVision[1]->m_bMkJudge)
+					if (!m_pVision[1]->m_bMkJudgeHisto && !m_pVision[1]->m_bMkJudge)
 					{
-						pDoc->LogAuto(_T("우측 펀칭 미마킹 알람 발생"));
-						nRtn = MsgBox(_T("우측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
-						pDoc->LogAuto(_T("우측 펀칭 미마킹 알람 해제"));
-						if (IDYES == nRtn)
+						if (ChkRepunching(1)) // 0 : Left, 1 : Right
 						{
-							m_bFailMkJudge[1] = TRUE;
-							ptPnt.x = m_dTarget[AXIS_X1];
-							ptPnt.y = m_dTarget[AXIS_Y1];
-
-							Move1(ptPnt, FALSE, WAIT);
-							Sleep(30);
-							Mk1();
-							Sleep(100);
-							Move1(ptPnt, TRUE, WAIT);
-							m_nMkPcs[1]--; // Repeat Current Position Verify.
-							m_nStepMk[1] = 8; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);
 							Stop();
 							break;
 						}
-						else
-						{
-							//m_pVision[1]->ArMkMtRst.Add(m_pVision[1]->MkMtRst);
-							Stop();
-						}
+						Stop();
 					}
-					else
+				}
+				else if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
+				{
+					if (!m_pVision[1]->m_bMkJudgeHisto)
 					{
-						;// m_pVision[1]->ArMkMtRst.Add(m_pVision[1]->MkMtRst);
+						if (ChkRepunching(1)) // 0 : Left, 1 : Right
+						{
+							Stop();
+							break;
+						}
+						Stop();
 					}
-#endif
+				}
+				else if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+				{
+					if (!m_pVision[1]->m_bMkJudge)
+					{
+						if (ChkRepunching(1)) // 0 : Left, 1 : Right
+						{
+							Stop();
+							break;
+						}
+						Stop();
+						//pDoc->LogAuto(_T("우측 펀칭 미마킹 알람 발생"));
+						//nRtn = MsgBox(_T("우측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+						//pDoc->LogAuto(_T("우측 펀칭 미마킹 알람 해제"));
+						//if (IDYES == nRtn)
+						//{
+						//	m_bFailMkJudge[1] = TRUE;
+						//	ptPnt.x = m_dTarget[AXIS_X1];
+						//	ptPnt.y = m_dTarget[AXIS_Y1];
+
+						//	Move1(ptPnt, FALSE, WAIT);
+						//	Sleep(30);
+						//	Mk1();
+						//	Sleep(100);
+						//	Move1(ptPnt, TRUE, WAIT);
+						//	m_nMkPcs[1]--; // Repeat Current Position Verify.
+						//	m_nStepMk[1] = 8; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);
+						//	Stop();
+						//	break;
+						//}
+						//else
+						//{
+						//	//m_pVision[1]->ArMkMtRst.Add(m_pVision[1]->MkMtRst);
+						//	Stop();
+						//}
+					}
+					//else
+					//{
+					//	;// m_pVision[1]->ArMkMtRst.Add(m_pVision[1]->MkMtRst);
+					//}
 				}
 			}
 		}
@@ -35252,4 +35363,55 @@ void CGvisR2R_PunchView::SetFeedingEnableToPlc(int nSerial, int nUpDn) // 0(Up),
 			//}
 	//}
 
+}
+
+BOOL CGvisR2R_PunchView::ChkRepunching(int nCam) // 0 : Left, 1 : Right
+{
+	CfPoint ptPnt;
+	int nRtn;
+
+	if (nCam == 0)
+	{
+		pDoc->LogAuto(_T("좌측 펀칭 미마킹 알람 발생"));
+		nRtn = MsgBox(_T("좌측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+		pDoc->LogAuto(_T("좌측 펀칭 미마킹 알람 해제"));
+		if (IDYES == nRtn)
+		{
+			m_bFailMkJudge[0] = TRUE;
+			ptPnt.x = m_dTarget[AXIS_X0];
+			ptPnt.y = m_dTarget[AXIS_Y0];
+
+			Move0(ptPnt, FALSE, WAIT);
+			Sleep(30);
+			Mk0();
+			Sleep(100);
+			Move0(ptPnt, TRUE, WAIT);
+			m_nMkPcs[0]--; // Repeat Current Position Verify.
+			m_nStepMk[0] = 8; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);
+			return TRUE; // Recheck
+		}
+	}
+	else if (nCam == 1)
+	{
+		pDoc->LogAuto(_T("우측 펀칭 미마킹 알람 발생"));
+		nRtn = MsgBox(_T("우측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+		pDoc->LogAuto(_T("우측 펀칭 미마킹 알람 해제"));
+		if (IDYES == nRtn)
+		{
+			m_bFailMkJudge[1] = TRUE;
+			ptPnt.x = m_dTarget[AXIS_X1];
+			ptPnt.y = m_dTarget[AXIS_Y1];
+
+			Move1(ptPnt, FALSE, WAIT);
+			Sleep(30);
+			Mk1();
+			Sleep(100);
+			Move1(ptPnt, TRUE, WAIT);
+			m_nMkPcs[1]--; // Repeat Current Position Verify.
+			m_nStepMk[1] = 8; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);
+			return TRUE; // Recheck
+		}
+	}
+
+	return FALSE;
 }

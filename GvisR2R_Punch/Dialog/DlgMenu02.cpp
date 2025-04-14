@@ -500,11 +500,13 @@ BOOL CDlgMenu02::OnInitDialog()
 	pView->m_pVision[0] = new CVision(0, m_MilSys, hCtrlV0, this);
 	m_MilSys = pView->m_pVision[0]->GetSystemID();
 	pView->m_pVision[0]->SetVerifyPunchScore(pDoc->GetVerifyPunchScore());
+	pView->m_pVision[0]->SetVerifyPunchHistoScore(pDoc->GetVerifyPunchHistoScore());
 
 	HWND hCtrlV1[4] = { 0 };
 	hCtrlV1[0] = GetDlgItem(IDC_STC_VISION_2)->GetSafeHwnd();
 	pView->m_pVision[1] = new CVision(1, m_MilSys, hCtrlV1, this);
-	pView->m_pVision[1]->SetVerifyPunchScore(pDoc->GetVerifyPunchScore());
+	pView->m_pVision[1]->SetVerifyPunchScore(pDoc->GetVerifyPunchScore2());
+	pView->m_pVision[1]->SetVerifyPunchHistoScore(pDoc->GetVerifyPunchHistoScore2());
 #endif
 
 
@@ -3516,47 +3518,47 @@ void CDlgMenu02::OnBtnAlign()
 		myBtn[16].SetCheck(FALSE);
 	}
 
-	if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
-	{
-		if (IDNO == pView->MsgBox(_T("미마킹 테스트를 진행하시겠습니까?"), 0, MB_YESNO))
-			return;
-
-		if (pView->IsClampOff())
-		{
-			return;
-		}
-
-		if (!pView->m_pMotion)
-			return;
-
-		SetLight();
-
-		CfPoint ptPnt;
-		int nPcsId = 0;
-		if (pDoc->m_Master[0].m_pPcsRgn)
-			ptPnt = pDoc->m_Master[0].m_pPcsRgn->GetMkPnt0(nPcsId);
-
-		pView->Move0(ptPnt, TRUE, TRUE);
-		Sleep(300);
-#ifdef USE_VISION
-		if (pView->m_pVision[0])
-		{
-			BOOL bJudgeMk;
-			BOOL bRtn = pView->m_pVision[0]->TestJudgeMk(bJudgeMk);
-			DispMkPmScore(0);
-			if (bRtn && bJudgeMk)
-			{
-				AfxMessageBox(_T("마킹"));
-			}
-			else if (!bJudgeMk)
-			{
-				AfxMessageBox(_T("미마킹"));
-			}
-		}
-#endif
-
-	}
-	else
+//	if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+//	{
+//		if (IDNO == pView->MsgBox(_T("미마킹 테스트를 진행하시겠습니까?"), 0, MB_YESNO))
+//			return;
+//
+//		if (pView->IsClampOff())
+//		{
+//			return;
+//		}
+//
+//		if (!pView->m_pMotion)
+//			return;
+//
+//		SetLight();
+//
+//		CfPoint ptPnt;
+//		int nPcsId = 0;
+//		if (pDoc->m_Master[0].m_pPcsRgn)
+//			ptPnt = pDoc->m_Master[0].m_pPcsRgn->GetMkPnt0(nPcsId);
+//
+//		pView->Move0(ptPnt, TRUE, TRUE);
+//		Sleep(300);
+//#ifdef USE_VISION
+//		if (pView->m_pVision[0])
+//		{
+//			BOOL bJudgeMk;
+//			BOOL bRtn = pView->m_pVision[0]->TestJudgeMk(bJudgeMk);
+//			DispMkPmScore(0);
+//			if (bRtn && bJudgeMk)
+//			{
+//				AfxMessageBox(_T("마킹"));
+//			}
+//			else if (!bJudgeMk)
+//			{
+//				AfxMessageBox(_T("미마킹"));
+//			}
+//		}
+//#endif
+//
+//	}
+//	else
 	{
 		int nAlignNum = m_nBtnAlignCam0Pos;
 
@@ -3585,48 +3587,48 @@ void CDlgMenu02::OnBtnAlign2()
 		myBtn[16].SetCheck(FALSE);
 	}
 
-	if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
-	{
-		if (IDNO == pView->MsgBox(_T("미마킹 테스트를 진행하시겠습니까?"), 0, MB_YESNO))
-			return;
-
-		if (pView->IsClampOff())
-		{
-			return;
-		}
-
-		if (!pView->m_pMotion)
-			return;
-
-		SetLight2();
-
-
-		CfPoint ptPnt;
-		int nPcsId = 0;
-		if (pDoc->m_Master[0].m_pPcsRgn)
-			ptPnt = pDoc->m_Master[0].m_pPcsRgn->GetMkPnt1(nPcsId);
-
-		pView->Move1(ptPnt, TRUE, TRUE);
-		Sleep(300);
-#ifdef USE_VISION
-		if (pView->m_pVision[1])
-		{
-			BOOL bJudgeMk;
-			BOOL bRtn = pView->m_pVision[1]->TestJudgeMk(bJudgeMk);
-			DispMkPmScore(1);
-			if (bRtn && bJudgeMk)
-			{
-				AfxMessageBox(_T("마킹"));
-			}
-			else if (!bJudgeMk)
-			{
-				AfxMessageBox(_T("미마킹"));
-			}
-		}
-#endif
-
-	}
-	else
+//	if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+//	{
+//		if (IDNO == pView->MsgBox(_T("미마킹 테스트를 진행하시겠습니까?"), 0, MB_YESNO))
+//			return;
+//
+//		if (pView->IsClampOff())
+//		{
+//			return;
+//		}
+//
+//		if (!pView->m_pMotion)
+//			return;
+//
+//		SetLight2();
+//
+//
+//		CfPoint ptPnt;
+//		int nPcsId = 0;
+//		if (pDoc->m_Master[0].m_pPcsRgn)
+//			ptPnt = pDoc->m_Master[0].m_pPcsRgn->GetMkPnt1(nPcsId);
+//
+//		pView->Move1(ptPnt, TRUE, TRUE);
+//		Sleep(300);
+//#ifdef USE_VISION
+//		if (pView->m_pVision[1])
+//		{
+//			BOOL bJudgeMk;
+//			BOOL bRtn = pView->m_pVision[1]->TestJudgeMk(bJudgeMk);
+//			DispMkPmScore(1);
+//			if (bRtn && bJudgeMk)
+//			{
+//				AfxMessageBox(_T("마킹"));
+//			}
+//			else if (!bJudgeMk)
+//			{
+//				AfxMessageBox(_T("미마킹"));
+//			}
+//		}
+//#endif
+//
+//	}
+//	else
 	{
 
 		int nAlignNum = m_nBtnAlignCam1Pos;

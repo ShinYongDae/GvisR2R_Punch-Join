@@ -34,6 +34,7 @@ CVision::CVision(int nIdx, MIL_ID MilSysId, HWND *hCtrl, CWnd* pParent /*=NULL*/
 
 	m_MilGrabModelPunch = NULL;
 	m_dVerifyPunchScore = 85.0;
+	m_dVerifyPunchHistoScore = 50.0;
 
 	// init camera
 	m_hCtrl[0] = hCtrl[0];
@@ -127,6 +128,7 @@ CVision::CVision(int nIdx, MIL_ID MilSysId, HWND *hCtrl, CWnd* pParent /*=NULL*/
 	m_dFdEnc = 0.0;
 
 	m_bMkJudge = FALSE;
+	m_bMkJudgeHisto = FALSE;
 
 	RECT rt={0,0,0,0};
 //	CreateEx(NULL, _T("None"), _T("None"), WS_POPUP, rt, pParent, (UINT)this);
@@ -4773,12 +4775,19 @@ BOOL CVision::SaveMkImg(int nSerial, int nMkPcsIdx, CString sDest) // Return FAL
 	}
 
 	m_bMkJudge = TRUE;
+	m_bMkJudgeHisto = TRUE;
 	if (MilGrabImg && MilGrabImg->m_MilImage)
 	{
 		MIL_ID MilGrabImgCld = M_NULL;
 		MbufChild2d(MilGrabImg->m_MilImage, (640 - DEF_IMG_DISP_SIZEX) / 2, (480 - DEF_IMG_DISP_SIZEX) / 2, DEF_IMG_DISP_SIZEX, DEF_IMG_DISP_SIZEX, &MilGrabImgCld);
 
-		if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+		if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
+		{
+			// Check Marking Judge
+			m_bMkJudgeHisto = CheckVerifyPunchingHisto(MilGrabImgCld);
+		}
+
+		if (pDoc->WorkingInfo.LastJob.bUseJudgeMk && ((pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto && !m_bMkJudgeHisto) || !pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto))
 		{
 			// Check Marking Judge
 			m_bMkJudge = CheckVerifyPunching(MilGrabImgCld);
@@ -4859,9 +4868,19 @@ void CVision::SetVerifyPunchScore(double dScore)
 	m_dVerifyPunchScore = dScore;
 }
 
+void CVision::SetVerifyPunchHistoScore(double dScore)
+{
+	m_dVerifyPunchHistoScore = dScore;
+}
+
 double CVision::GetVerifyPunchScore()
 {
 	return m_dVerifyPunchScore;
+}
+
+double CVision::GetVerifyPunchHistoScore()
+{
+	return m_dVerifyPunchHistoScore;
 }
 
 BOOL CVision::CheckVerifyPunching(MIL_ID &GrabImgId) // Return FALSE; --> Alarm Message & Answer Remarking
@@ -5634,6 +5653,229 @@ BOOL CVision::TestJudgeMk(BOOL &bMkJudge) // If return value is TRUE and bMkJudg
 	return TRUE;
 }
 
+BOOL CVision::CheckVerifyPunchingHisto(MIL_ID &GrabImgId) // Return FALSE; --> Alarm Message & Answer Remarking
+{
+	if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
+	{
+		if (!JudgeHisto(GrabImgId))
+		{
+			return FALSE; //  _T("미마킹 됨")
+		}
+	}
 
+	return TRUE; // _T("마킹 됨")
+}
+
+/* Number of possible pixel intensities. */
+#define HIST_NUM_INTENSITIES  256
+#define HIST_SCALE_FACTOR     8
+#define HIST_X_POSITION       100
+#define HIST_Y_POSITION       100
+
+BOOL CVision::JudgeHisto(MIL_ID &GrabImgId)
+{
+	DoHisto(GrabImgId); // m_nHistoRst[i] : i (gray level : 0 ~ 255)
+
+	long SzX = (long)((double)pDoc->m_nJudgeMkModelHistoSize);
+	long SzY = (long)((double)pDoc->m_nJudgeMkModelHistoSize);
+
+	int nSumRng = 0, nSumPixels = 0;
+	int nTotalPixels = 100 * 100;
+	int nPeakVal[256] = { 0 };
+	int nPeakColorVal[256] = { 0 };
+	int nTotPeakVal = 0, nGrateVal = 0;
+	BOOL bInc = FALSE;
+	int i, nHistoVal;
+
+	for (i = 0; i < 256; i++) // Gray color value : 0(black) ~ 255(white)
+	{
+		nHistoVal = m_nHistoRst[i];
+
+		if (nHistoVal > nGrateVal)
+		{
+			nGrateVal = nHistoVal;
+			bInc = TRUE;
+		}
+		if ((nHistoVal < nGrateVal && bInc) || (i == 255 && bInc))
+		{
+			nPeakVal[nTotPeakVal] = nGrateVal;
+			nPeakColorVal[nTotPeakVal] = i;
+			nTotPeakVal++;
+			bInc = FALSE;
+			nGrateVal = nHistoVal;
+		}
+	}
+
+	int nMaxPeak[2] = { 0 };
+	int nMaxPeakColorVal[2] = { 0 };
+	if (nTotPeakVal > 1)
+	{
+		for (i = 0; i < nTotPeakVal; i++)
+		{
+			if (nMaxPeak[0] < nPeakVal[i])
+			{
+				nMaxPeak[0] = nPeakVal[i];		// First grate value
+				nMaxPeakColorVal[0] = nPeakColorVal[i];
+			}
+
+			if (nMaxPeak[1] < nMaxPeak[0] && nMaxPeak[1] < nPeakVal[i] && nMaxPeak[1] == 0)
+			{
+				nMaxPeak[1] = nPeakVal[i];		// Second grate value
+				nMaxPeakColorVal[1] = nPeakColorVal[i];
+			}
+			else if (nMaxPeak[1] < nMaxPeak[0] && nMaxPeak[1] < nPeakVal[i] && nPeakVal[i] < nMaxPeak[0])
+			{
+				nMaxPeak[1] = nPeakVal[i];		// Second grate value
+				nMaxPeakColorVal[1] = nPeakColorVal[i];
+			}
+		}
+	}
+	else
+		return FALSE; // 미마킹됨 (마킹구분이 않됨)
+
+	int nMid = int((nPeakColorVal[0] + nPeakColorVal[1]) / 2);
+	double dMkedRatio;
+
+	if ((nMaxPeakColorVal[0] - nMaxPeakColorVal[1]) > 0)  // nMaxPeakColorVal[0] : 밝은색,  nMaxPeakColorVal[1] : 어두운색
+	{
+		if ((nMaxPeakColorVal[0] - nMaxPeakColorVal[1]) < 20)
+			return FALSE; // 미마킹됨 (마킹이 명확하지 않음)
+		dMkedRatio = nMaxPeak[1] / (SzX * SzY) * 200;
+	}
+	else
+	{
+		if ((nMaxPeakColorVal[1] - nMaxPeakColorVal[0]) < 20)  // nMaxPeakColorVal[1] : 밝은색,  nMaxPeakColorVal[0] : 어두운색
+			return FALSE; // 미마킹됨 (마킹이 명확하지 않음)
+		dMkedRatio = nMaxPeak[0] / (SzX * SzY) * 200;
+	}
+
+	if (dMkedRatio < m_dVerifyPunchHistoScore)
+		return FALSE; // 미마킹됨 (마킹크기가 설정치 보다 작음)
+
+	return TRUE; // 마킹됨
+}
+
+void CVision::DoHisto(MIL_ID &GrabImgId)
+{
+	MIL_ID	MilSystem = m_pMil->GetSystemID();
+	MIL_ID	HistResult;
+	MIL_INT	HistValues[HIST_NUM_INTENSITIES]; // Histogram values.
+
+	// Create Model
+	CLibMilBuf *MilPtModelImg = NULL;
+	MIL_ID MilBufPtModelCrop = M_NULL;
+
+	long SzX = (long)((double)pDoc->m_nJudgeMkModelHistoSize);
+	long SzY = (long)((double)pDoc->m_nJudgeMkModelHistoSize);
+	long StX = long((DEF_IMG_DISP_SIZEX - SzX) / 2);
+	long StY = long((DEF_IMG_DISP_SIZEY - SzY) / 2);
+
+	MilPtModelImg = m_pMil->AllocBuf(SzX, SzY, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
+
+	MbufChild2d(GrabImgId, StX, StY, SzX, SzY, &MilBufPtModelCrop);
+	MbufCopy(MilBufPtModelCrop, MilPtModelImg->m_MilImage);
+
+	/* Allocate a histogram result buffer. */
+	MimAllocResult(MilSystem, HIST_NUM_INTENSITIES, M_HIST_LIST, &HistResult);
+
+	/* Calculate the histogram. */
+	MimHistogram(MilPtModelImg->m_MilImage, HistResult);
+
+	/* Get the results. */
+	MimGetResult(HistResult, M_VALUE, HistValues);
+
+	int i;
+
+	for (i = 0; i < HIST_NUM_INTENSITIES; i++)
+	{
+		m_nHistoRst[i] = (HistValues[i] / HIST_SCALE_FACTOR);
+	}
+
+	/* Free all allocations. */
+	if (MilBufPtModelCrop)
+	{
+		MbufFree(MilBufPtModelCrop);
+		MilBufPtModelCrop = M_NULL;
+	}
+	if (MilPtModelImg)
+	{
+		delete MilPtModelImg;
+	}
+
+	MimFree(HistResult);
+}
+
+BOOL CVision::TestJudgeMkHisto(BOOL &bMkJudge) // If return value is TRUE and bMkJudge is TRUE, Judge is Marked.
+{
+#ifdef USE_IRAYPLE
+	m_cs.Lock();
+	CLibMilBuf *MilGrabImg = NULL;
+	if (m_pMil)
+		MilGrabImg = m_pMil->AllocBuf((long)m_pIRayple->GetImgWidth(), (long)m_pIRayple->GetImgHeight(), 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
+
+	if (m_pIRayple->OneshotGrab() == FALSE)
+	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
+		pView->ClrDispMsg();
+		AfxMessageBox(_T("m_pIRayple->OneshotGrab() Fail !!"));
+		if (MilGrabImg)
+			delete MilGrabImg;
+		m_cs.Unlock();
+		return FALSE;
+	}
+	else if (m_pMil->OneshotGrab(MilGrabImg->m_MilImage, GRAB_COLOR_COLOR) == FALSE)
+	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
+		pView->ClrDispMsg();
+		AfxMessageBox(_T("m_pMil->OneshotGrab Fail !!"));
+		if (MilGrabImg)
+			delete MilGrabImg;
+		m_cs.Unlock();
+		return FALSE;
+	}
+
+	if (MilGrabImg && MilGrabImg->m_MilImage)
+	{
+		MIL_ID MilGrabImgCld = M_NULL;
+		MbufChild2d(MilGrabImg->m_MilImage, (640 - DEF_IMG_DISP_SIZEX) / 2, (480 - DEF_IMG_DISP_SIZEX) / 2, DEF_IMG_DISP_SIZEX, DEF_IMG_DISP_SIZEX, &MilGrabImgCld);
+
+		// Check Marking Judge
+		bMkJudge = CheckVerifyPunchingHisto(MilGrabImgCld);
+
+		// Draw Cross Line
+		//MgraColor(M_DEFAULT, M_COLOR_BLACK);
+		//MgraLine(M_DEFAULT, MilGrabImgCld, 0, 50, 100, 50);
+		//MgraLine(M_DEFAULT, MilGrabImgCld, 50, 0, 50, 100);
+
+		if (MilGrabImgCld)
+		{
+			//MbufSave(sPath, MilGrabImgCld);
+			MbufFree(MilGrabImgCld);
+			MilGrabImgCld = M_NULL;
+		}
+	}
+	else
+	{
+		//pView->SetAlarmToPlc(UNIT_PUNCH);
+		pView->ClrDispMsg();
+		AfxMessageBox(_T("TestJudgeMk() Failled !!"));
+
+		if (MilGrabImg)
+			delete MilGrabImg;
+		m_cs.Unlock();
+		return FALSE;
+	}
+
+	if (MilGrabImg)
+		delete MilGrabImg;
+	Sleep(10);
+	m_cs.Unlock();
+
+	if (!bMkJudge)
+		return FALSE;
+
+#endif
+	return TRUE;
+}
 
 #endif

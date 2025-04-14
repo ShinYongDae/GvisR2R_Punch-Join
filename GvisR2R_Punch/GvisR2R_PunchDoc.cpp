@@ -1685,7 +1685,12 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("JudgeMk ModelSize"), NULL, szData, sizeof(szData), sPath))
 		m_nJudgeMkModelSize = _ttoi(szData);
 	else
-		m_nJudgeMkModelSize = 70;
+		m_nJudgeMkModelSize = 500; // [um]
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("JudgeMk ModelHistoSize"), NULL, szData, sizeof(szData), sPath))
+		m_nJudgeMkModelHistoSize = _ttoi(szData);
+	else
+		m_nJudgeMkModelHistoSize = 300; // [um]
 
 	// 마킹 금지 구역 - Left
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkLeft0_Lt_X"), NULL, szData, sizeof(szData), sPath))
@@ -2102,6 +2107,11 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	else
 		WorkingInfo.LastJob.bUseJudgeMk = TRUE;
 
+	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Use Judge Marking Histo"), NULL, szData, sizeof(szData), sPath))
+		WorkingInfo.LastJob.bUseJudgeMkHisto = _ttoi(szData) ? TRUE : FALSE;
+	else
+		WorkingInfo.LastJob.bUseJudgeMkHisto = TRUE;
+
 	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Judge Marking Ratio"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.LastJob.nJudgeMkRatio[0] = 100 - _ttoi(szData);
 	else
@@ -2111,6 +2121,16 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 		WorkingInfo.LastJob.nJudgeMkRatio[1] = 100 - _ttoi(szData);
 	else
 		WorkingInfo.LastJob.nJudgeMkRatio[1] = 15;
+
+	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Judge Marking Histo Ratio"), NULL, szData, sizeof(szData), sPath))
+		WorkingInfo.LastJob.nJudgeMkHistoRatio[0] = _ttoi(szData);
+	else
+		WorkingInfo.LastJob.nJudgeMkHistoRatio[0] = 50;
+
+	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Judge Marking Histo Ratio2"), NULL, szData, sizeof(szData), sPath))
+		WorkingInfo.LastJob.nJudgeMkHistoRatio[1] = _ttoi(szData);
+	else
+		WorkingInfo.LastJob.nJudgeMkHistoRatio[1] = 50;
 
 	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Ultra Sonic Cleanner Start Time"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.LastJob.sUltraSonicCleannerStTim = CString(szData);
@@ -15423,6 +15443,39 @@ double CGvisR2R_PunchDoc::GetVerifyPunchScore()
 	return dVerifyPunchScore;
 }
 
+double CGvisR2R_PunchDoc::GetVerifyPunchScore2()
+{
+	//return m_dVerifyPunchScore;
+	double dVerifyPunchScore = 85.0;
+#ifdef USE_VISION
+	if (pView->m_pVision[1])
+		dVerifyPunchScore = pView->m_pVision[1]->GetVerifyPunchScore();
+#endif
+	return dVerifyPunchScore;
+}
+
+double CGvisR2R_PunchDoc::GetVerifyPunchHistoScore()
+{
+	//return m_dVerifyPunchScore;
+	double dVerifyPunchScore = 50.0;
+#ifdef USE_VISION
+	if (pView->m_pVision[0])
+		dVerifyPunchScore = pView->m_pVision[0]->GetVerifyPunchHistoScore();
+#endif
+	return dVerifyPunchScore;
+}
+
+double CGvisR2R_PunchDoc::GetVerifyPunchHistoScore2()
+{
+	//return m_dVerifyPunchScore;
+	double dVerifyPunchScore = 50.0;
+#ifdef USE_VISION
+	if (pView->m_pVision[1])
+		dVerifyPunchScore = pView->m_pVision[1]->GetVerifyPunchHistoScore();
+#endif
+	return dVerifyPunchScore;
+}
+
 void CGvisR2R_PunchDoc::SetVerifyPunchScore(double dScore)
 {
 #ifdef USE_VISION
@@ -15436,6 +15489,22 @@ void CGvisR2R_PunchDoc::SetVerifyPunchScore2(double dScore)
 #ifdef USE_VISION
 	if (pView->m_pVision[1])
 		pView->m_pVision[1]->SetVerifyPunchScore(dScore);
+#endif
+}
+
+void CGvisR2R_PunchDoc::SetVerifyPunchHistoScore(double dScore)
+{
+#ifdef USE_VISION
+	if (pView->m_pVision[0])
+		pView->m_pVision[0]->SetVerifyPunchHistoScore(dScore);
+#endif
+}
+
+void CGvisR2R_PunchDoc::SetVerifyPunchHistoScore2(double dScore)
+{
+#ifdef USE_VISION
+	if (pView->m_pVision[1])
+		pView->m_pVision[1]->SetVerifyPunchHistoScore(dScore);
 #endif
 }
 

@@ -60,6 +60,9 @@ public:
 	afx_msg LRESULT OnMyBtnDown(WPARAM wPara, LPARAM lPara);
 	afx_msg LRESULT OnMyBtnUp(WPARAM wPara, LPARAM lPara);
 
+	void JudgeMk();
+	void JudgeMkHisto();
+
 // Dialog Data
 	//{{AFX_DATA(CDlgUtil03)
 	enum { IDD = IDD_DLG_UTIL_03 };
@@ -170,6 +173,8 @@ public:
 	afx_msg void OnBnClickedBtnJudgeMk();
 	afx_msg void OnStnClickedStc187();
 	afx_msg void OnStnClickedStc189();
+	afx_msg void OnBnClickedRadio1();
+	afx_msg void OnBnClickedRadio2();
 };
 
 //{{AFX_INSERT_LOCATION}}

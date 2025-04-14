@@ -73,6 +73,7 @@ BEGIN_MESSAGE_MAP(CDlgInfo, CDialog)
 	ON_BN_CLICKED(IDC_CHK_010, OnChk010)
 	ON_BN_CLICKED(IDC_CHK_011, OnChk011)
 	ON_BN_CLICKED(IDC_CHK_26, OnChk26)
+	ON_BN_CLICKED(IDC_CHK_28, OnChk28)
 	ON_BN_CLICKED(IDC_STC_0012, OnStc0012)
 	ON_BN_CLICKED(IDC_STC_0016, OnStc0016)
 	ON_BN_CLICKED(IDC_STC_0020, OnStc0020)
@@ -117,6 +118,9 @@ BEGIN_MESSAGE_MAP(CDlgInfo, CDialog)
 	ON_STN_CLICKED(IDC_STC_89, &CDlgInfo::OnStnClickedStc89)
 	ON_BN_CLICKED(IDC_CHK_USE_AOI_DUAL_ITS, &CDlgInfo::OnBnClickedChkUseAoiDualIts)
 	ON_BN_CLICKED(IDC_CHK_USE_AOI_DUAL_2D_ITS, &CDlgInfo::OnBnClickedChkUseAoiDual2dIts)
+	ON_STN_CLICKED(IDC_STC_193, &CDlgInfo::OnStnClickedStc193)
+	ON_STN_CLICKED(IDC_STC_195, &CDlgInfo::OnStnClickedStc195)
+	ON_STN_CLICKED(IDC_STC_91, &CDlgInfo::OnStnClickedStc91)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -367,6 +371,10 @@ void CDlgInfo::InitBtn()
 	myBtn[30].SetTextColor(RGB_BLUE);
 	myBtn[30].SetFont(_T("굴림체"), 14, TRUE);
 
+	myBtn[31].SubclassDlgItem(IDC_CHK_28, this);
+	myBtn[31].SetHwnd(this->GetSafeHwnd(), IDC_CHK_28);
+	myBtn[31].SetBtnType(BTN_TYPE_CHECK);
+
 	int i;
 	for(i=0; i<MAX_INFO_BTN; i++)
 	{
@@ -484,11 +492,16 @@ void CDlgInfo::InitStcTitle()
 	myStcTitle[69].SubclassDlgItem(IDC_STC_103, this);
 	myStcTitle[70].SubclassDlgItem(IDC_STC_87, this);
 	myStcTitle[71].SubclassDlgItem(IDC_STC_19, this);
+
 	myStcTitle[72].SubclassDlgItem(IDC_STC_22, this);
 	myStcTitle[73].SubclassDlgItem(IDC_STC_188, this);
 	myStcTitle[74].SubclassDlgItem(IDC_STC_190, this);
 	myStcTitle[75].SubclassDlgItem(IDC_STC_191, this);
 
+	myStcTitle[76].SubclassDlgItem(IDC_STC_192, this);
+	myStcTitle[77].SubclassDlgItem(IDC_STC_194, this);
+	myStcTitle[78].SubclassDlgItem(IDC_STC_196, this);
+	myStcTitle[79].SubclassDlgItem(IDC_STC_197, this);
 
 	for(int i=0; i<MAX_INFO_STC; i++)
 	{
@@ -540,6 +553,8 @@ void CDlgInfo::InitStcTitle()
 		case 61:
 		case 73:
 		case 75:
+		case 77:
+		case 79:
 			myStcTitle[i].SetTextColor(RGB_NAVY);
 			myStcTitle[i].SetBkColor(RGB_WHITE);
 			myStcTitle[i].SetFontBold(TRUE);
@@ -584,6 +599,10 @@ void CDlgInfo::InitStcData()
 	myStcData[21].SubclassDlgItem(IDC_STC_187, this);	// 마킹부 마킹여부 확인 미마킹일치율 L
 	myStcData[22].SubclassDlgItem(IDC_STC_189, this);	// 마킹부 마킹여부 확인 미마킹일치율 R
 	myStcData[23].SubclassDlgItem(IDC_STC_89, this);	// 마킹부 마킹여부 모델 크기
+
+	myStcData[24].SubclassDlgItem(IDC_STC_193, this);	// 마킹부 마킹여부 확인 마킹크기일치율 L
+	myStcData[25].SubclassDlgItem(IDC_STC_195, this);	// 마킹부 마킹여부 확인 마킹크기일치율 R
+	myStcData[26].SubclassDlgItem(IDC_STC_91, this);	// 마킹부 마킹여부 마킹크기
 
 	for(int i=0; i<MAX_INFO_STC_DATA; i++)
 	{
@@ -683,6 +702,11 @@ void CDlgInfo::Disp()
 	else
 		myBtn[28].SetCheck(FALSE);
 
+	if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
+		myBtn[31].SetCheck(TRUE);
+	else
+		myBtn[31].SetCheck(FALSE);
+
 	str.Format(_T("%d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0]);
 	myStcData[21].SetText(str);
 
@@ -691,6 +715,15 @@ void CDlgInfo::Disp()
 
 	str.Format(_T("%d"), pDoc->m_nJudgeMkModelSize); // [um]
 	myStcData[23].SetText(str);
+
+	str.Format(_T("%d"), pDoc->WorkingInfo.LastJob.nJudgeMkHistoRatio[0]);
+	myStcData[24].SetText(str);
+
+	str.Format(_T("%d"), pDoc->WorkingInfo.LastJob.nJudgeMkHistoRatio[1]);
+	myStcData[25].SetText(str);
+
+	str.Format(_T("%d"), pDoc->m_nJudgeMkModelHistoSize); // [um]
+	myStcData[26].SetText(str);
 
 	//pDoc->WorkingInfo.LastJob.bRclDrSen = pView->MpeRead(pView->Plc.DlgInfo.LampDoorSensorRecoiler) ? TRUE : FALSE; // LampDoorSensorRecoiler = _T("MB400219");
 	pDoc->WorkingInfo.LastJob.bRclDrSen = pDoc->m_pMpeSignal[1] & (0x01 << 9);
@@ -2407,6 +2440,21 @@ void CDlgInfo::OnChk26()
 	//pDoc->SetMkInfo(_T("Signal"), _T("JudgeMk"), pDoc->WorkingInfo.LastJob.bUseJudgeMk);
 }
 
+void CDlgInfo::OnChk28()
+{
+	if (myBtn[31].GetCheck())
+	{
+		pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto = TRUE;
+	}
+	else
+	{
+		pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto = FALSE;
+	}
+
+	CString sData = pDoc->WorkingInfo.LastJob.bUseJudgeMk ? _T("1") : _T("0");
+	::WritePrivateProfileString(_T("Last Job"), _T("Use Judge Marking"), sData, PATH_WORKING_INFO);
+}
+
 void CDlgInfo::OnStnClickedStc187()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
@@ -2660,4 +2708,79 @@ void CDlgInfo::OnBtnExit()
 		}
 	}
 	OnOK();
+}
+
+
+void CDlgInfo::OnStnClickedStc193()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	myStcData[24].SetBkColor(RGB_RED);
+	myStcData[24].RedrawWindow();
+
+	CPoint pt;	CRect rt;
+	GetDlgItem(IDC_STC_193)->GetWindowRect(&rt);
+	pt.x = rt.right; pt.y = rt.bottom;
+	ShowKeypad(IDC_STC_193, pt, TO_BOTTOM | TO_RIGHT);
+
+	myStcData[24].SetBkColor(RGB_WHITE);
+	myStcData[24].RedrawWindow();
+
+	CString sVal;
+	GetDlgItem(IDC_STC_193)->GetWindowText(sVal);
+	pDoc->WorkingInfo.LastJob.nJudgeMkHistoRatio[0] = _ttoi(sVal);
+	pDoc->SetVerifyPunchHistoScore(_ttof(sVal));
+
+	::WritePrivateProfileString(_T("Last Job"), _T("Judge Marking Histo Ratio"), sVal, PATH_WORKING_INFO);
+}
+
+
+void CDlgInfo::OnStnClickedStc195()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	myStcData[25].SetBkColor(RGB_RED);
+	myStcData[25].RedrawWindow();
+
+	CPoint pt;	CRect rt;
+	GetDlgItem(IDC_STC_195)->GetWindowRect(&rt);
+	pt.x = rt.right; pt.y = rt.bottom;
+	ShowKeypad(IDC_STC_195, pt, TO_BOTTOM | TO_RIGHT);
+
+	myStcData[25].SetBkColor(RGB_WHITE);
+	myStcData[25].RedrawWindow();
+
+	CString sVal;
+	GetDlgItem(IDC_STC_195)->GetWindowText(sVal);
+	pDoc->WorkingInfo.LastJob.nJudgeMkHistoRatio[1] = _ttoi(sVal);
+	pDoc->SetVerifyPunchHistoScore2(_ttof(sVal));
+
+	::WritePrivateProfileString(_T("Last Job"), _T("Judge Marking Histo Ratio2"), sVal, PATH_WORKING_INFO);
+}
+
+
+void CDlgInfo::OnStnClickedStc91()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	myStcData[26].SetBkColor(RGB_RED);
+	myStcData[26].RedrawWindow();
+
+	CPoint pt;	CRect rt;
+	GetDlgItem(IDC_STC_91)->GetWindowRect(&rt);
+	pt.x = rt.right; pt.y = rt.bottom;
+	ShowKeypad(IDC_STC_91, pt, TO_BOTTOM | TO_RIGHT);
+
+	myStcData[26].SetBkColor(RGB_WHITE);
+	myStcData[26].RedrawWindow();
+
+	CString sVal;
+	GetDlgItem(IDC_STC_91)->GetWindowText(sVal);
+	if (_ttoi(sVal) > 800 || _ttoi(sVal) < 100)
+	{
+		AfxMessageBox(_T("마킹크기는 100 ~ 800 um 이내여야 합니다."));
+		sVal.Format(_T("%d"), pDoc->m_nJudgeMkModelHistoSize);
+		GetDlgItem(IDC_STC_91)->SetWindowText(sVal);
+		return;
+	}
+
+	pDoc->m_nJudgeMkModelHistoSize = _ttoi(sVal); // [um]
+	::WritePrivateProfileString(_T("System"), _T("JudgeMk ModelHistoSize"), sVal, PATH_WORKING_INFO);
 }
