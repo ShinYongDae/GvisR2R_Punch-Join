@@ -865,15 +865,15 @@ BOOL CReelMap::Write(int nSerial)
 					}
 					else if (nR < nStripY * 2)
 					{
-						sReelmapVal.Format(_T("%d_B_%d_%d_%c\n"), nSerial, nC, nR, pDoc->m_cBigDefCode[nDefCode]);
+						sReelmapVal.Format(_T("%d_B_%d_%d_%c\n"), nSerial, nC, nR - nStripY, pDoc->m_cBigDefCode[nDefCode]);
 					}
 					else if (nR < nStripY * 3)
 					{
-						sReelmapVal.Format(_T("%d_C_%d_%d_%c\n"), nSerial, nC, nR, pDoc->m_cBigDefCode[nDefCode]);
+						sReelmapVal.Format(_T("%d_C_%d_%d_%c\n"), nSerial, nC, nR - (nStripY * 2), pDoc->m_cBigDefCode[nDefCode]);
 					}
 					else if (nR < nStripY * 4)
 					{
-						sReelmapVal.Format(_T("%d_D_%d_%d_%c\n"), nSerial, nC, nR, pDoc->m_cBigDefCode[nDefCode]);
+						sReelmapVal.Format(_T("%d_D_%d_%d_%c\n"), nSerial, nC, nR - (nStripY * 3), pDoc->m_cBigDefCode[nDefCode]);
 					}
 
 					sReelmapTable += sReelmapVal;
@@ -892,6 +892,7 @@ BOOL CReelMap::Write(int nSerial)
 
 	m_nWritedSerial = nSerial;
 
+	char* pRtn = NULL;
 	if (pDoc->WorkingInfo.System.bSaveReelmapTable)
 	{
 		CString sMsg, strFileData;
@@ -900,7 +901,9 @@ BOOL CReelMap::Write(int nSerial)
 		char FileName[MAX_PATH];
 		StringToChar(sRmapTablePath, FileName);
 
-		char* pRtn = NULL;
+		//char* pRtn = NULL;
+		pRtn = StringToChar(sReelmapTable);
+
 		FILE *fp = NULL;
 		size_t nFileSize, nRSize;
 		char *FileData;
@@ -922,14 +925,16 @@ BOOL CReelMap::Write(int nSerial)
 				strFileData = CharToString(FileData);
 				strFileData += sReelmapTable;
 
-				fprintf(fp, "%s", pRtn = StringToChar(sReelmapTable));
-				if (pRtn)
-				{
-					delete pRtn;
-					pRtn = NULL;
-				}
-
+				//fprintf(fp, "%s", pRtn = StringToChar(sReelmapTable));
+				fprintf(fp, "%s", pRtn);
 				fclose(fp);
+
+				//if (pRtn)
+				//{
+				//	delete pRtn;
+				//	pRtn = NULL;
+				//}
+
 				free(FileData);
 			}
 			else
@@ -943,12 +948,14 @@ BOOL CReelMap::Write(int nSerial)
 			fp = fopen(FileName, "w+");
 			if (fp != NULL)
 			{
-				fprintf(fp, "%s", pRtn = StringToChar(sReelmapTable));
-				if (pRtn)
-				{
-					delete pRtn;
-					pRtn = NULL;
-				}
+				//fprintf(fp, "%s", pRtn = StringToChar(sReelmapTable));
+				fprintf(fp, "%s", pRtn);
+				fclose(fp);
+				//if (pRtn)
+				//{
+				//	delete pRtn;
+				//	pRtn = NULL;
+				//}
 			}
 			else
 			{
@@ -957,7 +964,12 @@ BOOL CReelMap::Write(int nSerial)
 			}
 		}
 
-		fclose(fp);
+	}
+
+	if (pRtn)
+	{
+		delete pRtn;
+		pRtn = NULL;
 	}
 
 	return TRUE;
@@ -3759,6 +3771,9 @@ BOOL CReelMap::WriteYield(int nSerial, CString sPath)
 
 	StrToChar(sPath, FileName);
 
+	//// Writing Yield on file.
+	//CString sData = MakeYield();
+
 	fp = fopen(FileName, "a+");
 	if (fp == NULL)
 	{
@@ -3803,78 +3818,66 @@ BOOL CReelMap::WriteYield(int nSerial, CString sPath)
 
 	fclose(fp);
 
-	strMenu.Format(_T("%d"), nSerial);
+	// Writing Yield on file.
+	CString sData = MakeYield(nSerial, sPath);
 
-	for (i = 1; i < MAX_DEF; i++)
-	{
-		sCode.Format(_T("%d"), i);
-		sDefNum.Format(_T("%d"), m_stYield.nDefA[i]);
-
-		// [Info]
-		::WritePrivateProfileString(_T("Info"), sCode, sDefNum, sPath);
-
-		// [Serial]
-		::WritePrivateProfileString(strMenu, sCode, sDefNum, sPath);
-	}
-
-	// [Info]
-	strData.Format(_T("%d"), nSerial);
-	::WritePrivateProfileString(_T("Info"), _T("End Shot"), strData, sPath);
-
-	strData.Format(_T("%d"), nSerial - m_nStartSerial + 1);
-	::WritePrivateProfileString(_T("Info"), _T("Total Shot"), strData, sPath);
-
-	strData.Format(_T("%d"), m_stYield.nTot);
-	::WritePrivateProfileString(_T("Info"), _T("Total Pcs"), strData, sPath);
-
-	strData.Format(_T("%d"), m_stYield.nGood);
-	::WritePrivateProfileString(_T("Info"), _T("Good Pcs"), strData, sPath);
-
-	strData.Format(_T("%d"), m_stYield.nDef);
-	::WritePrivateProfileString(_T("Info"), _T("Bad Pcs"), strData, sPath);
-
-	// [Serial]
-	strData.Format(_T("%d"), m_stYield.nTot);
-	::WritePrivateProfileString(strMenu, _T("Total Pcs"), strData, sPath);
-
-	strData.Format(_T("%d"), m_stYield.nGood);
-	::WritePrivateProfileString(strMenu, _T("Good Pcs"), strData, sPath);
-
-	strData.Format(_T("%d"), m_stYield.nDef);
-	::WritePrivateProfileString(strMenu, _T("Bad Pcs"), strData, sPath);
-
-	for (k = 0; k < MAX_STRIP; k++)
-	{
-		strItem.Format(_T("Strip%d"), k);
-		strData.Format(_T("%d"), m_stYield.nDefStrip[k]);
-		// [Info]
-		::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
-		// [Serial]
-		::WritePrivateProfileString(strMenu, strItem, strData, sPath);
-
-		strItem.Format(_T("StripOut_%d"), k);
-		strData.Format(_T("%d"), m_stYield.nStripOut[k]);
-		// [Info]
-		::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
-		// [Serial]
-		::WritePrivateProfileString(strMenu, strItem, strData, sPath);
-
-		for (i = 1; i < MAX_DEF; i++)
-		{
-			strItem.Format(_T("Strip%d_%d"), k, i);
-			strData.Format(_T("%d"), m_stYield.nDefPerStrip[k][i]);
-			// [Info]
-			::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
-			// [Serial]
-			::WritePrivateProfileString(strMenu, strItem, strData, sPath);
-		}
-	}
-
-	strData.Format(_T("%d"), m_stYield.nTotSriptOut);
-	// [Info]
-	::WritePrivateProfileString(_T("Info"), _T("StripOut_Total"), strData, sPath);
-	// [Serial]
-	::WritePrivateProfileString(strMenu, _T("StripOut_Total"), strData, sPath);
+	//strMenu.Format(_T("%d"), nSerial);
+	//for (i = 1; i < MAX_DEF; i++)
+	//{
+	//	sCode.Format(_T("%d"), i);
+	//	sDefNum.Format(_T("%d"), m_stYield.nDefA[i]);
+	//	// [Info]
+	//	::WritePrivateProfileString(_T("Info"), sCode, sDefNum, sPath);
+	//	// [Serial]
+	//	::WritePrivateProfileString(strMenu, sCode, sDefNum, sPath);
+	//}
+	//// [Info]
+	//strData.Format(_T("%d"), nSerial);
+	//::WritePrivateProfileString(_T("Info"), _T("End Shot"), strData, sPath);
+	//strData.Format(_T("%d"), nSerial - m_nStartSerial + 1);
+	//::WritePrivateProfileString(_T("Info"), _T("Total Shot"), strData, sPath);
+	//strData.Format(_T("%d"), m_stYield.nTot);
+	//::WritePrivateProfileString(_T("Info"), _T("Total Pcs"), strData, sPath);
+	//strData.Format(_T("%d"), m_stYield.nGood);
+	//::WritePrivateProfileString(_T("Info"), _T("Good Pcs"), strData, sPath);
+	//strData.Format(_T("%d"), m_stYield.nDef);
+	//::WritePrivateProfileString(_T("Info"), _T("Bad Pcs"), strData, sPath);
+	//// [Serial]
+	//strData.Format(_T("%d"), m_stYield.nTot);
+	//::WritePrivateProfileString(strMenu, _T("Total Pcs"), strData, sPath);
+	//strData.Format(_T("%d"), m_stYield.nGood);
+	//::WritePrivateProfileString(strMenu, _T("Good Pcs"), strData, sPath);
+	//strData.Format(_T("%d"), m_stYield.nDef);
+	//::WritePrivateProfileString(strMenu, _T("Bad Pcs"), strData, sPath);
+	//for (k = 0; k < MAX_STRIP; k++)
+	//{
+	//	strItem.Format(_T("Strip%d"), k);
+	//	strData.Format(_T("%d"), m_stYield.nDefStrip[k]);
+	//	// [Info]
+	//	::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
+	//	// [Serial]
+	//	::WritePrivateProfileString(strMenu, strItem, strData, sPath);
+	//	strItem.Format(_T("StripOut_%d"), k);
+	//	strData.Format(_T("%d"), m_stYield.nStripOut[k]);
+	//	// [Info]
+	//	::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
+	//	// [Serial]
+	//	::WritePrivateProfileString(strMenu, strItem, strData, sPath);
+	//	for (i = 1; i < MAX_DEF; i++)
+	//	{
+	//		strItem.Format(_T("Strip%d_%d"), k, i);
+	//		strData.Format(_T("%d"), m_stYield.nDefPerStrip[k][i]);
+	//		// [Info]
+	//		::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
+	//		// [Serial]
+	//		::WritePrivateProfileString(strMenu, strItem, strData, sPath);
+	//	}
+	//}
+	//strData.Format(_T("%d"), m_stYield.nTotSriptOut);
+	//// [Info]
+	//::WritePrivateProfileString(_T("Info"), _T("StripOut_Total"), strData, sPath);
+	//// [Serial]
+	//::WritePrivateProfileString(strMenu, _T("StripOut_Total"), strData, sPath);
 
 	int dwEnd = GetTickCount();
 	int dwElapsed = dwEnd - dwStart;
@@ -3984,7 +3987,6 @@ BOOL CReelMap::MakeHeader(CString sPath)
 
 	return TRUE;
 }
-
 
 // ITS
 
@@ -4293,17 +4295,15 @@ BOOL CReelMap::MakeItsFile(int nSerial, int nLayer) // RMAP_UP, RMAP_DN, RMAP_IN
 	char FileName[MAX_PATH];
 	StringToChar(sPath, FileName);
 
-	char* pRtn = NULL;
+	//char* pRtn = NULL;
+	char* pRtn = StringToChar(GetItsFileData(nSerial, nLayer));
 	FILE *fp = NULL;
 	fp = fopen(FileName, "w+");
 	if (fp != NULL)
 	{
-		fprintf(fp, "%s", pRtn = StringToChar(GetItsFileData(nSerial, nLayer)));
-		if (pRtn)
-		{
-			delete pRtn;
-			pRtn = NULL;
-		}
+		//fprintf(fp, "%s", pRtn = StringToChar(GetItsFileData(nSerial, nLayer)));
+		fprintf(fp, "%s", pRtn);
+		fclose(fp);
 	}
 	else
 	{
@@ -4312,22 +4312,29 @@ BOOL CReelMap::MakeItsFile(int nSerial, int nLayer) // RMAP_UP, RMAP_DN, RMAP_IN
 		fp = fopen(FileName, "w+");
 		if (fp != NULL)
 		{
-			fprintf(fp, "%s", pRtn = StringToChar(GetItsFileData(nSerial, nLayer)));
+			//fprintf(fp, "%s", pRtn = StringToChar(GetItsFileData(nSerial, nLayer)));
+			fprintf(fp, "%s", pRtn);
+			fclose(fp);
+		}
+		else
+		{
 			if (pRtn)
 			{
 				delete pRtn;
 				pRtn = NULL;
 			}
-		}
-		else
-		{
 			sMsg.Format(_T("It is trouble to MakeItsFile.\r\n%s"), sPath);
 			pView->MsgBox(sMsg);
 			return FALSE;
 		}
 	}
 
-	fclose(fp);
+
+	if (pRtn)
+	{
+		delete pRtn;
+		pRtn = NULL;
+	}
 
 	return TRUE;
 }
@@ -4767,14 +4774,14 @@ BOOL CReelMap::RemakeReelmap()
 			}
 			fprintf(fp, "\n");
 		}
+
+		fclose(fp);
 	}
 	else
 	{
 		pView->MsgBox(_T("It is trouble to remake ReelMap."));
 		return FALSE;
 	}
-
-	fclose(fp);
 
 	return TRUE;
 }
@@ -7165,78 +7172,80 @@ BOOL CReelMap::WriteYieldOnOffline(int nSerial)
 
 	fclose(fp);
 
-	strMenu.Format(_T("%d"), nSerial);
-
-	for (i = 1; i < MAX_DEF; i++)
-	{
-		sCode.Format(_T("%d"), i);
-		sDefNum.Format(_T("%d"), m_stYield.nDefA[i]);
-
-		// [Info]
-		::WritePrivateProfileString(_T("Info"), sCode, sDefNum, sPath);
-
-		// [Serial]
-		::WritePrivateProfileString(strMenu, sCode, sDefNum, sPath);
-	}
-
-	// [Info]
-	strData.Format(_T("%d"), nSerial);
-	::WritePrivateProfileString(_T("Info"), _T("End Shot"), strData, sPath);
-
-	strData.Format(_T("%d"), nSerial - m_nStartSerial + 1);
-	::WritePrivateProfileString(_T("Info"), _T("Total Shot"), strData, sPath);
-
-	strData.Format(_T("%d"), m_stYield.nTot);
-	::WritePrivateProfileString(_T("Info"), _T("Total Pcs"), strData, sPath);
-
-	strData.Format(_T("%d"), m_stYield.nGood);
-	::WritePrivateProfileString(_T("Info"), _T("Good Pcs"), strData, sPath);
-
-	strData.Format(_T("%d"), m_stYield.nDef);
-	::WritePrivateProfileString(_T("Info"), _T("Bad Pcs"), strData, sPath);
-
-	// [Serial]
-	strData.Format(_T("%d"), m_stYield.nTot);
-	::WritePrivateProfileString(strMenu, _T("Total Pcs"), strData, sPath);
-
-	strData.Format(_T("%d"), m_stYield.nGood);
-	::WritePrivateProfileString(strMenu, _T("Good Pcs"), strData, sPath);
-
-	strData.Format(_T("%d"), m_stYield.nDef);
-	::WritePrivateProfileString(strMenu, _T("Bad Pcs"), strData, sPath);
-
-	for (k = 0; k < MAX_STRIP; k++)
-	{
-		strItem.Format(_T("Strip%d"), k);
-		strData.Format(_T("%d"), m_stYield.nDefStrip[k]);
-		// [Info]
-		::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
-		// [Serial]
-		::WritePrivateProfileString(strMenu, strItem, strData, sPath);
-
-		strItem.Format(_T("StripOut_%d"), k);
-		strData.Format(_T("%d"), m_stYield.nStripOut[k]);
-		// [Info]
-		::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
-		// [Serial]
-		::WritePrivateProfileString(strMenu, strItem, strData, sPath);
-
-		for (i = 1; i < MAX_DEF; i++)
-		{
-			strItem.Format(_T("Strip%d_%d"), k, i);
-			strData.Format(_T("%d"), m_stYield.nDefPerStrip[k][i]);
-			// [Info]
-			::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
-			// [Serial]
-			::WritePrivateProfileString(strMenu, strItem, strData, sPath);
-		}
-	}
-
-	strData.Format(_T("%d"), m_stYield.nTotSriptOut);
-	// [Info]
-	::WritePrivateProfileString(_T("Info"), _T("StripOut_Total"), strData, sPath);
-	// [Serial]
-	::WritePrivateProfileString(strMenu, _T("StripOut_Total"), strData, sPath);
+	// Writing Yield on file.
+	CString sData = MakeYield(nSerial, sPath);
+	//strMenu.Format(_T("%d"), nSerial);
+	//
+	//for (i = 1; i < MAX_DEF; i++)
+	//{
+	//	sCode.Format(_T("%d"), i);
+	//	sDefNum.Format(_T("%d"), m_stYield.nDefA[i]);
+	//
+	//	// [Info]
+	//	::WritePrivateProfileString(_T("Info"), sCode, sDefNum, sPath);
+	//
+	//	// [Serial]
+	//	::WritePrivateProfileString(strMenu, sCode, sDefNum, sPath);
+	//}
+	//
+	//// [Info]
+	//strData.Format(_T("%d"), nSerial);
+	//::WritePrivateProfileString(_T("Info"), _T("End Shot"), strData, sPath);
+	//
+	//strData.Format(_T("%d"), nSerial - m_nStartSerial + 1);
+	//::WritePrivateProfileString(_T("Info"), _T("Total Shot"), strData, sPath);
+	//
+	//strData.Format(_T("%d"), m_stYield.nTot);
+	//::WritePrivateProfileString(_T("Info"), _T("Total Pcs"), strData, sPath);
+	//
+	//strData.Format(_T("%d"), m_stYield.nGood);
+	//::WritePrivateProfileString(_T("Info"), _T("Good Pcs"), strData, sPath);
+	//
+	//strData.Format(_T("%d"), m_stYield.nDef);
+	//::WritePrivateProfileString(_T("Info"), _T("Bad Pcs"), strData, sPath);
+	//
+	//// [Serial]
+	//strData.Format(_T("%d"), m_stYield.nTot);
+	//::WritePrivateProfileString(strMenu, _T("Total Pcs"), strData, sPath);
+	//
+	//strData.Format(_T("%d"), m_stYield.nGood);
+	//::WritePrivateProfileString(strMenu, _T("Good Pcs"), strData, sPath);
+	//
+	//strData.Format(_T("%d"), m_stYield.nDef);
+	//::WritePrivateProfileString(strMenu, _T("Bad Pcs"), strData, sPath);
+	//
+	//for (k = 0; k < MAX_STRIP; k++)
+	//{
+	//	strItem.Format(_T("Strip%d"), k);
+	//	strData.Format(_T("%d"), m_stYield.nDefStrip[k]);
+	//	// [Info]
+	//	::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
+	//	// [Serial]
+	//	::WritePrivateProfileString(strMenu, strItem, strData, sPath);
+	//
+	//	strItem.Format(_T("StripOut_%d"), k);
+	//	strData.Format(_T("%d"), m_stYield.nStripOut[k]);
+	//	// [Info]
+	//	::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
+	//	// [Serial]
+	//	::WritePrivateProfileString(strMenu, strItem, strData, sPath);
+	//
+	//	for (i = 1; i < MAX_DEF; i++)
+	//	{
+	//		strItem.Format(_T("Strip%d_%d"), k, i);
+	//		strData.Format(_T("%d"), m_stYield.nDefPerStrip[k][i]);
+	//		// [Info]
+	//		::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
+	//		// [Serial]
+	//		::WritePrivateProfileString(strMenu, strItem, strData, sPath);
+	//	}
+	//}
+	//
+	//strData.Format(_T("%d"), m_stYield.nTotSriptOut);
+	//// [Info]
+	//::WritePrivateProfileString(_T("Info"), _T("StripOut_Total"), strData, sPath);
+	//// [Serial]
+	//::WritePrivateProfileString(strMenu, _T("StripOut_Total"), strData, sPath);
 
 	int dwEnd = GetTickCount();
 	int dwElapsed = dwEnd - dwStart;
@@ -7586,78 +7595,80 @@ BOOL CReelMap::WriteYieldOffline(int nSerial, CString sPath)
 
 	fclose(fp);
 
-	strMenu.Format(_T("%d"), nSerial);
-
-	for (i = 1; i < MAX_DEF; i++)
-	{
-		sCode.Format(_T("%d"), i);
-		sDefNum.Format(_T("%d"), m_stYield.nDefA[i]);
-
-		// [Info]
-		::WritePrivateProfileString(_T("Info"), sCode, sDefNum, sPath);
-
-		// [Serial]
-		::WritePrivateProfileString(strMenu, sCode, sDefNum, sPath);
-	}
-
-	// [Info]
-	strData.Format(_T("%d"), nSerial);
-	::WritePrivateProfileString(_T("Info"), _T("End Shot"), strData, sPath);
-
-	strData.Format(_T("%d"), nSerial - m_nStartSerial + 1);
-	::WritePrivateProfileString(_T("Info"), _T("Total Shot"), strData, sPath);
-
-	strData.Format(_T("%d"), m_stYield.nTot);
-	::WritePrivateProfileString(_T("Info"), _T("Total Pcs"), strData, sPath);
-
-	strData.Format(_T("%d"), m_stYield.nGood);
-	::WritePrivateProfileString(_T("Info"), _T("Good Pcs"), strData, sPath);
-
-	strData.Format(_T("%d"), m_stYield.nDef);
-	::WritePrivateProfileString(_T("Info"), _T("Bad Pcs"), strData, sPath);
-
-	// [Serial]
-	strData.Format(_T("%d"), m_stYield.nTot);
-	::WritePrivateProfileString(strMenu, _T("Total Pcs"), strData, sPath);
-
-	strData.Format(_T("%d"), m_stYield.nGood);
-	::WritePrivateProfileString(strMenu, _T("Good Pcs"), strData, sPath);
-
-	strData.Format(_T("%d"), m_stYield.nDef);
-	::WritePrivateProfileString(strMenu, _T("Bad Pcs"), strData, sPath);
-
-	for (k = 0; k < MAX_STRIP; k++)
-	{
-		strItem.Format(_T("Strip%d"), k);
-		strData.Format(_T("%d"), m_stYield.nDefStrip[k]);
-		// [Info]
-		::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
-		// [Serial]
-		::WritePrivateProfileString(strMenu, strItem, strData, sPath);
-
-		strItem.Format(_T("StripOut_%d"), k);
-		strData.Format(_T("%d"), m_stYield.nStripOut[k]);
-		// [Info]
-		::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
-		// [Serial]
-		::WritePrivateProfileString(strMenu, strItem, strData, sPath);
-
-		for (i = 1; i < MAX_DEF; i++)
-		{
-			strItem.Format(_T("Strip%d_%d"), k, i);
-			strData.Format(_T("%d"), m_stYield.nDefPerStrip[k][i]);
-			// [Info]
-			::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
-			// [Serial]
-			::WritePrivateProfileString(strMenu, strItem, strData, sPath);
-		}
-	}
-
-	strData.Format(_T("%d"), m_stYield.nTotSriptOut);
-	// [Info]
-	::WritePrivateProfileString(_T("Info"), _T("StripOut_Total"), strData, sPath);
-	// [Serial]
-	::WritePrivateProfileString(strMenu, _T("StripOut_Total"), strData, sPath);
+	// Writing Yield on file.
+	CString sData = MakeYield(nSerial, sPath);
+	//strMenu.Format(_T("%d"), nSerial);
+	//
+	//for (i = 1; i < MAX_DEF; i++)
+	//{
+	//	sCode.Format(_T("%d"), i);
+	//	sDefNum.Format(_T("%d"), m_stYield.nDefA[i]);
+	//
+	//	// [Info]
+	//	::WritePrivateProfileString(_T("Info"), sCode, sDefNum, sPath);
+	//
+	//	// [Serial]
+	//	::WritePrivateProfileString(strMenu, sCode, sDefNum, sPath);
+	//}
+	//
+	//// [Info]
+	//strData.Format(_T("%d"), nSerial);
+	//::WritePrivateProfileString(_T("Info"), _T("End Shot"), strData, sPath);
+	//
+	//strData.Format(_T("%d"), nSerial - m_nStartSerial + 1);
+	//::WritePrivateProfileString(_T("Info"), _T("Total Shot"), strData, sPath);
+	//
+	//strData.Format(_T("%d"), m_stYield.nTot);
+	//::WritePrivateProfileString(_T("Info"), _T("Total Pcs"), strData, sPath);
+	//
+	//strData.Format(_T("%d"), m_stYield.nGood);
+	//::WritePrivateProfileString(_T("Info"), _T("Good Pcs"), strData, sPath);
+	//
+	//strData.Format(_T("%d"), m_stYield.nDef);
+	//::WritePrivateProfileString(_T("Info"), _T("Bad Pcs"), strData, sPath);
+	//
+	//// [Serial]
+	//strData.Format(_T("%d"), m_stYield.nTot);
+	//::WritePrivateProfileString(strMenu, _T("Total Pcs"), strData, sPath);
+	//
+	//strData.Format(_T("%d"), m_stYield.nGood);
+	//::WritePrivateProfileString(strMenu, _T("Good Pcs"), strData, sPath);
+	//
+	//strData.Format(_T("%d"), m_stYield.nDef);
+	//::WritePrivateProfileString(strMenu, _T("Bad Pcs"), strData, sPath);
+	//
+	//for (k = 0; k < MAX_STRIP; k++)
+	//{
+	//	strItem.Format(_T("Strip%d"), k);
+	//	strData.Format(_T("%d"), m_stYield.nDefStrip[k]);
+	//	// [Info]
+	//	::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
+	//	// [Serial]
+	//	::WritePrivateProfileString(strMenu, strItem, strData, sPath);
+	//
+	//	strItem.Format(_T("StripOut_%d"), k);
+	//	strData.Format(_T("%d"), m_stYield.nStripOut[k]);
+	//	// [Info]
+	//	::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
+	//	// [Serial]
+	//	::WritePrivateProfileString(strMenu, strItem, strData, sPath);
+	//
+	//	for (i = 1; i < MAX_DEF; i++)
+	//	{
+	//		strItem.Format(_T("Strip%d_%d"), k, i);
+	//		strData.Format(_T("%d"), m_stYield.nDefPerStrip[k][i]);
+	//		// [Info]
+	//		::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
+	//		// [Serial]
+	//		::WritePrivateProfileString(strMenu, strItem, strData, sPath);
+	//	}
+	//}
+	//
+	//strData.Format(_T("%d"), m_stYield.nTotSriptOut);
+	//// [Info]
+	//::WritePrivateProfileString(_T("Info"), _T("StripOut_Total"), strData, sPath);
+	//// [Serial]
+	//::WritePrivateProfileString(strMenu, _T("StripOut_Total"), strData, sPath);
 
 	int dwEnd = GetTickCount();
 	int dwElapsed = dwEnd - dwStart;
@@ -7758,4 +7769,86 @@ BOOL CReelMap::ShiftMkedPcsDef() // (피스인덱스는 CamMaster에서 정한 것을 기준으
 			}
 		}
 	}
+}
+
+CString CReelMap::MakeYield(int nSerial, CString sPath)
+{
+	CString sData = _T("");
+	CString strMenu, sCode, sDefNum, strItem, strData;
+	int i, k;
+
+	strMenu.Format(_T("%d"), nSerial);
+
+	for (i = 1; i < MAX_DEF; i++)
+	{
+		sCode.Format(_T("%d"), i);
+		sDefNum.Format(_T("%d"), m_stYield.nDefA[i]);
+
+		// [Info]
+		::WritePrivateProfileString(_T("Info"), sCode, sDefNum, sPath);
+
+		// [Serial]
+		::WritePrivateProfileString(strMenu, sCode, sDefNum, sPath);
+	}
+
+	// [Info]
+	strData.Format(_T("%d"), nSerial);
+	::WritePrivateProfileString(_T("Info"), _T("End Shot"), strData, sPath);
+
+	strData.Format(_T("%d"), nSerial - m_nStartSerial + 1);
+	::WritePrivateProfileString(_T("Info"), _T("Total Shot"), strData, sPath);
+
+	strData.Format(_T("%d"), m_stYield.nTot);
+	::WritePrivateProfileString(_T("Info"), _T("Total Pcs"), strData, sPath);
+
+	strData.Format(_T("%d"), m_stYield.nGood);
+	::WritePrivateProfileString(_T("Info"), _T("Good Pcs"), strData, sPath);
+
+	strData.Format(_T("%d"), m_stYield.nDef);
+	::WritePrivateProfileString(_T("Info"), _T("Bad Pcs"), strData, sPath);
+
+	// [Serial]
+	strData.Format(_T("%d"), m_stYield.nTot);
+	::WritePrivateProfileString(strMenu, _T("Total Pcs"), strData, sPath);
+
+	strData.Format(_T("%d"), m_stYield.nGood);
+	::WritePrivateProfileString(strMenu, _T("Good Pcs"), strData, sPath);
+
+	strData.Format(_T("%d"), m_stYield.nDef);
+	::WritePrivateProfileString(strMenu, _T("Bad Pcs"), strData, sPath);
+
+	for (k = 0; k < MAX_STRIP; k++)
+	{
+		strItem.Format(_T("Strip%d"), k);
+		strData.Format(_T("%d"), m_stYield.nDefStrip[k]);
+		// [Info]
+		::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
+		// [Serial]
+		::WritePrivateProfileString(strMenu, strItem, strData, sPath);
+
+		strItem.Format(_T("StripOut_%d"), k);
+		strData.Format(_T("%d"), m_stYield.nStripOut[k]);
+		// [Info]
+		::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
+		// [Serial]
+		::WritePrivateProfileString(strMenu, strItem, strData, sPath);
+
+		for (i = 1; i < MAX_DEF; i++)
+		{
+			strItem.Format(_T("Strip%d_%d"), k, i);
+			strData.Format(_T("%d"), m_stYield.nDefPerStrip[k][i]);
+			// [Info]
+			::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
+			// [Serial]
+			::WritePrivateProfileString(strMenu, strItem, strData, sPath);
+		}
+	}
+
+	strData.Format(_T("%d"), m_stYield.nTotSriptOut);
+	// [Info]
+	::WritePrivateProfileString(_T("Info"), _T("StripOut_Total"), strData, sPath);
+	// [Serial]
+	::WritePrivateProfileString(strMenu, _T("StripOut_Total"), strData, sPath);
+
+	return sData;
 }

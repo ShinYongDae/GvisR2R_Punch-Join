@@ -774,8 +774,9 @@ BOOL CMyFile::ChkLotEnd(CString sPath)
 		FileData = (char*)calloc(nFileSize+1, sizeof(char));
 
 		nRSize = fread(FileData, sizeof(char), nFileSize, fp);
-		strFileData.Format(_T("%s"), CharToString(FileData));
 		fclose(fp);
+
+		strFileData.Format(_T("%s"), CharToString(FileData));
 		free( FileData );
 	}
 	else

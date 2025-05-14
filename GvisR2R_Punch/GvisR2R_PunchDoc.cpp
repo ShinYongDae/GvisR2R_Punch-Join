@@ -5131,10 +5131,10 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoUp(int nSerial, int *pNewLot, BOOL bFromBuf) /
 
 		/* Allocate space for a path name */
 		FileData = (char*)calloc(nFileSize + 1, sizeof(char));
-
 		nRSize = fread(FileData, sizeof(char), nFileSize, fp);
-		strFileData = CharToString(FileData);
 		fclose(fp);
+
+		strFileData = CharToString(FileData);
 		free(FileData);
 	}
 	else
@@ -5366,10 +5366,10 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoDn(int nSerial, int *pNewLot, BOOL bFromBuf) /
 
 		/* Allocate space for a path name */
 		FileData = (char*)calloc(nFileSize + 1, sizeof(char));
-
 		nRSize = fread(FileData, sizeof(char), nFileSize, fp);
-		strFileData.Format(_T("%s"), CharToString(FileData));
 		fclose(fp);
+
+		strFileData.Format(_T("%s"), CharToString(FileData));
 		free(FileData);
 	}
 	else
@@ -6137,10 +6137,10 @@ int CGvisR2R_PunchDoc::LoadPCRUp(int nSerial, BOOL bFromShare)	// return : 2(Fai
 
 		/* Allocate space for a path name */
 		FileData = (char*)calloc(nFileSize + 1, sizeof(char));
-
 		nRSize = fread(FileData, sizeof(char), nFileSize, fp);
-		strFileData = CharToString(FileData);
 		fclose(fp);
+
+		strFileData = CharToString(FileData);
 		free(FileData);
 	}
 	else
@@ -6460,10 +6460,10 @@ int CGvisR2R_PunchDoc::LoadPCRDn(int nSerial, BOOL bFromShare)	// return : 2(Fai
 
 		/* Allocate space for a path name */
 		FileData = (char*)calloc(nFileSize + 1, sizeof(char));
-
 		nRSize = fread(FileData, sizeof(char), nFileSize, fp);
-		strFileData = CharToString(FileData);
 		fclose(fp);
+
+		strFileData = CharToString(FileData);
 		free(FileData);
 	}
 	else
@@ -9442,11 +9442,11 @@ BOOL CGvisR2R_PunchDoc::GetPcrInfo(CString sPath, stModelInfo &stInfo)
 		/* Allocate space for a path name */
 		//FileData = (char*)malloc( nFileSize );
 		FileData = (char*)calloc(nFileSize + 1, sizeof(char));
-
 		nRSize = fread(FileData, sizeof(char), nFileSize, fp);
 		//strFileData.Format(_T("%s"), CharToString(FileData));
-		strFileData = CharToString(FileData);
 		fclose(fp);
+
+		strFileData = CharToString(FileData);
 		free(FileData);
 	}
 	else
@@ -11503,10 +11503,10 @@ int CGvisR2R_PunchDoc::LoadPCRUpInner(int nSerial, BOOL bFromShare)	// return : 
 
 		/* Allocate space for a path name */
 		FileData = (char*)calloc(nFileSize + 1, sizeof(char));
-
 		nRSize = fread(FileData, sizeof(char), nFileSize, fp);
-		strFileData = CharToString(FileData);
 		fclose(fp);
+
+		strFileData = CharToString(FileData);
 		free(FileData);
 	}
 	else
@@ -11725,10 +11725,10 @@ int CGvisR2R_PunchDoc::LoadPCRDnInner(int nSerial, BOOL bFromShare)	// return : 
 
 		/* Allocate space for a path name */
 		FileData = (char*)calloc(nFileSize + 1, sizeof(char));
-
 		nRSize = fread(FileData, sizeof(char), nFileSize, fp);
-		strFileData = CharToString(FileData);
 		fclose(fp);
+
+		strFileData = CharToString(FileData);
 		free(FileData);
 	}
 	else
@@ -13082,10 +13082,10 @@ int CGvisR2R_PunchDoc::LoadPcrUp(CString sPath)	// return : 2(Failed), 1(정상), 
 
 		/* Allocate space for a path name */
 		FileData = (char*)calloc(nFileSize + 1, sizeof(char));
-
 		nRSize = fread(FileData, sizeof(char), nFileSize, fp);
-		strFileData = CharToString(FileData);
 		fclose(fp);
+
+		strFileData = CharToString(FileData);
 		free(FileData);
 	}
 	else
@@ -13400,10 +13400,10 @@ int CGvisR2R_PunchDoc::LoadPcrDn(CString sPath)	// return : 2(Failed), 1(정상), 
 
 		/* Allocate space for a path name */
 		FileData = (char*)calloc(nFileSize + 1, sizeof(char));
-
 		nRSize = fread(FileData, sizeof(char), nFileSize, fp);
-		strFileData = CharToString(FileData);
 		fclose(fp);
+
+		strFileData = CharToString(FileData);
 		free(FileData);
 	}
 	else

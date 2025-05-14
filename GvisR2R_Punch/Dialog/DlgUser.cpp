@@ -144,13 +144,13 @@ int CDlgUser::ReadUserNameListFile()
 		fseek(fp, 0, SEEK_SET);
 
 		/* Allocate space for a path name */
-		FileData = (char*)calloc(nFileSize+1, sizeof(char));
-		
+		FileData = (char*)calloc(nFileSize+1, sizeof(char));		
 		nRSize = fread(FileData, sizeof(char), nFileSize, fp);
+		fclose(fp);
+
 		strFileData.Format(_T("%s"), CharToString(FileData));
 		pDoc->m_strUserNameList = strFileData;
 
-		fclose(fp);
 		free( FileData );
 	}
 	else
@@ -173,12 +173,16 @@ void CDlgUser::WriteUserNameListFile()
 	CString strFileName = _T("C:\\R2RSet\\UserNameList.ini");
 	//strcpy(FileName, strFileName);
 	_stprintf(FileName, _T("%s"), strFileName);
-	char* pRtn = NULL;
-	fp = fopen(pRtn=TCHARToChar(FileName), "w+");
 
+	//char* pRtn = NULL;
+	char* pRtn = StringToChar(pDoc->m_strUserNameList);
+
+	fp = fopen(pRtn=TCHARToChar(FileName), "w+");
 	if (fp != NULL)
 	{
-		fprintf(fp, "%s", pRtn = StringToChar(pDoc->m_strUserNameList));
+		//fprintf(fp, "%s", pRtn = StringToChar(pDoc->m_strUserNameList));
+		fprintf(fp, "%s", pRtn);
+		fclose(fp);
 	}
 	else
 	{
@@ -186,7 +190,6 @@ void CDlgUser::WriteUserNameListFile()
 		//AfxMessageBox(_T("It is trouble to open UserNameList.ini"),MB_ICONWARNING|MB_OK);
 	}
 
-	fclose(fp);
 	if(pRtn)
 		delete pRtn;
 }

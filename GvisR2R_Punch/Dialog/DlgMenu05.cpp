@@ -1525,10 +1525,9 @@ CString CDlgMenu05::LoadFile(CString sPath)
 
 			nRSize++;
 		}
+		fclose(fp);
 
 		sData.Format(_T("%s"), CharToString(FileData));
-
-		fclose(fp);
 		free( FileData );
 	}
 	else
@@ -3115,25 +3114,26 @@ void CDlgMenu05::MakeItsFile(int nSerial, int nLayer)
 	char FileName[MAX_PATH];
 	StringToChar(sItsPath, FileName);
 
-	char* pRtn = NULL;
+	char* pRtn = StringToChar(GetItsFileData(nSerial, nLayer));
+	//char* pRtn = NULL;
 	FILE *fp = NULL;
 	fp = fopen(FileName, "w+");
 	if (fp != NULL)
 	{
-		fprintf(fp, "%s", pRtn = StringToChar(GetItsFileData(nSerial, nLayer)));
-		if (pRtn)
-		{
-			delete pRtn;
-			pRtn = NULL;
-		}
+		fprintf(fp, "%s", pRtn);
+		//fprintf(fp, "%s", pRtn = StringToChar(GetItsFileData(nSerial, nLayer)));
+		fclose(fp);
 	}
 	else
 	{
 		pView->MsgBox(_T("It is trouble to MakeItsFile."));
-		return;
 	}
 
-	fclose(fp);
+	if (pRtn)
+	{
+		delete pRtn;
+		pRtn = NULL;
+	}
 }
 
 CString CDlgMenu05::GetItsFileData(int nSerial, int nLayer) // RMAP_UP, RMAP_DN, RMAP_INNER_UP, RMAP_INNER_DN
@@ -3378,14 +3378,18 @@ void CDlgMenu05::MakeSapp3() // With ReelmapDataAll.txt파일에서 정보를 취합함.
 			m_sProcessNum = _T("");
 
 	}
+
+	char* pRtn = StringToChar(Sapp3Data());
+	//char* pRtn = NULL;
 	sPath.Format(_T("%s%9s_%4s_%5s.txt"), pDoc->WorkingInfo.System.sPathSapp3, m_sLot, m_sProcessNum, pDoc->WorkingInfo.System.sMcName);
 	_stprintf(FileName, _T("%s"), sPath);
-	char* pRtn = NULL;
 	fp = fopen(pRtn=TCHARToChar(FileName), "w+");
 
 	if (fp != NULL)
 	{
-		fprintf(fp, "%s\n", pRtn = StringToChar(Sapp3Data()));
+		//fprintf(fp, "%s\n", pRtn = StringToChar(Sapp3Data()));
+		fprintf(fp, "%s\n", pRtn);
+		fclose(fp);
 	}
 	else
 	{
@@ -3395,9 +3399,9 @@ void CDlgMenu05::MakeSapp3() // With ReelmapDataAll.txt파일에서 정보를 취합함.
 		pView->ClrDispMsg();
 		AfxMessageBox(strMsg);
 	}
-	if(pRtn)
+
+	if (pRtn)
 		delete pRtn;
-	fclose(fp);
 }
 
 CString CDlgMenu05::Sapp3Data()

@@ -241,6 +241,7 @@ public:
 	BOOL UpdateYieldOffline(int nSerial);
 	BOOL UpdateReelmapYield();
 	BOOL MakeHeader(CString sPath);
+	CString MakeYield(int nSerial, CString sPath);
 
 	BOOL GetNodeXYonRmap(int &nNodeX, int &nNodeY, CString sPath);
 
