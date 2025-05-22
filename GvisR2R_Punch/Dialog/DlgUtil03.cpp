@@ -1784,14 +1784,20 @@ void CDlgUtil03::DispResultPtScore(int nCam)
 	{
 		if (pView->m_pVision[0])
 		{
-			sVal.Format(_T("%d"), int(100.0 - pView->m_pVision[0]->MkMtRst.dScore));
+			if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
+				sVal.Format(_T("%d"), int(pView->m_pVision[0]->MkMtRst.dScore));
+			else if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+				sVal.Format(_T("%d"), int(100.0 - pView->m_pVision[0]->MkMtRst.dScore));
 			GetDlgItem(IDC_STC_REJECT_SCR)->SetWindowText(sVal);
 		}
 	}
 	else if(nCam == 1)
 	if (pView->m_pVision[1])
 	{
-		sVal.Format(_T("%d"), int(100.0 - pView->m_pVision[1]->MkMtRst.dScore));
+		if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
+			sVal.Format(_T("%d"), int(pView->m_pVision[1]->MkMtRst.dScore));
+		else if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+			sVal.Format(_T("%d"), int(100.0 - pView->m_pVision[1]->MkMtRst.dScore));
 		GetDlgItem(IDC_STC_REJECT_SCR2)->SetWindowText(sVal);
 	}
 #endif
@@ -1898,7 +1904,7 @@ void CDlgUtil03::JudgeMkHisto()
 {
 	CString sMsg;
 
-	if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+	if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
 	{
 		int nCam = -1;
 
@@ -1947,12 +1953,12 @@ void CDlgUtil03::JudgeMkHisto()
 			{
 				if (nCam == 0)
 				{
-					sMsg.Format(_T("미마킹 테스트 결과 1 : 정상 (%d)"), int(100.0 - pView->m_pVision[0]->MkMtRst.dScore));
+					sMsg.Format(_T("미마킹 테스트 결과 1 : 정상 (%d)"), int(pView->m_pVision[0]->MkMtRst.dScore));
 					pDoc->LogAuto(sMsg);
 				}
 				else if (nCam == 1)
 				{
-					sMsg.Format(_T("미마킹 테스트 결과 2 : 정상 (%d)"), int(100.0 - pView->m_pVision[1]->MkMtRst.dScore));
+					sMsg.Format(_T("미마킹 테스트 결과 2 : 정상 (%d)"), int(pView->m_pVision[1]->MkMtRst.dScore));
 					pDoc->LogAuto(sMsg);
 				}
 				AfxMessageBox(_T("마킹"));
@@ -1961,12 +1967,12 @@ void CDlgUtil03::JudgeMkHisto()
 			{
 				if (nCam == 0)
 				{
-					sMsg.Format(_T("미마킹 테스트 결과 1 : 비정상 (%d)"), int(100.0 - pView->m_pVision[0]->MkMtRst.dScore));
+					sMsg.Format(_T("미마킹 테스트 결과 1 : 비정상 (%d)"), int(pView->m_pVision[0]->MkMtRst.dScore));
 					pDoc->LogAuto(sMsg);
 				}
 				else if (nCam == 1)
 				{
-					sMsg.Format(_T("미마킹 테스트 결과 2 : 비정상 (%d)"), int(100.0 - pView->m_pVision[1]->MkMtRst.dScore));
+					sMsg.Format(_T("미마킹 테스트 결과 2 : 비정상 (%d)"), int(pView->m_pVision[1]->MkMtRst.dScore));
 					pDoc->LogAuto(sMsg);
 				}
 				AfxMessageBox(_T("미마킹"));

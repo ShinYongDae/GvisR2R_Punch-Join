@@ -6324,12 +6324,18 @@ void CDlgMenu02::DispMkPmScore(int nCam)
 #ifdef USE_VISION
 	if (nCam == 0 && pView->m_pVision[0])
 	{
-		sVal.Format(_T("%d"), int(100.0 - pView->m_pVision[0]->MkMtRst.dScore));
+		if(pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
+			sVal.Format(_T("%d"), int(pView->m_pVision[0]->MkMtRst.dScore));
+		else if(pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+			sVal.Format(_T("%d"), int(100.0 - pView->m_pVision[0]->MkMtRst.dScore));
 		GetDlgItem(IDC_STATIC_MK_PM_SCORE)->SetWindowText(sVal);
 	}
 	else if (nCam == 1 && pView->m_pVision[1])
 	{
-		sVal.Format(_T("%d"), int(100.0 - pView->m_pVision[1]->MkMtRst.dScore));
+		if(pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
+			sVal.Format(_T("%d"), int(pView->m_pVision[1]->MkMtRst.dScore));
+		else if(pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+			sVal.Format(_T("%d"), int(100.0 - pView->m_pVision[1]->MkMtRst.dScore));
 		GetDlgItem(IDC_STATIC_MK_PM_SCORE2)->SetWindowText(sVal);
 	}
 #endif

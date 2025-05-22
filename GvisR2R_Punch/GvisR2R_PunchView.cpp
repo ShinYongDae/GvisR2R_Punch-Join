@@ -12713,6 +12713,9 @@ void CGvisR2R_PunchView::MoveInitPos0(BOOL bWait)
 	fLen = sqrt(((pTgtPos[0] - dCurrX) * (pTgtPos[0] - dCurrX)) + ((pTgtPos[1] - dCurrY) * (pTgtPos[1] - dCurrY)));
 	if (fLen > 0.001)
 	{
+		if (m_pVoiceCoil[0])
+			m_pVoiceCoil[0]->SetProbing(0);
+
 		m_pMotion->GetSpeedProfile0(TRAPEZOIDAL, AXIS_X0, fLen, fVel, fAcc, fJerk);
 		if(bWait)
 			m_pMotion->Move0(MS_X0Y0, pTgtPos, fVel, fAcc, fAcc, ABS, WAIT);
@@ -12774,6 +12777,9 @@ void CGvisR2R_PunchView::MoveInitPos1(BOOL bWait)
 	fLen = sqrt(((pTgtPos[0] - dCurrX) * (pTgtPos[0] - dCurrX)) + ((pTgtPos[1] - dCurrY) * (pTgtPos[1] - dCurrY)));
 	if (fLen > 0.001)
 	{
+		if (m_pVoiceCoil[1])
+			m_pVoiceCoil[1]->SetProbing(1);
+
 		m_pMotion->GetSpeedProfile1(TRAPEZOIDAL, AXIS_X1, fLen, fVel, fAcc, fJerk);
 		if(bWait)
 			m_pMotion->Move1(MS_X1Y1, pTgtPos, fVel, fAcc, fAcc, ABS, WAIT);

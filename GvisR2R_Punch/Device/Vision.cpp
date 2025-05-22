@@ -5675,82 +5675,101 @@ BOOL CVision::CheckVerifyPunchingHisto(MIL_ID &GrabImgId) // Return FALSE; --> A
 BOOL CVision::JudgeHisto(MIL_ID &GrabImgId)
 {
 	DoHisto(GrabImgId); // m_nHistoRst[i] : i (gray level : 0 ~ 255)
+	double dResX, dResY, dResCam;
 
-	long SzX = (long)((double)pDoc->m_nJudgeMkModelHistoSize);
-	long SzY = (long)((double)pDoc->m_nJudgeMkModelHistoSize);
+	dResX = _tstof(pDoc->WorkingInfo.Vision[m_nIdx].sResX);
+	dResY = _tstof(pDoc->WorkingInfo.Vision[m_nIdx].sResY);
+	dResCam = _tstof(pDoc->WorkingInfo.Vision[m_nIdx].sCamPxlRes) / 10000.0; // CamMaster Pixel Resolution.
+
+	long SzX = (long)((double)pDoc->m_nJudgeMkModelHistoSize) * 0.001 / dResX;
+	long SzY = (long)((double)pDoc->m_nJudgeMkModelHistoSize) * 0.001 / dResY;
 
 	int nSumRng = 0, nSumPixels = 0;
-	int nTotalPixels = 100 * 100;
+	int nTotalPixels = SzX * SzY;
 	int nPeakVal[256] = { 0 };
 	int nPeakColorVal[256] = { 0 };
 	int nTotPeakVal = 0, nGrateVal = 0;
 	BOOL bInc = FALSE;
-	int i, nHistoVal;
+	int i, nHistoVal, nWhite = 0;
 
 	for (i = 0; i < 256; i++) // Gray color value : 0(black) ~ 255(white)
 	{
 		nHistoVal = m_nHistoRst[i];
-
-		if (nHistoVal > nGrateVal)
+		if (nHistoVal > 240)
 		{
-			nGrateVal = nHistoVal;
-			bInc = TRUE;
-		}
-		if ((nHistoVal < nGrateVal && bInc) || (i == 255 && bInc))
-		{
-			nPeakVal[nTotPeakVal] = nGrateVal;
-			nPeakColorVal[nTotPeakVal] = i;
-			nTotPeakVal++;
-			bInc = FALSE;
-			nGrateVal = nHistoVal;
+			nWhite += nHistoVal;
 		}
 	}
 
-	int nMaxPeak[2] = { 0 };
-	int nMaxPeakColorVal[2] = { 0 };
-	if (nTotPeakVal > 1)
-	{
-		for (i = 0; i < nTotPeakVal; i++)
-		{
-			if (nMaxPeak[0] < nPeakVal[i])
-			{
-				nMaxPeak[0] = nPeakVal[i];		// First grate value
-				nMaxPeakColorVal[0] = nPeakColorVal[i];
-			}
-
-			if (nMaxPeak[1] < nMaxPeak[0] && nMaxPeak[1] < nPeakVal[i] && nMaxPeak[1] == 0)
-			{
-				nMaxPeak[1] = nPeakVal[i];		// Second grate value
-				nMaxPeakColorVal[1] = nPeakColorVal[i];
-			}
-			else if (nMaxPeak[1] < nMaxPeak[0] && nMaxPeak[1] < nPeakVal[i] && nPeakVal[i] < nMaxPeak[0])
-			{
-				nMaxPeak[1] = nPeakVal[i];		// Second grate value
-				nMaxPeakColorVal[1] = nPeakColorVal[i];
-			}
-		}
-	}
-	else
-		return FALSE; // 미마킹됨 (마킹구분이 않됨)
-
-	int nMid = int((nPeakColorVal[0] + nPeakColorVal[1]) / 2);
-	double dMkedRatio;
-
-	if ((nMaxPeakColorVal[0] - nMaxPeakColorVal[1]) > 0)  // nMaxPeakColorVal[0] : 밝은색,  nMaxPeakColorVal[1] : 어두운색
-	{
-		if ((nMaxPeakColorVal[0] - nMaxPeakColorVal[1]) < 20)
-			return FALSE; // 미마킹됨 (마킹이 명확하지 않음)
-		dMkedRatio = nMaxPeak[1] / (SzX * SzY) * 200;
-	}
-	else
-	{
-		if ((nMaxPeakColorVal[1] - nMaxPeakColorVal[0]) < 20)  // nMaxPeakColorVal[1] : 밝은색,  nMaxPeakColorVal[0] : 어두운색
-			return FALSE; // 미마킹됨 (마킹이 명확하지 않음)
-		dMkedRatio = nMaxPeak[0] / (SzX * SzY) * 200;
-	}
-
-	if (dMkedRatio < m_dVerifyPunchHistoScore)
-		return FALSE; // 미마킹됨 (마킹크기가 설정치 보다 작음)
+	//int nJudge = nTotalPixels - (nTotalPixels * m_dVerifyPunchHistoScore) / 200;
+	int nJudge = 200 - 200 * ((double)nWhite / (double)nTotalPixels);
+	MkMtRst.dScore = nJudge > 100 ? 100 : nJudge;
+	if (MkMtRst.dScore < m_dVerifyPunchHistoScore)
+		return FALSE;
+	//for (i = 0; i < 256; i++) // Gray color value : 0(black) ~ 255(white)
+	//{
+	//	nHistoVal = m_nHistoRst[i];
+	//
+	//	if (nHistoVal > nGrateVal)
+	//	{
+	//		nGrateVal = nHistoVal;
+	//		bInc = TRUE;
+	//	}
+	//	if ((nHistoVal < nGrateVal && bInc) || (i == 255 && bInc))
+	//	{
+	//		nPeakVal[nTotPeakVal] = nGrateVal;
+	//		nPeakColorVal[nTotPeakVal] = i;
+	//		nTotPeakVal++;
+	//		bInc = FALSE;
+	//		nGrateVal = nHistoVal;
+	//	}
+	//}
+	//
+	//int nMaxPeak[2] = { 0 };
+	//int nMaxPeakColorVal[2] = { 0 };
+	//if (nTotPeakVal > 1)
+	//{
+	//	for (i = 0; i < nTotPeakVal; i++)
+	//	{
+	//		if (nMaxPeak[0] < nPeakVal[i])
+	//		{
+	//			nMaxPeak[0] = nPeakVal[i];		// First grate value
+	//			nMaxPeakColorVal[0] = nPeakColorVal[i];
+	//		}
+	//
+	//		if (nMaxPeak[1] < nMaxPeak[0] && nMaxPeak[1] < nPeakVal[i] && nMaxPeak[1] == 0)
+	//		{
+	//			nMaxPeak[1] = nPeakVal[i];		// Second grate value
+	//			nMaxPeakColorVal[1] = nPeakColorVal[i];
+	//		}
+	//		else if (nMaxPeak[1] < nMaxPeak[0] && nMaxPeak[1] < nPeakVal[i] && nPeakVal[i] < nMaxPeak[0])
+	//		{
+	//			nMaxPeak[1] = nPeakVal[i];		// Second grate value
+	//			nMaxPeakColorVal[1] = nPeakColorVal[i];
+	//		}
+	//	}
+	//}
+	//else
+	//	return FALSE; // 미마킹됨 (마킹구분이 않됨)
+	//
+	//int nMid = int((nPeakColorVal[0] + nPeakColorVal[1]) / 2);
+	//double dMkedRatio;
+	//
+	//if ((nMaxPeakColorVal[0] - nMaxPeakColorVal[1]) > 0)  // nMaxPeakColorVal[0] : 밝은색,  nMaxPeakColorVal[1] : 어두운색
+	//{
+	//	if ((nMaxPeakColorVal[0] - nMaxPeakColorVal[1]) < 20)
+	//		return FALSE; // 미마킹됨 (마킹이 명확하지 않음)
+	//	dMkedRatio = nMaxPeak[1] / (SzX * SzY) * 200;
+	//}
+	//else
+	//{
+	//	if ((nMaxPeakColorVal[1] - nMaxPeakColorVal[0]) < 20)  // nMaxPeakColorVal[1] : 밝은색,  nMaxPeakColorVal[0] : 어두운색
+	//		return FALSE; // 미마킹됨 (마킹이 명확하지 않음)
+	//	dMkedRatio = nMaxPeak[0] / (SzX * SzY) * 200;
+	//}
+	//
+	//if (dMkedRatio < m_dVerifyPunchHistoScore)
+	//	return FALSE; // 미마킹됨 (마킹크기가 설정치 보다 작음)
 
 	return TRUE; // 마킹됨
 }
@@ -5764,9 +5783,14 @@ void CVision::DoHisto(MIL_ID &GrabImgId)
 	// Create Model
 	CLibMilBuf *MilPtModelImg = NULL;
 	MIL_ID MilBufPtModelCrop = M_NULL;
+	double dResX, dResY, dResCam;
 
-	long SzX = (long)((double)pDoc->m_nJudgeMkModelHistoSize);
-	long SzY = (long)((double)pDoc->m_nJudgeMkModelHistoSize);
+	dResX = _tstof(pDoc->WorkingInfo.Vision[m_nIdx].sResX);
+	dResY = _tstof(pDoc->WorkingInfo.Vision[m_nIdx].sResY);
+	dResCam = _tstof(pDoc->WorkingInfo.Vision[m_nIdx].sCamPxlRes) / 10000.0; // CamMaster Pixel Resolution.
+
+	long SzX = (long)((double)pDoc->m_nJudgeMkModelHistoSize) * 0.001 / dResX;
+	long SzY = (long)((double)pDoc->m_nJudgeMkModelHistoSize) * 0.001 / dResY;
 	long StX = long((DEF_IMG_DISP_SIZEX - SzX) / 2);
 	long StY = long((DEF_IMG_DISP_SIZEY - SzY) / 2);
 
@@ -5774,6 +5798,7 @@ void CVision::DoHisto(MIL_ID &GrabImgId)
 
 	MbufChild2d(GrabImgId, StX, StY, SzX, SzY, &MilBufPtModelCrop);
 	MbufCopy(MilBufPtModelCrop, MilPtModelImg->m_MilImage);
+	MbufSave(_T("C:\\Histgram.tif"), MilPtModelImg->m_MilImage);
 
 	/* Allocate a histogram result buffer. */
 	MimAllocResult(MilSystem, HIST_NUM_INTENSITIES, M_HIST_LIST, &HistResult);
@@ -5788,7 +5813,8 @@ void CVision::DoHisto(MIL_ID &GrabImgId)
 
 	for (i = 0; i < HIST_NUM_INTENSITIES; i++)
 	{
-		m_nHistoRst[i] = (HistValues[i] / HIST_SCALE_FACTOR);
+		m_nHistoRst[i] = HistValues[i];
+		//m_nHistoRst[i] = (HistValues[i] / HIST_SCALE_FACTOR);
 	}
 
 	/* Free all allocations. */
@@ -5811,7 +5837,8 @@ BOOL CVision::TestJudgeMkHisto(BOOL &bMkJudge) // If return value is TRUE and bM
 	m_cs.Lock();
 	CLibMilBuf *MilGrabImg = NULL;
 	if (m_pMil)
-		MilGrabImg = m_pMil->AllocBuf((long)m_pIRayple->GetImgWidth(), (long)m_pIRayple->GetImgHeight(), 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
+		MilGrabImg = m_pMil->AllocBuf((long)640, (long)480, 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
+		//MilGrabImg = m_pMil->AllocBuf((long)m_pIRayple->GetImgWidth(), (long)m_pIRayple->GetImgHeight(), 8L + M_UNSIGNED, M_IMAGE + M_DISP + M_PROC);
 
 	if (m_pIRayple->OneshotGrab() == FALSE)
 	{
