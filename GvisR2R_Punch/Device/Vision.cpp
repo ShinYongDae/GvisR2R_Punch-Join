@@ -4833,7 +4833,7 @@ BOOL CVision::SaveMkImg(int nSerial, int nMkPcsIdx, CString sDest) // Return FAL
 	Sleep(10);
 	m_cs.Unlock();
 
-	if (!m_bMkJudge)
+	if (!m_bMkJudge || !m_bMkJudgeHisto)
 		return FALSE;
 
 #endif
@@ -5798,7 +5798,12 @@ void CVision::DoHisto(MIL_ID &GrabImgId)
 
 	MbufChild2d(GrabImgId, StX, StY, SzX, SzY, &MilBufPtModelCrop);
 	MbufCopy(MilBufPtModelCrop, MilPtModelImg->m_MilImage);
-	MbufSave(_T("C:\\Histgram.tif"), MilPtModelImg->m_MilImage);
+	if (pDoc->m_bDebugJudgeMk)
+	{
+		CString sMsg;
+		sMsg.Format(_T("C:\\Histgram_%d.tif"), m_nIdx);
+		MbufSave(sMsg, MilPtModelImg->m_MilImage);
+	}
 
 	/* Allocate a histogram result buffer. */
 	MimAllocResult(MilSystem, HIST_NUM_INTENSITIES, M_HIST_LIST, &HistResult);
