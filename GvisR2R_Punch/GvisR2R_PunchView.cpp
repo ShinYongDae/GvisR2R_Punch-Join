@@ -31921,14 +31921,14 @@ void CGvisR2R_PunchView::MakeSapp3()
 		pDoc->WorkingInfo.LastJob.sProcessNum,
 		pDoc->WorkingInfo.System.sMcName);
 
-	char* pRtn = StringToChar(sSapp3Data);
-	//char* pRtn = NULL;
+	char* pData = StringToChar(sSapp3Data);
+	char* pRtn = NULL;
 	_stprintf(FileName, _T("%s"), sPath);
 	fp = fopen(pRtn = TCHARToChar(FileName), "w+");
 
 	if (fp != NULL)
 	{
-		fprintf(fp, "%s\n", pRtn);
+		fprintf(fp, "%s\n", pData);
 		//fprintf(fp, "%s\n", pRtn = StringToChar(sSapp3Data));
 		fclose(fp);
 	}
@@ -31942,6 +31942,8 @@ void CGvisR2R_PunchView::MakeSapp3()
 
 	if (pRtn)
 		delete pRtn;
+	if (pData)
+		delete pData;
 }
 
 BOOL CGvisR2R_PunchView::UpdateReelmap(int nSerial)

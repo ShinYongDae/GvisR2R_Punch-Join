@@ -3379,8 +3379,8 @@ void CDlgMenu05::MakeSapp3() // With ReelmapDataAll.txt파일에서 정보를 취합함.
 
 	}
 
-	char* pRtn = StringToChar(Sapp3Data());
-	//char* pRtn = NULL;
+	char* pData = StringToChar(Sapp3Data());
+	char* pRtn = NULL;
 	sPath.Format(_T("%s%9s_%4s_%5s.txt"), pDoc->WorkingInfo.System.sPathSapp3, m_sLot, m_sProcessNum, pDoc->WorkingInfo.System.sMcName);
 	_stprintf(FileName, _T("%s"), sPath);
 	fp = fopen(pRtn=TCHARToChar(FileName), "w+");
@@ -3388,7 +3388,7 @@ void CDlgMenu05::MakeSapp3() // With ReelmapDataAll.txt파일에서 정보를 취합함.
 	if (fp != NULL)
 	{
 		//fprintf(fp, "%s\n", pRtn = StringToChar(Sapp3Data()));
-		fprintf(fp, "%s\n", pRtn);
+		fprintf(fp, "%s\n", pData);
 		fclose(fp);
 	}
 	else
@@ -3402,6 +3402,8 @@ void CDlgMenu05::MakeSapp3() // With ReelmapDataAll.txt파일에서 정보를 취합함.
 
 	if (pRtn)
 		delete pRtn;
+	if (pData)
+		delete pData;
 }
 
 CString CDlgMenu05::Sapp3Data()
