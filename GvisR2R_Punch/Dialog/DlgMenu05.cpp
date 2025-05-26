@@ -1233,8 +1233,210 @@ CString CDlgMenu05::DisplayData()
 
 	strFileData += _T("\t-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\r\n");
 
-	strData.Format(_T("\t19\t    %s    \t"), pDoc->m_pReelMap->m_sKorDef[DEF_LIGHT]);
-	strFileData += strData; // "\t19\t    ³ë±¤    \t");
+	strData.Format(_T("\t19\t    %s    \t"), pDoc->m_pReelMap->m_sKorDef[DEF_EDGE_NICK]);
+	strFileData += strData; // "\t19\t  E.Nick  \t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[0][DEF_EDGE_NICK]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[1][DEF_EDGE_NICK]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[2][DEF_EDGE_NICK]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[3][DEF_EDGE_NICK]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%13d"), m_nEntireAddedDefect[DEF_EDGE_NICK]);
+	strFileData += strData;
+	strFileData += _T("\r\n");
+
+	strData.Format(_T("\t20\t    %s    \t"), pDoc->m_pReelMap->m_sKorDef[DEF_EDGE_PROT]);
+	strFileData += strData; // "\t20\t  E.Prot  \t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[0][DEF_EDGE_PROT]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[1][DEF_EDGE_PROT]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[2][DEF_EDGE_PROT]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[3][DEF_EDGE_PROT]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%13d"), m_nEntireAddedDefect[DEF_EDGE_PROT]);
+	strFileData += strData;
+	strFileData += _T("\r\n");
+
+	strData.Format(_T("\t21\t    %s    \t"), pDoc->m_pReelMap->m_sKorDef[DEF_EDGE_SPACE]);
+	strFileData += strData; // "\t21\t  E.Space  \t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[0][DEF_EDGE_SPACE]);
+	strFileData += strData;
+	strData.Format(_T("\t%3d"), m_nDefPerStrip[0][DEF_EDGE_NICK] + m_nDefPerStrip[0][DEF_EDGE_PROT] + m_nDefPerStrip[0][DEF_EDGE_SPACE]);
+	strFileData += strData;
+	strFileData += _T("\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[1][DEF_EDGE_SPACE]);
+	strFileData += strData;
+	strData.Format(_T("\t%3d"), m_nDefPerStrip[1][DEF_EDGE_NICK] + m_nDefPerStrip[1][DEF_EDGE_PROT] + m_nDefPerStrip[1][DEF_EDGE_SPACE]);
+	strFileData += strData;
+	strFileData += _T("\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[2][DEF_EDGE_SPACE]);
+	strFileData += strData;
+	strData.Format(_T("\t%3d"), m_nDefPerStrip[2][DEF_EDGE_NICK] + m_nDefPerStrip[2][DEF_EDGE_PROT] + m_nDefPerStrip[2][DEF_EDGE_SPACE]);
+	strFileData += strData;
+	strFileData += _T("\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[3][DEF_EDGE_SPACE]);
+	strFileData += strData;
+	strData.Format(_T("\t%3d"), m_nDefPerStrip[3][DEF_EDGE_NICK] + m_nDefPerStrip[3][DEF_EDGE_PROT] + m_nDefPerStrip[3][DEF_EDGE_SPACE]);
+	strFileData += strData;
+	strFileData += _T("\t");
+	strData.Format(_T("%13d"), m_nEntireAddedDefect[DEF_EDGE_SPACE]);
+	strFileData += strData;
+	strData.Format(_T("  \t%3d"), m_nEntireAddedDefect[DEF_EDGE_NICK] + m_nEntireAddedDefect[DEF_EDGE_PROT] + m_nEntireAddedDefect[DEF_EDGE_SPACE]);
+	strFileData += strData;
+	strFileData += _T("\r\n");
+
+	strFileData += _T("\t-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\r\n");
+
+	strData.Format(_T("\t22\t    %s    \t"), pDoc->m_pReelMap->m_sKorDef[DEF_USER_DEFINE_1]);
+	strFileData += strData; // "\t22\t  UDD1  \t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[0][DEF_USER_DEFINE_1]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[1][DEF_USER_DEFINE_1]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[2][DEF_USER_DEFINE_1]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[3][DEF_USER_DEFINE_1]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%13d"), m_nEntireAddedDefect[DEF_USER_DEFINE_1]);
+	strFileData += strData;
+	strFileData += _T("\r\n");
+
+	strFileData += _T("\t-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\r\n");
+
+	strData.Format(_T("\t23\t    %s    \t"), pDoc->m_pReelMap->m_sKorDef[DEF_NARROW]);
+	strFileData += strData; // "\t23\t  ¼±Æø°¨¼Ò  \t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[0][DEF_NARROW]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[1][DEF_NARROW]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[2][DEF_NARROW]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[3][DEF_NARROW]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%13d"), m_nEntireAddedDefect[DEF_NARROW]);
+	strFileData += strData;
+	strFileData += _T("\r\n");
+
+	strData.Format(_T("\t24\t    %s    \t"), pDoc->m_pReelMap->m_sKorDef[DEF_WIDE]);
+	strFileData += strData; // "\t24\t  ¼±ÆøÁõ°¡  \t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[0][DEF_WIDE]);
+	strFileData += strData;
+	strData.Format(_T("\t%3d"), m_nDefPerStrip[0][DEF_NARROW] + m_nDefPerStrip[0][DEF_WIDE]);
+	strFileData += strData;
+	strFileData += _T("\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[1][DEF_WIDE]);
+	strFileData += strData;
+	strData.Format(_T("\t%3d"), m_nDefPerStrip[1][DEF_NARROW] + m_nDefPerStrip[1][DEF_WIDE]);
+	strFileData += strData;
+	strFileData += _T("\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[2][DEF_WIDE]);
+	strFileData += strData;
+	strData.Format(_T("\t%3d"), m_nDefPerStrip[2][DEF_NARROW] + m_nDefPerStrip[2][DEF_WIDE]);
+	strFileData += strData;
+	strFileData += _T("\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[3][DEF_WIDE]);
+	strFileData += strData;
+	strData.Format(_T("\t%3d"), m_nDefPerStrip[3][DEF_NARROW] + m_nDefPerStrip[3][DEF_WIDE]);
+	strFileData += strData;
+	strFileData += _T("\t");
+	strData.Format(_T("%13d"), m_nEntireAddedDefect[DEF_WIDE]);
+	strFileData += strData;
+	strData.Format(_T("  \t%3d"), m_nEntireAddedDefect[DEF_NARROW] + m_nEntireAddedDefect[DEF_WIDE]);
+	strFileData += strData;
+	strFileData += _T("\r\n");
+
+	strFileData += _T("\t-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\r\n");
+
+	strData.Format(_T("\t25\t    %s    \t"), pDoc->m_pReelMap->m_sKorDef[DEF_FIXED_DEF]);
+	strFileData += strData; // "\t25\t  °íÁ¤ºÒ·®  \t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[0][DEF_FIXED_DEF]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[1][DEF_FIXED_DEF]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[2][DEF_FIXED_DEF]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[3][DEF_FIXED_DEF]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%13d"), m_nEntireAddedDefect[DEF_FIXED_DEF]);
+	strFileData += strData;
+	strFileData += _T("\r\n");
+
+	strFileData += _T("\t-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\r\n");
+
+	strData.Format(_T("\t26\t    %s    \t"), pDoc->m_pReelMap->m_sKorDef[DEF_VH_SIZE]);
+	strFileData += strData; // "\t26\t  VHÅ©±â  \t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[0][DEF_VH_SIZE]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[1][DEF_VH_SIZE]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[2][DEF_VH_SIZE]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[3][DEF_VH_SIZE]);
+	strFileData += strData;
+	strFileData += _T("\t\t");
+	strData.Format(_T("%13d"), m_nEntireAddedDefect[DEF_VH_SIZE]);
+	strFileData += strData;
+	strFileData += _T("\r\n");
+
+	strData.Format(_T("\t27\t    %s    \t"), pDoc->m_pReelMap->m_sKorDef[DEF_VH_EDGE]);
+	strFileData += strData; // "\t27\t  VH¿¡Áö°áÇÔ  \t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[0][DEF_VH_EDGE]);
+	strFileData += strData;
+	strData.Format(_T("\t%3d"), m_nDefPerStrip[0][DEF_VH_SIZE] + m_nDefPerStrip[0][DEF_VH_EDGE]);
+	strFileData += strData;
+	strFileData += _T("\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[1][DEF_VH_EDGE]);
+	strFileData += strData;
+	strData.Format(_T("\t%3d"), m_nDefPerStrip[1][DEF_VH_SIZE] + m_nDefPerStrip[1][DEF_VH_EDGE]);
+	strFileData += strData;
+	strFileData += _T("\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[2][DEF_VH_EDGE]);
+	strFileData += strData;
+	strData.Format(_T("\t%3d"), m_nDefPerStrip[2][DEF_VH_SIZE] + m_nDefPerStrip[2][DEF_VH_EDGE]);
+	strFileData += strData;
+	strFileData += _T("\t");
+	strData.Format(_T("%3d"), m_nDefPerStrip[3][DEF_VH_EDGE]);
+	strFileData += strData;
+	strData.Format(_T("\t%3d"), m_nDefPerStrip[3][DEF_VH_SIZE] + m_nDefPerStrip[3][DEF_VH_EDGE]);
+	strFileData += strData;
+	strFileData += _T("\t");
+	strData.Format(_T("%13d"), m_nEntireAddedDefect[DEF_VH_EDGE]);
+	strFileData += strData;
+	strData.Format(_T("  \t%3d"), m_nEntireAddedDefect[DEF_VH_SIZE] + m_nEntireAddedDefect[DEF_VH_EDGE]);
+	strFileData += strData;
+	strFileData += _T("\r\n");
+
+	strFileData += _T("\t-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\r\n");
+
+	strData.Format(_T("\t28\t    %s    \t"), pDoc->m_pReelMap->m_sKorDef[DEF_LIGHT]);
+	strFileData += strData; // "\t28\t    ³ë±¤    \t");
 	strData.Format(_T("%3d"), m_nDefPerStrip[0][DEF_LIGHT]);
 	strFileData += strData;
 	strFileData += _T("\t\t");
@@ -2533,7 +2735,7 @@ CString CDlgMenu05::TxtDataMDS()
 	strFileData += strData;
 	strData.Format(_T("    13       È¦³»ºÒ·®%10d%10d%10d%10d%20d\r\n"), m_nDefPerStrip[0][DEF_HOLE_DEFECT], m_nDefPerStrip[1][DEF_HOLE_DEFECT], m_nDefPerStrip[2][DEF_HOLE_DEFECT], m_nDefPerStrip[3][DEF_HOLE_DEFECT], m_nEntireAddedDefect[DEF_HOLE_DEFECT]);
 	strFileData += strData;
-	strData.Format(_T("    14          POI  %10d%10d%10d%10d%20d\r\n"), m_nDefPerStrip[0][DEF_POI], m_nDefPerStrip[1][DEF_POI], m_nDefPerStrip[2][DEF_POI], m_nDefPerStrip[3][DEF_POI], m_nEntireAddedDefect[DEF_POI]);
+	strData.Format(_T("    14          POI    %10d%10d%10d%10d%20d\r\n"), m_nDefPerStrip[0][DEF_POI], m_nDefPerStrip[1][DEF_POI], m_nDefPerStrip[2][DEF_POI], m_nDefPerStrip[3][DEF_POI], m_nEntireAddedDefect[DEF_POI]);
 	strFileData += strData;
 	strData.Format(_T("    15        VH¿ÀÇÂ %10d%10d%10d%10d%20d\r\n"), m_nDefPerStrip[0][DEF_VH_OPEN], m_nDefPerStrip[1][DEF_VH_OPEN], m_nDefPerStrip[2][DEF_VH_OPEN], m_nDefPerStrip[3][DEF_VH_OPEN], m_nEntireAddedDefect[DEF_VH_OPEN]);
 	strFileData += strData;
@@ -2543,7 +2745,25 @@ CString CDlgMenu05::TxtDataMDS()
 	strFileData += strData;
 	strData.Format(_T("    18        VH°áÇÔ %10d%10d%10d%10d%20d\r\n"), m_nDefPerStrip[0][DEF_VH_DEF], m_nDefPerStrip[1][DEF_VH_DEF], m_nDefPerStrip[2][DEF_VH_DEF], m_nDefPerStrip[3][DEF_VH_DEF], m_nEntireAddedDefect[DEF_VH_DEF]);
 	strFileData += strData;
-	strData.Format(_T("    19         ³ë±¤  %10d%10d%10d%10d%20d\r\n"), m_nDefPerStrip[0][DEF_LIGHT], m_nDefPerStrip[1][DEF_LIGHT], m_nDefPerStrip[2][DEF_LIGHT], m_nDefPerStrip[3][DEF_LIGHT], nTot);
+	strData.Format(_T("    19        E.Nick   %10d%10d%10d%10d%20d\r\n"), m_nDefPerStrip[0][DEF_EDGE_NICK], m_nDefPerStrip[1][DEF_EDGE_NICK], m_nDefPerStrip[2][DEF_EDGE_NICK], m_nDefPerStrip[3][DEF_EDGE_NICK], m_nEntireAddedDefect[DEF_EDGE_NICK]);
+	strFileData += strData;
+	strData.Format(_T("    20        E.Prot   %10d%10d%10d%10d%20d\r\n"), m_nDefPerStrip[0][DEF_EDGE_PROT], m_nDefPerStrip[1][DEF_EDGE_PROT], m_nDefPerStrip[2][DEF_EDGE_PROT], m_nDefPerStrip[3][DEF_EDGE_PROT], m_nEntireAddedDefect[DEF_EDGE_PROT]);
+	strFileData += strData;
+	strData.Format(_T("    21        E.Space %10d%10d%10d%10d%20d\r\n"), m_nDefPerStrip[0][DEF_EDGE_SPACE], m_nDefPerStrip[1][DEF_EDGE_SPACE], m_nDefPerStrip[2][DEF_EDGE_SPACE], m_nDefPerStrip[3][DEF_EDGE_SPACE], m_nEntireAddedDefect[DEF_EDGE_SPACE]);
+	strFileData += strData;
+	strData.Format(_T("    22         UDD1  %10d%10d%10d%10d%20d\r\n"), m_nDefPerStrip[0][DEF_USER_DEFINE_1], m_nDefPerStrip[1][DEF_USER_DEFINE_1], m_nDefPerStrip[2][DEF_USER_DEFINE_1], m_nDefPerStrip[3][DEF_USER_DEFINE_1], m_nEntireAddedDefect[DEF_USER_DEFINE_1]);
+	strFileData += strData;
+	strData.Format(_T("    23       ¼±Æø°¨¼Ò%10d%10d%10d%10d%20d\r\n"), m_nDefPerStrip[0][DEF_NARROW], m_nDefPerStrip[1][DEF_NARROW], m_nDefPerStrip[2][DEF_NARROW], m_nDefPerStrip[3][DEF_NARROW], m_nEntireAddedDefect[DEF_NARROW]);
+	strFileData += strData;
+	strData.Format(_T("    24       ¼±ÆøÁõ°¡%10d%10d%10d%10d%20d\r\n"), m_nDefPerStrip[0][DEF_WIDE], m_nDefPerStrip[1][DEF_WIDE], m_nDefPerStrip[2][DEF_WIDE], m_nDefPerStrip[3][DEF_WIDE], m_nEntireAddedDefect[DEF_WIDE]);
+	strFileData += strData;
+	strData.Format(_T("    25       °íÁ¤ºÒ·®%10d%10d%10d%10d%20d\r\n"), m_nDefPerStrip[0][DEF_FIXED_DEF], m_nDefPerStrip[1][DEF_FIXED_DEF], m_nDefPerStrip[2][DEF_FIXED_DEF], m_nDefPerStrip[3][DEF_FIXED_DEF], m_nEntireAddedDefect[DEF_FIXED_DEF]);
+	strFileData += strData;
+	strData.Format(_T("    26        VHÅ©±â %10d%10d%10d%10d%20d\r\n"), m_nDefPerStrip[0][DEF_VH_SIZE], m_nDefPerStrip[1][DEF_VH_SIZE], m_nDefPerStrip[2][DEF_VH_SIZE], m_nDefPerStrip[3][DEF_VH_SIZE], m_nEntireAddedDefect[DEF_VH_SIZE]);
+	strFileData += strData;
+	strData.Format(_T("    27    VH¿¡Áö°áÇÔ%10d%10d%10d%10d%20d\r\n"), m_nDefPerStrip[0][DEF_VH_EDGE], m_nDefPerStrip[1][DEF_VH_EDGE], m_nDefPerStrip[2][DEF_VH_EDGE], m_nDefPerStrip[3][DEF_VH_EDGE], m_nEntireAddedDefect[DEF_VH_EDGE]);
+	strFileData += strData;
+	strData.Format(_T("    28         ³ë±¤    %10d%10d%10d%10d%20d\r\n"), m_nDefPerStrip[0][DEF_LIGHT], m_nDefPerStrip[1][DEF_LIGHT], m_nDefPerStrip[2][DEF_LIGHT], m_nDefPerStrip[3][DEF_LIGHT], nTot);
 	strFileData += strData;
 	strFileData += _T("    -----------------------------------------------------------------------------\r\n");
 	strFileData += _T("                                                                                 \r\n");
@@ -4339,7 +4559,7 @@ void CDlgMenu05::PrintData(HDC hPrtdc, int xpage, int ypage)
 	strFileData.Format(_T("    13       È¦³»ºÒ·®%10d%10d%10d%10d%20d"), m_nDefPerStrip[0][DEF_HOLE_DEFECT], m_nDefPerStrip[1][DEF_HOLE_DEFECT], m_nDefPerStrip[2][DEF_HOLE_DEFECT], m_nDefPerStrip[3][DEF_HOLE_DEFECT], m_nEntireAddedDefect[DEF_HOLE_DEFECT]);
 	TextOut(hPrtdc,nHorizOffset,60*nCharHight,strFileData,strFileData.GetLength());
 
-	strFileData.Format(_T("    14          POI  %10d%10d%10d%10d%20d"), m_nDefPerStrip[0][DEF_POI], m_nDefPerStrip[1][DEF_POI], m_nDefPerStrip[2][DEF_POI], m_nDefPerStrip[3][DEF_POI], m_nEntireAddedDefect[DEF_POI]);
+	strFileData.Format(_T("    14          POI    %10d%10d%10d%10d%20d"), m_nDefPerStrip[0][DEF_POI], m_nDefPerStrip[1][DEF_POI], m_nDefPerStrip[2][DEF_POI], m_nDefPerStrip[3][DEF_POI], m_nEntireAddedDefect[DEF_POI]);
 	TextOut(hPrtdc,nHorizOffset,61*nCharHight,strFileData,strFileData.GetLength());
 
 	strFileData.Format(_T("    15        VH¿ÀÇÂ %10d%10d%10d%10d%20d"), m_nDefPerStrip[0][DEF_VH_OPEN], m_nDefPerStrip[1][DEF_VH_OPEN], m_nDefPerStrip[2][DEF_VH_OPEN], m_nDefPerStrip[3][DEF_VH_OPEN], m_nEntireAddedDefect[DEF_VH_OPEN]);
@@ -4354,9 +4574,36 @@ void CDlgMenu05::PrintData(HDC hPrtdc, int xpage, int ypage)
 	strFileData.Format(_T("    18        VH°áÇÔ %10d%10d%10d%10d%20d"), m_nDefPerStrip[0][DEF_VH_DEF], m_nDefPerStrip[1][DEF_VH_DEF], m_nDefPerStrip[2][DEF_VH_DEF], m_nDefPerStrip[3][DEF_VH_DEF], m_nEntireAddedDefect[DEF_VH_DEF]);
 	TextOut(hPrtdc,nHorizOffset,65*nCharHight,strFileData,strFileData.GetLength());
 
+	strFileData.Format(_T("    19        E.Nick   %10d%10d%10d%10d%20d"), m_nDefPerStrip[0][DEF_EDGE_NICK], m_nDefPerStrip[1][DEF_EDGE_NICK], m_nDefPerStrip[2][DEF_EDGE_NICK], m_nDefPerStrip[3][DEF_EDGE_NICK], m_nEntireAddedDefect[DEF_EDGE_NICK]);
+	TextOut(hPrtdc, nHorizOffset, 66 * nCharHight, strFileData, strFileData.GetLength());
+
+	strFileData.Format(_T("    20        E.Prot   %10d%10d%10d%10d%20d"), m_nDefPerStrip[0][DEF_EDGE_PROT], m_nDefPerStrip[1][DEF_EDGE_PROT], m_nDefPerStrip[2][DEF_EDGE_PROT], m_nDefPerStrip[3][DEF_EDGE_PROT], m_nEntireAddedDefect[DEF_EDGE_PROT]);
+	TextOut(hPrtdc, nHorizOffset, 67 * nCharHight, strFileData, strFileData.GetLength());
+
+	strFileData.Format(_T("    21        E.Space  %10d%10d%10d%10d%20d"), m_nDefPerStrip[0][DEF_EDGE_SPACE], m_nDefPerStrip[1][DEF_EDGE_SPACE], m_nDefPerStrip[2][DEF_EDGE_SPACE], m_nDefPerStrip[3][DEF_EDGE_SPACE], m_nEntireAddedDefect[DEF_EDGE_SPACE]);
+	TextOut(hPrtdc, nHorizOffset, 68 * nCharHight, strFileData, strFileData.GetLength());
+
+	strFileData.Format(_T("    22         UDD1  %10d%10d%10d%10d%20d"), m_nDefPerStrip[0][DEF_USER_DEFINE_1], m_nDefPerStrip[1][DEF_USER_DEFINE_1], m_nDefPerStrip[2][DEF_USER_DEFINE_1], m_nDefPerStrip[3][DEF_USER_DEFINE_1], m_nEntireAddedDefect[DEF_USER_DEFINE_1]);
+	TextOut(hPrtdc, nHorizOffset, 69 * nCharHight, strFileData, strFileData.GetLength());
+
+	strFileData.Format(_T("    23       ¼±Æø°¨¼Ò%10d%10d%10d%10d%20d"), m_nDefPerStrip[0][DEF_NARROW], m_nDefPerStrip[1][DEF_NARROW], m_nDefPerStrip[2][DEF_NARROW], m_nDefPerStrip[3][DEF_NARROW], m_nEntireAddedDefect[DEF_NARROW]);
+	TextOut(hPrtdc, nHorizOffset, 70 * nCharHight, strFileData, strFileData.GetLength());
+
+	strFileData.Format(_T("    24       ¼±ÆøÁõ°¡%10d%10d%10d%10d%20d"), m_nDefPerStrip[0][DEF_WIDE], m_nDefPerStrip[1][DEF_WIDE], m_nDefPerStrip[2][DEF_WIDE], m_nDefPerStrip[3][DEF_WIDE], m_nEntireAddedDefect[DEF_WIDE]);
+	TextOut(hPrtdc, nHorizOffset, 71 * nCharHight, strFileData, strFileData.GetLength());
+
+	strFileData.Format(_T("    25       °íÁ¤ºÒ·®%10d%10d%10d%10d%20d"), m_nDefPerStrip[0][DEF_FIXED_DEF], m_nDefPerStrip[1][DEF_FIXED_DEF], m_nDefPerStrip[2][DEF_FIXED_DEF], m_nDefPerStrip[3][DEF_FIXED_DEF], m_nEntireAddedDefect[DEF_FIXED_DEF]);
+	TextOut(hPrtdc, nHorizOffset, 72 * nCharHight, strFileData, strFileData.GetLength());
+
+	strFileData.Format(_T("    26       VHÅ©±â %10d%10d%10d%10d%20d"), m_nDefPerStrip[0][DEF_VH_SIZE], m_nDefPerStrip[1][DEF_VH_SIZE], m_nDefPerStrip[2][DEF_VH_SIZE], m_nDefPerStrip[3][DEF_VH_SIZE], m_nEntireAddedDefect[DEF_VH_SIZE]);
+	TextOut(hPrtdc, nHorizOffset, 73 * nCharHight, strFileData, strFileData.GetLength());
+
+	strFileData.Format(_T("    27    VH¿¡Áö°áÇÔ%10d%10d%10d%10d%20d"), m_nDefPerStrip[0][DEF_VH_EDGE], m_nDefPerStrip[1][DEF_VH_EDGE], m_nDefPerStrip[2][DEF_VH_EDGE], m_nDefPerStrip[3][DEF_VH_EDGE], m_nEntireAddedDefect[DEF_VH_EDGE]);
+	TextOut(hPrtdc, nHorizOffset, 74 * nCharHight, strFileData, strFileData.GetLength());
+
 	nTot = m_nDefPerStrip[0][DEF_LIGHT]+m_nDefPerStrip[1][DEF_LIGHT]+m_nDefPerStrip[2][DEF_LIGHT]+m_nDefPerStrip[3][DEF_LIGHT];
-	strFileData.Format(_T("    19         ³ë±¤  %10d%10d%10d%10d%20d"), m_nDefPerStrip[0][DEF_LIGHT], m_nDefPerStrip[1][DEF_LIGHT], m_nDefPerStrip[2][DEF_LIGHT], m_nDefPerStrip[3][DEF_LIGHT], nTot);
-	TextOut(hPrtdc,nHorizOffset,66*nCharHight,strFileData,strFileData.GetLength());
+	strFileData.Format(_T("    28         ³ë±¤    %10d%10d%10d%10d%20d"), m_nDefPerStrip[0][DEF_LIGHT], m_nDefPerStrip[1][DEF_LIGHT], m_nDefPerStrip[2][DEF_LIGHT], m_nDefPerStrip[3][DEF_LIGHT], nTot);
+	TextOut(hPrtdc,nHorizOffset,75*nCharHight,strFileData,strFileData.GetLength());
 
 	strFileData = _T("    -----------------------------------------------------------------------------");
 	TextOut(hPrtdc,nHorizOffset,67*nCharHight,strFileData,strFileData.GetLength());

@@ -138,6 +138,8 @@ BOOL CCamMaster::LoadMstInfo()
 		{
 			if (LoadStripPieceRegion_Binary())
 				SetMasterPanelInfo(); // for DTS
+			else
+				return FALSE;
 		}
 		else
 			LoadPcsRgnFromCam();

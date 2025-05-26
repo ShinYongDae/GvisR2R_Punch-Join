@@ -169,7 +169,7 @@ BEGIN
     LTEXT           "Copyright (C) 2025.05.26",IDC_STATIC,42,16,114,8
     DEFPUSHBUTTON   "확인",IDOK,113,43,50,14,WS_GROUP
     LTEXT           "미마킹테스트(Histo)",IDC_STATIC,7,29,139,8
-    LTEXT           "각인부 통신 최적화",IDC_STATIC,7,38,96,8
+    LTEXT           "Result파일 불량항목 추가",IDC_STATIC,7,38,96,8
     LTEXT           "2Layer Offline모드 ITS파일 생성",IDC_STATIC,7,48,94,8
 END
 
