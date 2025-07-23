@@ -142,10 +142,14 @@ public:
 	double GetVerifyPunchScore2();
 	double GetVerifyPunchHistoScore();
 	double GetVerifyPunchHistoScore2();
+	int GetVerifyPunchHistoWhite();
+	int GetVerifyPunchHistoWhite2();
 	void SetVerifyPunchScore(double dScore);
 	void SetVerifyPunchScore2(double dScore);
 	void SetVerifyPunchHistoScore(double dScore);
 	void SetVerifyPunchHistoScore2(double dScore);
+	void SetVerifyPunchHistoWhite(int nDn);
+	void SetVerifyPunchHistoWhite2(int nDn);
 
 	void LogAuto(CString strMsg, int nType = 0);
 	void LogPLC(CString strMsg, int nType = 0);

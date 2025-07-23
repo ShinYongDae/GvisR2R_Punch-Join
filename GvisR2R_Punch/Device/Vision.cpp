@@ -35,6 +35,7 @@ CVision::CVision(int nIdx, MIL_ID MilSysId, HWND *hCtrl, CWnd* pParent /*=NULL*/
 	m_MilGrabModelPunch = NULL;
 	m_dVerifyPunchScore = 85.0;
 	m_dVerifyPunchHistoScore = 50.0;
+	m_nVerifyPunchHistoWhite = 240;
 
 	// init camera
 	m_hCtrl[0] = hCtrl[0];
@@ -4873,6 +4874,11 @@ void CVision::SetVerifyPunchHistoScore(double dScore)
 	m_dVerifyPunchHistoScore = dScore;
 }
 
+void CVision::SetVerifyPunchHistoWhite(int nWhite)
+{
+	m_nVerifyPunchHistoWhite = nWhite;
+}
+
 double CVision::GetVerifyPunchScore()
 {
 	return m_dVerifyPunchScore;
@@ -4881,6 +4887,11 @@ double CVision::GetVerifyPunchScore()
 double CVision::GetVerifyPunchHistoScore()
 {
 	return m_dVerifyPunchHistoScore;
+}
+
+int CVision::GetVerifyPunchHistoWhite()
+{
+	return m_nVerifyPunchHistoWhite;
 }
 
 BOOL CVision::CheckVerifyPunching(MIL_ID &GrabImgId) // Return FALSE; --> Alarm Message & Answer Remarking
@@ -5695,15 +5706,15 @@ BOOL CVision::JudgeHisto(MIL_ID &GrabImgId)
 	for (i = 0; i < 256; i++) // Gray color value : 0(black) ~ 255(white)
 	{
 		nHistoVal = m_nHistoRst[i];
-		if (nHistoVal > 240)
+		if (nHistoVal > m_nVerifyPunchHistoWhite) // 240
 		{
 			nWhite += nHistoVal;
 		}
 	}
 
 	//int nJudge = nTotalPixels - (nTotalPixels * m_dVerifyPunchHistoScore) / 200;
-	int nJudge = 200 - 200 * ((double)nWhite / (double)nTotalPixels);
-	MkMtRst.dScore = nJudge > 100 ? 100 : nJudge;
+	int nJudge = int(200.0*(1.0 - ((double)nWhite / (double)nTotalPixels)));
+	MkMtRst.dScore = (double)(nJudge > 100 ? 100 : nJudge);
 	if (MkMtRst.dScore < m_dVerifyPunchHistoScore)
 		return FALSE;
 	//for (i = 0; i < 256; i++) // Gray color value : 0(black) ~ 255(white)

@@ -3,7 +3,6 @@
 #include "CamIRayple.h"
 #include "RGBConvert.h"
 
-
 #include "../GvisR2R_PunchDoc.h"
 #include "../GvisR2R_PunchView.h"
 
@@ -112,7 +111,9 @@ CCamIRayple::CCamIRayple(int nIdx, HWND hCtrl, CWnd* pParent /*=NULL*/)
 		AfxMessageBox(_T("Error - Camera serial number setting."));
 	}
 
+#ifndef USE_MIL
 	m_Render.setHandle(m_hWndDisplay);
+#endif
 
 	Connect(TRUE);
 }
@@ -766,7 +767,7 @@ BOOL CCamIRayple::StartStreamGrabbing(bool bResumeConnect)
 	{
 		Getparam();
 	}
-
+#ifndef USE_MIL
 	// open display
 	if (!m_Render.isOpen())
 	{
@@ -776,7 +777,7 @@ BOOL CCamIRayple::StartStreamGrabbing(bool bResumeConnect)
 			return false;
 		}
 	}
-
+#endif
 	if (IMV_OK != IMV_AttachGrabbing(m_devHandle, onGetFrame, this))
 	{
 		pView->ClrDispMsg();
@@ -835,8 +836,9 @@ BOOL CCamIRayple::StopStreamGrabbing(bool bResumeConnect)
 		m_displayThreadHandle = NULL;
 	}
 
+#ifndef USE_MIL
 	m_Render.close();
-
+#endif
 	if (!IMV_IsGrabbing(m_devHandle))
 	{
 		return true;

@@ -2122,15 +2122,25 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	else
 		WorkingInfo.LastJob.nJudgeMkRatio[1] = 15;
 
-	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Judge Marking Histo Ratio"), NULL, szData, sizeof(szData), sPath))
+	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Judge Marking Histo Ratio Left"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.LastJob.nJudgeMkHistoRatio[0] = _ttoi(szData);
 	else
 		WorkingInfo.LastJob.nJudgeMkHistoRatio[0] = 50;
 
-	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Judge Marking Histo Ratio2"), NULL, szData, sizeof(szData), sPath))
+	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Judge Marking Histo Ratio Right"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.LastJob.nJudgeMkHistoRatio[1] = _ttoi(szData);
 	else
 		WorkingInfo.LastJob.nJudgeMkHistoRatio[1] = 50;
+
+	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Judge Marking Histo White Left"), NULL, szData, sizeof(szData), sPath))
+		WorkingInfo.LastJob.nJudgeMkHistoWhite[0] = max(min(_ttoi(szData), 240), 128); // Range : 128 ~ 240
+	else
+		WorkingInfo.LastJob.nJudgeMkHistoWhite[0] = 240;
+
+	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Judge Marking Histo White Right"), NULL, szData, sizeof(szData), sPath))
+		WorkingInfo.LastJob.nJudgeMkHistoWhite[1] = max(min(_ttoi(szData), 240), 128); // Range : 128 ~ 240
+	else
+		WorkingInfo.LastJob.nJudgeMkHistoWhite[1] = 240;
 
 	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Ultra Sonic Cleanner Start Time"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.LastJob.sUltraSonicCleannerStTim = CString(szData);
@@ -14934,6 +14944,16 @@ BOOL CGvisR2R_PunchDoc::LoadStatus()
 	else
 		pView->m_nSnTHREAD_UPDATAE_YIELD = 0;
 
+	if (0 < ::GetPrivateProfileString(_T("Thread"), _T("nSnTHREAD_UPDATAE_YIELD_ALL"), NULL, szData, sizeof(szData), sPath))
+		pView->m_nSnTHREAD_UPDATAE_YIELD_ALL = _ttoi(szData);
+	else
+		pView->m_nSnTHREAD_UPDATAE_YIELD_ALL = 0;
+
+	if (0 < ::GetPrivateProfileString(_T("Thread"), _T("nSnTHREAD_UPDATAE_YIELD_INNER_ALL"), NULL, szData, sizeof(szData), sPath))
+		pView->m_nSnTHREAD_UPDATAE_YIELD_INNER_ALL = _ttoi(szData);
+	else
+		pView->m_nSnTHREAD_UPDATAE_YIELD_INNER_ALL = 0;
+
 	if (0 < ::GetPrivateProfileString(_T("Thread"), _T("nSnTHREAD_UPDATAE_YIELD_ITS"), NULL, szData, sizeof(szData), sPath))
 		pView->m_nSnTHREAD_UPDATAE_YIELD_ITS = _ttoi(szData);
 	else
@@ -15456,7 +15476,6 @@ double CGvisR2R_PunchDoc::GetVerifyPunchScore2()
 
 double CGvisR2R_PunchDoc::GetVerifyPunchHistoScore()
 {
-	//return m_dVerifyPunchScore;
 	double dVerifyPunchScore = 50.0;
 #ifdef USE_VISION
 	if (pView->m_pVision[0])
@@ -15467,13 +15486,32 @@ double CGvisR2R_PunchDoc::GetVerifyPunchHistoScore()
 
 double CGvisR2R_PunchDoc::GetVerifyPunchHistoScore2()
 {
-	//return m_dVerifyPunchScore;
 	double dVerifyPunchScore = 50.0;
 #ifdef USE_VISION
 	if (pView->m_pVision[1])
 		dVerifyPunchScore = pView->m_pVision[1]->GetVerifyPunchHistoScore();
 #endif
 	return dVerifyPunchScore;
+}
+
+int CGvisR2R_PunchDoc::GetVerifyPunchHistoWhite()
+{
+	double dVerifyPunchWhite = 240.0;
+#ifdef USE_VISION
+	if (pView->m_pVision[0])
+		dVerifyPunchWhite = pView->m_pVision[0]->GetVerifyPunchHistoWhite();
+#endif
+	return dVerifyPunchWhite;
+}
+
+int CGvisR2R_PunchDoc::GetVerifyPunchHistoWhite2()
+{
+	double dVerifyPunchWhite = 240.0;
+#ifdef USE_VISION
+	if (pView->m_pVision[1])
+		dVerifyPunchWhite = pView->m_pVision[1]->GetVerifyPunchHistoWhite();
+#endif
+	return dVerifyPunchWhite;
 }
 
 void CGvisR2R_PunchDoc::SetVerifyPunchScore(double dScore)
@@ -15505,6 +15543,22 @@ void CGvisR2R_PunchDoc::SetVerifyPunchHistoScore2(double dScore)
 #ifdef USE_VISION
 	if (pView->m_pVision[1])
 		pView->m_pVision[1]->SetVerifyPunchHistoScore(dScore);
+#endif
+}
+
+void CGvisR2R_PunchDoc::SetVerifyPunchHistoWhite(int nDn)
+{
+#ifdef USE_VISION
+	if (pView->m_pVision[0])
+		pView->m_pVision[0]->SetVerifyPunchHistoWhite(nDn);
+#endif
+}
+
+void CGvisR2R_PunchDoc::SetVerifyPunchHistoWhite2(int nDn)
+{
+#ifdef USE_VISION
+	if (pView->m_pVision[1])
+		pView->m_pVision[1]->SetVerifyPunchHistoWhite(nDn);
 #endif
 }
 

@@ -278,8 +278,8 @@ public:
 	CString GetRmapPathOnOffline(int nRmap);
 	BOOL WriteOnOffline(int nSerial);
 	BOOL WriteLastRmapInfoOnOffline();
-	int GetFirstShotFromPcr();
-	int GetLastShotFromPcr();
+	int GetFirstShotFromPcrOnOffline();
+	int GetLastShotFromPcrOnOffline();
 	BOOL ReadYieldOffline(int nSerial, CString sPath);
 	BOOL WriteYieldOffline(int nSerial, CString sPath);
 
@@ -304,6 +304,10 @@ public:
 	BOOL SetPcsMkOut(int nCam, int nPcsIdx); // 0: Left Cam Or 1: Right Cam , 불량 피스 인덱스 [ 0 ~ (Total Pcs - 1) ]
 	BOOL ShiftMkedPcsDef();
 	BOOL ShiftMkedPcsDef(int nSerial);
+
+	BOOL WriteLastRmapInfo();
+	int GetFirstShotFromPcr();
+	int GetLastShotFromPcr();
 
 // Overrides
 	// ClassWizard generated virtual function overrides

@@ -615,12 +615,15 @@
 #define IDC_BTN_HOME_MOVE2              1184
 #define IDC_GRP_04                      1184
 #define IDC_STC_106                     1184
+#define IDC_STC_198                     1184
 #define IDC_STC_UP                      1185
 #define IDC_GRP_LT11                    1185
 #define IDC_CHK_0                       1185
+#define IDC_STC_199                     1185
 #define IDC_STC_DN                      1186
 #define IDC_STC_ALN2                    1186
 #define IDC_CHK_1                       1186
+#define IDC_STC_217                     1186
 #define IDC_STC_0030                    1187
 #define IDC_STC_LAYER2                  1187
 #define IDC_STC_ALN_X2                  1187
@@ -1028,6 +1031,7 @@
 #define IDC_STC_92                      1261
 #define IDC_STC_UTIL04_30               1261
 #define IDC_STATIC_1013                 1261
+#define IDC_STC_218                     1261
 #define IDC_CHK_31                      1262
 #define IDC_STC_93                      1262
 #define IDC_STC_UTIL04_31               1262

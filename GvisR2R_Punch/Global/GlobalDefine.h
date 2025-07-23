@@ -810,7 +810,7 @@ struct stLastJob
 	int nAlarmTimePunch, nAlarmTimeAoi;
 	BOOL bDispContRun, bDispLotEnd;
 	BOOL bUseJudgeMk, bUseJudgeMkHisto;
-	int nJudgeMkRatio[2], nJudgeMkHistoRatio[2];
+	int nJudgeMkRatio[2], nJudgeMkHistoRatio[2], nJudgeMkHistoWhite[2];
 
 	stLastJob()
 	{
@@ -874,6 +874,8 @@ struct stLastJob
 		nJudgeMkRatio[1] = 85;
 		nJudgeMkHistoRatio[0] = 50;
 		nJudgeMkHistoRatio[1] = 50;
+		nJudgeMkHistoWhite[0] = 240;
+		nJudgeMkHistoWhite[1] = 240;
 	}
 };
 

@@ -64,9 +64,9 @@ static GLfloat pos[]={200.0f,300.0f,400.0f,1.0f};                       //이것
 	{
 		Firstshow = TRUE;
 
-	int argc = 1;
-	char *argv[1] = { (char*)"Something" };
-	glutInit(&argc, argv);
+		int argc = 1;
+		char *argv[1] = { (char*)"Something" };
+		glutInit(&argc, argv);
 	}
 }
 

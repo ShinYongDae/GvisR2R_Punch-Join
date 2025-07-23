@@ -1,6 +1,6 @@
 #pragma once
 #include "afxwin.h"
-
+#include "../Global/GlobalDefine.h"
 #include "Render.h"
 #include "Tool.h"
 #include <list>
@@ -14,8 +14,9 @@ class CCamIRayple : public CWnd
 
 	CTool		m_mxTime;
 	CTool		m_mutexQue;
+#ifndef USE_MIL
 	CRender     m_Render;
-
+#endif
 	CWnd		*m_pParent;
 	int			m_nIdxCam;
 	HWND		m_hWndDisplay;		// handle to diplay window

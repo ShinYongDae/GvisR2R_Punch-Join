@@ -3821,64 +3821,6 @@ BOOL CReelMap::WriteYield(int nSerial, CString sPath)
 	// Writing Yield on file.
 	CString sData = MakeYield(nSerial, sPath);
 
-	//strMenu.Format(_T("%d"), nSerial);
-	//for (i = 1; i < MAX_DEF; i++)
-	//{
-	//	sCode.Format(_T("%d"), i);
-	//	sDefNum.Format(_T("%d"), m_stYield.nDefA[i]);
-	//	// [Info]
-	//	::WritePrivateProfileString(_T("Info"), sCode, sDefNum, sPath);
-	//	// [Serial]
-	//	::WritePrivateProfileString(strMenu, sCode, sDefNum, sPath);
-	//}
-	//// [Info]
-	//strData.Format(_T("%d"), nSerial);
-	//::WritePrivateProfileString(_T("Info"), _T("End Shot"), strData, sPath);
-	//strData.Format(_T("%d"), nSerial - m_nStartSerial + 1);
-	//::WritePrivateProfileString(_T("Info"), _T("Total Shot"), strData, sPath);
-	//strData.Format(_T("%d"), m_stYield.nTot);
-	//::WritePrivateProfileString(_T("Info"), _T("Total Pcs"), strData, sPath);
-	//strData.Format(_T("%d"), m_stYield.nGood);
-	//::WritePrivateProfileString(_T("Info"), _T("Good Pcs"), strData, sPath);
-	//strData.Format(_T("%d"), m_stYield.nDef);
-	//::WritePrivateProfileString(_T("Info"), _T("Bad Pcs"), strData, sPath);
-	//// [Serial]
-	//strData.Format(_T("%d"), m_stYield.nTot);
-	//::WritePrivateProfileString(strMenu, _T("Total Pcs"), strData, sPath);
-	//strData.Format(_T("%d"), m_stYield.nGood);
-	//::WritePrivateProfileString(strMenu, _T("Good Pcs"), strData, sPath);
-	//strData.Format(_T("%d"), m_stYield.nDef);
-	//::WritePrivateProfileString(strMenu, _T("Bad Pcs"), strData, sPath);
-	//for (k = 0; k < MAX_STRIP; k++)
-	//{
-	//	strItem.Format(_T("Strip%d"), k);
-	//	strData.Format(_T("%d"), m_stYield.nDefStrip[k]);
-	//	// [Info]
-	//	::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
-	//	// [Serial]
-	//	::WritePrivateProfileString(strMenu, strItem, strData, sPath);
-	//	strItem.Format(_T("StripOut_%d"), k);
-	//	strData.Format(_T("%d"), m_stYield.nStripOut[k]);
-	//	// [Info]
-	//	::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
-	//	// [Serial]
-	//	::WritePrivateProfileString(strMenu, strItem, strData, sPath);
-	//	for (i = 1; i < MAX_DEF; i++)
-	//	{
-	//		strItem.Format(_T("Strip%d_%d"), k, i);
-	//		strData.Format(_T("%d"), m_stYield.nDefPerStrip[k][i]);
-	//		// [Info]
-	//		::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
-	//		// [Serial]
-	//		::WritePrivateProfileString(strMenu, strItem, strData, sPath);
-	//	}
-	//}
-	//strData.Format(_T("%d"), m_stYield.nTotSriptOut);
-	//// [Info]
-	//::WritePrivateProfileString(_T("Info"), _T("StripOut_Total"), strData, sPath);
-	//// [Serial]
-	//::WritePrivateProfileString(strMenu, _T("StripOut_Total"), strData, sPath);
-
 	int dwEnd = GetTickCount();
 	int dwElapsed = dwEnd - dwStart;
 
@@ -5068,35 +5010,47 @@ CString CReelMap::GetSapp3Txt()
 	int nSum, nStripPcs;
 	double dRateBeforeVerify, dRateAfterVerify;
 	nStripPcs = m_stResult.nEntirePieceNum / MAX_STRIP_NUM;
+	//nStripPcs = m_stYield.nTot / MAX_STRIP_NUM;
 
 	// 파일 이름.
 	strFileData.Format(_T("FileName : %9s_%4s_%5s.txt\r\n\r\n"), m_stResult.sLot, m_stResult.sProcessNum, m_stResult.sMachin);
 
 	// 열별 투입/완성/수율 Data.
 	strFileData += _T("1Q\r\n");
+	//dRateBeforeVerify = 100.0 * (nStripPcs - m_stYield.nDefStrip[0]) / nStripPcs;
+	//dRateAfterVerify = 100.0 * (nStripPcs - m_stYield.nDefStrip[0]) / nStripPcs;
+	//strData.Format(_T("%d,%d,%.1f,%.1f\r\n"), nStripPcs, nStripPcs - m_stYield.nDefStrip[0], dRateBeforeVerify, dRateAfterVerify); // 투입수량, 완성수량, Verify전 수량, Verify후 수량
 	dRateBeforeVerify = 100.0 * (nStripPcs - m_stResult.nDefStrip[0]) / nStripPcs;
 	dRateAfterVerify = 100.0 * (nStripPcs - m_stResult.nDefStrip[0]) / nStripPcs;
 	strData.Format(_T("%d,%d,%.1f,%.1f\r\n"), nStripPcs, nStripPcs - m_stResult.nDefStrip[0], dRateBeforeVerify, dRateAfterVerify); // 투입수량, 완성수량, Verify전 수량, Verify후 수량
 	strFileData += strData;
 
 	strFileData += _T("2Q\r\n");
+	//dRateBeforeVerify = 100.0 * (nStripPcs - m_stYield.nDefStrip[1]) / nStripPcs;
+	//dRateAfterVerify = 100.0 * (nStripPcs - m_stYield.nDefStrip[1]) / nStripPcs;
+	//strData.Format(_T("%d,%d,%.1f,%.1f\r\n"), nStripPcs, nStripPcs - m_stYield.nDefStrip[1], dRateBeforeVerify, dRateAfterVerify); // 투입수량, 완성수량, Verify전 수량, Verify후 수량
 	dRateBeforeVerify = 100.0 * (nStripPcs - m_stResult.nDefStrip[1]) / nStripPcs;
 	dRateAfterVerify = 100.0 * (nStripPcs - m_stResult.nDefStrip[1]) / nStripPcs;
 	strData.Format(_T("%d,%d,%.1f,%.1f\r\n"), nStripPcs, nStripPcs - m_stResult.nDefStrip[1], dRateBeforeVerify, dRateAfterVerify); // 투입수량, 완성수량, Verify전 수량, Verify후 수량
 	strFileData += strData;
 
 	strFileData += _T("3Q\r\n");
+	//dRateBeforeVerify = 100.0 * (nStripPcs - m_stYield.nDefStrip[2]) / nStripPcs;
+	//dRateAfterVerify = 100.0 * (nStripPcs - m_stYield.nDefStrip[2]) / nStripPcs;
+	//strData.Format(_T("%d,%d,%.1f,%.1f\r\n"), nStripPcs, nStripPcs - m_stYield.nDefStrip[2], dRateBeforeVerify, dRateAfterVerify); // 투입수량, 완성수량, Verify전 수량, Verify후 수량
 	dRateBeforeVerify = 100.0 * (nStripPcs - m_stResult.nDefStrip[2]) / nStripPcs;
 	dRateAfterVerify = 100.0 * (nStripPcs - m_stResult.nDefStrip[2]) / nStripPcs;
 	strData.Format(_T("%d,%d,%.1f,%.1f\r\n"), nStripPcs, nStripPcs - m_stResult.nDefStrip[2], dRateBeforeVerify, dRateAfterVerify); // 투입수량, 완성수량, Verify전 수량, Verify후 수량
 	strFileData += strData;
 
 	strFileData += _T("4Q\r\n");
+	//dRateBeforeVerify = 100.0 * (nStripPcs - m_stYield.nDefStrip[3]) / nStripPcs;
+	//dRateAfterVerify = 100.0 * (nStripPcs - m_stYield.nDefStrip[3]) / nStripPcs;
+	//strData.Format(_T("%d,%d,%.1f,%.1f\r\n"), nStripPcs, nStripPcs - m_stYield.nDefStrip[3], dRateBeforeVerify, dRateAfterVerify); // 투입수량, 완성수량, Verify전 수량, Verify후 수량
 	dRateBeforeVerify = 100.0 * (nStripPcs - m_stResult.nDefStrip[3]) / nStripPcs;
 	dRateAfterVerify = 100.0 * (nStripPcs - m_stResult.nDefStrip[3]) / nStripPcs;
 	strData.Format(_T("%d,%d,%.1f,%.1f\r\n"), nStripPcs, nStripPcs - m_stResult.nDefStrip[3], dRateBeforeVerify, dRateAfterVerify); // 투입수량, 완성수량, Verify전 수량, Verify후 수량
 	strFileData += strData;
-
 
 	strFileData += _T("\r\n");
 
@@ -5104,12 +5058,15 @@ CString CReelMap::GetSapp3Txt()
 	// 열별 불량 Data.
 	strFileData += _T("1X\r\n");
 
+	//if (m_stYield.nDefPerStrip[0][DEF_OPEN] > 0 && pDoc->m_nSapp3Code[SAPP3_OPEN] > 0)
 	if (m_stResult.nDefPerStrip[0][DEF_OPEN] > 0 && pDoc->m_nSapp3Code[SAPP3_OPEN] > 0)
 	{
+		//strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_OPEN], m_stYield.nDefPerStrip[0][DEF_OPEN]); // 오픈(B102)
 		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_OPEN], m_stResult.nDefPerStrip[0][DEF_OPEN]); // 오픈(B102)
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[0][DEF_SHORT];
 	nSum = m_stResult.nDefPerStrip[0][DEF_SHORT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SHORT] > 0)
 	{
@@ -5117,13 +5074,15 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
-	nSum = m_stResult.nDefPerStrip[0][DEF_USHORT];
+	nSum = m_stYield.nDefPerStrip[0][DEF_USHORT];
+	//nSum = m_stResult.nDefPerStrip[0][DEF_USHORT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_USHORT] > 0)
 	{
 		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_USHORT], nSum); // u쇼트(B314)
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[0][DEF_NICK] + m_stYield.nDefPerStrip[0][DEF_EDGE_NICK];
 	nSum = m_stResult.nDefPerStrip[0][DEF_NICK] + m_stResult.nDefPerStrip[0][DEF_EDGE_NICK];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
 	{
@@ -5131,6 +5090,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[0][DEF_SPACE] + m_stYield.nDefPerStrip[0][DEF_EXTRA] + m_stYield.nDefPerStrip[0][DEF_PROTRUSION] + m_stYield.nDefPerStrip[0][DEF_EDGE_SPACE] + m_stYield.nDefPerStrip[0][DEF_EDGE_PROT];
 	nSum = m_stResult.nDefPerStrip[0][DEF_SPACE] + m_stResult.nDefPerStrip[0][DEF_EXTRA] + m_stResult.nDefPerStrip[0][DEF_PROTRUSION] + m_stResult.nDefPerStrip[0][DEF_EDGE_SPACE] + m_stResult.nDefPerStrip[0][DEF_EDGE_PROT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] > 0)
 	{
@@ -5138,6 +5098,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[0][DEF_PINHOLE];
 	nSum = m_stResult.nDefPerStrip[0][DEF_PINHOLE];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_PINHOLE] > 0)
 	{
@@ -5145,6 +5106,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[0][DEF_PAD];
 	nSum = m_stResult.nDefPerStrip[0][DEF_PAD];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_PAD] > 0)
 	{
@@ -5154,9 +5116,11 @@ CString CReelMap::GetSapp3Txt()
 
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_HOPEN] > 0)
 	{
+		//strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_HOPEN], m_stYield.nDefPerStrip[0][DEF_HOLE_OPEN]);
 		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_HOPEN], m_stResult.nDefPerStrip[0][DEF_HOLE_OPEN]);
 		strFileData += strData;
 	}
+	//nSum = m_stYield.nDefPerStrip[0][DEF_HOLE_MISS] + m_stYield.nDefPerStrip[0][DEF_HOLE_POSITION] + m_stYield.nDefPerStrip[0][DEF_HOLE_DEFECT];
 	nSum = m_stResult.nDefPerStrip[0][DEF_HOLE_MISS] + m_stResult.nDefPerStrip[0][DEF_HOLE_POSITION] + m_stResult.nDefPerStrip[0][DEF_HOLE_DEFECT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_HMISS_HPOS_HBAD] > 0)
 	{
@@ -5164,6 +5128,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[0][DEF_VH_OPEN] + m_stYield.nDefPerStrip[0][DEF_VH_MISS] + m_stYield.nDefPerStrip[0][DEF_VH_POSITION] + m_stYield.nDefPerStrip[0][DEF_VH_DEF];
 	nSum = m_stResult.nDefPerStrip[0][DEF_VH_OPEN] + m_stResult.nDefPerStrip[0][DEF_VH_MISS] + m_stResult.nDefPerStrip[0][DEF_VH_POSITION] + m_stResult.nDefPerStrip[0][DEF_VH_DEF];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_VHOPEN_NOVH_VHALIGN_VHDEF] > 0)
 	{
@@ -5173,12 +5138,15 @@ CString CReelMap::GetSapp3Txt()
 
 	strFileData += _T("2X\r\n");
 
+	//if (m_stYield.nDefPerStrip[1][DEF_OPEN] > 0 && pDoc->m_nSapp3Code[SAPP3_OPEN] > 0)
 	if (m_stResult.nDefPerStrip[1][DEF_OPEN] > 0 && pDoc->m_nSapp3Code[SAPP3_OPEN] > 0)
 	{
+		//strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_OPEN], m_stYield.nDefPerStrip[1][DEF_OPEN]); // 오픈(B102)
 		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_OPEN], m_stResult.nDefPerStrip[1][DEF_OPEN]); // 오픈(B102)
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[1][DEF_SHORT];
 	nSum = m_stResult.nDefPerStrip[1][DEF_SHORT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SHORT] > 0)
 	{
@@ -5186,6 +5154,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[1][DEF_USHORT];
 	nSum = m_stResult.nDefPerStrip[1][DEF_USHORT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_USHORT] > 0)
 	{
@@ -5193,6 +5162,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[1][DEF_NICK] + m_stYield.nDefPerStrip[1][DEF_EDGE_NICK];
 	nSum = m_stResult.nDefPerStrip[1][DEF_NICK] + m_stResult.nDefPerStrip[1][DEF_EDGE_NICK];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
 	{
@@ -5200,6 +5170,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[1][DEF_SPACE] + m_stYield.nDefPerStrip[1][DEF_EXTRA] + m_stYield.nDefPerStrip[1][DEF_PROTRUSION] + m_stYield.nDefPerStrip[1][DEF_EDGE_SPACE] + m_stYield.nDefPerStrip[1][DEF_EDGE_PROT];
 	nSum = m_stResult.nDefPerStrip[1][DEF_SPACE] + m_stResult.nDefPerStrip[1][DEF_EXTRA] + m_stResult.nDefPerStrip[1][DEF_PROTRUSION] + m_stResult.nDefPerStrip[1][DEF_EDGE_SPACE] + m_stResult.nDefPerStrip[1][DEF_EDGE_PROT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] > 0)
 	{
@@ -5207,6 +5178,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[1][DEF_PINHOLE];
 	nSum = m_stResult.nDefPerStrip[1][DEF_PINHOLE];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_PINHOLE] > 0)
 	{
@@ -5214,6 +5186,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[1][DEF_PAD];
 	nSum = m_stResult.nDefPerStrip[1][DEF_PAD];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_PAD] > 0)
 	{
@@ -5223,10 +5196,12 @@ CString CReelMap::GetSapp3Txt()
 
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_HOPEN] > 0)
 	{
+		//strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_HOPEN], m_stYield.nDefPerStrip[2][DEF_HOLE_OPEN]);
 		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_HOPEN], m_stResult.nDefPerStrip[2][DEF_HOLE_OPEN]);
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[1][DEF_HOLE_MISS] + m_stYield.nDefPerStrip[1][DEF_HOLE_POSITION] + m_stYield.nDefPerStrip[1][DEF_HOLE_DEFECT];
 	nSum = m_stResult.nDefPerStrip[1][DEF_HOLE_MISS] + m_stResult.nDefPerStrip[1][DEF_HOLE_POSITION] + m_stResult.nDefPerStrip[1][DEF_HOLE_DEFECT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_HMISS_HPOS_HBAD] > 0)
 	{
@@ -5234,6 +5209,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[1][DEF_VH_OPEN] + m_stYield.nDefPerStrip[1][DEF_VH_MISS] + m_stYield.nDefPerStrip[1][DEF_VH_POSITION] + m_stYield.nDefPerStrip[1][DEF_VH_DEF];
 	nSum = m_stResult.nDefPerStrip[1][DEF_VH_OPEN] + m_stResult.nDefPerStrip[1][DEF_VH_MISS] + m_stResult.nDefPerStrip[1][DEF_VH_POSITION] + m_stResult.nDefPerStrip[1][DEF_VH_DEF];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_VHOPEN_NOVH_VHALIGN_VHDEF] > 0)
 	{
@@ -5244,12 +5220,15 @@ CString CReelMap::GetSapp3Txt()
 
 	strFileData += _T("3X\r\n");
 
+	//if (m_stYield.nDefPerStrip[2][DEF_OPEN] > 0 && pDoc->m_nSapp3Code[SAPP3_OPEN] > 0)
 	if (m_stResult.nDefPerStrip[2][DEF_OPEN] > 0 && pDoc->m_nSapp3Code[SAPP3_OPEN] > 0)
 	{
+		//strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_OPEN], m_stYield.nDefPerStrip[2][DEF_OPEN]); // 오픈(B102)
 		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_OPEN], m_stResult.nDefPerStrip[2][DEF_OPEN]); // 오픈(B102)
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[2][DEF_SHORT];
 	nSum = m_stResult.nDefPerStrip[2][DEF_SHORT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SHORT] > 0)
 	{
@@ -5257,6 +5236,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[2][DEF_USHORT];
 	nSum = m_stResult.nDefPerStrip[2][DEF_USHORT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_USHORT] > 0)
 	{
@@ -5264,6 +5244,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[2][DEF_NICK] + m_stYield.nDefPerStrip[2][DEF_EDGE_NICK];
 	nSum = m_stResult.nDefPerStrip[2][DEF_NICK] + m_stResult.nDefPerStrip[2][DEF_EDGE_NICK];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
 	{
@@ -5271,6 +5252,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[2][DEF_SPACE] + m_stYield.nDefPerStrip[2][DEF_EXTRA] + m_stYield.nDefPerStrip[2][DEF_PROTRUSION] + m_stYield.nDefPerStrip[2][DEF_EDGE_SPACE] + m_stYield.nDefPerStrip[2][DEF_EDGE_PROT];
 	nSum = m_stResult.nDefPerStrip[2][DEF_SPACE] + m_stResult.nDefPerStrip[2][DEF_EXTRA] + m_stResult.nDefPerStrip[2][DEF_PROTRUSION] + m_stResult.nDefPerStrip[2][DEF_EDGE_SPACE] + m_stResult.nDefPerStrip[2][DEF_EDGE_PROT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] > 0)
 	{
@@ -5278,6 +5260,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[2][DEF_PINHOLE];
 	nSum = m_stResult.nDefPerStrip[2][DEF_PINHOLE];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_PINHOLE] > 0)
 	{
@@ -5285,6 +5268,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[2][DEF_PAD];
 	nSum = m_stResult.nDefPerStrip[2][DEF_PAD];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_PAD] > 0)
 	{
@@ -5294,10 +5278,12 @@ CString CReelMap::GetSapp3Txt()
 
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_HOPEN] > 0)
 	{
+		//strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_HOPEN], m_stYield.nDefPerStrip[2][DEF_HOLE_OPEN]);
 		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_HOPEN], m_stResult.nDefPerStrip[2][DEF_HOLE_OPEN]);
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[2][DEF_HOLE_MISS] + m_stYield.nDefPerStrip[2][DEF_HOLE_POSITION] + m_stYield.nDefPerStrip[2][DEF_HOLE_DEFECT];
 	nSum = m_stResult.nDefPerStrip[2][DEF_HOLE_MISS] + m_stResult.nDefPerStrip[2][DEF_HOLE_POSITION] + m_stResult.nDefPerStrip[2][DEF_HOLE_DEFECT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_HMISS_HPOS_HBAD] > 0)
 	{
@@ -5305,6 +5291,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[2][DEF_VH_OPEN] + m_stYield.nDefPerStrip[2][DEF_VH_MISS] + m_stYield.nDefPerStrip[2][DEF_VH_POSITION] + m_stYield.nDefPerStrip[2][DEF_VH_DEF];
 	nSum = m_stResult.nDefPerStrip[2][DEF_VH_OPEN] + m_stResult.nDefPerStrip[2][DEF_VH_MISS] + m_stResult.nDefPerStrip[2][DEF_VH_POSITION] + m_stResult.nDefPerStrip[2][DEF_VH_DEF];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_VHOPEN_NOVH_VHALIGN_VHDEF] > 0)
 	{
@@ -5315,12 +5302,15 @@ CString CReelMap::GetSapp3Txt()
 
 	strFileData += _T("4X\r\n");
 
+	//if (m_stYield.nDefPerStrip[3][DEF_OPEN] > 0 && pDoc->m_nSapp3Code[SAPP3_OPEN] > 0)
 	if (m_stResult.nDefPerStrip[3][DEF_OPEN] > 0 && pDoc->m_nSapp3Code[SAPP3_OPEN] > 0)
 	{
+		//strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_OPEN], m_stYield.nDefPerStrip[3][DEF_OPEN]); // 오픈(B102)
 		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_OPEN], m_stResult.nDefPerStrip[3][DEF_OPEN]); // 오픈(B102)
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[3][DEF_SHORT];
 	nSum = m_stResult.nDefPerStrip[3][DEF_SHORT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SHORT] > 0)
 	{
@@ -5328,6 +5318,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[3][DEF_USHORT];
 	nSum = m_stResult.nDefPerStrip[3][DEF_USHORT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_USHORT] > 0)
 	{
@@ -5335,6 +5326,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[3][DEF_NICK] + m_stYield.nDefPerStrip[3][DEF_EDGE_NICK];
 	nSum = m_stResult.nDefPerStrip[3][DEF_NICK] + m_stResult.nDefPerStrip[3][DEF_EDGE_NICK];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_NICK] > 0)
 	{
@@ -5342,6 +5334,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[3][DEF_SPACE] + m_stYield.nDefPerStrip[3][DEF_EXTRA] + m_stYield.nDefPerStrip[3][DEF_PROTRUSION] + m_stYield.nDefPerStrip[3][DEF_EDGE_SPACE] + m_stYield.nDefPerStrip[3][DEF_EDGE_PROT];
 	nSum = m_stResult.nDefPerStrip[3][DEF_SPACE] + m_stResult.nDefPerStrip[3][DEF_EXTRA] + m_stResult.nDefPerStrip[3][DEF_PROTRUSION] + m_stResult.nDefPerStrip[3][DEF_EDGE_SPACE] + m_stResult.nDefPerStrip[3][DEF_EDGE_PROT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] > 0)
 	{
@@ -5349,6 +5342,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[3][DEF_PINHOLE];
 	nSum = m_stResult.nDefPerStrip[3][DEF_PINHOLE];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_PINHOLE] > 0)
 	{
@@ -5356,6 +5350,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[3][DEF_PAD];
 	nSum = m_stResult.nDefPerStrip[3][DEF_PAD];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_PAD] > 0)
 	{
@@ -5365,10 +5360,12 @@ CString CReelMap::GetSapp3Txt()
 
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_HOPEN] > 0)
 	{
+		//strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_HOPEN], m_stYield.nDefPerStrip[3][DEF_HOLE_OPEN]);
 		strData.Format(_T("B%d,%d\r\n"), pDoc->m_nSapp3Code[SAPP3_HOPEN], m_stResult.nDefPerStrip[3][DEF_HOLE_OPEN]);
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[3][DEF_HOLE_MISS] + m_stYield.nDefPerStrip[3][DEF_HOLE_POSITION] + m_stYield.nDefPerStrip[3][DEF_HOLE_DEFECT];
 	nSum = m_stResult.nDefPerStrip[3][DEF_HOLE_MISS] + m_stResult.nDefPerStrip[3][DEF_HOLE_POSITION] + m_stResult.nDefPerStrip[3][DEF_HOLE_DEFECT];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_HMISS_HPOS_HBAD] > 0)
 	{
@@ -5376,6 +5373,7 @@ CString CReelMap::GetSapp3Txt()
 		strFileData += strData;
 	}
 
+	//nSum = m_stYield.nDefPerStrip[3][DEF_VH_OPEN] + m_stYield.nDefPerStrip[3][DEF_VH_MISS] + m_stYield.nDefPerStrip[3][DEF_VH_POSITION] + m_stYield.nDefPerStrip[3][DEF_VH_DEF];
 	nSum = m_stResult.nDefPerStrip[3][DEF_VH_OPEN] + m_stResult.nDefPerStrip[3][DEF_VH_MISS] + m_stResult.nDefPerStrip[3][DEF_VH_POSITION] + m_stResult.nDefPerStrip[3][DEF_VH_DEF];
 	if (nSum > 0 && pDoc->m_nSapp3Code[SAPP3_VHOPEN_NOVH_VHALIGN_VHDEF] > 0)
 	{
@@ -5388,7 +5386,6 @@ CString CReelMap::GetSapp3Txt()
 	strData.Format(_T("%.2f"), m_stResult.dEntireSpeed);
 	strFileData += strData;
 	strFileData += _T("\r\n");
-
 
 	return strFileData;
 }
@@ -6381,15 +6378,15 @@ BOOL CReelMap::WriteLastRmapInfoOnOffline()
 	::WritePrivateProfileString(_T("Info"), _T("Lot Start"), sLotStart, sPath);
 	::WritePrivateProfileString(_T("Info"), _T("Lot Run"), sLotRun, sPath);
 	::WritePrivateProfileString(_T("Info"), _T("Lot End"), sLotEnd, sPath);
-	sVal.Format(_T("%d"), GetFirstShotFromPcr());
+	sVal.Format(_T("%d"), GetFirstShotFromPcrOnOffline());
 	::WritePrivateProfileString(_T("Info"), _T("Start Serial"), sVal, sPath);
-	sVal.Format(_T("%d"), GetLastShotFromPcr());
+	sVal.Format(_T("%d"), GetLastShotFromPcrOnOffline());
 	::WritePrivateProfileString(_T("Info"), _T("End Serial"), sVal, sPath);
 
 	return TRUE;
 }
 
-int CReelMap::GetFirstShotFromPcr()
+int CReelMap::GetFirstShotFromPcrOnOffline()
 {
 	CString sPath;
 	CString sFileN, sRmapPath;
@@ -6445,7 +6442,7 @@ int CReelMap::GetFirstShotFromPcr()
 	return nFirstShot;
 }
 
-int CReelMap::GetLastShotFromPcr()
+int CReelMap::GetLastShotFromPcrOnOffline()
 {
 	CString sPath;
 	CString sFileN, sRmapPath;
@@ -7869,4 +7866,231 @@ CString CReelMap::MakeYield(int nSerial, CString sPath)
 	::WritePrivateProfileString(strMenu, _T("StripOut_Total"), strData, sPath);
 
 	return sData;
+}
+
+BOOL CReelMap::WriteLastRmapInfo()
+{
+	CFileFind findfile;
+
+	CString sVal, sMsg, sPath;
+
+	sPath = GetRmapPath(m_nLayer);
+	if (!findfile.FindFile(sPath))
+	{
+		sMsg.Format(_T("Reelmap이 존재하지 않습니다.\r\n%s"), sPath);
+		pView->MsgBox(sMsg);
+		return FALSE;
+	}
+
+	CString sProcessCode, sEntireSpeed, sLotStart, sLotRun, sLotEnd;
+	int nLastShot, nCompletedShot;
+	TCHAR szData[MAX_PATH];
+
+	if (0 < ::GetPrivateProfileString(_T("Info"), _T("Completed Shot"), NULL, szData, sizeof(szData), sPath))
+		nCompletedShot = _tstoi(szData);
+	else
+		nCompletedShot = 0; // Failed.
+
+	if (0 < ::GetPrivateProfileString(_T("Info"), _T("Marked Shot"), NULL, szData, sizeof(szData), sPath))
+		nLastShot = _tstoi(szData);
+	else
+	{
+		nLastShot = 0; // Failed.
+		pView->MsgBox(_T("릴맵에 Marked Shot 정보가 없습니다."));
+		return FALSE;
+	}
+
+	// 공종코드
+	if (0 < ::GetPrivateProfileString(_T("Info"), _T("Process Code"), NULL, szData, sizeof(szData), sPath))
+		sProcessCode = CString(szData);
+	else
+		sProcessCode = _T("");
+
+	// 속도
+	if (0 < ::GetPrivateProfileString(_T("Info"), _T("Entire Speed"), NULL, szData, sizeof(szData), sPath))
+		sEntireSpeed = CString(szData);
+	else
+		sEntireSpeed = _T("0.0");
+
+	if (0 < ::GetPrivateProfileString(_T("Info"), _T("Lot Start"), NULL, szData, sizeof(szData), sPath))
+		sLotStart = CString(szData);
+	else
+		sLotStart = _T("");
+
+	if (0 < ::GetPrivateProfileString(_T("Info"), _T("Lot Run"), NULL, szData, sizeof(szData), sPath))
+		sLotRun = CString(szData);
+	else
+		sLotRun = _T("");
+
+	if (0 < ::GetPrivateProfileString(_T("Info"), _T("Lot End"), NULL, szData, sizeof(szData), sPath))
+		sLotEnd = CString(szData);
+	else
+		sLotEnd = _T("");
+
+
+	int k, i;
+	CString strMenu, strItem, sCode, sDefNum, strData;
+
+
+	// 수율 정보 ===================================================================
+	strData.Format(_T("%d"), m_stYield.nTot);
+	::WritePrivateProfileString(_T("Info"), _T("Total Pcs"), strData, sPath);
+	strData.Format(_T("%d"), m_stYield.nGood);
+	::WritePrivateProfileString(_T("Info"), _T("Good Pcs"), strData, sPath);
+	strData.Format(_T("%d"), m_stYield.nDef);
+	::WritePrivateProfileString(_T("Info"), _T("Bad Pcs"), strData, sPath);
+
+	for (i = 1; i < MAX_DEF; i++)
+	{
+		m_nDef[i] = m_stYield.nDefA[i];
+		sCode.Format(_T("%d"), i);
+		sDefNum.Format(_T("%d"), m_nDef[i]);
+		::WritePrivateProfileString(_T("Info"), sCode, sDefNum, sPath);
+	}
+
+	int nTotStOut = 0;
+	for (k = 0; k < MAX_STRIP; k++)
+	{
+		strItem.Format(_T("Strip%d"), k);
+		m_nDefStrip[k] = m_stYield.nDefStrip[k];
+		strData.Format(_T("%d"), m_nDefStrip[k]);
+		::WritePrivateProfileString(_T("Info"), strItem, strData, sPath);
+
+		strItem.Format(_T("%d"), k);
+		m_nStripOut[k] = m_stYield.nStripOut[k];
+		strData.Format(_T("%d"), m_nStripOut[k]);
+		::WritePrivateProfileString(_T("StripOut"), strItem, strData, sPath);
+
+		for (i = 1; i < MAX_DEF; i++)
+		{
+			strMenu.Format(_T("Strip%d"), k);
+			strItem.Format(_T("%d"), i);
+			m_nDefPerStrip[k][i] = m_stYield.nDefPerStrip[k][i];
+			strData.Format(_T("%d"), m_nDefPerStrip[k][i]);
+			::WritePrivateProfileString(strMenu, strItem, strData, sPath);
+		}
+	}
+	strData.Format(_T("%d"), m_stYield.nTotSriptOut);
+	::WritePrivateProfileString(_T("StripOut"), _T("Total"), strData, sPath);
+
+	//=====================================================================================
+
+	sVal.Format(_T("%d"), GetFirstShotFromPcr());
+	::WritePrivateProfileString(_T("Info"), _T("Start Serial"), sVal, sPath);
+	sVal.Format(_T("%d"), GetLastShotFromPcr());
+	::WritePrivateProfileString(_T("Info"), _T("End Serial"), sVal, sPath);
+
+	return TRUE;
+}
+
+int CReelMap::GetFirstShotFromPcr()
+{
+	CString sPath;
+	CString sFileN, sRmapPath;
+
+	sRmapPath = GetRmapPath(m_nLayer);
+	int nPos = sRmapPath.ReverseFind('\\');
+	if (nPos != -1)
+	{
+		sFileN = sRmapPath.Right(sRmapPath.GetLength() - nPos - 1);
+		sRmapPath.Delete(nPos, sRmapPath.GetLength() - nPos);
+	}
+
+	sPath = sRmapPath + _T("\\*.pcr");
+
+	// 검색할 경로 및 파일
+	// 특정 확장자를 갖는 파일을 검색하고 싶으면 '경로/*.pcr' 등으로 사용
+
+	// 검색 클래스
+	CFileFind finder;
+
+	// CFileFind는 파일, 디렉터리가 존재하면 TRUE 를 반환함
+	BOOL bWorking = finder.FindFile(sPath);
+
+	CString fileName;
+	CString DirName;
+	int nSerial = 0, nFirstShot = 100000;
+
+	while (bWorking)
+	{
+		//다음 파일 or 폴더 가 존재하면다면 TRUE 반환
+		bWorking = finder.FindNextFile();
+
+		// folder 일 경우는 continue
+		if (finder.IsDirectory() || finder.IsDots())
+			continue;
+
+		// 파일 일때
+		// 파일의 이름
+		CString _fileName = finder.GetFileName();
+
+		// 현재폴더 상위폴더 썸네일파일은 제외
+		if (_fileName == _T("Thumbs.db")) continue;
+
+		fileName = finder.GetFileTitle();
+
+		//읽어온 파일 이름에서 LastShot 번호를 찾는다.
+		nSerial = _tstoi(fileName);
+
+		if (nSerial < nFirstShot)
+			nFirstShot = nSerial;
+	}
+
+	return nFirstShot;
+}
+
+int CReelMap::GetLastShotFromPcr()
+{
+	CString sPath;
+	CString sFileN, sRmapPath;
+
+	sRmapPath = GetRmapPath(m_nLayer);
+	int nPos = sRmapPath.ReverseFind('\\');
+	if (nPos != -1)
+	{
+		sFileN = sRmapPath.Right(sRmapPath.GetLength() - nPos - 1);
+		sRmapPath.Delete(nPos, sRmapPath.GetLength() - nPos);
+	}
+
+	sPath = sRmapPath + _T("\\*.pcr");
+
+	// 검색할 경로 및 파일
+	// 특정 확장자를 갖는 파일을 검색하고 싶으면 '경로/*.pcr' 등으로 사용
+
+	// 검색 클래스
+	CFileFind finder;
+
+	// CFileFind는 파일, 디렉터리가 존재하면 TRUE 를 반환함
+	BOOL bWorking = finder.FindFile(sPath);
+
+	CString fileName;
+	CString DirName;
+	int nSerial = 0, nLastShot = 0;
+
+	while (bWorking)
+	{
+		//다음 파일 or 폴더 가 존재하면다면 TRUE 반환
+		bWorking = finder.FindNextFile();
+
+		// folder 일 경우는 continue
+		if (finder.IsDirectory() || finder.IsDots())
+			continue;
+
+		// 파일 일때
+		// 파일의 이름
+		CString _fileName = finder.GetFileName();
+
+		// 현재폴더 상위폴더 썸네일파일은 제외
+		if (_fileName == _T("Thumbs.db")) continue;
+
+		fileName = finder.GetFileTitle();
+
+		//읽어온 파일 이름에서 LastShot 번호를 찾는다.
+		nSerial = _tstoi(fileName);
+
+		if (nSerial > nLastShot)
+			nLastShot = nSerial;
+	}
+
+	return nLastShot;
 }

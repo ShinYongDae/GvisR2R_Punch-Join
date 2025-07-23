@@ -440,7 +440,7 @@ public:
 	BOOL m_bTHREAD_DISP_DEF;
 	int	m_nStepTHREAD_DISP_DEF;
 	BOOL m_bTHREAD_UPDATAE_YIELD[2];		// [0] : Cam0, [1] : Cam1
-	int	m_nSerialTHREAD_UPDATAE_YIELD[2];	// [0] : Cam0, [1] : Cam1
+	int	m_nSerialTHREAD_UPDATAE_YIELD[2];	// [0] : Cam0, [1] : Cam1 - 마킹 중인 버퍼의 시리얼
 	BOOL m_bTHREAD_SHIFT2MK;// [2];		// [0] : Cam0, [1] : Cam1
 	BOOL m_bTHREAD_UPDATE_REELMAP_UP, m_bTHREAD_UPDATE_REELMAP_ALLUP;
 	BOOL m_bTHREAD_UPDATE_REELMAP_DN, m_bTHREAD_UPDATE_REELMAP_ALLDN;
@@ -457,7 +457,7 @@ public:
 	BOOL m_bTHREAD_UPDATE_YIELD_ITS;
 	BOOL m_bTHREAD_UPDATE_YIELD_INNER_UP, m_bTHREAD_UPDATE_YIELD_INNER_ALLUP;
 	BOOL m_bTHREAD_UPDATE_YIELD_INNER_DN, m_bTHREAD_UPDATE_YIELD_INNER_ALLDN;
-	int	m_nSnTHREAD_UPDATAE_YIELD, m_nSnTHREAD_UPDATAE_YIELD_ITS;
+	int	m_nSnTHREAD_UPDATAE_YIELD, m_nSnTHREAD_UPDATAE_YIELD_ALL, m_nSnTHREAD_UPDATAE_YIELD_ITS, m_nSnTHREAD_UPDATAE_YIELD_INNER_ALL;
 
 	void UpdateReelmapYieldUp();
 	void UpdateReelmapYieldAllUp();
@@ -767,7 +767,7 @@ public:
 	void WriteLastRMapUpAllInfoOnOffline();
 	void WriteLastRMapDnAllInfoOnOffline();
 	void DeleteReelmapOnOffline();
-	BOOL WriteLastRmapInfo(int nLastShot, int nOffline);
+	BOOL WriteLastRmapInfoOnOffline(int nLastShot, int nOffline);
 	int GetLastShotFromPcr(int nOffline);
 	BOOL RemakeRmapFromPcr(int nLastShot, int nOffline);
 	void ResetYield(int nOffline=3); // [nOffline] 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
@@ -1124,6 +1124,7 @@ public:
 	void GetResult();
 	void MakeResult();
 	void MakeResultIts();
+	BOOL WriteLastRmapInfo();
 	void MakeResultMDS();
 
 	BOOL MoveMeasPos(int nId); // Elec Chk

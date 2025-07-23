@@ -10,8 +10,8 @@
 #include "MyBtn.h"
 #include "MyStatic.h"
 
-#define MAX_INFO_STC				80
-#define MAX_INFO_STC_DATA			27
+#define MAX_INFO_STC				82
+#define MAX_INFO_STC_DATA			29
 #define MAX_INFO_BTN				32
 
 #define TIM_DISP_STS				450
@@ -142,6 +142,8 @@ public:
 	afx_msg void OnStnClickedStc193();
 	afx_msg void OnStnClickedStc195();
 	afx_msg void OnStnClickedStc91();
+	afx_msg void OnStnClickedStc199();
+	afx_msg void OnStnClickedStc218();
 };
 
 //{{AFX_INSERT_LOCATION}}

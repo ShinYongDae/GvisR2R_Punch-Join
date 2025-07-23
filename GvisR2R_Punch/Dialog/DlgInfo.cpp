@@ -121,6 +121,8 @@ BEGIN_MESSAGE_MAP(CDlgInfo, CDialog)
 	ON_STN_CLICKED(IDC_STC_193, &CDlgInfo::OnStnClickedStc193)
 	ON_STN_CLICKED(IDC_STC_195, &CDlgInfo::OnStnClickedStc195)
 	ON_STN_CLICKED(IDC_STC_91, &CDlgInfo::OnStnClickedStc91)
+	ON_STN_CLICKED(IDC_STC_199, &CDlgInfo::OnStnClickedStc199)
+	ON_STN_CLICKED(IDC_STC_218, &CDlgInfo::OnStnClickedStc218)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -502,6 +504,8 @@ void CDlgInfo::InitStcTitle()
 	myStcTitle[77].SubclassDlgItem(IDC_STC_194, this);
 	myStcTitle[78].SubclassDlgItem(IDC_STC_196, this);
 	myStcTitle[79].SubclassDlgItem(IDC_STC_197, this);
+	myStcTitle[80].SubclassDlgItem(IDC_STC_217, this);
+	myStcTitle[81].SubclassDlgItem(IDC_STC_198, this);
 
 	for(int i=0; i<MAX_INFO_STC; i++)
 	{
@@ -555,6 +559,7 @@ void CDlgInfo::InitStcTitle()
 		case 75:
 		case 77:
 		case 79:
+		case 80:
 			myStcTitle[i].SetTextColor(RGB_NAVY);
 			myStcTitle[i].SetBkColor(RGB_WHITE);
 			myStcTitle[i].SetFontBold(TRUE);
@@ -603,6 +608,9 @@ void CDlgInfo::InitStcData()
 	myStcData[24].SubclassDlgItem(IDC_STC_193, this);	// 마킹부 마킹여부 확인 마킹크기일치율 L
 	myStcData[25].SubclassDlgItem(IDC_STC_195, this);	// 마킹부 마킹여부 확인 마킹크기일치율 R
 	myStcData[26].SubclassDlgItem(IDC_STC_91, this);	// 마킹부 마킹여부 마킹크기
+
+	myStcData[27].SubclassDlgItem(IDC_STC_199, this);	// 마킹부 마킹여부 확인 White Dn L
+	myStcData[28].SubclassDlgItem(IDC_STC_218, this);	// 마킹부 마킹여부 확인 White Dn R
 
 	for(int i=0; i<MAX_INFO_STC_DATA; i++)
 	{
@@ -724,6 +732,12 @@ void CDlgInfo::Disp()
 
 	str.Format(_T("%d"), pDoc->m_nJudgeMkModelHistoSize); // [um]
 	myStcData[26].SetText(str);
+
+	str.Format(_T("%d"), pDoc->WorkingInfo.LastJob.nJudgeMkHistoWhite[0]);
+	myStcData[27].SetText(str);
+
+	str.Format(_T("%d"), pDoc->WorkingInfo.LastJob.nJudgeMkHistoWhite[1]);
+	myStcData[28].SetText(str);
 
 	//pDoc->WorkingInfo.LastJob.bRclDrSen = pView->MpeRead(pView->Plc.DlgInfo.LampDoorSensorRecoiler) ? TRUE : FALSE; // LampDoorSensorRecoiler = _T("MB400219");
 	pDoc->WorkingInfo.LastJob.bRclDrSen = pDoc->m_pMpeSignal[1] & (0x01 << 9);
@@ -2730,7 +2744,7 @@ void CDlgInfo::OnStnClickedStc193()
 	pDoc->WorkingInfo.LastJob.nJudgeMkHistoRatio[0] = _ttoi(sVal);
 	pDoc->SetVerifyPunchHistoScore(_ttof(sVal));
 
-	::WritePrivateProfileString(_T("Last Job"), _T("Judge Marking Histo Ratio"), sVal, PATH_WORKING_INFO);
+	::WritePrivateProfileString(_T("Last Job"), _T("Judge Marking Histo Ratio Left"), sVal, PATH_WORKING_INFO);
 }
 
 
@@ -2753,7 +2767,7 @@ void CDlgInfo::OnStnClickedStc195()
 	pDoc->WorkingInfo.LastJob.nJudgeMkHistoRatio[1] = _ttoi(sVal);
 	pDoc->SetVerifyPunchHistoScore2(_ttof(sVal));
 
-	::WritePrivateProfileString(_T("Last Job"), _T("Judge Marking Histo Ratio2"), sVal, PATH_WORKING_INFO);
+	::WritePrivateProfileString(_T("Last Job"), _T("Judge Marking Histo Ratio Right"), sVal, PATH_WORKING_INFO);
 }
 
 
@@ -2783,4 +2797,52 @@ void CDlgInfo::OnStnClickedStc91()
 
 	pDoc->m_nJudgeMkModelHistoSize = _ttoi(sVal); // [um]
 	::WritePrivateProfileString(_T("System"), _T("JudgeMk ModelHistoSize"), sVal, PATH_WORKING_INFO);
+}
+
+
+void CDlgInfo::OnStnClickedStc199()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	myStcData[27].SetBkColor(RGB_RED);
+	myStcData[27].RedrawWindow();
+
+	CPoint pt;	CRect rt;
+	GetDlgItem(IDC_STC_199)->GetWindowRect(&rt);
+	pt.x = rt.right; pt.y = rt.bottom;
+	ShowKeypad(IDC_STC_199, pt, TO_BOTTOM | TO_RIGHT);
+
+	myStcData[27].SetBkColor(RGB_WHITE);
+	myStcData[27].RedrawWindow();
+
+	CString sVal;
+	GetDlgItem(IDC_STC_199)->GetWindowText(sVal);
+	pDoc->WorkingInfo.LastJob.nJudgeMkHistoWhite[0] = max(min(_ttoi(sVal), 240), 128); // Range : 128 ~ 240
+	pDoc->SetVerifyPunchHistoWhite(pDoc->WorkingInfo.LastJob.nJudgeMkHistoWhite[0]);
+	sVal.Format(_T("%d"), pDoc->WorkingInfo.LastJob.nJudgeMkHistoWhite[0]);
+	GetDlgItem(IDC_STC_199)->SetWindowText(sVal);
+	::WritePrivateProfileString(_T("Last Job"), _T("Judge Marking Histo White Left"), sVal, PATH_WORKING_INFO);
+}
+
+
+void CDlgInfo::OnStnClickedStc218()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	myStcData[28].SetBkColor(RGB_RED);
+	myStcData[28].RedrawWindow();
+
+	CPoint pt;	CRect rt;
+	GetDlgItem(IDC_STC_218)->GetWindowRect(&rt);
+	pt.x = rt.right; pt.y = rt.bottom;
+	ShowKeypad(IDC_STC_218, pt, TO_BOTTOM | TO_RIGHT);
+
+	myStcData[28].SetBkColor(RGB_WHITE);
+	myStcData[28].RedrawWindow();
+
+	CString sVal;
+	GetDlgItem(IDC_STC_218)->GetWindowText(sVal);
+	pDoc->WorkingInfo.LastJob.nJudgeMkHistoWhite[1] = max(min(_ttoi(sVal), 240), 128); // Range : 128 ~ 240
+	pDoc->SetVerifyPunchHistoWhite2(pDoc->WorkingInfo.LastJob.nJudgeMkHistoWhite[1]);
+	sVal.Format(_T("%d"), pDoc->WorkingInfo.LastJob.nJudgeMkHistoWhite[1]);
+	GetDlgItem(IDC_STC_218)->SetWindowText(sVal);
+	::WritePrivateProfileString(_T("Last Job"), _T("Judge Marking Histo White Right"), sVal, PATH_WORKING_INFO);
 }

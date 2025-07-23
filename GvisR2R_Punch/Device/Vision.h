@@ -128,6 +128,7 @@ class CVision : public CWnd
 
 	CLibMilBuf *m_MilGrabModelPunch;
 	double m_dVerifyPunchScore, m_dVerifyPunchHistoScore;
+	int m_nVerifyPunchHistoWhite;
 
 	MIL_ID MilCADImgBuf, MilBufCADTemp;
 	MIL_ID MilBufPinTemp, MilPinImgBuf;
@@ -263,8 +264,10 @@ public:
 	BOOL PrepareVerifyPunching();
 	void SetVerifyPunchScore(double dScore);
 	void SetVerifyPunchHistoScore(double dScore);
+	void SetVerifyPunchHistoWhite(int nWhite);
 	double GetVerifyPunchScore();
 	double GetVerifyPunchHistoScore();
+	int GetVerifyPunchHistoWhite();
 	BOOL CheckVerifyPunching(MIL_ID &GrabImgId);
 	BOOL Judge(MIL_ID &GrabImgId, stPtMtRst &stRst);
 	BOOL CheckVerifyPunchingHisto(MIL_ID &GrabImgId);
