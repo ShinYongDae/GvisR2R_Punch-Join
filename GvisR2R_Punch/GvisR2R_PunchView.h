@@ -207,7 +207,7 @@ class CGvisR2R_PunchView : public CFormView
 
 	CString m_sShare[2], m_sBuf[2]; // [0]: AOI-Up , [1]: AOI-Dn
 	int		m_pBufSerial[2][100], m_nBufTot[2]; // [0]: AOI-Up , [1]: AOI-Dn
-	__int64 m_nBufSerialSorting[2][100]; // [0]: AOI-Up , [1]: AOI-Dn
+	unsigned __int64 m_nBufSerialSorting[2][100]; // [0]: AOI-Up , [1]: AOI-Dn
 	int		m_nBufSerial[2][2]; // [0]: AOI-Up , [1]: AOI-Dn // [0]: Cam0, [1]:Cam1
 
 	CString m_sDispMsg[10];
@@ -224,7 +224,6 @@ class CGvisR2R_PunchView : public CFormView
 
 	double m_dElecChkVal;
 	CString m_sMsg;
-
 
 	void InitMyMsg();
 	void CloseMyMsg();
@@ -334,10 +333,10 @@ class CGvisR2R_PunchView : public CFormView
 
 	BOOL SortingInUp(CString sPath, int nIndex);
 	BOOL SortingOutUp(int* pSerial, int nTot);
-	void SwapUp(__int64 *num1, __int64 *num2);
+	void SwapUp(unsigned __int64 *num1, unsigned __int64 *num2);
 	BOOL SortingInDn(CString sPath, int nIndex);
 	BOOL SortingOutDn(int* pSerial, int nTot);
-	void SwapDn(__int64 *num1, __int64 *num2);
+	void SwapDn(unsigned __int64 *num1, unsigned __int64 *num2);
 
 	BOOL LoadMstInfo();			// Reelmap 초기화
 
@@ -574,6 +573,7 @@ public:
 	int m_nSerialMakeItsFile;
 
 	BOOL m_bIsBuf[2]; // [0]: AOI-Up , [1]: AOI-Dn
+	BOOL m_bOnLine;
 
 
 // 작업입니다.
@@ -758,7 +758,7 @@ public:
 
 	BOOL RemakeReelmapFromPcr(CString sModel, CString sLot, CString sLayerUp, CString sLayerDn);
 	int IsOfflineFolder(); // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
-	void StartThreadRemakeRmapFromPcr();
+	void StartThreadRemakeRmapFromPcr(BOOL bOnLine = FALSE);
 	void StartThread();
 	void SetLastSerialOnOffline(int nSerial, int nOffline);
 	void StopThreadRemakeRmapFromPcr();

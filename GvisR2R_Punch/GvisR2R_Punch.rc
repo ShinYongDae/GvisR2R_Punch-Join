@@ -166,11 +166,11 @@ FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,14,7,20,20
     LTEXT           "GvisR2R_Punch, 버전 2.1.0",IDC_STATIC,42,7,114,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2025.07.21",IDC_STATIC,42,16,114,8
+    LTEXT           "Copyright (C) 2025.08.06",IDC_STATIC,42,16,114,8
     DEFPUSHBUTTON   "확인",IDOK,113,43,50,14,WS_GROUP
     LTEXT           "미마킹테스트(Histo) - White DN",IDC_STATIC,7,29,139,8
-    LTEXT           "Result파일 불량항목 추가",IDC_STATIC,7,38,96,8
-    LTEXT           "머징수율처리시 시리얼 빠짐 수정",IDC_STATIC,7,48,88,8
+    LTEXT           "PCR파일로 릴맵 재생성 패치",IDC_STATIC,7,38,96,8
+    LTEXT           "릴맵Disp: 파일읽기 --> 메모리참조",IDC_STATIC,7,48,95,8
 END
 
 IDD_GVISR2R_PUNCH_FORM DIALOGEX 0, 0, 630, 461
@@ -2394,7 +2394,7 @@ BEGIN
     GROUPBOX        "우측 마킹금지 #1",IDC_STATIC,184,243,168,51
     CONTROL         "전체마킹 테스트 숨기기",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,140,96,12
     CONTROL         "Save Model Image for Judging",IDC_CHECK12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,154,115,12
-    CONTROL         "이전 펀칭 얼라인 및 위치데이터(*.PCH) 사용",IDC_CHECK13,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,169,149,12
+    CONTROL         "이전 펀칭 얼라인 및 위치데이터(*.PCH) 사용",IDC_CHECK13,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,169,160,12
 END
 
 IDD_DLG_CAMMASTERINFO_MST DIALOGEX 0, 0, 615, 319

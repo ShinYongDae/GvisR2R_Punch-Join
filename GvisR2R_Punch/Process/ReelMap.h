@@ -22,6 +22,22 @@
 #pragma warning(disable: 4477)
 
 
+struct stRmapInfo
+{
+	CString sProcessCode, sEntireSpeed, sLotStart, sLotRun, sLotEnd;
+	int nLastShot, nCompletedShot;
+	stRmapInfo()
+	{
+		sProcessCode = _T("");
+		sEntireSpeed = _T("");
+		sLotStart = _T("");
+		sLotRun = _T("");
+		sLotEnd = _T("");
+		nLastShot = 0;
+		nCompletedShot = 0;
+	}
+};
+
 struct stResult
 {
 	CString sMachin, sOpName, sProcessNum;
@@ -145,6 +161,7 @@ public:
 
 	stYield m_stYield, m_stYieldOffline;
 	int m_nStartSerial;
+	stRmapInfo m_stRmapInfo;
 
 // Operations
 public:
@@ -308,6 +325,7 @@ public:
 	BOOL WriteLastRmapInfo();
 	int GetFirstShotFromPcr();
 	int GetLastShotFromPcr();
+	BOOL GetLastRmapInfo();
 
 // Overrides
 	// ClassWizard generated virtual function overrides

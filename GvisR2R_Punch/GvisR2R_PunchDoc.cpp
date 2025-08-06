@@ -6205,7 +6205,7 @@ int CGvisR2R_PunchDoc::LoadPCRUp(int nSerial, BOOL bFromShare)	// return : 2(Fai
 
 	// Total Defect Numbers
 	nTemp = strFileData.Find('\n', 0);
-	strTotalBadPieceNum = strFileData.Left(nTemp);;
+	strTotalBadPieceNum = strFileData.Left(nTemp);
 	strFileData.Delete(0, nTemp + 1);
 	nFileSize = nFileSize - nTemp - 1;
 

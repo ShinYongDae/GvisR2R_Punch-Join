@@ -3282,15 +3282,17 @@ void CDlgMenu05::MakeIts()
 
 			nSerial = _tstoi(sSerial);
 
-			LoadPCRUpFromMk(nSerial);
-			MakeItsFile(nSerial, nLayer);
-			//if(nLayer == RMAP_UP || nLayer == RMAP_INNER_UP)
-			//	LoadPCRUpFromMk(nSerial);
-			//else
-			//	LoadPCRDnFromMk(nSerial);
-			//MakeItsFile(nSerial, nLayer);
+			if (LoadPCRUpFromMk(nSerial) == 1)
+			{
+				MakeItsFile(nSerial, nLayer);
+				nTot++;
 
-			nTot++;
+				//if(nLayer == RMAP_UP || nLayer == RMAP_INNER_UP)
+				//	LoadPCRUpFromMk(nSerial);
+				//else
+				//	LoadPCRDnFromMk(nSerial);
+				//MakeItsFile(nSerial, nLayer);
+			}
 		}
 	}
 
@@ -3310,15 +3312,17 @@ void CDlgMenu05::MakeIts()
 
 			nSerial = _tstoi(sSerial);
 
-			LoadPCRUpFromMk(nSerial);
-			MakeItsFile(nSerial, nLayer);
-			//if(nLayer == RMAP_UP || nLayer == RMAP_INNER_UP)
-			//	LoadPCRUpFromMk(nSerial);
-			//else
-			//	LoadPCRDnFromMk(nSerial);
-			//MakeItsFile(nSerial, nLayer);
+			if (LoadPCRUpFromMk(nSerial) == 1)
+			{
+				MakeItsFile(nSerial, nLayer);
+				//if(nLayer == RMAP_UP || nLayer == RMAP_INNER_UP)
+				//	LoadPCRUpFromMk(nSerial);
+				//else
+				//	LoadPCRDnFromMk(nSerial);
+				//MakeItsFile(nSerial, nLayer);
 
-			nTot++;
+				nTot++;
+			}
 		}
 	}
 }
