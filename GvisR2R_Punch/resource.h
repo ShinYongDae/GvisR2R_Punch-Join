@@ -1043,6 +1043,7 @@
 #define IDC_STC_12_26                   1264
 #define IDC_STC_95                      1264
 #define IDC_STC_UTIL04_33               1264
+#define IDC_STC_223                     1264
 #define IDC_CHK_35                      1265
 #define IDC_STC_96                      1265
 #define IDC_STC_UTIL04_34               1265

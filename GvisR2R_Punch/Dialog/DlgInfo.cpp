@@ -2465,8 +2465,8 @@ void CDlgInfo::OnChk28()
 		pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto = FALSE;
 	}
 
-	CString sData = pDoc->WorkingInfo.LastJob.bUseJudgeMk ? _T("1") : _T("0");
-	::WritePrivateProfileString(_T("Last Job"), _T("Use Judge Marking"), sData, PATH_WORKING_INFO);
+	CString sData = pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto ? _T("1") : _T("0");
+	::WritePrivateProfileString(_T("Last Job"), _T("Use Judge Marking Histo"), sData, PATH_WORKING_INFO);
 }
 
 void CDlgInfo::OnStnClickedStc187()

@@ -15163,7 +15163,7 @@ BOOL CGvisR2R_PunchView::SaveMk0Img(int nMkPcsIdx) // Cam0
 		{
 			//BOOL bRtn = m_pVision[0]->SaveMkImg(sPath);
 			BOOL bRtn = m_pVision[0]->SaveMkImg(nSerial, nMkPcsIdx, sDest);
-			if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+			if (pDoc->WorkingInfo.LastJob.bUseJudgeMk || pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
 			{
 				if(m_pDlgMenu02)
 					m_pDlgMenu02->DispMkPmScore(0);
