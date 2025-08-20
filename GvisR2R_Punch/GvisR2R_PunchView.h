@@ -1338,6 +1338,8 @@ public:
 	CString GetMkMtInfo1(int nSerial, int nMkPcs);
 
 	BOOL ChkRepunching(int nCam);
+	BOOL ChkMkImgL(int nSerial, int nTotDef);// , int nTotMk);
+	BOOL ChkMkImgR(int nSerial, int nTotDef);// , int nTotMk);
 
 
 // 재정의입니다.

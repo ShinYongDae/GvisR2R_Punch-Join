@@ -166,7 +166,7 @@ FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,14,7,20,20
     LTEXT           "GvisR2R_Punch, 버전 2.1.0",IDC_STATIC,42,7,114,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2025.08.18",IDC_STATIC,42,16,114,8
+    LTEXT           "Copyright (C) 2025.08.20",IDC_STATIC,42,16,114,8
     DEFPUSHBUTTON   "확인",IDOK,113,43,50,14,WS_GROUP
     LTEXT           "미마킹테스트(Histo) - White DN",IDC_STATIC,7,29,139,8
     LTEXT           "PCR파일로 릴맵 재생성 패치",IDC_STATIC,7,38,96,8
@@ -2395,6 +2395,7 @@ BEGIN
     CONTROL         "전체마킹 테스트 숨기기",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,140,96,12
     CONTROL         "Save Model Image for Judging",IDC_CHECK12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,154,115,12
     CONTROL         "이전 펀칭 얼라인 및 위치데이터(*.PCH) 사용",IDC_CHECK13,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,169,160,12
+    CONTROL         "불량 마킹이미지 파일수 카운트",IDC_CHECK14,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,67,110,12
 END
 
 IDD_DLG_CAMMASTERINFO_MST DIALOGEX 0, 0, 615, 319

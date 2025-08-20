@@ -3831,6 +3831,7 @@ BOOL CGvisR2R_PunchView::ChkBufUp(int* pSerial, int &nTot)
 		pDoc->m_bBufEmpty[0] = TRUE; pDoc->SetStatus(_T("General"), _T("bBufEmpty[0]"), pDoc->m_bBufEmpty[0]);
 		if (!pDoc->m_bBufEmptyF[0])
 		{
+			ApplyListTorq();
 			pDoc->m_bBufEmptyF[0] = TRUE; pDoc->SetStatus(_T("General"), _T("bBufEmptyF[0]"), pDoc->m_bBufEmptyF[0]);		// 최초 한번 버퍼가 비어있으면(초기화를 하고 난 이후) TRUE.
 		}
 		return FALSE; // pcr파일이 존재하지 않음.
@@ -15024,7 +15025,23 @@ void CGvisR2R_PunchView::DoMark0()
 		}
 
 		pDoc->SaveMkCntL();
-		m_nStepMk[0]++;
+		//m_nStepMk[0]++;
+		if (m_bCam)
+		{
+			if (!ChkMkImgL(m_nBufUpSerial[0], m_nTotMk[0]))//, m_nCurMk[0]))
+			{
+				Stop();
+				nRtn = MsgBox(_T("좌측 불량수와 마킹이미지 파일수가 다릅니다.\r\n계속 작업을 진행하시겠습니까?"), 1, MB_YESNO);
+				if (IDYES == nRtn)
+				{
+					m_nStepMk[0]++;
+				}
+			}
+			else
+				m_nStepMk[0]++;
+		}
+		else
+			m_nStepMk[0]++;
 		break;
 	case 104:
 		if (IsMoveDone0())
@@ -15742,7 +15759,23 @@ void CGvisR2R_PunchView::DoMark1()
 		}
 
 		pDoc->SaveMkCntR();
-		m_nStepMk[1]++;
+		//m_nStepMk[1]++;
+		if (m_bCam)
+		{
+			if (!ChkMkImgR(m_nBufUpSerial[1], m_nTotMk[1]))//, m_nCurMk[1]))
+			{
+				Stop();
+				nRtn = MsgBox(_T("우측 불량수와 마킹이미지 파일수가 다릅니다.\r\n계속 작업을 진행하시겠습니까?"), 1, MB_YESNO);
+				if (IDYES == nRtn)
+				{
+					m_nStepMk[1]++;
+				}
+			}
+			else
+				m_nStepMk[1]++;
+		}
+		else
+			m_nStepMk[1]++;
 		break;
 	case 104:
 		if (IsMoveDone1())
@@ -29487,7 +29520,23 @@ void CGvisR2R_PunchView::DoMark0Its()
 		}
 
 		pDoc->SaveMkCntL();
-		m_nStepMk[0]++;
+		//m_nStepMk[0]++;
+		if (m_bCam)
+		{
+			if (!ChkMkImgL(m_nBufUpSerial[0], m_nTotMk[0]))//, m_nCurMk[0]))
+			{
+				Stop();
+				nRtn = MsgBox(_T("좌측 불량수와 마킹이미지 파일수가 다릅니다.\r\n계속 작업을 진행하시겠습니까?"), 1, MB_YESNO);
+				if (IDYES == nRtn)
+				{
+					m_nStepMk[0]++;
+				}
+			}
+			else
+				m_nStepMk[0]++;
+		}
+		else
+			m_nStepMk[0]++;
 		break;
 	case 104:
 		if (IsMoveDone0())
@@ -30175,7 +30224,23 @@ void CGvisR2R_PunchView::DoMark1Its()
 		}
 
 		pDoc->SaveMkCntR();
-		m_nStepMk[1]++;
+		//m_nStepMk[1]++;
+		if (m_bCam)
+		{
+			if (!ChkMkImgR(m_nBufUpSerial[1], m_nTotMk[1]))//, m_nCurMk[1]))
+			{
+				Stop();
+				nRtn = MsgBox(_T("우측 불량수와 마킹이미지 파일수가 다릅니다.\r\n계속 작업을 진행하시겠습니까?"), 1, MB_YESNO);
+				if (IDYES == nRtn)
+				{
+					m_nStepMk[1]++;
+				}
+			}
+			else
+				m_nStepMk[1]++;
+		}
+		else
+			m_nStepMk[1]++;
 		break;
 	case 104:
 		if (IsMoveDone1())
@@ -35539,4 +35604,107 @@ BOOL CGvisR2R_PunchView::WriteLastRmapInfo()
 			pDoc->m_pReelMapIts->WriteLastRmapInfo();
 	}
 	return TRUE;
+}
+
+
+BOOL CGvisR2R_PunchView::ChkMkImgR(int nSerial, int nTotDef)//, int nTotMk)
+{
+	if (!pDoc->m_bCntMkedImg)
+		return TRUE;
+
+	int nCount = 0;
+	CString sDest, sPath, sMsg, sTemp;
+	sDest.Format(_T("%s%s\\%s\\%s\\Punching"), pDoc->WorkingInfo.System.sPathOldFile, pDoc->WorkingInfo.LastJob.sModel,
+		pDoc->WorkingInfo.LastJob.sLot, pDoc->WorkingInfo.LastJob.sLayerUp);
+	sPath.Format(_T("%s\\*.tif"), sDest);
+
+	CString sFileName, sSerial, arSerial = _T("");
+	BOOL bExist = FALSE;
+	int nSerialF;
+	CFileFind cFile;
+
+	bExist = cFile.FindFile(sPath);
+	while (bExist)
+	{
+		bExist = cFile.FindNextFile();
+		if (cFile.IsDots()) continue;
+		if (cFile.IsDirectory()) continue;
+
+		sFileName = cFile.GetFileName();
+		sSerial = sFileName.Left(4);
+		nSerialF = _tstoi(sSerial);
+		if (nSerialF == nSerial)
+		{
+			sTemp.Format(_T("%s, "), sFileName);
+			arSerial += sTemp;
+			nCount++;
+			if (nCount >= nTotDef)
+			{
+				sTemp.Format(_T("%d=%d"), nTotDef, nCount);
+				pView->DispStsBar(sTemp, 6);
+				return TRUE;
+			}
+		}
+	}
+
+	if (nCount >= nTotDef)
+	{
+		sTemp.Format(_T("%d=%d"), nTotDef, nCount);
+		pView->DispStsBar(sTemp, 6);
+		return TRUE;
+	}
+	sMsg.Format(_T("시리얼: %d, 마킹이미지수: %d, 총불량수: %d\r\n%s"), nSerial, nCount, nTotDef, arSerial);
+	MsgBox(sMsg);
+	return FALSE;
+}
+
+BOOL CGvisR2R_PunchView::ChkMkImgL(int nSerial, int nTotDef)//, int nTotMk)
+{
+	if (!pDoc->m_bCntMkedImg)
+		return TRUE;
+
+	int nCount = 0;
+	CString sDest, sPath, sMsg, sTemp;
+	sDest.Format(_T("%s%s\\%s\\%s\\Punching"), pDoc->WorkingInfo.System.sPathOldFile, pDoc->WorkingInfo.LastJob.sModel,
+		pDoc->WorkingInfo.LastJob.sLot, pDoc->WorkingInfo.LastJob.sLayerUp);
+	sPath.Format(_T("%s\\*.tif"), sDest);
+
+	CString sFileName, sSerial, arSerial = _T("");
+	BOOL bExist = FALSE;
+	int nSerialF;
+	CFileFind cFile;
+
+	bExist = cFile.FindFile(sPath);
+	while (bExist)
+	{
+		bExist = cFile.FindNextFile();
+		if (cFile.IsDots()) continue;
+		if (cFile.IsDirectory()) continue;
+
+		sFileName = cFile.GetFileName();
+		sSerial = sFileName.Left(4);
+		nSerialF = _tstoi(sSerial);
+		if (nSerialF == nSerial)
+		{
+			sTemp.Format(_T("%s, "), sFileName);
+			arSerial += sTemp;
+			nCount++;
+			if (nCount >= nTotDef)
+			{
+				sTemp.Format(_T("%d=%d"), nTotDef, nCount);
+				pView->DispStsBar(sTemp, 6);
+				return TRUE;
+			}
+		}
+	}
+
+	if (nCount >= nTotDef)
+	{
+		sTemp.Format(_T("%d=%d"), nTotDef, nCount);
+		pView->DispStsBar(sTemp, 6);
+		return TRUE;
+	}
+	sMsg.Format(_T("시리얼: %d, 마킹이미지수: %d, 총불량수: %d\r\n%s"), nSerial, nCount, nTotDef, arSerial);
+	MsgBox(sMsg);
+	return FALSE;
 }

@@ -1549,6 +1549,7 @@
 #define IDC_CHK_122                     1427
 #define IDC_STC_PIN_IMG2                1427
 #define IDC_STC_REJECT_IMG              1427
+#define IDC_CHECK14                     1427
 #define IDC_STC_DEF_11                  1428
 #define IDC_CHK_USE_AOI_INNER           1428
 #define IDC_STC_12_95                   1428

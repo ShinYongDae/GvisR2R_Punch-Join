@@ -500,15 +500,15 @@ BOOL CDlgMenu02::OnInitDialog()
 	pView->m_pVision[0] = new CVision(0, m_MilSys, hCtrlV0, this);
 	m_MilSys = pView->m_pVision[0]->GetSystemID();
 	pView->m_pVision[0]->SetVerifyPunchScore(pDoc->GetVerifyPunchScore());
-	pView->m_pVision[0]->SetVerifyPunchHistoScore(pDoc->GetVerifyPunchHistoScore());
-	pView->m_pVision[0]->SetVerifyPunchHistoWhite(pDoc->GetVerifyPunchHistoWhite());
+	pView->m_pVision[0]->SetVerifyPunchHistoScore(pDoc->WorkingInfo.LastJob.nJudgeMkHistoRatio[0]);
+	pView->m_pVision[0]->SetVerifyPunchHistoWhite(pDoc->WorkingInfo.LastJob.nJudgeMkHistoWhite[0]);
 
 	HWND hCtrlV1[4] = { 0 };
 	hCtrlV1[0] = GetDlgItem(IDC_STC_VISION_2)->GetSafeHwnd();
 	pView->m_pVision[1] = new CVision(1, m_MilSys, hCtrlV1, this);
 	pView->m_pVision[1]->SetVerifyPunchScore(pDoc->GetVerifyPunchScore2());
-	pView->m_pVision[1]->SetVerifyPunchHistoScore(pDoc->GetVerifyPunchHistoScore2());
-	pView->m_pVision[1]->SetVerifyPunchHistoWhite(pDoc->GetVerifyPunchHistoWhite2());
+	pView->m_pVision[1]->SetVerifyPunchHistoScore(pDoc->WorkingInfo.LastJob.nJudgeMkHistoRatio[1]);
+	pView->m_pVision[1]->SetVerifyPunchHistoWhite(pDoc->WorkingInfo.LastJob.nJudgeMkHistoWhite[1]);
 #endif
 
 

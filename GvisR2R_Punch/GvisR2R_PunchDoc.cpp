@@ -284,6 +284,7 @@ CGvisR2R_PunchDoc::CGvisR2R_PunchDoc()
 	m_bUsePchFile = FALSE;
 	m_bDebugGrabAlign = FALSE;
 	m_bUseStatus = FALSE;
+	m_bCntMkedImg = TRUE;
 
 	SetCurrentInfoSignal(_SigInx::_MyMsgYes, FALSE);
 	SetCurrentInfoSignal(_SigInx::_MyMsgNo, FALSE);
@@ -1077,6 +1078,11 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	//	m_bUseIts = _ttoi(szData) ? TRUE : FALSE;
 	//else
 	//	m_bUseIts = FALSE;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("CountMarkingImageFile"), NULL, szData, sizeof(szData), PATH_WORKING_INFO))
+		m_bCntMkedImg = _ttoi(szData) ? TRUE : FALSE;
+	else
+		m_bCntMkedImg = TRUE;
 
 	// 20160926 - syd
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("USE_RTR_SHIFT_ADJUST"), NULL, szData, sizeof(szData), sPath))
