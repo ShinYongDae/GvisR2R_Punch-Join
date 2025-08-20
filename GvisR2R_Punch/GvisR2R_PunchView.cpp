@@ -20571,13 +20571,37 @@ void CGvisR2R_PunchView::Mk2PtDoMarking()
 			}
 			else
 			{
-				//Sleep(100);
+				Sleep(100);
 				m_nMkStAuto++;
 			}
 			break;
 
 		case MK_ST + (Mk2PtIdx::DoMk) + 2:
 			m_nMkStAuto++;
+			//if (!m_bTHREAD_UPDATAE_YIELD[0] && !m_bTHREAD_UPDATAE_YIELD[1])
+			//{
+			//	if (!m_bUpdateYieldOnRmap)
+			//	{
+			//		if (!m_bTHREAD_UPDATE_REELMAP_UP && !m_bTHREAD_UPDATE_REELMAP_DN && !m_bTHREAD_UPDATE_REELMAP_ALLUP && !m_bTHREAD_UPDATE_REELMAP_ALLDN)
+			//		{
+			//			if (!m_bTHREAD_UPDATE_YIELD_UP && !m_bTHREAD_UPDATE_YIELD_DN && !m_bTHREAD_UPDATE_YIELD_ALLUP && !m_bTHREAD_UPDATE_YIELD_ALLDN)
+			//			{
+			//				m_bUpdateYieldOnRmap = TRUE;
+			//				pDoc->UpdateYieldOnRmap(); // 20241115 -> 20250821
+			//				m_nMkStAuto++;
+			//			}
+			//			else
+			//				Sleep(100);
+			//		}
+			//		else
+			//			Sleep(100);
+			//	}
+			//	else
+			//	{
+			//		Sleep(100);
+			//		m_nMkStAuto++; // 마킹 및 verify가 완전히 끝나지 않은 경우.
+			//	}
+			//}
 			break;
 
 		case MK_ST + (Mk2PtIdx::Verify) :
@@ -20831,7 +20855,7 @@ void CGvisR2R_PunchView::Mk2PtShift2Mk() // MODE_INNER
 					{
 						UpdateRst();
 						UpdateWorking();	// Update Working Info...
-						//pDoc->UpdateYieldOnRmap(); // 20241115
+						pDoc->UpdateYieldOnRmap(); // 20241115 -> 20250821
 						m_nMkStAuto++;
 					}
 					//else
@@ -35024,7 +35048,6 @@ void CGvisR2R_PunchView::Mk4PtShift2Mk() // MODE_INNER
 					{
 						UpdateRst();
 						UpdateWorking();	// Update Working Info...
-											//pDoc->UpdateYieldOnRmap(); // 20241115
 						m_nMkStAuto++;
 					}
 					//else

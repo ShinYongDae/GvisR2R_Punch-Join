@@ -2391,7 +2391,7 @@ BOOL CReelMap::UpdateYield(int nSerial)
 {
 	if (nSerial <= 0)
 	{
-		//pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("Serial Error.68"));
+		pView->ClrDispMsg(); AfxMessageBox(_T("Serial Error.68"));
 		return 0;
 	}
 
