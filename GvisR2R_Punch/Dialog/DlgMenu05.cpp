@@ -2606,7 +2606,7 @@ void CDlgMenu05::OnBtnSave()
 		}
 	}
 	else
-	strDestPath.Format(_T("%s%s\\%s\\%s.txt"), pDoc->WorkingInfo.System.sPathOldFile, 
+		strDestPath.Format(_T("%s%s\\%s\\%s.txt"), pDoc->WorkingInfo.System.sPathOldFile, 
 												   m_sModel, m_sLot, _T("Result"));
 
 	CFileFind cFile;

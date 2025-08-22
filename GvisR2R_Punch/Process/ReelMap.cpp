@@ -6488,98 +6488,147 @@ void CReelMap::SetLastSerialOnOffline(int nSerial)
 	::WritePrivateProfileString(_T("Info"), _T("Marked Date"), sData, sPath);
 }
 
+
 CString CReelMap::GetRmapPathOnOffline(int nRmap)
 {
 	CString sPath = _T("");
 	CString Path[5], str;
 
-	if (IsOfflineFolder())
+	switch (nRmap)
 	{
-		switch (nRmap)
-		{
-		case RMAP_UP:
-			str = _T("ReelMapDataUp.txt");
-			sPath.Format(_T("%s%s\\%s\\%s\\OFFLINE\\%s"),
-				pDoc->WorkingInfo.System.sPathOldFile,
-				pDoc->WorkingInfo.LastJob.sModel,
-				pDoc->WorkingInfo.LastJob.sLot,
-				pDoc->WorkingInfo.LastJob.sLayerUp,
-				str);
-			break;
-		case RMAP_DN:
-			str = _T("ReelMapDataDn.txt");
-			sPath.Format(_T("%s%s\\%s\\%s\\OFFLINE\\%s"),
-				pDoc->WorkingInfo.System.sPathOldFile,
-				pDoc->WorkingInfo.LastJob.sModel,
-				pDoc->WorkingInfo.LastJob.sLot,
-				pDoc->WorkingInfo.LastJob.sLayerDn,
-				str);
-			break;
-		case RMAP_ALLUP:
-			str = _T("ReelMapDataAll.txt");
-			sPath.Format(_T("%s%s\\%s\\%s\\OFFLINE\\%s"),
-				pDoc->WorkingInfo.System.sPathOldFile,
-				pDoc->WorkingInfo.LastJob.sModel,
-				pDoc->WorkingInfo.LastJob.sLot,
-				pDoc->WorkingInfo.LastJob.sLayerUp,
-				str);
-			break;
-		case RMAP_ALLDN:
-			str = _T("ReelMapDataAll.txt");
-			sPath.Format(_T("%s%s\\%s\\%s\\OFFLINE\\%s"),
-				pDoc->WorkingInfo.System.sPathOldFile,
-				pDoc->WorkingInfo.LastJob.sModel,
-				pDoc->WorkingInfo.LastJob.sLot,
-				pDoc->WorkingInfo.LastJob.sLayerDn,
-				str);
-			break;
-		}
-	}
-	else
-	{
-		switch (nRmap)
-		{
-		case RMAP_UP:
-			str = _T("ReelMapDataUp.txt");
-			sPath.Format(_T("%s%s\\%s\\%s\\%s"),
-				pDoc->WorkingInfo.System.sPathOldFile,
-				pDoc->WorkingInfo.LastJob.sModel,
-				pDoc->WorkingInfo.LastJob.sLot,
-				pDoc->WorkingInfo.LastJob.sLayerUp,
-				str);
-			break;
-		case RMAP_DN:
-			str = _T("ReelMapDataDn.txt");
-			sPath.Format(_T("%s%s\\%s\\%s\\%s"),
-				pDoc->WorkingInfo.System.sPathOldFile,
-				pDoc->WorkingInfo.LastJob.sModel,
-				pDoc->WorkingInfo.LastJob.sLot,
-				pDoc->WorkingInfo.LastJob.sLayerDn,
-				str);
-			break;
-		case RMAP_ALLUP:
-			str = _T("ReelMapDataAll.txt");
-			sPath.Format(_T("%s%s\\%s\\%s\\%s"),
-				pDoc->WorkingInfo.System.sPathOldFile,
-				pDoc->WorkingInfo.LastJob.sModel,
-				pDoc->WorkingInfo.LastJob.sLot,
-				pDoc->WorkingInfo.LastJob.sLayerUp,
-				str);
-			break;
-		case RMAP_ALLDN:
-			str = _T("ReelMapDataAll.txt");
-			sPath.Format(_T("%s%s\\%s\\%s\\%s"),
-				pDoc->WorkingInfo.System.sPathOldFile,
-				pDoc->WorkingInfo.LastJob.sModel,
-				pDoc->WorkingInfo.LastJob.sLot,
-				pDoc->WorkingInfo.LastJob.sLayerDn,
-				str);
-			break;
-		}
+	case RMAP_UP:
+		str = _T("ReelMapDataUp.txt");
+		sPath.Format(_T("%s%s\\%s\\%s\\OFFLINE\\%s"),
+			pDoc->WorkingInfo.System.sPathOldFile,
+			pDoc->WorkingInfo.LastJob.sModel,
+			pDoc->WorkingInfo.LastJob.sLot,
+			pDoc->WorkingInfo.LastJob.sLayerUp,
+			str);
+		break;
+	case RMAP_DN:
+		str = _T("ReelMapDataDn.txt");
+		sPath.Format(_T("%s%s\\%s\\%s\\OFFLINE\\%s"),
+			pDoc->WorkingInfo.System.sPathOldFile,
+			pDoc->WorkingInfo.LastJob.sModel,
+			pDoc->WorkingInfo.LastJob.sLot,
+			pDoc->WorkingInfo.LastJob.sLayerDn,
+			str);
+		break;
+	case RMAP_ALLUP:
+		str = _T("ReelMapDataAll.txt");
+		sPath.Format(_T("%s%s\\%s\\%s\\OFFLINE\\%s"),
+			pDoc->WorkingInfo.System.sPathOldFile,
+			pDoc->WorkingInfo.LastJob.sModel,
+			pDoc->WorkingInfo.LastJob.sLot,
+			pDoc->WorkingInfo.LastJob.sLayerUp,
+			str);
+		break;
+	case RMAP_ALLDN:
+		str = _T("ReelMapDataAll.txt");
+		sPath.Format(_T("%s%s\\%s\\%s\\OFFLINE\\%s"),
+			pDoc->WorkingInfo.System.sPathOldFile,
+			pDoc->WorkingInfo.LastJob.sModel,
+			pDoc->WorkingInfo.LastJob.sLot,
+			pDoc->WorkingInfo.LastJob.sLayerDn,
+			str);
+		break;
 	}
 
 	return sPath;
 }
+
+//CString CReelMap::GetRmapPathOnOffline(int nRmap)
+//{
+//	CString sPath = _T("");
+//	CString Path[5], str;
+//
+//	if (IsOfflineFolder())
+//	{
+//		switch (nRmap)
+//		{
+//		case RMAP_UP:
+//			str = _T("ReelMapDataUp.txt");
+//			sPath.Format(_T("%s%s\\%s\\%s\\OFFLINE\\%s"),
+//				pDoc->WorkingInfo.System.sPathOldFile,
+//				pDoc->WorkingInfo.LastJob.sModel,
+//				pDoc->WorkingInfo.LastJob.sLot,
+//				pDoc->WorkingInfo.LastJob.sLayerUp,
+//				str);
+//			break;
+//		case RMAP_DN:
+//			str = _T("ReelMapDataDn.txt");
+//			sPath.Format(_T("%s%s\\%s\\%s\\OFFLINE\\%s"),
+//				pDoc->WorkingInfo.System.sPathOldFile,
+//				pDoc->WorkingInfo.LastJob.sModel,
+//				pDoc->WorkingInfo.LastJob.sLot,
+//				pDoc->WorkingInfo.LastJob.sLayerDn,
+//				str);
+//			break;
+//		case RMAP_ALLUP:
+//			str = _T("ReelMapDataAll.txt");
+//			sPath.Format(_T("%s%s\\%s\\%s\\OFFLINE\\%s"),
+//				pDoc->WorkingInfo.System.sPathOldFile,
+//				pDoc->WorkingInfo.LastJob.sModel,
+//				pDoc->WorkingInfo.LastJob.sLot,
+//				pDoc->WorkingInfo.LastJob.sLayerUp,
+//				str);
+//			break;
+//		case RMAP_ALLDN:
+//			str = _T("ReelMapDataAll.txt");
+//			sPath.Format(_T("%s%s\\%s\\%s\\OFFLINE\\%s"),
+//				pDoc->WorkingInfo.System.sPathOldFile,
+//				pDoc->WorkingInfo.LastJob.sModel,
+//				pDoc->WorkingInfo.LastJob.sLot,
+//				pDoc->WorkingInfo.LastJob.sLayerDn,
+//				str);
+//			break;
+//		}
+//	}
+//	else
+//	{
+//		switch (nRmap)
+//		{
+//		case RMAP_UP:
+//			str = _T("ReelMapDataUp.txt");
+//			sPath.Format(_T("%s%s\\%s\\%s\\%s"),
+//				pDoc->WorkingInfo.System.sPathOldFile,
+//				pDoc->WorkingInfo.LastJob.sModel,
+//				pDoc->WorkingInfo.LastJob.sLot,
+//				pDoc->WorkingInfo.LastJob.sLayerUp,
+//				str);
+//			break;
+//		case RMAP_DN:
+//			str = _T("ReelMapDataDn.txt");
+//			sPath.Format(_T("%s%s\\%s\\%s\\%s"),
+//				pDoc->WorkingInfo.System.sPathOldFile,
+//				pDoc->WorkingInfo.LastJob.sModel,
+//				pDoc->WorkingInfo.LastJob.sLot,
+//				pDoc->WorkingInfo.LastJob.sLayerDn,
+//				str);
+//			break;
+//		case RMAP_ALLUP:
+//			str = _T("ReelMapDataAll.txt");
+//			sPath.Format(_T("%s%s\\%s\\%s\\%s"),
+//				pDoc->WorkingInfo.System.sPathOldFile,
+//				pDoc->WorkingInfo.LastJob.sModel,
+//				pDoc->WorkingInfo.LastJob.sLot,
+//				pDoc->WorkingInfo.LastJob.sLayerUp,
+//				str);
+//			break;
+//		case RMAP_ALLDN:
+//			str = _T("ReelMapDataAll.txt");
+//			sPath.Format(_T("%s%s\\%s\\%s\\%s"),
+//				pDoc->WorkingInfo.System.sPathOldFile,
+//				pDoc->WorkingInfo.LastJob.sModel,
+//				pDoc->WorkingInfo.LastJob.sLot,
+//				pDoc->WorkingInfo.LastJob.sLayerDn,
+//				str);
+//			break;
+//		}
+//	}
+//
+//	return sPath;
+//}
 
 BOOL CReelMap::WriteOnOffline(int nSerial)
 {
