@@ -50,7 +50,12 @@
 #define FROM_DISPDEFIMG			100
 
 #define AT_LP					10
-#define MK_DONE_CHECK			30	// m_nStepMk
+
+#define MK_DO_ALL				5	// m_nStepMk
+#define MK_DO_REJECT			7	// m_nStepMk
+#define MK_DONE_CHECK_START		8	// m_nStepMk
+#define MK_DO					13	// m_nStepMk
+#define MK_DONE_CHECK_END		30	// m_nStepMk
 #define MK_LIGHT_ERR			50	// m_nStepMk
 #define MK_END					100	// m_nStepMk
 
@@ -162,7 +167,6 @@ typedef struct _DispMain
 
 }stDispMain;
 typedef CArray<stDispMain, stDispMain> CArDispMain;
-
 
 
 class CGvisR2R_PunchView : public CFormView
@@ -367,6 +371,7 @@ public:
 
 	int m_nDebugStep; 	void DispThreadTick();
 
+	int m_nOverSaveMkImg[2]; // [0]: Left, [1]: Right
 	int m_nMkStrip[2][MAX_STRIP]; // [nCam][nStrip] - [좌/우][] : 스트립에 펀칭한 피스 수 count
 	int m_nStepMk[4], m_nMkPcs[4]; 	// [0] Auto-Left, [1] Auto-Right, [2] Manual-Left, [3] Manual-Right  ; m_nStepMk(마킹Sequence), nMkOrderIdx(마킹한 count)
 	int m_nMarkingOrder[2]; 	// [0] Auto-Left, [1] Auto-Right
@@ -826,8 +831,8 @@ public:
 	void ResetTargetPos();
 	BOOL InitMk();
 	void InitAuto(BOOL bInit = TRUE);
-	void Mk0();
-	void Mk1();
+	BOOL Mk0();
+	BOOL Mk1();
 	BOOL IsReMk();
 	BOOL IsMkDone();
 	BOOL IsAoiTblVac();
@@ -1064,6 +1069,8 @@ public:
 	void MoveMk(double dOffset);
 	BOOL IsMk0Done();
 	BOOL IsMk1Done();
+	BOOL IsMk0Miss();
+	BOOL IsMk1Miss();
 	void InitIoWrite();
 
 	void SetLastProc();
@@ -1338,8 +1345,10 @@ public:
 	CString GetMkMtInfo1(int nSerial, int nMkPcs);
 
 	BOOL ChkRepunching(int nCam);
-	BOOL ChkMkImgL(int nSerial, int nTotDef);// , int nTotMk);
-	BOOL ChkMkImgR(int nSerial, int nTotDef);// , int nTotMk);
+	BOOL ChkMkImgL(int nSerial, int nTotMk);
+	BOOL ChkMkImgR(int nSerial, int nTotMk);
+	void ResetMkImgL(int nSerial);
+	void ResetMkImgR(int nSerial);
 
 
 // 재정의입니다.

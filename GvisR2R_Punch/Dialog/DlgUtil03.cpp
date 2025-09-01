@@ -1449,19 +1449,19 @@ void CDlgUtil03::OnBtnMkMoveInit()
 	if (bOn0 && !bOn1)
 	{
 		if (pView->m_pVoiceCoil[0])
-			pView->m_pVoiceCoil[0]->MoveSmacShiftPos(0);
+			pView->m_pVoiceCoil[0]->MoveSmacShiftPos();
 	}
 	else if (!bOn0 && bOn1)
 	{
 		if (pView->m_pVoiceCoil[0])
-			pView->m_pVoiceCoil[1]->MoveSmacShiftPos(1);
+			pView->m_pVoiceCoil[1]->MoveSmacShiftPos();
 	}
 	else if(bOn0 && bOn1)
 	{
 		if (pView->m_pVoiceCoil[0])
-			pView->m_pVoiceCoil[0]->MoveSmacShiftPos(0);
+			pView->m_pVoiceCoil[0]->MoveSmacShiftPos();
 		if (pView->m_pVoiceCoil[1])
-			pView->m_pVoiceCoil[1]->MoveSmacShiftPos(1);
+			pView->m_pVoiceCoil[1]->MoveSmacShiftPos();
 	}
 }
 
@@ -1474,19 +1474,19 @@ void CDlgUtil03::OnBtnMkHome()
 	if (bOn0 && !bOn1)
 	{
 		if (pView->m_pVoiceCoil[0])
-			pView->m_pVoiceCoil[0]->SearchHomeSmac(0);
+			pView->m_pVoiceCoil[0]->SearchHomeSmac();
 	}
 	else if (!bOn0 && bOn1)
 	{
 		if (pView->m_pVoiceCoil[1])
-			pView->m_pVoiceCoil[1]->SearchHomeSmac(1);
+			pView->m_pVoiceCoil[1]->SearchHomeSmac();
 	}
 	else if(bOn0 && bOn1)
 	{
 		if (pView->m_pVoiceCoil[0])
-			pView->m_pVoiceCoil[0]->SearchHomeSmac(0);
+			pView->m_pVoiceCoil[0]->SearchHomeSmac();
 		if (pView->m_pVoiceCoil[1])
-			pView->m_pVoiceCoil[1]->SearchHomeSmac(1);
+			pView->m_pVoiceCoil[1]->SearchHomeSmac();
 	}
 }
 

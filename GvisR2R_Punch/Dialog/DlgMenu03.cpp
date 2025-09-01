@@ -2146,8 +2146,8 @@ LRESULT CDlgMenu03::OnMyBtnDown(WPARAM wPara, LPARAM lPara)
 	{
 		if(pView->m_pVoiceCoil[0])
 		{
-			pView->m_pVoiceCoil[0]->SearchHomeSmac(0);
-			pView->m_pVoiceCoil[0]->MoveSmacShiftPos(0);
+			pView->m_pVoiceCoil[0]->SearchHomeSmac();
+			pView->m_pVoiceCoil[0]->MoveSmacShiftPos();
 			pView->m_bProbDn[0] = FALSE;
 		}
 	}
@@ -2156,8 +2156,8 @@ LRESULT CDlgMenu03::OnMyBtnDown(WPARAM wPara, LPARAM lPara)
 	{
 		if(pView->m_pVoiceCoil[1])
 		{
-			pView->m_pVoiceCoil[1]->SearchHomeSmac(1);
-			pView->m_pVoiceCoil[1]->MoveSmacShiftPos(1);
+			pView->m_pVoiceCoil[1]->SearchHomeSmac();
+			pView->m_pVoiceCoil[1]->MoveSmacShiftPos();
 			pView->m_bProbDn[1] = FALSE;
 		}
 	}
@@ -3202,6 +3202,7 @@ BOOL CDlgMenu03::DoReset()
 			// ÃÊ±âÈ­
 			pDoc->m_ListBuf[0].Clear();
 			pDoc->m_ListBuf[1].Clear();
+			pDoc->m_ListSerialYield.Clear();
 		}
 		else
 		{

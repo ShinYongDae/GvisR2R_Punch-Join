@@ -885,6 +885,7 @@ struct stMarking
 	CString sWaitVel;
 	CString sWaitAcc;
 	CString sMarkingPos;
+	CString sMarkingSensingPosOffset;
 	CString sMarkingVel;
 	CString sMarkingAcc;
 	CString sMarkingToq;
@@ -902,6 +903,7 @@ struct stMarking
 		sWaitVel = _T("");
 		sWaitAcc = _T("");
 		sMarkingPos = _T("");
+		sMarkingSensingPosOffset = _T("");
 		sMarkingVel = _T("");
 		sMarkingAcc = _T("");
 		sMarkingToq = _T("");

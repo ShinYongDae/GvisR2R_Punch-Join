@@ -224,8 +224,10 @@
 #define IDC_EDIT_NO_MK_R1_RB_Y          1038
 #define IDC_STC_MDL                     1039
 #define IDC_STATIC_21                   1039
+#define IDC_EDIT_MK_OFFSET              1039
 #define IDC_STC_MODEL                   1040
 #define IDC_STATIC_22                   1040
+#define IDC_EDIT_MK_OFFSET2             1040
 #define IDC_STC_LAY                     1041
 #define IDC_STATIC_23                   1041
 #define IDC_STC_LAYER                   1042

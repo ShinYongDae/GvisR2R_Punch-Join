@@ -106,6 +106,7 @@ public:
 	CString m_sMsgBox, m_sPrevMsgBox;
 	CString m_sIsMsgBox;
 
+	stListBuf m_ListSerialYield;
 	stListBuf m_ListBuf[2]; // [0]:AOI-Up , [1]:AOI-Dn
 
 	BOOL m_bNewLotShare[2]; // [0]:AOI-Up , [1]:AOI-Dn
