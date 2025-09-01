@@ -793,7 +793,7 @@ BOOL CSmac::IsDoneMark()
 {
 	double dPos, dShiftPos, dFinalPos, dJudgePos;
 	int nPos;
-	CString sPos;
+	CString sPos, sLog;
 
 	//return m_bReturnCmdEnd;
 	if (!m_bDoneMark)
@@ -814,9 +814,12 @@ BOOL CSmac::IsDoneMark()
 						m_bMisMark = TRUE;
 					else
 						m_bMisMark = FALSE;
+					sLog.Format(_T("DN: %.3f"), dFinalPos);
+					pDoc->LogPunch(sLog);
 				}
 				else
 				{
+					pDoc->LogPunch(_T("No_Return"));
 					m_bMisMark = TRUE;
 				}
 				m_nStepIsDoneMark++;
@@ -828,7 +831,11 @@ BOOL CSmac::IsDoneMark()
 			dJudgePos = (dShiftPos + dFinalPos) / 2.0;
 			dPos = GetSmacPosition();
 			if (dPos < dJudgePos)	// 대기위치까지 무한 대기 상태
+			{
+				sLog.Format(_T("UP: %.3f"), dPos);
+				pDoc->LogPunch(sLog);
 				m_nStepIsDoneMark++;
+			}
 			else
 				Sleep(100);
 			break;

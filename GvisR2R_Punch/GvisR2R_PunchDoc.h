@@ -16,6 +16,7 @@
 #define PATH_LOG		_T("C:\\Debuging\\Log")
 #define PATH_LOG_AUTO	_T("C:\\Debuging\\Log\\Auto")
 #define PATH_LOG_PLC	_T("C:\\Debuging\\Log\\PLC")
+#define PATH_LOG_PUNCH	_T("C:\\Debuging\\Log\\PUNCH")
 
 class CGvisR2R_PunchDoc : public CDocument
 {
@@ -154,6 +155,7 @@ public:
 
 	void LogAuto(CString strMsg, int nType = 0);
 	void LogPLC(CString strMsg, int nType = 0);
+	void LogPunch(CString strMsg, int nType = 0);
 	CString GetProcessNum();
 	BOOL LoadWorkingInfo();
 	void SaveWorkingInfo();
