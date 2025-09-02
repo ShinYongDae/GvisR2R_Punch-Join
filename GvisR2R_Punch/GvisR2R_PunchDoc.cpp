@@ -12982,61 +12982,6 @@ void CGvisR2R_PunchDoc::LogAuto(CString strMsg, int nType)
 	file.Close();
 }
 
-// Write Log for PLC
-void CGvisR2R_PunchDoc::LogPLC(CString strMsg, int nType)
-{
-	if (m_bOffLogPLC)
-		return;
-
-	CSafeLockDoc lock(&g_LogLockPLC);
-
-	TCHAR szFile[MAX_PATH] = { 0, };
-	TCHAR szPath[MAX_PATH] = { 0, };
-	TCHAR* pszPos = NULL;
-
-	_stprintf(szPath, PATH_LOG);
-	if (!DirectoryExists(szPath))
-		CreateDirectory(szPath, NULL);
-
-	_stprintf(szPath, PATH_LOG_PLC);
-	if (!DirectoryExists(szPath))
-		CreateDirectory(szPath, NULL);
-
-	COleDateTime time = COleDateTime::GetCurrentTime();
-
-	switch (nType)
-	{
-	case 0:
-		_stprintf(szFile, _T("%s\\%s.txt"), szPath, COleDateTime::GetCurrentTime().Format(_T("%Y%m%d")));
-		break;
-	}
-
-	CString strDate;
-	CString strContents;
-	CTime now;
-
-	strDate.Format(_T("%s: "), COleDateTime::GetCurrentTime().Format(_T("%Y/%m/%d %H:%M:%S")));
-	strContents = strDate;
-	strContents += strMsg;
-	strContents += _T("\r\n");
-	strContents += _T("\r\n");
-
-	CFile file;
-
-	if (file.Open(szFile, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeWrite | CFile::shareDenyNone) == 0)
-		return;
-
-	char cameraKey[1024];
-	StringToChar(strContents, cameraKey);
-
-	file.SeekToEnd();
-	int nLenth = strContents.GetLength();
-	int nLenth2 = strlen(cameraKey);
-	file.Write(cameraKey, nLenth2);
-	file.Flush();
-	file.Close();
-}
-
 void CGvisR2R_PunchDoc::StringToChar(CString str, char* pCh) // char* returned must be deleted... 
 {
 	wchar_t*	wszStr;
@@ -15981,6 +15926,61 @@ void CGvisR2R_PunchDoc::SetDoorAoiUp()
 	pView->MpeWrite(pView->Plc.DlgInfo.DoorSensorAoiUp, pDoc->WorkingInfo.LastJob.bAoiUpDrSen ? 1 : 0);	// AOI(상) Door센서 사용
 }
 
+// Write Log for PLC
+void CGvisR2R_PunchDoc::LogPLC(CString strMsg, int nType)
+{
+	if (m_bOffLogPLC)
+		return;
+
+	CSafeLockDoc lock(&g_LogLockPLC);
+
+	TCHAR szFile[MAX_PATH] = { 0, };
+	TCHAR szPath[MAX_PATH] = { 0, };
+	TCHAR* pszPos = NULL;
+
+	_stprintf(szPath, PATH_LOG);
+	if (!DirectoryExists(szPath))
+		CreateDirectory(szPath, NULL);
+
+	_stprintf(szPath, PATH_LOG_PLC);
+	if (!DirectoryExists(szPath))
+		CreateDirectory(szPath, NULL);
+
+	COleDateTime time = COleDateTime::GetCurrentTime();
+
+	switch (nType)
+	{
+	case 0:
+		_stprintf(szFile, _T("%s\\%s.txt"), szPath, COleDateTime::GetCurrentTime().Format(_T("%Y%m%d")));
+		break;
+	}
+
+	CString strDate;
+	CString strContents;
+	CTime now;
+
+	strDate.Format(_T("%s: "), COleDateTime::GetCurrentTime().Format(_T("%Y/%m/%d %H:%M:%S")));
+	strContents = strDate;
+	strContents += strMsg;
+	strContents += _T("\r\n");
+	//strContents += _T("\r\n");
+
+	CFile file;
+
+	if (file.Open(szFile, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeWrite | CFile::shareDenyNone) == 0)
+		return;
+
+	char cameraKey[1024];
+	StringToChar(strContents, cameraKey);
+
+	file.SeekToEnd();
+	int nLenth = strContents.GetLength();
+	int nLenth2 = strlen(cameraKey);
+	file.Write(cameraKey, nLenth2);
+	file.Flush();
+	file.Close();
+}
+
 
 // Write Log for Punch
 void CGvisR2R_PunchDoc::LogPunch(CString strMsg, int nType)
@@ -16015,11 +16015,17 @@ void CGvisR2R_PunchDoc::LogPunch(CString strMsg, int nType)
 	CString strContents;
 	CTime now;
 
-	strDate.Format(_T("%s: "), COleDateTime::GetCurrentTime().Format(_T("%Y/%m/%d %H:%M:%S")));
-	strContents = strDate;
+	SYSTEMTIME cur_time;
+	GetLocalTime(&cur_time);
+	CString strTime;
+	strTime.Format(_T("[%02d:%02d:%02d.%03d] : "), cur_time.wHour, cur_time.wMinute, cur_time.wSecond, cur_time.wMilliseconds);
+	strContents = strTime;
+
+	//strDate.Format(_T("%s: "), COleDateTime::GetCurrentTime().Format(_T("%Y/%m/%d %H:%M:%S")));
+	//strContents = strDate;
 	strContents += strMsg;
 	strContents += _T("\r\n");
-	strContents += _T("\r\n");
+	//strContents += _T("\r\n");
 
 	CFile file;
 
