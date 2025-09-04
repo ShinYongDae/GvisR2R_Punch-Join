@@ -38,7 +38,7 @@ protected: // serialization에서만 만들어집니다.
 public:
 	CfPoint m_pntNoMkLeft[2][4], m_pntNoMkRight[2][4]; // LT, LB, RB, RT
 	BOOL m_bVsStatusUp, m_bVsStatusDn;
-	BOOL m_bOffLogAuto, m_bOffLogPLC;
+	BOOL m_bOffLogAuto, m_bOffLogPLC, m_bChkSmacWaitPos;
 	int m_nDelayShow, m_nJudgeMkModelSize, m_nJudgeMkModelHistoSize;
 	BOOL m_bBufEmpty[2]; // [0]: Up, [1]: Dn
 	BOOL m_bBufEmptyF[2]; // [0]: Up, [1]: Dn

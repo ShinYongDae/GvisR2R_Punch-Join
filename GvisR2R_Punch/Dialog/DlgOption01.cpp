@@ -67,6 +67,7 @@ BEGIN_MESSAGE_MAP(CDlgOption01, CDialog)
 	ON_BN_CLICKED(IDC_CHECK14, &CDlgOption01::OnBnClickedCheck14)
 	ON_EN_CHANGE(IDC_EDIT_MK_OFFSET, &CDlgOption01::OnEnChangeEditMkOffset)
 	ON_EN_CHANGE(IDC_EDIT_MK_OFFSET2, &CDlgOption01::OnEnChangeEditMkOffset2)
+	ON_BN_CLICKED(IDC_CHECK15, &CDlgOption01::OnBnClickedCheck15)
 END_MESSAGE_MAP()
 
 
@@ -336,6 +337,7 @@ void CDlgOption01::DispStatus()
 	((CButton*)GetDlgItem(IDC_CHECK12))->SetCheck(pDoc->m_bDebugJudgeMk);
 	((CButton*)GetDlgItem(IDC_CHECK13))->SetCheck(pDoc->m_bUsePchFile);
 	((CButton*)GetDlgItem(IDC_CHECK14))->SetCheck(pDoc->m_bCntMkedImg);
+	((CButton*)GetDlgItem(IDC_CHECK15))->SetCheck(pDoc->m_bChkSmacWaitPos);
 
 	if (pView->m_pMotion)
 	{
@@ -594,4 +596,21 @@ void CDlgOption01::OnEnChangeEditMkOffset2()
 	GetDlgItem(IDC_EDIT_MK_OFFSET2)->GetWindowText(sData);
 	pDoc->WorkingInfo.Marking[1].sMarkingSensingPosOffset = sData;
 	::WritePrivateProfileString(_T("Marking1"), _T("MARKING_MARKING_SENSING_POS_OFFSET"), sData, sPath);
+}
+
+
+void CDlgOption01::OnBnClickedCheck15()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	BOOL bOn = ((CButton*)GetDlgItem(IDC_CHECK15))->GetCheck();
+	pDoc->m_bChkSmacWaitPos = bOn;
+
+	if (bOn)
+	{
+		::WritePrivateProfileString(_T("System"), _T("ChkSmacWaitPos"), _T("1"), PATH_WORKING_INFO);
+	}
+	else
+	{
+		::WritePrivateProfileString(_T("System"), _T("ChkSmacWaitPos"), _T("0"), PATH_WORKING_INFO);
+	}
 }

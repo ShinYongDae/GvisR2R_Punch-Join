@@ -1556,6 +1556,7 @@
 #define IDC_CHK_USE_AOI_INNER           1428
 #define IDC_STC_12_95                   1428
 #define IDC_STC_REJECT_IMG2             1428
+#define IDC_CHECK15                     1428
 #define IDC_STC_DEF_12                  1429
 #define IDC_CHK_USE_AOI_OUTER           1429
 #define IDC_CHK_123                     1429

@@ -37,7 +37,7 @@ public:
 
 // Attributes
 public:
-	CRs232Smac m_Rs232Smac;
+	CRs232Smac m_Rs232;
 	BOOL m_bRs232Run;
 
 	CString m_strReceiveVoiceCoil;
@@ -85,7 +85,7 @@ public:
 	BOOL IsDoneMark(int nMkPcsIdx);
 	BOOL IsMissMark();
 	double GetMkFinalPos();
-
+	
 	void SetProbShiftData();
 	void SetProbFinalData();
 

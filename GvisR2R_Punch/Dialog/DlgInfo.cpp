@@ -2745,6 +2745,9 @@ void CDlgInfo::OnStnClickedStc193()
 	pDoc->SetVerifyPunchHistoScore(_ttof(sVal));
 
 	::WritePrivateProfileString(_T("Last Job"), _T("Judge Marking Histo Ratio Left"), sVal, PATH_WORKING_INFO);
+
+	if (pView->m_pDlgMenu02)
+		pView->m_pDlgMenu02->DispMkPmStdVal();
 }
 
 
@@ -2768,6 +2771,9 @@ void CDlgInfo::OnStnClickedStc195()
 	pDoc->SetVerifyPunchHistoScore2(_ttof(sVal));
 
 	::WritePrivateProfileString(_T("Last Job"), _T("Judge Marking Histo Ratio Right"), sVal, PATH_WORKING_INFO);
+
+	if (pView->m_pDlgMenu02)
+		pView->m_pDlgMenu02->DispMkPmStdVal();
 }
 
 

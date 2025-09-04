@@ -58,18 +58,18 @@ END_MESSAGE_MAP()
 
 void CSmac::Init()
 {
-	m_Rs232Smac.SetHwnd(this);
-	m_Rs232Smac.m_nPort = (BYTE)_tstoi(pDoc->WorkingInfo.VoiceCoil[m_nCh].sPort);
-	m_Rs232Smac.m_dwBaudRate = (DWORD)_tstoi(pDoc->WorkingInfo.VoiceCoil[m_nCh].sBaudRate);
-	m_Rs232Smac.m_bCR = pDoc->WorkingInfo.VoiceCoil[m_nCh].bCr;
-	m_Rs232Smac.m_bLF = pDoc->WorkingInfo.VoiceCoil[m_nCh].bLf;
-	m_bRs232Run = m_Rs232Smac.OpenComPort();
+	m_Rs232.SetHwnd(this);
+	m_Rs232.m_nPort = (BYTE)_tstoi(pDoc->WorkingInfo.VoiceCoil[m_nCh].sPort);
+	m_Rs232.m_dwBaudRate = (DWORD)_tstoi(pDoc->WorkingInfo.VoiceCoil[m_nCh].sBaudRate);
+	m_Rs232.m_bCR = pDoc->WorkingInfo.VoiceCoil[m_nCh].bCr;
+	m_Rs232.m_bLF = pDoc->WorkingInfo.VoiceCoil[m_nCh].bLf;
+	m_bRs232Run = m_Rs232.OpenComPort();
 
 #ifdef USE_SMAC
 	if(!m_bRs232Run)
 	{
 		CString sMsg;
-		sMsg.Format(_T("보이스코일이 초기화되지 않았습니다.(COM%d)"), m_Rs232Smac.m_nPort);
+		sMsg.Format(_T("보이스코일이 초기화되지 않았습니다.(COM%d)"), m_Rs232.m_nPort);
 //		pView->MsgBox(_T("보이스코일이 초기화되지 않았습니다.");
 		pView->ClrDispMsg();
 		AfxMessageBox(sMsg);
@@ -84,7 +84,7 @@ void CSmac::Close()
 
 	if(m_bRs232Run)
 	{
-		m_Rs232Smac.DestroyRs232();
+		m_Rs232.DestroyRs232();
 		m_bRs232Run = FALSE;
 	}
 }
@@ -92,7 +92,7 @@ void CSmac::Close()
 CString CSmac::Rcv()
 {
 	CString sRcv = m_sRcvRs232;
-	m_Rs232Smac.ClearReceive();
+	m_Rs232.ClearReceive();
 	m_sRcvRs232 = _T("");
 
 	return sRcv;
@@ -105,7 +105,7 @@ BOOL CSmac::Send(CString str)
 	char* pRtn = NULL;
 	char* cSend = new char[nLen+1];
 	strcpy(cSend, pRtn=StringToChar(str));
-	BOOL bRtn = m_Rs232Smac.WriteRs232Block(cSend, nLen);
+	BOOL bRtn = m_Rs232.WriteRs232Block(cSend, nLen);
 	delete cSend;
 
 	if(pRtn)
@@ -141,7 +141,10 @@ void CSmac::SearchHomeSmac()
 	{
 		SetEsc();
 		pView->ClrDispMsg();
-		AfxMessageBox(_T("Fail Homming."));
+		if(!m_nCh)
+			AfxMessageBox(_T("Fail Homming - First SMAC."));
+		else
+			AfxMessageBox(_T("Fail Homming - Second SMAC."));
 	}
 #endif
 }
@@ -173,7 +176,11 @@ double CSmac::GetSmacPosition()
 	if(!WaitSmacCmdEnd(_T("OK")))
 	{
 		SetEsc();
-		pView->ClrDispMsg(); AfxMessageBox(_T("Fail GetPosition First Smac."));
+		pView->ClrDispMsg(); 
+		if(!m_nCh)
+			AfxMessageBox(_T("Fail GetPosition First Smac."));
+		else
+			AfxMessageBox(_T("Fail GetPosition Second Smac."));
 		return 0.0;
 	}
 
@@ -210,7 +217,10 @@ void CSmac::MoveSmacShiftPos()
 	{
 		SetEsc();
 		pView->ClrDispMsg(); 
-		AfxMessageBox(_T("Fail Moving Shift Position."));
+		if (!m_nCh)
+			AfxMessageBox(_T("Fail Moving Shift Position(Left)."));
+		else
+			AfxMessageBox(_T("Fail Moving Shift Position(Right)."));
 	}
 
 	Sleep(30);
@@ -238,7 +248,11 @@ void CSmac::MoveSmacFinalPos()
 	if (!WaitSmacCmdEnd(_T("OK")))
 	{
 		SetEsc();
-		pView->ClrDispMsg(); AfxMessageBox(_T("Fail Moving Final Position - First Smac."));
+		pView->ClrDispMsg(); 
+		if (!m_nCh)
+			AfxMessageBox(_T("Fail Moving Final Position - First Smac."));
+		else
+			AfxMessageBox(_T("Fail Moving Final Position - Second Smac."));
 	}
 	
 	dPos = GetSmacPosition();
@@ -260,7 +274,10 @@ void CSmac::MoveSmacMeasPos()
 	{
 		SetEsc();
 		pView->ClrDispMsg();
-		AfxMessageBox(_T("Fail Moving Final Position."));
+		if (!m_nCh)
+			AfxMessageBox(_T("Fail Moving Final Position - First Smac."));
+		else
+			AfxMessageBox(_T("Fail Moving Final Position - Second Smac."));
 	}
 
 	dPos = GetSmacPosition();
@@ -295,7 +312,11 @@ CString CSmac::GetSmacStatus()
 	if (!WaitSmacCmdEnd(_T("OK")))
 	{
 		SetEsc();
-		pView->ClrDispMsg(); AfxMessageBox(_T("Fail GetStatus First Smac."));
+		pView->ClrDispMsg(); 
+		if (!m_nCh)
+			AfxMessageBox(_T("Fail GetStatus First Smac - First Smac."));
+		else
+			AfxMessageBox(_T("Fail GetStatus First Smac - Second Smac."));
 		return _T("NG");
 	}
 
@@ -334,8 +355,13 @@ double CSmac::GetSmacMeasureOfSurface()
 	if (!WaitSmacCmdEnd(_T("OK")))
 	{
 		SetEsc();
-		pView->ClrDispMsg(); AfxMessageBox(_T("Fail Measuring Surface First Smac."));
-		dPos = GetSmacPosition();
+		pView->ClrDispMsg(); 
+		if (!m_nCh)
+			AfxMessageBox(_T("Fail Measuring Surface First Smac."));
+		else
+			AfxMessageBox(_T("Fail Measuring Surface First Smac."));
+
+		//dPos = GetSmacPosition();
 		return 0.0;
 	}
 
@@ -447,7 +473,12 @@ BOOL CSmac::WaitSmacCmdEnd(CString strEndCmd)
 		else
 		{
 			pView->ClrDispMsg(); 
-			AfxMessageBox(_T("Error, Wait Smac Cmd End."));
+
+			if (!m_nCh)
+				AfxMessageBox(_T("Error, Wait Smac Cmd End - First SMAC."));
+			else
+				AfxMessageBox(_T("Error, Wait Smac Cmd End - Second SMAC."));
+
 			return FALSE;
 		}
 	}
@@ -568,9 +599,14 @@ CString CSmac::DisplaySmacErrorList(int nErrCode)
 		strError=_T("");
 		return strError;
 	}
-
-	strVal.Format(_T("SMAC Error code is %s ."), strError);
-	pView->ClrDispMsg(); AfxMessageBox(strVal);
+		
+	if (!m_nCh)
+		strVal.Format(_T("First SMAC Error code is %s ."), strError);
+	else
+		strVal.Format(_T("Second SMAC Error code is %s ."), strError);
+	
+	pView->ClrDispMsg(); 
+	AfxMessageBox(strVal);
 
 	return strError;
 }
@@ -593,14 +629,14 @@ LRESULT CSmac::OnReceiveRs232(WPARAM wP, LPARAM lP)
 {
 	CString str;
 	if(m_sRcvRs232.IsEmpty())
-		m_sRcvRs232.Format(_T("%s"),m_Rs232Smac.m_cRxBuffer);
+		m_sRcvRs232.Format(_T("%s"),m_Rs232.m_cRxBuffer);
 	else
 	{
-		str.Format(_T("%s"),m_Rs232Smac.m_cRxBuffer);
+		str.Format(_T("%s"),m_Rs232.m_cRxBuffer);
 		m_sRcvRs232 += str;
 		m_strReceiveVoiceCoil = m_sRcvRs232;
 	}
-	m_Rs232Smac.ClearReceive();
+	m_Rs232.ClearReceive();
 	return 0L;
 }
 
@@ -619,16 +655,16 @@ BOOL CSmac::SetCmdEndChk(CString strEndCmd)
 	CurTimer=GetTickCount();
 	
 	m_bReturnCmdEnd = FALSE; // Chk 
-	if(!m_bRunTimerCheckEnd)
+	if (!m_bRunTimerCheckEnd)
 	{
 		m_bRunTimerCheckEnd = TRUE;
 		m_strEndCmd = strEndCmd;
-		if(!m_bTimerStop)
+		if (!m_bTimerStop)
 			SetTimer(TIMER_CHECK_END_CMD, 100, NULL);
 	}
 	else
 		return FALSE;
-
+	
 	return TRUE;
 }
 
@@ -640,53 +676,45 @@ void CSmac::OnTimer(UINT_PTR nIDEvent)//(UINT nIDEvent)
 
 	switch (nIDEvent)
 	{
-		case TIMER_CHECK_END_CMD:
-			KillTimer(TIMER_CHECK_END_CMD);
-			if (m_bRunTimerCheckEnd)
+	case TIMER_CHECK_END_CMD:
+		KillTimer(TIMER_CHECK_END_CMD);
+		if (m_bRunTimerCheckEnd)
+		{
+			if (m_strReceiveVoiceCoil.Find(m_strEndCmd) != -1)
 			{
-				if (m_strReceiveVoiceCoil.Find(m_strEndCmd) != -1)
-				{
-					m_bRunTimerCheckEnd = FALSE;
-					m_bReturnCmdEnd = TRUE;
-					Sleep(10);
-				}
-				else
-					SetTimer(TIMER_CHECK_END_CMD, 100, NULL);
+				m_bRunTimerCheckEnd = FALSE;
+				m_bReturnCmdEnd = TRUE;
+				Sleep(10);
 			}
-			break;
-		case TIMER_CHECK_ERROR_CODE:    
-			KillTimer(TIMER_CHECK_ERROR_CODE);
-			nErrCode = CheckSmacErrorCode();
-			if(nErrCode) // 0: No Error...
-				DisplaySmacErrorList(nErrCode);
-			break;
-		default:    //MPIMessageFATAL_ERROR;		
-			break;
+			else
+				SetTimer(TIMER_CHECK_END_CMD, 100, NULL);
+		}
+		break;
+	//case TIMER_CHECK_END_CMD:
+	//	if(m_strReceiveVoiceCoil.Find(m_strEndCmd) != -1)
+	//	{
+	//		if(m_bRunTimerCheckEnd)
+	//		{
+	//			KillTimer(TIMER_CHECK_END_CMD);
+	//			m_bRunTimerCheckEnd = FALSE;
+	//		}
+	//		m_bReturnCmdEnd = TRUE;
+	//		Sleep(10);
+	//	}
+	//	break;
+	case TIMER_CHECK_ERROR_CODE:    
+		KillTimer(TIMER_CHECK_ERROR_CODE);
+		nErrCode = CheckSmacErrorCode();
+		if(nErrCode) // 0: No Error...
+			DisplaySmacErrorList(nErrCode);
+		break;
+	default:    //MPIMessageFATAL_ERROR;		
+		break;
 	}
 
 	CWnd::OnTimer(nIDEvent);
 }
 
-
-void CSmac::SetMarking()
-{
-	CString strSend;
-	strSend.Format(_T("MS60")); // Punching
-	ClearReceive();
-	
-	m_strReceiveVoiceCoil = _T("");
-	SendStringToVoiceCoil(strSend);
-	Sleep(30);
-	SendStringToVoiceCoil(_T("\r\n"));
-	Sleep(100);
-	if (!WaitSmacCmdEnd(_T("PUNCHING_OK")))
-	{
-		SetEsc();
-		pView->ClrDispMsg(); 
-		AfxMessageBox(_T("Fail Punching First Smac."));
-	}
-	Sleep(30);
-}
 
 void CSmac::SetMarkShiftData()
 {
@@ -770,6 +798,29 @@ void CSmac::SetMarkFinalData()
 }
 
 
+void CSmac::SetMarking()
+{
+	CString strSend;
+	strSend.Format(_T("MS60")); // Punching
+	ClearReceive();
+
+	m_strReceiveVoiceCoil = _T("");
+	SendStringToVoiceCoil(strSend);
+	Sleep(30);
+	SendStringToVoiceCoil(_T("\r\n"));
+	Sleep(100);
+	if (!WaitSmacCmdEnd(_T("PUNCHING_OK")))
+	{
+		SetEsc();
+		pView->ClrDispMsg();
+		if (!m_nCh)
+			AfxMessageBox(_T("Fail Punching First Smac."));
+		else
+			AfxMessageBox(_T("Fail Punching Second Smac."));
+	}
+	Sleep(30);
+}
+
 BOOL CSmac::SetMark()
 {
 	if (m_bRunTimerCheckEnd)
@@ -778,7 +829,7 @@ BOOL CSmac::SetMark()
 	CString strSend;
 	strSend.Format(_T("MS60")); // Punching
 	ClearReceive();
-
+	
 	m_strReceiveVoiceCoil = _T("");
 	SendStringToVoiceCoil(strSend);
 	Sleep(30);
@@ -799,108 +850,119 @@ double CSmac::GetMkFinalPos()
 
 BOOL CSmac::IsDoneMark(int nMkPcsIdx)
 {
+	//return m_bReturnCmdEnd;
 	double dPos, dShiftPos, dFinalPos, dJudgePos;
-	int nPos;
+	int nPos, nSerial;
 	CString sPos, sLog;
 
-	if (!m_bDoneMark)
+	if (!pDoc->m_bChkSmacWaitPos)
 	{
-		if (m_bReturnCmdEnd)
+		if (!m_bDoneMark)
 		{
-			nPos = m_strReceiveVoiceCoil.Find(_T(":PUNCHING_OK"), 0);
-			if (nPos > 0)
+			if (m_bReturnCmdEnd)
 			{
-				sPos = m_strReceiveVoiceCoil.Left(nPos);
-				nPos = sPos.ReverseFind('\r');
-				sPos = sPos.Left(nPos);
-				nPos = sPos.Find('\n');
-				sPos = sPos.Right(nPos + 1);
-				m_dFinalMkPos = _tstof(sPos) * 0.005; // 엔코더 해상도 : [5um / 1pluse]
-				dFinalPos = _tstof(pDoc->WorkingInfo.Marking[m_nCh].sMarkingPos);
-				dJudgePos = dFinalPos + _tstof(pDoc->WorkingInfo.Marking[m_nCh].sMarkingSensingPosOffset);
-				if (m_dFinalMkPos < dJudgePos) // 미마킹으로 판단
+				nPos = m_strReceiveVoiceCoil.Find(_T(":PUNCHING_OK"), 0);
+				if (nPos > 0)
+				{
+					sPos = m_strReceiveVoiceCoil.Left(nPos);
+					nPos = sPos.ReverseFind('\r');
+					sPos = sPos.Left(nPos);
+					nPos = sPos.Find('\n');
+					sPos = sPos.Right(nPos + 1);
+					m_dFinalMkPos = _tstof(sPos) * 0.005; // 엔코더 해상도 : [5um / 1pluse]
+					dFinalPos = _tstof(pDoc->WorkingInfo.Marking[m_nCh].sMarkingPos);
+					dJudgePos = dFinalPos + _tstof(pDoc->WorkingInfo.Marking[m_nCh].sMarkingSensingPosOffset);
+					if (m_dFinalMkPos < dJudgePos) // 미마킹으로 판단
+						m_bMisMark = TRUE;
+					else
+						m_bMisMark = FALSE;
+					nSerial = pView->m_nBufUpSerial[m_nCh]; // Cam1
+					if (m_nCh)
+						sLog.Format(_T("%s DN%d: %.3f"), pView->GetMkInfo1(nSerial, nMkPcsIdx, FALSE), m_nCh, m_dFinalMkPos);
+					else
+						sLog.Format(_T("%s DN%d: %.3f"), pView->GetMkInfo0(nSerial, nMkPcsIdx, FALSE), m_nCh, m_dFinalMkPos);
+					pDoc->LogPunch(sLog);
+				}
+				else
+				{
+					pDoc->LogPunch(_T("No_Return"));
 					m_bMisMark = TRUE;
-				else
-					m_bMisMark = FALSE;
-				int nSerial = pView->m_nBufUpSerial[m_nCh]; // Cam1
-				if (m_nCh)
-					sLog.Format(_T("%s DN%d: %.3f"), pView->GetMkInfo1(nSerial, nMkPcsIdx, FALSE), m_nCh, m_dFinalMkPos);
-				else
-					sLog.Format(_T("%s DN%d: %.3f"), pView->GetMkInfo0(nSerial, nMkPcsIdx, FALSE), m_nCh, m_dFinalMkPos);
-				pDoc->LogPunch(sLog);
+				}
+				m_bDoneMark = TRUE;
+				return TRUE;
 			}
-			else
-			{
-				pDoc->LogPunch(_T("No_Return"));
-				m_bMisMark = TRUE;
-			}
-			m_bDoneMark = TRUE;
-			return TRUE;
+
+			return FALSE;
 		}
-
-		return FALSE;
-	}
-	else
-		return TRUE;
-
-	/*
-	//return m_bReturnCmdEnd;
-	if (!m_bDoneMark)
-	{
-	switch (m_nStepIsDoneMark)
-	{
-	case 0:
-	if (m_bReturnCmdEnd)
-	{
-	nPos = m_strReceiveVoiceCoil.Find(_T(":PUNCHING_OK"), 0);
-	if (nPos > 0)
-	{
-	sPos = m_strReceiveVoiceCoil.Left(nPos);
-	nPos = sPos.ReverseFind('\r');
-	sPos = sPos.Left(nPos);
-	nPos = sPos.Find('\n');
-	sPos = sPos.Right(nPos+1);
-	m_dFinalMkPos = _tstof(sPos) * 0.005; // 엔코더 해상도 : [5um / 1pluse]
-	dFinalPos = _tstof(pDoc->WorkingInfo.Marking[m_nCh].sMarkingPos);
-	dJudgePos = dFinalPos + _tstof(pDoc->WorkingInfo.Marking[m_nCh].sMarkingSensingPosOffset);
-	if(m_dFinalMkPos < dJudgePos) // 미마킹으로 판단
-	m_bMisMark = TRUE;
-	else
-	m_bMisMark = FALSE;
-	sLog.Format(_T("DN%d: %.3f"), m_nCh, m_dFinalMkPos);
-	pDoc->LogPunch(sLog);
+		else
+			return TRUE;
 	}
 	else
 	{
-	pDoc->LogPunch(_T("No_Return"));
-	m_bMisMark = TRUE;
+		if (!m_bDoneMark)
+		{
+			switch (m_nStepIsDoneMark)
+			{
+			case 0:
+				if (m_bReturnCmdEnd)
+				{
+					nPos = m_strReceiveVoiceCoil.Find(_T(":PUNCHING_OK"), 0);
+					if (nPos > 0)
+					{
+						sPos = m_strReceiveVoiceCoil.Left(nPos);
+						nPos = sPos.ReverseFind('\r');
+						sPos = sPos.Left(nPos);
+						nPos = sPos.Find('\n');
+						sPos = sPos.Right(nPos + 1);
+						m_dFinalMkPos = _tstof(sPos) * 0.005; // 엔코더 해상도 : [5um / 1pluse]
+						dFinalPos = _tstof(pDoc->WorkingInfo.Marking[m_nCh].sMarkingPos);
+						dJudgePos = dFinalPos + _tstof(pDoc->WorkingInfo.Marking[m_nCh].sMarkingSensingPosOffset);
+						if (m_dFinalMkPos < dJudgePos) // 미마킹으로 판단
+							m_bMisMark = TRUE;
+						else
+							m_bMisMark = FALSE;
+						nSerial = pView->m_nBufUpSerial[m_nCh]; // Cam1
+						if (m_nCh)
+							sLog.Format(_T("%s DN%d: %.3f"), pView->GetMkInfo1(nSerial, nMkPcsIdx, FALSE), m_nCh, m_dFinalMkPos);
+						else
+							sLog.Format(_T("%s DN%d: %.3f"), pView->GetMkInfo0(nSerial, nMkPcsIdx, FALSE), m_nCh, m_dFinalMkPos);
+						pDoc->LogPunch(sLog);
+					}
+					else
+					{
+						pDoc->LogPunch(_T("No_Return"));
+						m_bMisMark = TRUE;
+					}
+					m_nStepIsDoneMark++;
+				}
+				break;
+			case 1:
+				dShiftPos = _tstof(pDoc->WorkingInfo.Marking[m_nCh].sWaitPos);
+				dFinalPos = _tstof(pDoc->WorkingInfo.Marking[m_nCh].sMarkingPos);
+				dJudgePos = (dShiftPos + dFinalPos) / 2.0;
+				dPos = GetSmacPosition();
+				if (dPos < dJudgePos)	// 대기위치까지 무한 대기 상태
+				{
+					nSerial = pView->m_nBufUpSerial[m_nCh]; // Cam1
+					if (m_nCh)
+						sLog.Format(_T("%s UP%d: %.3f"), pView->GetMkInfo1(nSerial, nMkPcsIdx, FALSE), m_nCh, dPos);
+					else
+						sLog.Format(_T("%s UP%d: %.3f"), pView->GetMkInfo0(nSerial, nMkPcsIdx, FALSE), m_nCh, dPos);
+					pDoc->LogPunch(sLog);
+					m_nStepIsDoneMark++;
+				}
+				else
+					Sleep(30);
+				break;
+			case 2:
+				m_bDoneMark = TRUE;
+				return TRUE;
+			}
+			return FALSE;
+		}
+		else
+			return TRUE;
 	}
-	m_nStepIsDoneMark++;
-	}
-	break;
-	case 1:
-	dShiftPos = _tstof(pDoc->WorkingInfo.Marking[m_nCh].sWaitPos);
-	dFinalPos = _tstof(pDoc->WorkingInfo.Marking[m_nCh].sMarkingPos);
-	dJudgePos = (dShiftPos + dFinalPos) / 2.0;
-	dPos = GetSmacPosition();
-	if (dPos < dJudgePos)	// 대기위치까지 무한 대기 상태
-	{
-	sLog.Format(_T("UP%d: %.3f"), m_nCh, dPos);
-	pDoc->LogPunch(sLog);
-	m_nStepIsDoneMark++;
-	}
-	else
-	Sleep(30);
-	break;
-	case 2:
-	m_bDoneMark = TRUE;
-	return TRUE;
-	}
-	return FALSE;
-	}
-	else
-	return TRUE;
-	*/
 }
 
 // Elec Check =================================

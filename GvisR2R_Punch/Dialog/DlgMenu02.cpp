@@ -6344,10 +6344,20 @@ void CDlgMenu02::DispMkPmScore(int nCam)
 void CDlgMenu02::DispMkPmStdVal()
 {
 	CString sVal;
-	sVal.Format(_T("%d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0]);
-	GetDlgItem(IDC_STATIC_MK_PM_SCORE3)->SetWindowText(sVal);
-	sVal.Format(_T("%d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1]);
-	GetDlgItem(IDC_STATIC_MK_PM_SCORE4)->SetWindowText(sVal);
+	if (pDoc->WorkingInfo.LastJob.bUseJudgeMk)
+	{
+		sVal.Format(_T("%d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[0]);
+		GetDlgItem(IDC_STATIC_MK_PM_SCORE3)->SetWindowText(sVal);
+		sVal.Format(_T("%d"), 100 - pDoc->WorkingInfo.LastJob.nJudgeMkRatio[1]);
+		GetDlgItem(IDC_STATIC_MK_PM_SCORE4)->SetWindowText(sVal);
+	}
+	if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
+	{
+		sVal.Format(_T("%d"), pDoc->WorkingInfo.LastJob.nJudgeMkHistoRatio[0]);
+		GetDlgItem(IDC_STATIC_MK_PM_SCORE3)->SetWindowText(sVal);
+		sVal.Format(_T("%d"), pDoc->WorkingInfo.LastJob.nJudgeMkHistoRatio[1]);
+		GetDlgItem(IDC_STATIC_MK_PM_SCORE4)->SetWindowText(sVal);
+	}
 }
 
 void CDlgMenu02::InitMkPmRst(int nCam)

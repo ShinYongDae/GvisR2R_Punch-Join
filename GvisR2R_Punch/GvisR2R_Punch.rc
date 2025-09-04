@@ -166,11 +166,11 @@ FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,14,7,20,20
     LTEXT           "GvisR2R_Punch, 버전 2.1.0",IDC_STATIC,42,7,114,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2025.09.03",IDC_STATIC,42,16,114,8
+    LTEXT           "Copyright (C) 2025.09.04",IDC_STATIC,42,16,114,8
     DEFPUSHBUTTON   "확인",IDOK,113,43,50,14,WS_GROUP
     LTEXT           "미마킹테스트(Histo) - White DN",IDC_STATIC,7,29,139,8
     LTEXT           "PCR파일로 릴맵 재생성 패치",IDC_STATIC,7,38,96,8
-    LTEXT           "수율 비동기 처리",IDC_STATIC,7,48,77,8
+    LTEXT           "수율 비동기 처리 - UpdateYield",IDC_STATIC,7,48,99,8
 END
 
 IDD_GVISR2R_PUNCH_FORM DIALOGEX 0, 0, 630, 461
@@ -2396,10 +2396,11 @@ BEGIN
     CONTROL         "Save Model Image for Judging",IDC_CHECK12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,154,115,12
     CONTROL         "이전 펀칭 얼라인 및 위치데이터(*.PCH) 사용",IDC_CHECK13,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,169,160,12
     CONTROL         "불량 마킹이미지 파일수 카운트",IDC_CHECK14,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,122,67,120,12
-    LTEXT           "마킹(좌) 감지위치 Offset [mm]",IDC_STATIC,219,15,95,8
+    LTEXT           "마킹(좌) 감지위치 Offset [mm]",IDC_STATIC,214,15,98,8
     EDITTEXT        IDC_EDIT_MK_OFFSET,316,13,37,13,ES_CENTER | ES_AUTOHSCROLL
-    LTEXT           "마킹(우) 감지위치 Offset [mm]",IDC_STATIC,219,30,94,8
+    LTEXT           "마킹(우) 감지위치 Offset [mm]",IDC_STATIC,214,30,98,8
     EDITTEXT        IDC_EDIT_MK_OFFSET2,316,28,37,13,ES_CENTER | ES_AUTOHSCROLL
+    CONTROL         "보이스코일 펀칭 후 대기위치 확인",IDC_CHECK15,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,232,48,120,12
 END
 
 IDD_DLG_CAMMASTERINFO_MST DIALOGEX 0, 0, 615, 319
