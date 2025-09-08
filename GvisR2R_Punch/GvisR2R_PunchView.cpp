@@ -14904,7 +14904,7 @@ void CGvisR2R_PunchView::DoMark0()
 				m_nStepMk[0]++;
 			}
 		}
-		else if (m_bPriority[1]) // Cam1 ->
+		else if (m_bPriority[2]) // Cam1 <-
 		{
 			if (IsMoveDone0())
 			{
@@ -14912,24 +14912,13 @@ void CGvisR2R_PunchView::DoMark0()
 				m_bPriority[2] = FALSE;
 				ptPnt.x = 0.0;
 				ptPnt.y = m_dEnc[AXIS_Y0];
-				Move0(ptPnt, FALSE); // (pDoc->WorkingInfo.System.bNoMk || bCam)
+				Move0(ptPnt, FALSE); 
 			}
 		}
-		else if (m_bPriority[2] && m_bPriority[3]) // Cam1 <- && Cam0 ->
+		else if (m_bPriority[1] && m_bPriority[3]) // Cam1 -> && Cam0 ->
 		{
 			break; // Cam1 이 안전위치로 대피할 때까지 기다린다.
 		}
-		//else if (m_bPriority[2]) // Cam1 <-
-		//{
-		//	if (IsMoveDone0())
-		//	{
-		//		m_bCollision[0] = FALSE;
-		//		m_bPriority[2] = FALSE;
-		//		ptPnt.x = 0.0;
-		//		ptPnt.y = m_dEnc[AXIS_Y0];
-		//		Move0(ptPnt, FALSE);
-		//	}
-		//}
 		break;
 	case 10:
 		m_nStepMk[0]++;
@@ -15637,7 +15626,7 @@ void CGvisR2R_PunchView::DoMark1()
 		{
 			if (IsMoveDone1())
 			{
-				Move1(ptPnt, m_bCam); // (pDoc->WorkingInfo.System.bNoMk || bCam)
+				Move1(ptPnt, m_bCam);
 				m_nStepMk[1]++;
 			}
 		}
@@ -15651,28 +15640,6 @@ void CGvisR2R_PunchView::DoMark1()
 				m_nStepMk[1]++;
 			}
 		}
-		else if (m_bPriority[0]) // Cam0 <-	// 우선 순위 결정에서 Cam0에 먼저 양보함.
-		{
-			if (IsMoveDone1())
-			{
-				m_bCollision[1] = FALSE;
-				m_bPriority[3] = FALSE;
-				ptPnt.x = _tstof(pDoc->WorkingInfo.Motion.sSafeZone);
-				ptPnt.y = m_dEnc[AXIS_Y1];
-				Move1(ptPnt, FALSE); // (pDoc->WorkingInfo.System.bNoMk || bCam)
-			}
-		}
-		else if (m_bPriority[2]) // Cam1 <-		// 우선 순위 결정에서 Cam0에 먼저 양보함.
-		{
-			if (IsMoveDone1())
-			{
-				m_bCollision[1] = FALSE;
-				m_bPriority[3] = FALSE;
-				ptPnt.x = _tstof(pDoc->WorkingInfo.Motion.sSafeZone);
-				ptPnt.y = m_dEnc[AXIS_Y1];
-				Move1(ptPnt, FALSE);
-			}
-		}
 		else if (m_bPriority[3]) // Cam0 ->	// 우선 순위 결정에서 Cam0에 먼저 양보함.
 		{
 			if (IsMoveDone1())
@@ -15684,6 +15651,32 @@ void CGvisR2R_PunchView::DoMark1()
 				Move1(ptPnt, FALSE);
 			}
 		}
+		else if (m_bPriority[0] && m_bPriority[2]) // Cam0 <- && Cam1 <-
+		{
+			break; // Cam0 이 안전위치로 대피할 때까지 기다린다.
+		}
+		//else if (m_bPriority[0]) // Cam0 <-	// 우선 순위 결정에서 Cam0에 먼저 양보함.
+		//{
+		//	if (IsMoveDone1())
+		//	{
+		//		m_bCollision[1] = FALSE;
+		//		m_bPriority[3] = FALSE;
+		//		ptPnt.x = _tstof(pDoc->WorkingInfo.Motion.sSafeZone);
+		//		ptPnt.y = m_dEnc[AXIS_Y1];
+		//		Move1(ptPnt, FALSE); // (pDoc->WorkingInfo.System.bNoMk || bCam)
+		//	}
+		//}
+		//else if (m_bPriority[2]) // Cam1 <-		// 우선 순위 결정에서 Cam0에 먼저 양보함.
+		//{
+		//	if (IsMoveDone1())
+		//	{
+		//		m_bCollision[1] = FALSE;
+		//		m_bPriority[3] = FALSE;
+		//		ptPnt.x = _tstof(pDoc->WorkingInfo.Motion.sSafeZone);
+		//		ptPnt.y = m_dEnc[AXIS_Y1];
+		//		Move1(ptPnt, FALSE);
+		//	}
+		//}
 		break;
 	case 10:
 		m_nStepMk[1]++;
@@ -29573,7 +29566,7 @@ void CGvisR2R_PunchView::DoMark0Its()
 				m_nStepMk[0]++;
 			}
 		}
-		else if (m_bPriority[2]) // Cam1 ->
+		else if (m_bPriority[2]) // Cam1 <-
 		{
 			if (IsMoveDone0())
 			{
@@ -29584,7 +29577,7 @@ void CGvisR2R_PunchView::DoMark0Its()
 				Move0(ptPnt, FALSE);
 			}
 		}
-		else if (m_bPriority[2] && m_bPriority[3]) // Cam1 <- && Cam0 ->
+		else if (m_bPriority[1] && m_bPriority[3]) // Cam1 -> && Cam0 ->
 		{
 			break; // Cam1 이 안전위치로 대피할 때까지 기다린다.
 		}
@@ -30285,7 +30278,7 @@ void CGvisR2R_PunchView::DoMark1Its()
 		{
 			if (IsMoveDone1())
 			{
-				Move1(ptPnt, m_bCam); // (pDoc->WorkingInfo.System.bNoMk || bCam)
+				Move1(ptPnt, m_bCam);
 				m_nStepMk[1]++;
 			}
 		}
@@ -30295,11 +30288,11 @@ void CGvisR2R_PunchView::DoMark1Its()
 			{
 				m_bCollision[1] = FALSE;
 				m_bPriority[1] = FALSE;
-				Move1(ptPnt, m_bCam); // (pDoc->WorkingInfo.System.bNoMk || bCam)
+				Move1(ptPnt, m_bCam);
 				m_nStepMk[1]++;
 			}
 		}
-		else if (m_bPriority[0]) // Cam0 <-	// 우선 순위 결정에서 Cam0에 먼저 양보함.
+		else if (m_bPriority[3]) // Cam0 ->	// 우선 순위 결정에서 Cam0에 먼저 양보함.
 		{
 			if (IsMoveDone1())
 			{
@@ -30310,28 +30303,32 @@ void CGvisR2R_PunchView::DoMark1Its()
 				Move1(ptPnt, FALSE);
 			}
 		}
-		else if (m_bPriority[2]) // Cam1 <-		// 우선 순위 결정에서 Cam0에 먼저 양보함.
+		else if (m_bPriority[0] && m_bPriority[2]) // Cam0 <- && Cam1 <-
 		{
-			if (IsMoveDone1())
-			{
-				m_bCollision[1] = FALSE;
-				m_bPriority[3] = FALSE;
-				ptPnt.x = _tstof(pDoc->WorkingInfo.Motion.sSafeZone);
-				ptPnt.y = m_dEnc[AXIS_Y1];
-				Move1(ptPnt, FALSE);
-			}
+			break; // Cam0 이 안전위치로 대피할 때까지 기다린다.
 		}
-		else if (m_bPriority[3])// Cam0 ->	// 우선 순위 결정에서 Cam0에 먼저 양보함.
-		{
-			if (IsMoveDone1())
-			{
-				m_bCollision[1] = FALSE;
-				m_bPriority[3] = FALSE;
-				ptPnt.x = _tstof(pDoc->WorkingInfo.Motion.sSafeZone);
-				ptPnt.y = m_dEnc[AXIS_Y1];
-				Move1(ptPnt, FALSE);
-			}
-		}
+		//else if (m_bPriority[0]) // Cam0 <-	// 우선 순위 결정에서 Cam0에 먼저 양보함.
+		//{
+		//	if (IsMoveDone1())
+		//	{
+		//		m_bCollision[1] = FALSE;
+		//		m_bPriority[3] = FALSE;
+		//		ptPnt.x = _tstof(pDoc->WorkingInfo.Motion.sSafeZone);
+		//		ptPnt.y = m_dEnc[AXIS_Y1];
+		//		Move1(ptPnt, FALSE);
+		//	}
+		//}
+		//else if (m_bPriority[2]) // Cam1 <-		// 우선 순위 결정에서 Cam0에 먼저 양보함.
+		//{
+		//	if (IsMoveDone1())
+		//	{
+		//		m_bCollision[1] = FALSE;
+		//		m_bPriority[3] = FALSE;
+		//		ptPnt.x = _tstof(pDoc->WorkingInfo.Motion.sSafeZone);
+		//		ptPnt.y = m_dEnc[AXIS_Y1];
+		//		Move1(ptPnt, FALSE);
+		//	}
+		//}
 		break;
 	case 10:
 		m_nStepMk[1]++;
@@ -36091,14 +36088,14 @@ BOOL CGvisR2R_PunchView::ChkMkImgR(int nSerial, int nTotMk)
 		nSerialF = _tstoi(sSerial);
 		if (nSerialF == nSerial)
 		{
-			sTemp.Format(_T("%s, "), sFileName);
-			arSerial += sTemp;
+			//sTemp.Format(_T("%s, "), sFileName);
+			//arSerial += sTemp;
 			nCount++;
 			nMkPnt = nCount - m_nOverSaveMkImg[1];
 			if (nMkPnt >= nTotMk)
 			{
-				sTemp.Format(_T("%d=%d"), nTotMk, nMkPnt);
-				pView->DispStsBar(sTemp, 6);
+				//sTemp.Format(_T("%d=%d"), nTotMk, nMkPnt);
+				//pView->DispStsBar(sTemp, 6);
 				return TRUE;
 			}
 		}
@@ -36107,11 +36104,12 @@ BOOL CGvisR2R_PunchView::ChkMkImgR(int nSerial, int nTotMk)
 	nMkPnt = nCount - m_nOverSaveMkImg[1];
 	if (nMkPnt >= nTotMk)
 	{
-		sTemp.Format(_T("%d=%d"), nTotMk, nMkPnt);
-		pView->DispStsBar(sTemp, 6);
+		//sTemp.Format(_T("%d=%d"), nTotMk, nMkPnt);
+		//pView->DispStsBar(sTemp, 6);
 		return TRUE;
 	}
-	sMsg.Format(_T("시리얼: %d, 마킹이미지수(중복수): %d(%d), 총마킹수: %d\r\n%s"), nSerial, nCount, m_nOverSaveMkImg[1], nTotMk, arSerial);
+	//sMsg.Format(_T("시리얼: %d, 마킹이미지수(중복수): %d(%d), 총마킹수: %d\r\n%s"), nSerial, nCount, m_nOverSaveMkImg[1], nTotMk, arSerial);
+	sMsg.Format(_T("시리얼: %d, 마킹이미지수(중복수): %d(%d), 총마킹수: %d"), nSerial, nCount, m_nOverSaveMkImg[1], nTotMk);
 	MsgBox(sMsg);
 	return FALSE;
 }
@@ -36144,14 +36142,14 @@ BOOL CGvisR2R_PunchView::ChkMkImgL(int nSerial, int nTotMk)
 		nSerialF = _tstoi(sSerial);
 		if (nSerialF == nSerial)
 		{
-			sTemp.Format(_T("%s, "), sFileName);
-			arSerial += sTemp;
+			//sTemp.Format(_T("%s, "), sFileName);
+			//arSerial += sTemp;
 			nCount++;
 			nMkPnt = nCount - m_nOverSaveMkImg[0];
 			if (nCount >= nTotMk)
 			{
-				sTemp.Format(_T("%d=%d"), nTotMk, nMkPnt);
-				pView->DispStsBar(sTemp, 6);
+				//sTemp.Format(_T("%d=%d"), nTotMk, nMkPnt);
+				//pView->DispStsBar(sTemp, 6);
 				return TRUE;
 			}
 		}
@@ -36160,11 +36158,12 @@ BOOL CGvisR2R_PunchView::ChkMkImgL(int nSerial, int nTotMk)
 	nMkPnt = nCount - m_nOverSaveMkImg[0];
 	if (nCount >= nTotMk)
 	{
-		sTemp.Format(_T("%d=%d"), nTotMk, nMkPnt);
-		pView->DispStsBar(sTemp, 6);
+		//sTemp.Format(_T("%d=%d"), nTotMk, nMkPnt);
+		//pView->DispStsBar(sTemp, 6);
 		return TRUE;
 	}
-	sMsg.Format(_T("시리얼: %d, 마킹이미지수(중복수): %d(%d), 총마킹수: %d\r\n%s"), nSerial, nCount, m_nOverSaveMkImg[0], nTotMk, arSerial);
+	//sMsg.Format(_T("시리얼: %d, 마킹이미지수(중복수): %d(%d), 총마킹수: %d\r\n%s"), nSerial, nCount, m_nOverSaveMkImg[0], nTotMk, arSerial);
+	sMsg.Format(_T("시리얼: %d, 마킹이미지수(중복수): %d(%d), 총마킹수: %d"), nSerial, nCount, m_nOverSaveMkImg[0], nTotMk);
 	MsgBox(sMsg);
 	return FALSE;
 }
