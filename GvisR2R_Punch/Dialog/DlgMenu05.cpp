@@ -3250,13 +3250,13 @@ void CDlgMenu05::MakeIts()
 
 	int nLayer = GetLayer(m_sLayerUp);
 
-	if (pDoc->GetTestMode() == MODE_OUTER || pDoc->WorkingInfo.System.bUseDualIts || pDoc->WorkingInfo.System.bUseDual2dIts)
-	{
-		if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
-		{
-			pView->MsgBox(_T("OFFLINE 폴더가 없습니다."));
-		}
-	}
+	//if (pDoc->GetTestMode() == MODE_OUTER || pDoc->WorkingInfo.System.bUseDualIts || pDoc->WorkingInfo.System.bUseDual2dIts)
+	//{
+	//	if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+	//	{
+	//		pView->MsgBox(_T("OFFLINE 폴더가 없습니다."));
+	//	}
+	//}
 
 	pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir, m_sModel, m_sLayerUp);
 	pDoc->m_Master[0].LoadMstInfo();

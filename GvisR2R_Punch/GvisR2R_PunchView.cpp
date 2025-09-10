@@ -1344,13 +1344,13 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 	if (nIDEvent == TIM_CAMMASTER_UPDATE)
 	{
 		KillTimer(TIM_CAMMASTER_UPDATE);
-		if (pDoc->GetTestMode() == MODE_OUTER)
-		{
-			if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
-			{
-				MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
-			}
-		}
+		//if (pDoc->GetTestMode() == MODE_OUTER)
+		//{
+		//	if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+		//	{
+		//		MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
+		//	}
+		//}
 		if (LoadMstInfo())
 		{
 			if (m_pDlgMenu01)
@@ -10533,13 +10533,13 @@ void CGvisR2R_PunchView::ResetMkInfo(int nAoi) // 0 : AOI-Up , 1 : AOI-Dn , 2 : 
 
 		if (IsLastJob(0)) // Up
 		{
-			if (pDoc->GetTestMode() == MODE_OUTER)
-			{
-				if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
-				{
-					MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
-				}
-			}
+			//if (pDoc->GetTestMode() == MODE_OUTER)
+			//{
+			//	if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+			//	{
+			//		MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
+			//	}
+			//}
 			pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
 				pDoc->WorkingInfo.LastJob.sModel,
 				pDoc->WorkingInfo.LastJob.sLayerUp);
@@ -12056,6 +12056,8 @@ BOOL CGvisR2R_PunchView::Mk0()
 {
 	if (!m_pVoiceCoil[0])
 		return FALSE;
+
+	m_pVoiceCoil[0]->ResetStepIsDoneMark();
 	if (!m_pVoiceCoil[0]->SetMark())
 		return FALSE;
 
@@ -12068,6 +12070,8 @@ BOOL CGvisR2R_PunchView::Mk1()
 {
 	if (!m_pVoiceCoil[1])
 		return FALSE;
+
+	m_pVoiceCoil[1]->ResetStepIsDoneMark();
 	if (!m_pVoiceCoil[1]->SetMark())
 		return FALSE;
 
@@ -12349,13 +12353,13 @@ BOOL CGvisR2R_PunchView::LoadMstInfo()
 
 	if (IsLastJob(0)) // Up
 	{
-		if (pDoc->GetTestMode() == MODE_OUTER)
-		{
-			if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
-			{
-				MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
-			}
-		}
+		//if (pDoc->GetTestMode() == MODE_OUTER)
+		//{
+		//	if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+		//	{
+		//		MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
+		//	}
+		//}
 		if (bGetCurrentInfoEng)
 		{
 			pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
@@ -14356,8 +14360,6 @@ void CGvisR2R_PunchView::DoMark1All()
 				{
 					if (!IsInitPos1() && !IsPinPos1())
 						MoveInitPos1();
-					//if (!IsMkEdPos1() && !IsPinPos1())
-					//	MoveMkEdPos1();
 				}
 			}
 
@@ -14674,11 +14676,6 @@ void CGvisR2R_PunchView::DoMark0()
 					}
 				}
 			}
-
-			//if (m_nStepMk[0] < MK_DO && m_nStepMk[0] > MK_DONE_CHECK_START) // Mk0();
-			//{
-			//	m_nStepMk[0] = MK_DONE_CHECK_START; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);	// 마킹완료Check
-			//}
 		}
 		return;
 	}
@@ -14904,7 +14901,7 @@ void CGvisR2R_PunchView::DoMark0()
 				m_nStepMk[0]++;
 			}
 		}
-		else if (m_bPriority[1]) // Cam1 ->
+		else if (m_bPriority[2]) // Cam1 <-
 		{
 			if (IsMoveDone0())
 			{
@@ -14912,24 +14909,13 @@ void CGvisR2R_PunchView::DoMark0()
 				m_bPriority[2] = FALSE;
 				ptPnt.x = 0.0;
 				ptPnt.y = m_dEnc[AXIS_Y0];
-				Move0(ptPnt, FALSE); // (pDoc->WorkingInfo.System.bNoMk || bCam)
+				Move0(ptPnt, FALSE); 
 			}
 		}
-		else if (m_bPriority[2] && m_bPriority[3]) // Cam1 <- && Cam0 ->
+		else if (m_bPriority[1] && m_bPriority[3]) // Cam1 -> && Cam0 ->
 		{
 			break; // Cam1 이 안전위치로 대피할 때까지 기다린다.
 		}
-		//else if (m_bPriority[2]) // Cam1 <-
-		//{
-		//	if (IsMoveDone0())
-		//	{
-		//		m_bCollision[0] = FALSE;
-		//		m_bPriority[2] = FALSE;
-		//		ptPnt.x = 0.0;
-		//		ptPnt.y = m_dEnc[AXIS_Y0];
-		//		Move0(ptPnt, FALSE);
-		//	}
-		//}
 		break;
 	case 10:
 		m_nStepMk[0]++;
@@ -14948,16 +14934,6 @@ void CGvisR2R_PunchView::DoMark0()
 			m_dwStMkDn[0] = GetTickCount();
 			m_nStepMk[0]++;
 		}
-		//if (IsNoMk0())
-		//{
-		//	if (!WaitDelay0(1))		// F:Done, T:On Waiting....
-		//		m_nStepMk[0]++;
-		//}
-		//else
-		//{
-		//	m_dwStMkDn[0] = GetTickCount();
-		//	m_nStepMk[0]++;
-		//}
 		break;
 	case MK_DO:
 		if (!IsNoMk0())
@@ -14976,7 +14952,7 @@ void CGvisR2R_PunchView::DoMark0()
 					{
 						DispMain(_T("운전중"), RGB_RED);
 						m_dwStMkDn[0] = GetTickCount();
-						m_nStepMk[0] = MK_DO;
+						m_nStepMk[0] = MK_MOVE; // MK_DO
 					}
 					else
 					{
@@ -15086,7 +15062,7 @@ void CGvisR2R_PunchView::DoMark0()
 					if (IDYES == nRtn)
 					{
 						DispMain(_T("운전중"), RGB_RED);
-						m_nStepMk[0] = MK_DO;
+						m_nStepMk[0] = MK_MOVE;
 					}
 					else
 					{
@@ -15122,7 +15098,7 @@ void CGvisR2R_PunchView::DoMark0()
 					if (IDYES == nRtn)
 					{
 						DispMain(_T("운전중"), RGB_RED);
-						m_nStepMk[0] = MK_DO; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);
+						m_nStepMk[0] = MK_MOVE; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);
 					}
 					else
 					{
@@ -15136,27 +15112,86 @@ void CGvisR2R_PunchView::DoMark0()
 		}
 		else
 		{
-			m_nMkPcs[0]++;
-			m_nStepMk[0] = MK_DONE_CHECK_END; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);
+			if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
+			{
+				if (m_bFailMkJudge[0]) // when ChkRepunching(0)
+				{
+					if (IsMk0Done(m_nMkPcs[0], TRUE))
+					{
+						m_bFailMkJudge[0] = FALSE;
+						// One more MK On Start....
+						if (IsMk0Miss())
+						{
+							nRtn = MsgBox(_T("보이스코일(좌) 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+							if (IDYES == nRtn)
+							{
+								DispMain(_T("운전중"), RGB_RED);
+								m_nStepMk[0] = MK_MOVE;
+							}
+							else
+							{
+								m_bAnswer[2] = FALSE;
+								m_nMkPcs[0]++;
+								m_nStepMk[0] = MK_DONE_CHECK_END;
+								Stop();
+							}
+							break;
+						}
+
+						m_bAnswer[2] = FALSE;
+						m_nMkPcs[0]++;
+						m_nStepMk[0] = MK_DONE_CHECK_END;
+						break;
+					}
+					else
+					{
+						if (m_dwStMkDn[0] + DELAY_SMAC < GetTickCount())
+						{
+							m_bFailMkJudge[0] = FALSE;
+
+							BuzzerFromThread(TRUE, 0);
+							DispMain(_T("정 지"), RGB_RED);
+							//m_pVoiceCoil[0]->SearchHomeSmac();
+							if (m_pVoiceCoil[0])
+								m_pVoiceCoil[0]->SetEsc();
+							if (IsMk0Miss())
+							{
+								nRtn = MsgBox(_T("보이스코일(좌) 마킹완료가 않되고 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+							}
+							else
+							{
+								nRtn = MsgBox(_T("보이스코일(좌) 마킹완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+							}
+							if (IDYES == nRtn)
+							{
+								DispMain(_T("운전중"), RGB_RED);
+								m_nStepMk[0] = MK_MOVE;
+							}
+							else
+							{
+								m_bAnswer[2] = FALSE;
+								m_nMkPcs[0]++;
+								m_nStepMk[0] = MK_DONE_CHECK_END;
+								Stop();
+							}
+						}
+					}
+				}
+				else
+				{
+					m_nMkPcs[0]++;
+					m_nStepMk[0] = MK_DONE_CHECK_END;
+				}
+			}
+			else
+			{
+				m_nMkPcs[0]++;
+				m_nStepMk[0] = MK_DONE_CHECK_END; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);
+			}
 		}
 		break;
 	case 18:
 		m_nStepMk[0]++;
-		//if ((nRtn = WaitRtnVal(1)) > -1)
-		//{
-		//	if (IDYES == nRtn)
-		//	{
-		//		DispMain(_T("운전중"), RGB_RED);
-		//		m_nStepMk[0] = MK_DO; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);
-		//	}
-		//	else
-		//	{
-		//		m_bAnswer[2] = FALSE; pDoc->SetStatus(_T("General"), _T("bAnswer[2]"), m_bAnswer[2]);
-		//		m_nMkPcs[0]++;
-		//		m_nStepMk[0]++;
-		//		StopFromThread();
-		//	}
-		//}
 		break;
 	case 19:
 		m_nStepMk[0] = MK_DONE_CHECK_END; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);
@@ -15420,16 +15455,9 @@ void CGvisR2R_PunchView::DoMark1()
 					{
 						if (!IsInitPos1() && !IsPinPos1())
 							MoveInitPos1();
-						//if (!IsMkEdPos1() && !IsPinPos1())
-						//	MoveMkEdPos1();
 					}
 				}
 			}
-
-			//if (m_nStepMk[1] < MK_DO && m_nStepMk[1] > MK_DONE_CHECK_START) // Mk1();
-			//{
-			//	m_nStepMk[1] = MK_DONE_CHECK_START; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);	// 마킹완료Check
-			//}
 		}
 		return;
 	}
@@ -15637,7 +15665,7 @@ void CGvisR2R_PunchView::DoMark1()
 		{
 			if (IsMoveDone1())
 			{
-				Move1(ptPnt, m_bCam); // (pDoc->WorkingInfo.System.bNoMk || bCam)
+				Move1(ptPnt, m_bCam);
 				m_nStepMk[1]++;
 			}
 		}
@@ -15651,28 +15679,6 @@ void CGvisR2R_PunchView::DoMark1()
 				m_nStepMk[1]++;
 			}
 		}
-		else if (m_bPriority[0]) // Cam0 <-	// 우선 순위 결정에서 Cam0에 먼저 양보함.
-		{
-			if (IsMoveDone1())
-			{
-				m_bCollision[1] = FALSE;
-				m_bPriority[3] = FALSE;
-				ptPnt.x = _tstof(pDoc->WorkingInfo.Motion.sSafeZone);
-				ptPnt.y = m_dEnc[AXIS_Y1];
-				Move1(ptPnt, FALSE); // (pDoc->WorkingInfo.System.bNoMk || bCam)
-			}
-		}
-		else if (m_bPriority[2]) // Cam1 <-		// 우선 순위 결정에서 Cam0에 먼저 양보함.
-		{
-			if (IsMoveDone1())
-			{
-				m_bCollision[1] = FALSE;
-				m_bPriority[3] = FALSE;
-				ptPnt.x = _tstof(pDoc->WorkingInfo.Motion.sSafeZone);
-				ptPnt.y = m_dEnc[AXIS_Y1];
-				Move1(ptPnt, FALSE);
-			}
-		}
 		else if (m_bPriority[3]) // Cam0 ->	// 우선 순위 결정에서 Cam0에 먼저 양보함.
 		{
 			if (IsMoveDone1())
@@ -15684,6 +15690,32 @@ void CGvisR2R_PunchView::DoMark1()
 				Move1(ptPnt, FALSE);
 			}
 		}
+		else if (m_bPriority[0] && m_bPriority[2]) // Cam0 <- && Cam1 <-
+		{
+			break; // Cam0 이 안전위치로 대피할 때까지 기다린다.
+		}
+		//else if (m_bPriority[0]) // Cam0 <-	// 우선 순위 결정에서 Cam0에 먼저 양보함.
+		//{
+		//	if (IsMoveDone1())
+		//	{
+		//		m_bCollision[1] = FALSE;
+		//		m_bPriority[3] = FALSE;
+		//		ptPnt.x = _tstof(pDoc->WorkingInfo.Motion.sSafeZone);
+		//		ptPnt.y = m_dEnc[AXIS_Y1];
+		//		Move1(ptPnt, FALSE); // (pDoc->WorkingInfo.System.bNoMk || bCam)
+		//	}
+		//}
+		//else if (m_bPriority[2]) // Cam1 <-		// 우선 순위 결정에서 Cam0에 먼저 양보함.
+		//{
+		//	if (IsMoveDone1())
+		//	{
+		//		m_bCollision[1] = FALSE;
+		//		m_bPriority[3] = FALSE;
+		//		ptPnt.x = _tstof(pDoc->WorkingInfo.Motion.sSafeZone);
+		//		ptPnt.y = m_dEnc[AXIS_Y1];
+		//		Move1(ptPnt, FALSE);
+		//	}
+		//}
 		break;
 	case 10:
 		m_nStepMk[1]++;
@@ -15702,16 +15734,6 @@ void CGvisR2R_PunchView::DoMark1()
 			m_dwStMkDn[1] = GetTickCount();
 			m_nStepMk[1]++;
 		}
-		//if (IsNoMk1())
-		//{
-		//	if (!WaitDelay1(6))		// F:Done, T:On Waiting....
-		//		m_nStepMk[1]++;
-		//}
-		//else
-		//{
-		//	m_dwStMkDn[1] = GetTickCount();
-		//	m_nStepMk[1]++;
-		//}
 		break;
 	case MK_DO:
 		if (!IsNoMk1())
@@ -15730,7 +15752,7 @@ void CGvisR2R_PunchView::DoMark1()
 					{
 						DispMain(_T("운전중"), RGB_RED);
 						m_dwStMkDn[1] = GetTickCount();
-						m_nStepMk[1] = MK_DO;
+						m_nStepMk[1] = MK_MOVE; // MK_DO
 					}
 					else
 					{
@@ -15837,7 +15859,7 @@ void CGvisR2R_PunchView::DoMark1()
 					if (IDYES == nRtn)
 					{
 						DispMain(_T("운전중"), RGB_RED);
-						m_nStepMk[1] = MK_DO;
+						m_nStepMk[1] = MK_MOVE;
 					}
 					else
 					{
@@ -15874,7 +15896,7 @@ void CGvisR2R_PunchView::DoMark1()
 					if (IDYES == nRtn)
 					{
 						DispMain(_T("운전중"), RGB_RED);
-						m_nStepMk[1] = MK_DO; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);
+						m_nStepMk[1] = MK_MOVE; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);
 					}
 					else
 					{
@@ -15888,27 +15910,86 @@ void CGvisR2R_PunchView::DoMark1()
 		}
 		else
 		{
-			m_nMkPcs[1]++;
-			m_nStepMk[1] = MK_DONE_CHECK_END; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);
+			if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
+			{
+				if (m_bFailMkJudge[1]) // when ChkRepunching(1)
+				{
+					if (IsMk1Done(m_nMkPcs[1], TRUE))
+					{
+						m_bFailMkJudge[1] = FALSE;
+						// One more MK On Start....
+						if (IsMk1Miss())
+						{
+							nRtn = MsgBox(_T("보이스코일(우) 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+							if (IDYES == nRtn)
+							{
+								DispMain(_T("운전중"), RGB_RED);
+								m_nStepMk[1] = MK_MOVE;
+							}
+							else
+							{
+								m_bAnswer[3] = FALSE;
+								m_nMkPcs[1]++;
+								m_nStepMk[1] = MK_DONE_CHECK_END;
+								Stop();
+							}
+							break;
+						}
+
+						m_bAnswer[3] = FALSE;
+						m_nMkPcs[1]++;
+						m_nStepMk[1] = MK_DONE_CHECK_END;
+						break;
+					}
+					else
+					{
+						if (m_dwStMkDn[1] + DELAY_SMAC < GetTickCount())
+						{
+							m_bFailMkJudge[1] = FALSE;
+
+							BuzzerFromThread(TRUE, 0);
+							DispMain(_T("정 지"), RGB_RED);
+							//m_pVoiceCoil[1]->SearchHomeSmac();
+							if (m_pVoiceCoil[1])
+								m_pVoiceCoil[1]->SetEsc();
+							if (IsMk1Miss())
+							{
+								nRtn = MsgBox(_T("보이스코일(우) 마킹완료가 않되고 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+							}
+							else
+							{
+								nRtn = MsgBox(_T("보이스코일(우) 마킹완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+							}
+							if (IDYES == nRtn)
+							{
+								DispMain(_T("운전중"), RGB_RED);
+								m_nStepMk[1] = MK_MOVE;
+							}
+							else
+							{
+								m_bAnswer[3] = FALSE;
+								m_nMkPcs[1]++;
+								m_nStepMk[1] = MK_DONE_CHECK_END;
+								Stop();
+							}
+						}
+					}
+				}
+				else
+				{
+					m_nMkPcs[1]++;
+					m_nStepMk[1] = MK_DONE_CHECK_END;
+				}
+			}
+			else
+			{
+				m_nMkPcs[1]++;
+				m_nStepMk[1] = MK_DONE_CHECK_END; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);
+			}
 		}
 		break;
 	case 18:
 		m_nStepMk[1]++;
-		//if ((nRtn = WaitRtnVal(2)) > -1)
-		//{
-		//	if (IDYES == nRtn)
-		//	{
-		//		DispMain(_T("운전중"), RGB_RED);
-		//		m_nStepMk[1] = MK_DO; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);
-		//	}
-		//	else
-		//	{
-		//		m_bAnswer[3] = FALSE; pDoc->SetStatus(_T("General"), _T("bAnswer[3]"), m_bAnswer[3]);
-		//		m_nMkPcs[1]++;
-		//		m_nStepMk[1]++;
-		//		StopFromThread();
-		//	}
-		//}
 		break;
 	case 19:
 		m_nStepMk[1] = MK_DONE_CHECK_END; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);
@@ -17884,13 +17965,13 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 				{
 					if (IsLastJob(0)) // Up
 					{
-						if (pDoc->GetTestMode() == MODE_OUTER)
-						{
-							if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
-							{
-								MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
-							}
-						}
+						//if (pDoc->GetTestMode() == MODE_OUTER)
+						//{
+						//	if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+						//	{
+						//		MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
+						//	}
+						//}
 						pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
 							pDoc->WorkingInfo.LastJob.sModel,
 							pDoc->WorkingInfo.LastJob.sLayerUp);
@@ -18153,13 +18234,13 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 				{
 					if (IsLastJob(0)) // Up
 					{
-						if (pDoc->GetTestMode() == MODE_OUTER)
-						{
-							if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
-							{
-								MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
-							}
-						}
+						//if (pDoc->GetTestMode() == MODE_OUTER)
+						//{
+						//	if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+						//	{
+						//		MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
+						//	}
+						//}
 						pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
 							pDoc->WorkingInfo.LastJob.sModel,
 							pDoc->WorkingInfo.LastJob.sLayerUp);
@@ -18858,13 +18939,13 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 				{
 					if (IsLastJob(0)) // Up
 					{
-						if (pDoc->GetTestMode() == MODE_OUTER)
-						{
-							if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
-							{
-								MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
-							}
-						}
+						//if (pDoc->GetTestMode() == MODE_OUTER)
+						//{
+						//	if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+						//	{
+						//		MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
+						//	}
+						//}
 						pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
 							pDoc->WorkingInfo.LastJob.sModel,
 							pDoc->WorkingInfo.LastJob.sLayerUp);
@@ -19129,13 +19210,13 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 				{
 					if (IsLastJob(0)) // Up
 					{
-						if (pDoc->GetTestMode() == MODE_OUTER)
-						{
-							if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
-							{
-								MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
-							}
-						}
+						//if (pDoc->GetTestMode() == MODE_OUTER)
+						//{
+						//	if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+						//	{
+						//		MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
+						//	}
+						//}
 						pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
 							pDoc->WorkingInfo.LastJob.sModel,
 							pDoc->WorkingInfo.LastJob.sLayerUp);
@@ -25214,22 +25295,22 @@ BOOL CGvisR2R_PunchView::IsRdyTest1()
 	return FALSE;
 }
 
-BOOL CGvisR2R_PunchView::IsMk0Done(int nMkPcsIdx)
+BOOL CGvisR2R_PunchView::IsMk0Done(int nMkPcsIdx, BOOL bRemark)
 {
 	BOOL bDone = FALSE;
 
-	if (m_pVoiceCoil[0])
-		bDone = m_pVoiceCoil[0]->IsDoneMark(nMkPcsIdx);
+	if (pView->m_pVoiceCoil[0])
+		bDone = pView->m_pVoiceCoil[0]->IsDoneMark(nMkPcsIdx, bRemark);
 
 	return bDone;
 }
 
-BOOL CGvisR2R_PunchView::IsMk1Done(int nMkPcsIdx)
+BOOL CGvisR2R_PunchView::IsMk1Done(int nMkPcsIdx, BOOL bRemark)
 {
 	BOOL bDone = FALSE;
 
-	if (m_pVoiceCoil[1])
-		bDone = m_pVoiceCoil[1]->IsDoneMark(nMkPcsIdx);
+	if (pView->m_pVoiceCoil[1])
+		bDone = pView->m_pVoiceCoil[1]->IsDoneMark(nMkPcsIdx, bRemark);
 
 	return bDone;
 }
@@ -29345,11 +29426,6 @@ void CGvisR2R_PunchView::DoMark0Its()
 					}
 				}
 			}
-
-			//if (m_nStepMk[0] < MK_DO && m_nStepMk[0] > MK_DONE_CHECK_START) // Mk0();
-			//{
-			//	m_nStepMk[0] = MK_DONE_CHECK_START; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);	// 마킹완료Check
-			//}
 		}
 		return;
 	}
@@ -29573,7 +29649,7 @@ void CGvisR2R_PunchView::DoMark0Its()
 				m_nStepMk[0]++;
 			}
 		}
-		else if (m_bPriority[2]) // Cam1 ->
+		else if (m_bPriority[2]) // Cam1 <-
 		{
 			if (IsMoveDone0())
 			{
@@ -29584,7 +29660,7 @@ void CGvisR2R_PunchView::DoMark0Its()
 				Move0(ptPnt, FALSE);
 			}
 		}
-		else if (m_bPriority[2] && m_bPriority[3]) // Cam1 <- && Cam0 ->
+		else if (m_bPriority[1] && m_bPriority[3]) // Cam1 -> && Cam0 ->
 		{
 			break; // Cam1 이 안전위치로 대피할 때까지 기다린다.
 		}
@@ -29606,16 +29682,6 @@ void CGvisR2R_PunchView::DoMark0Its()
 			m_dwStMkDn[0] = GetTickCount();
 			m_nStepMk[0]++;
 		}
-		//if (IsNoMk0())
-		//{
-		//	if (!WaitDelay0(1))		// F:Done, T:On Waiting....
-		//		m_nStepMk[0]++;
-		//}
-		//else
-		//{
-		//	m_dwStMkDn[0] = GetTickCount();
-		//	m_nStepMk[0]++;
-		//}
 		break;
 	case MK_DO:
 		if (!IsNoMk0())
@@ -29634,7 +29700,7 @@ void CGvisR2R_PunchView::DoMark0Its()
 					{
 						DispMain(_T("운전중"), RGB_RED);
 						m_dwStMkDn[0] = GetTickCount();
-						m_nStepMk[0] = MK_DO;
+						m_nStepMk[0] = MK_MOVE; // MK_DO
 					}
 					else
 					{
@@ -29731,7 +29797,7 @@ void CGvisR2R_PunchView::DoMark0Its()
 					if (IDYES == nRtn)
 					{
 						DispMain(_T("운전중"), RGB_RED);
-						m_nStepMk[0] = MK_DO;
+						m_nStepMk[0] = MK_MOVE;
 					}
 					else
 					{
@@ -29768,7 +29834,7 @@ void CGvisR2R_PunchView::DoMark0Its()
 					if (IDYES == nRtn)
 					{
 						DispMain(_T("운전중"), RGB_RED);
-						m_nStepMk[0] = MK_DO; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);
+						m_nStepMk[0] = MK_MOVE; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);
 					}
 					else
 					{
@@ -29782,27 +29848,86 @@ void CGvisR2R_PunchView::DoMark0Its()
 		}
 		else
 		{
-			m_nMkPcs[0]++;
-			m_nStepMk[0] = MK_DONE_CHECK_END; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);
+			if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
+			{
+				if (m_bFailMkJudge[0]) // when ChkRepunching(0)
+				{
+					if (IsMk0Done(m_nMkPcs[0], TRUE))
+					{
+						m_bFailMkJudge[0] = FALSE;
+						// One more MK On Start....
+						if (IsMk0Miss())
+						{
+							nRtn = MsgBox(_T("보이스코일(좌) 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+							if (IDYES == nRtn)
+							{
+								DispMain(_T("운전중"), RGB_RED);
+								m_nStepMk[0] = MK_MOVE;
+							}
+							else
+							{
+								m_bAnswer[2] = FALSE;
+								m_nMkPcs[0]++;
+								m_nStepMk[0] = MK_DONE_CHECK_END;
+								Stop();
+							}
+							break;
+						}
+
+						m_bAnswer[2] = FALSE;
+						m_nMkPcs[0]++;
+						m_nStepMk[0] = MK_DONE_CHECK_END;
+						break;
+					}
+					else
+					{
+						if (m_dwStMkDn[0] + DELAY_SMAC < GetTickCount())
+						{
+							m_bFailMkJudge[0] = FALSE;
+
+							BuzzerFromThread(TRUE, 0);
+							DispMain(_T("정 지"), RGB_RED);
+							//m_pVoiceCoil[0]->SearchHomeSmac();
+							if (m_pVoiceCoil[0])
+								m_pVoiceCoil[0]->SetEsc();
+							if (IsMk0Miss())
+							{
+								nRtn = MsgBox(_T("보이스코일(좌) 마킹완료가 않되고 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+							}
+							else
+							{
+								nRtn = MsgBox(_T("보이스코일(좌) 마킹완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+							}
+							if (IDYES == nRtn)
+							{
+								DispMain(_T("운전중"), RGB_RED);
+								m_nStepMk[0] = MK_MOVE;
+							}
+							else
+							{
+								m_bAnswer[2] = FALSE;
+								m_nMkPcs[0]++;
+								m_nStepMk[0] = MK_DONE_CHECK_END;
+								Stop();
+							}
+						}
+					}
+				}
+				else
+				{
+					m_nMkPcs[0]++;
+					m_nStepMk[0] = MK_DONE_CHECK_END;
+				}
+			}
+			else
+			{
+				m_nMkPcs[0]++;
+				m_nStepMk[0] = MK_DONE_CHECK_END; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);
+			}
 		}
 		break;
 	case 18:
 		m_nStepMk[0]++;
-		//if ((nRtn = WaitRtnVal(1)) > -1)
-		//{
-		//	if (IDYES == nRtn)
-		//	{
-		//		DispMain(_T("운전중"), RGB_RED);
-		//		m_nStepMk[0] = MK_DO; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);
-		//	}
-		//	else
-		//	{
-		//		m_bAnswer[2] = FALSE; pDoc->SetStatus(_T("General"), _T("bAnswer[2]"), m_bAnswer[2]);
-		//		m_nMkPcs[0]++;
-		//		m_nStepMk[0]++;
-		//		StopFromThread();
-		//	}
-		//}
 		break;
 	case 19:
 		m_nStepMk[0] = MK_DONE_CHECK_END; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);
@@ -30068,16 +30193,9 @@ void CGvisR2R_PunchView::DoMark1Its()
 					{
 						if (!IsInitPos1() && !IsPinPos1())
 							MoveInitPos1();
-						//if (!IsMkEdPos1() && !IsPinPos1())
-						//	MoveMkEdPos1();
 					}
 				}
 			}
-
-			//if (m_nStepMk[1] < MK_DO && m_nStepMk[1] > MK_DONE_CHECK_START) // Mk1();
-			//{
-			//	m_nStepMk[1] = MK_DONE_CHECK_START; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);	// 마킹완료Check
-			//}
 		}
 		return;
 	}
@@ -30285,7 +30403,7 @@ void CGvisR2R_PunchView::DoMark1Its()
 		{
 			if (IsMoveDone1())
 			{
-				Move1(ptPnt, m_bCam); // (pDoc->WorkingInfo.System.bNoMk || bCam)
+				Move1(ptPnt, m_bCam);
 				m_nStepMk[1]++;
 			}
 		}
@@ -30295,11 +30413,11 @@ void CGvisR2R_PunchView::DoMark1Its()
 			{
 				m_bCollision[1] = FALSE;
 				m_bPriority[1] = FALSE;
-				Move1(ptPnt, m_bCam); // (pDoc->WorkingInfo.System.bNoMk || bCam)
+				Move1(ptPnt, m_bCam);
 				m_nStepMk[1]++;
 			}
 		}
-		else if (m_bPriority[0]) // Cam0 <-	// 우선 순위 결정에서 Cam0에 먼저 양보함.
+		else if (m_bPriority[3]) // Cam0 ->	// 우선 순위 결정에서 Cam0에 먼저 양보함.
 		{
 			if (IsMoveDone1())
 			{
@@ -30310,28 +30428,32 @@ void CGvisR2R_PunchView::DoMark1Its()
 				Move1(ptPnt, FALSE);
 			}
 		}
-		else if (m_bPriority[2]) // Cam1 <-		// 우선 순위 결정에서 Cam0에 먼저 양보함.
+		else if (m_bPriority[0] && m_bPriority[2]) // Cam0 <- && Cam1 <-
 		{
-			if (IsMoveDone1())
-			{
-				m_bCollision[1] = FALSE;
-				m_bPriority[3] = FALSE;
-				ptPnt.x = _tstof(pDoc->WorkingInfo.Motion.sSafeZone);
-				ptPnt.y = m_dEnc[AXIS_Y1];
-				Move1(ptPnt, FALSE);
-			}
+			break; // Cam0 이 안전위치로 대피할 때까지 기다린다.
 		}
-		else if (m_bPriority[3])// Cam0 ->	// 우선 순위 결정에서 Cam0에 먼저 양보함.
-		{
-			if (IsMoveDone1())
-			{
-				m_bCollision[1] = FALSE;
-				m_bPriority[3] = FALSE;
-				ptPnt.x = _tstof(pDoc->WorkingInfo.Motion.sSafeZone);
-				ptPnt.y = m_dEnc[AXIS_Y1];
-				Move1(ptPnt, FALSE);
-			}
-		}
+		//else if (m_bPriority[0]) // Cam0 <-	// 우선 순위 결정에서 Cam0에 먼저 양보함.
+		//{
+		//	if (IsMoveDone1())
+		//	{
+		//		m_bCollision[1] = FALSE;
+		//		m_bPriority[3] = FALSE;
+		//		ptPnt.x = _tstof(pDoc->WorkingInfo.Motion.sSafeZone);
+		//		ptPnt.y = m_dEnc[AXIS_Y1];
+		//		Move1(ptPnt, FALSE);
+		//	}
+		//}
+		//else if (m_bPriority[2]) // Cam1 <-		// 우선 순위 결정에서 Cam0에 먼저 양보함.
+		//{
+		//	if (IsMoveDone1())
+		//	{
+		//		m_bCollision[1] = FALSE;
+		//		m_bPriority[3] = FALSE;
+		//		ptPnt.x = _tstof(pDoc->WorkingInfo.Motion.sSafeZone);
+		//		ptPnt.y = m_dEnc[AXIS_Y1];
+		//		Move1(ptPnt, FALSE);
+		//	}
+		//}
 		break;
 	case 10:
 		m_nStepMk[1]++;
@@ -30350,16 +30472,6 @@ void CGvisR2R_PunchView::DoMark1Its()
 			m_dwStMkDn[1] = GetTickCount();
 			m_nStepMk[1]++;
 		}
-		//if (IsNoMk1())
-		//{
-		//	if (!WaitDelay1(6))		// F:Done, T:On Waiting....
-		//		m_nStepMk[1]++;
-		//}
-		//else
-		//{
-		//	m_dwStMkDn[1] = GetTickCount();
-		//	m_nStepMk[1]++;
-		//}
 		break;
 	case MK_DO:
 		if (!IsNoMk1())
@@ -30378,7 +30490,7 @@ void CGvisR2R_PunchView::DoMark1Its()
 					{
 						DispMain(_T("운전중"), RGB_RED);
 						m_dwStMkDn[1] = GetTickCount();
-						m_nStepMk[1] = MK_DO;
+						m_nStepMk[1] = MK_MOVE; // MK_DO
 					}
 					else
 					{
@@ -30475,7 +30587,7 @@ void CGvisR2R_PunchView::DoMark1Its()
 					if (IDYES == nRtn)
 					{
 						DispMain(_T("운전중"), RGB_RED);
-						m_nStepMk[1] = MK_DO;
+						m_nStepMk[1] = MK_MOVE;
 					}
 					else
 					{
@@ -30505,7 +30617,7 @@ void CGvisR2R_PunchView::DoMark1Its()
 					if (IDYES == nRtn)
 					{
 						DispMain(_T("운전중"), RGB_RED);
-						m_nStepMk[1] = MK_DO; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);
+						m_nStepMk[1] = MK_MOVE; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);
 					}
 					else
 					{
@@ -30519,27 +30631,86 @@ void CGvisR2R_PunchView::DoMark1Its()
 		}
 		else
 		{
-			m_nMkPcs[1]++;
-			m_nStepMk[1] = MK_DONE_CHECK_END; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);
+			if (pDoc->WorkingInfo.LastJob.bUseJudgeMkHisto)
+			{
+				if (m_bFailMkJudge[1]) // when ChkRepunching(1)
+				{
+					if (IsMk1Done(m_nMkPcs[1], TRUE))
+					{
+						m_bFailMkJudge[1] = FALSE;
+						// One more MK On Start....
+						if (IsMk1Miss())
+						{
+							nRtn = MsgBox(_T("보이스코일(우) 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+							if (IDYES == nRtn)
+							{
+								DispMain(_T("운전중"), RGB_RED);
+								m_nStepMk[1] = MK_MOVE;
+							}
+							else
+							{
+								m_bAnswer[3] = FALSE;
+								m_nMkPcs[1]++;
+								m_nStepMk[1] = MK_DONE_CHECK_END;
+								Stop();
+							}
+							break;
+						}
+
+						m_bAnswer[3] = FALSE;
+						m_nMkPcs[1]++;
+						m_nStepMk[1] = MK_DONE_CHECK_END;
+						break;
+					}
+					else
+					{
+						if (m_dwStMkDn[1] + DELAY_SMAC < GetTickCount())
+						{
+							m_bFailMkJudge[1] = FALSE;
+
+							BuzzerFromThread(TRUE, 0);
+							DispMain(_T("정 지"), RGB_RED);
+							//m_pVoiceCoil[1]->SearchHomeSmac();
+							if (m_pVoiceCoil[1])
+								m_pVoiceCoil[1]->SetEsc();
+							if (IsMk1Miss())
+							{
+								nRtn = MsgBox(_T("보이스코일(우) 마킹완료가 않되고 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+							}
+							else
+							{
+								nRtn = MsgBox(_T("보이스코일(우) 마킹완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
+							}
+							if (IDYES == nRtn)
+							{
+								DispMain(_T("운전중"), RGB_RED);
+								m_nStepMk[1] = MK_MOVE;
+							}
+							else
+							{
+								m_bAnswer[3] = FALSE;
+								m_nMkPcs[1]++;
+								m_nStepMk[1] = MK_DONE_CHECK_END;
+								Stop();
+							}
+						}
+					}
+				}
+				else
+				{
+					m_nMkPcs[1]++;
+					m_nStepMk[1] = MK_DONE_CHECK_END;
+				}
+			}
+			else
+			{
+				m_nMkPcs[1]++;
+				m_nStepMk[1] = MK_DONE_CHECK_END; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);
+			}
 		}
 		break;
 	case 18:
 		m_nStepMk[1]++;
-		//if ((nRtn = WaitRtnVal(2)) > -1)
-		//{
-		//	if (IDYES == nRtn)
-		//	{
-		//		DispMain(_T("운전중"), RGB_RED);
-		//		m_nStepMk[1] = MK_DO; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);
-		//	}
-		//	else
-		//	{
-		//		m_bAnswer[3] = FALSE; pDoc->SetStatus(_T("General"), _T("bAnswer[3]"), m_bAnswer[3]);
-		//		m_nMkPcs[1]++;
-		//		m_nStepMk[1]++;
-		//		StopFromThread();
-		//	}
-		//}
 		break;
 	case 19:
 		m_nStepMk[1] = MK_DONE_CHECK_END; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);
@@ -35967,7 +36138,7 @@ BOOL CGvisR2R_PunchView::ChkRepunching(int nCam) // 0 : Left, 1 : Right
 			ptPnt.y = m_dTarget[AXIS_Y0];
 
 			Move0(ptPnt, FALSE, WAIT);
-			Sleep(30);
+			Sleep(300);
 
 			if (!Mk0())
 			{
@@ -35979,9 +36150,9 @@ BOOL CGvisR2R_PunchView::ChkRepunching(int nCam) // 0 : Left, 1 : Right
 				nRtn = MsgBox(_T("보이스코일(좌) 통신완료가 않됩니다."));
 			}
 
-			Sleep(100);
+			Sleep(600);
 			Move0(ptPnt, TRUE, WAIT);
-			m_nMkPcs[0]--; // Repeat Current Position Verify.
+			//m_nMkPcs[0]--; // Repeat Current Position Verify.
 			m_nStepMk[0] = MK_DONE_CHECK_START; pDoc->SetStatusInt(_T("General"), _T("nStepMk[0]"), m_nStepMk[0]);
 			return TRUE; // Recheck
 		}
@@ -35998,7 +36169,7 @@ BOOL CGvisR2R_PunchView::ChkRepunching(int nCam) // 0 : Left, 1 : Right
 			ptPnt.y = m_dTarget[AXIS_Y1];
 
 			Move1(ptPnt, FALSE, WAIT);
-			Sleep(30);
+			Sleep(300);
 
 			if (!Mk1())
 			{
@@ -36010,9 +36181,9 @@ BOOL CGvisR2R_PunchView::ChkRepunching(int nCam) // 0 : Left, 1 : Right
 				nRtn = MsgBox(_T("보이스코일(우) 통신완료가 않됩니다."));
 			}
 
-			Sleep(100);
+			Sleep(600);
 			Move1(ptPnt, TRUE, WAIT);
-			m_nMkPcs[1]--; // Repeat Current Position Verify.
+			//m_nMkPcs[1]--; // Repeat Current Position Verify.
 			m_nStepMk[1] = MK_DONE_CHECK_START; pDoc->SetStatusInt(_T("General"), _T("nStepMk[1]"), m_nStepMk[1]);
 			return TRUE; // Recheck
 		}
@@ -36091,14 +36262,14 @@ BOOL CGvisR2R_PunchView::ChkMkImgR(int nSerial, int nTotMk)
 		nSerialF = _tstoi(sSerial);
 		if (nSerialF == nSerial)
 		{
-			sTemp.Format(_T("%s, "), sFileName);
-			arSerial += sTemp;
+			//sTemp.Format(_T("%s, "), sFileName);
+			//arSerial += sTemp;
 			nCount++;
 			nMkPnt = nCount - m_nOverSaveMkImg[1];
 			if (nMkPnt >= nTotMk)
 			{
-				sTemp.Format(_T("%d=%d"), nTotMk, nMkPnt);
-				pView->DispStsBar(sTemp, 6);
+				//sTemp.Format(_T("%d=%d"), nTotMk, nMkPnt);
+				//pView->DispStsBar(sTemp, 6);
 				return TRUE;
 			}
 		}
@@ -36107,11 +36278,12 @@ BOOL CGvisR2R_PunchView::ChkMkImgR(int nSerial, int nTotMk)
 	nMkPnt = nCount - m_nOverSaveMkImg[1];
 	if (nMkPnt >= nTotMk)
 	{
-		sTemp.Format(_T("%d=%d"), nTotMk, nMkPnt);
-		pView->DispStsBar(sTemp, 6);
+		//sTemp.Format(_T("%d=%d"), nTotMk, nMkPnt);
+		//pView->DispStsBar(sTemp, 6);
 		return TRUE;
 	}
-	sMsg.Format(_T("시리얼: %d, 마킹이미지수(중복수): %d(%d), 총마킹수: %d\r\n%s"), nSerial, nCount, m_nOverSaveMkImg[1], nTotMk, arSerial);
+	//sMsg.Format(_T("시리얼: %d, 마킹이미지수(중복수): %d(%d), 총마킹수: %d\r\n%s"), nSerial, nCount, m_nOverSaveMkImg[1], nTotMk, arSerial);
+	sMsg.Format(_T("시리얼: %d, 마킹이미지수(중복수): %d(%d), 총마킹수: %d"), nSerial, nCount, m_nOverSaveMkImg[1], nTotMk);
 	MsgBox(sMsg);
 	return FALSE;
 }
@@ -36144,14 +36316,14 @@ BOOL CGvisR2R_PunchView::ChkMkImgL(int nSerial, int nTotMk)
 		nSerialF = _tstoi(sSerial);
 		if (nSerialF == nSerial)
 		{
-			sTemp.Format(_T("%s, "), sFileName);
-			arSerial += sTemp;
+			//sTemp.Format(_T("%s, "), sFileName);
+			//arSerial += sTemp;
 			nCount++;
 			nMkPnt = nCount - m_nOverSaveMkImg[0];
 			if (nCount >= nTotMk)
 			{
-				sTemp.Format(_T("%d=%d"), nTotMk, nMkPnt);
-				pView->DispStsBar(sTemp, 6);
+				//sTemp.Format(_T("%d=%d"), nTotMk, nMkPnt);
+				//pView->DispStsBar(sTemp, 6);
 				return TRUE;
 			}
 		}
@@ -36160,11 +36332,12 @@ BOOL CGvisR2R_PunchView::ChkMkImgL(int nSerial, int nTotMk)
 	nMkPnt = nCount - m_nOverSaveMkImg[0];
 	if (nCount >= nTotMk)
 	{
-		sTemp.Format(_T("%d=%d"), nTotMk, nMkPnt);
-		pView->DispStsBar(sTemp, 6);
+		//sTemp.Format(_T("%d=%d"), nTotMk, nMkPnt);
+		//pView->DispStsBar(sTemp, 6);
 		return TRUE;
 	}
-	sMsg.Format(_T("시리얼: %d, 마킹이미지수(중복수): %d(%d), 총마킹수: %d\r\n%s"), nSerial, nCount, m_nOverSaveMkImg[0], nTotMk, arSerial);
+	//sMsg.Format(_T("시리얼: %d, 마킹이미지수(중복수): %d(%d), 총마킹수: %d\r\n%s"), nSerial, nCount, m_nOverSaveMkImg[0], nTotMk, arSerial);
+	sMsg.Format(_T("시리얼: %d, 마킹이미지수(중복수): %d(%d), 총마킹수: %d"), nSerial, nCount, m_nOverSaveMkImg[0], nTotMk);
 	MsgBox(sMsg);
 	return FALSE;
 }
