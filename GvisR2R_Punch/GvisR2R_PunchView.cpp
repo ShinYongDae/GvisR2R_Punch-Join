@@ -9869,6 +9869,9 @@ BOOL CGvisR2R_PunchView::SetSerialMkInfo(int nSerial, BOOL bDumy)
 
 void CGvisR2R_PunchView::InitAuto(BOOL bInit)
 {
+	if (pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_INNER)
+		pDoc->GetCurrentInfoEng();
+
 	CString sItem;
 
 	if (!pDoc->WorkingInfo.LastJob.bSampleTest)
