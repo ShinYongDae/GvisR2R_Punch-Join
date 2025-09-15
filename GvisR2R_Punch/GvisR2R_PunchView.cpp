@@ -3180,12 +3180,13 @@ void CGvisR2R_PunchView::DispThreadTick()
 	if (m_bDestroyedView)
 		return;
 
-	CString str;
+	CString str = _T("");
 		//str.Format(_T("%d%d%d%d:%d%d"),
 		//	m_bTHREAD_UPDATE_REELMAP_UP ? 1 : 0, m_bTHREAD_UPDATE_REELMAP_DN ? 1 : 0,
 		//	m_bTHREAD_UPDATE_REELMAP_ALLUP ? 1 : 0, m_bTHREAD_UPDATE_REELMAP_ALLDN ? 1 : 0,
 		//	m_bTHREAD_REELMAP_YIELD_UP ? 1 : 0, m_bTHREAD_REELMAP_YIELD_DN ? 1 : 0);
-	str.Format(_T("%.3f"), m_pVoiceCoil[0]->GetMkFinalPos());
+	if (pView->m_pVoiceCoil[0])
+		str.Format(_T("%.3f"), m_pVoiceCoil[0]->GetMkFinalPos());
 	pFrm->DispStatusBar(str, 5);
 #ifdef USE_IDS
 		double dFPS[2];
@@ -3197,7 +3198,8 @@ void CGvisR2R_PunchView::DispThreadTick()
 		pFrm->DispStatusBar(str, 6);
 #else
 		//str.Format(_T("%d,%d,%d,%d"), m_nStepAuto, m_nMkStAuto, m_nStepMk[0], m_nStepMk[1]);//pView->m_nLotEndAuto
-	str.Format(_T("%.3f"), m_pVoiceCoil[1]->GetMkFinalPos());
+	if (pView->m_pVoiceCoil[1])
+		str.Format(_T("%.3f"), m_pVoiceCoil[1]->GetMkFinalPos());
 	pFrm->DispStatusBar(str, 6);
 #endif
 }
@@ -9869,6 +9871,8 @@ BOOL CGvisR2R_PunchView::SetSerialMkInfo(int nSerial, BOOL bDumy)
 
 void CGvisR2R_PunchView::InitAuto(BOOL bInit)
 {
+	pDoc->WorkingInfo.LastJob.bReview = FALSE;
+
 	if (pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_INNER)
 		pDoc->GetCurrentInfoEng();
 

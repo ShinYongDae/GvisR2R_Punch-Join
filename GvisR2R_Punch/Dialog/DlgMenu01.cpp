@@ -317,6 +317,7 @@ BOOL CDlgMenu01::OnInitDialog()
 	GetDlgItem(IDC_BTN_GD_RA_ALL)->ShowWindow(SW_HIDE);
 
 	GetDlgItem(IDC_CHK_2LAYER)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_CHK_REVIEW_MOVE)->ShowWindow(SW_HIDE);
 
 	GetDlgItem(IDC_HIDE_CAD_001)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_HIDE_DEF_001)->ShowWindow(SW_HIDE);

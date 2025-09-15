@@ -393,7 +393,9 @@ BOOL CDlgMenu06::OnInitDialog()
 	GetDlgItem(IDC_CHK_EJECT_BUFFER)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_CHK_LOT_END)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_CHK_REMARKING)->ShowWindow(SW_HIDE);
+
 	GetDlgItem(IDC_CHK_2LAYER)->ShowWindow(SW_HIDE);
+
 	GetDlgItem(IDC_CHK_MK_1)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_CHK_MK_2)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_CHK_MK_3)->ShowWindow(SW_HIDE);
@@ -3076,6 +3078,7 @@ void CDlgMenu06::UpdateData()
 	}
 
 	myBtn[2].SetCheck(pDoc->WorkingInfo.LastJob.bVerify);
+	myBtn[5].SetCheck(pDoc->WorkingInfo.LastJob.bReview);
 	GetDlgItem(IDC_STC_REVIEW_LEN)->SetWindowText(pDoc->WorkingInfo.LastJob.sVerifyLen);
 	pDoc->SetMkMenu01(_T("Data"), _T("VerifyLen"), pDoc->WorkingInfo.LastJob.sVerifyLen);
 
