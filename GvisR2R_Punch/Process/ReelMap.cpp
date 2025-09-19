@@ -5001,7 +5001,7 @@ CString CReelMap::GetItsFileData(int nSerial, int nLayer) // RMAP_UP, RMAP_DN, R
 BOOL CReelMap::MakeDirIts()
 {
 	CFileFind finder;
-	CString  Path[3], sItsPath;
+	CString  Path[3];
 	CString sItsInnerPath, sItsOuterPath;
 	CString sPath = _T("");
 
@@ -7190,7 +7190,7 @@ int CReelMap::IsOfflineFolder() // 0 : Not exist, 1 : Exist only Up, 2 : Exist o
 	CFileFind finder;
 
 	str = _T("OFFLINE");
-	sPath.Format(_T("%s%s\\%s\\%s\\%s\\*.*"), pDoc->WorkingInfo.System.sPathOldFile,
+	sPath.Format(_T("%s%s\\%s\\%s\\%s\\*.pcr"), pDoc->WorkingInfo.System.sPathOldFile,
 		pDoc->WorkingInfo.LastJob.sModel,
 		pDoc->WorkingInfo.LastJob.sLot,
 		pDoc->WorkingInfo.LastJob.sLayerUp,
@@ -7203,7 +7203,7 @@ int CReelMap::IsOfflineFolder() // 0 : Not exist, 1 : Exist only Up, 2 : Exist o
 		nRtn |= 0x01;
 
 	str = _T("OFFLINE");
-	sPath.Format(_T("%s%s\\%s\\%s\\%s\\*.*"), pDoc->WorkingInfo.System.sPathOldFile,
+	sPath.Format(_T("%s%s\\%s\\%s\\%s\\*.pcr"), pDoc->WorkingInfo.System.sPathOldFile,
 		pDoc->WorkingInfo.LastJob.sModel,
 		pDoc->WorkingInfo.LastJob.sLot,
 		pDoc->WorkingInfo.LastJob.sLayerDn,

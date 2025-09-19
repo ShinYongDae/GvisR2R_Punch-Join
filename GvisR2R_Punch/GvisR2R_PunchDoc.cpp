@@ -1520,7 +1520,7 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	else
 	{
 		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("ItsFileInnerDirPath가 설정되어 있지 않습니다."), MB_ICONWARNING | MB_OK);
-		WorkingInfo.System.sPathItsInner = CString(_T(""));
+		WorkingInfo.System.sPathItsInner = CString(_T("D:\\Its1\\"));
 	}
 
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("ItsFileOuterDirPath"), NULL, szData, sizeof(szData), sPath))
@@ -1528,7 +1528,7 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	else
 	{
 		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("ItsFileOuterDirPath가 설정되어 있지 않습니다."), MB_ICONWARNING | MB_OK);
-		WorkingInfo.System.sPathItsOuter = CString(_T(""));
+		WorkingInfo.System.sPathItsOuter = CString(_T("D:\\Its\\"));
 	}
 
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("VrsOldFileDirIpPath"), NULL, szData, sizeof(szData), sPath))
@@ -7042,7 +7042,7 @@ BOOL CGvisR2R_PunchDoc::CopyDefImgUp(int nSerial, CString sNewLot)
 			}
 			else
 			{
-				strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImagePos\\%d\\%d_%05d_%s_%c_%d_%d.tif"), WorkingInfo.System.sPathOldFile,
+				strDefImgPathD.Format(_T("%s%s\\%s\\%s\\DefImagePos\\%d\\%d_%05d_%s_%c_%d_%d.tif"), WorkingInfo.System.sPathOldFile,
 					WorkingInfo.LastJob.sModel,
 					sLot,
 					WorkingInfo.LastJob.sLayerUp,
@@ -7338,7 +7338,7 @@ BOOL CGvisR2R_PunchDoc::CopyDefImgDn(int nSerial, CString sNewLot)
 			int nPcsIdx = pDoc->m_pPcr[1][nPcrIdx]->m_pDefPcs[i];
 			int nDefCode = pDoc->m_pPcr[1][nPcrIdx]->m_pDefType[i];
 			if (pDoc->m_Master[0].m_pPcsRgn)
-				pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[0].MasterInfo.nActionCode, nPcsIdx, nStrip, nCol, nRow);
+				pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, nPcsIdx, nStrip, nCol, nRow);
 
 			if (WorkingInfo.System.sPathOldFile.Right(1) != "\\")
 			{
@@ -7351,7 +7351,7 @@ BOOL CGvisR2R_PunchDoc::CopyDefImgDn(int nSerial, CString sNewLot)
 			}
 			else
 			{
-				strDefImgPathD.Format(_T("%s\\%s\\%s\\%s\\DefImagePos\\%d\\%d_%05d_%s_%c_%d_%d.tif"), WorkingInfo.System.sPathOldFile,
+				strDefImgPathD.Format(_T("%s%s\\%s\\%s\\DefImagePos\\%d\\%d_%05d_%s_%c_%d_%d.tif"), WorkingInfo.System.sPathOldFile,
 					WorkingInfo.LastJob.sModel,
 					sLot,
 					WorkingInfo.LastJob.sLayerDn,
@@ -13582,10 +13582,10 @@ int CGvisR2R_PunchDoc::LoadPcrDn(CString sPath)	// return : 2(Failed), 1(정상), 
 			m_pPcr[1][nIdx]->m_pDefType[i] = _tstoi(strBadName);
 
 			// Temp for ITS - m_pPcr[0][nIdx]->m_pDefPcs[i] = Rotate180(_tstoi(strPieceID));
-			pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[0].MasterInfo.nActionCode, Rotate180(m_pPcr[1][nIdx]->m_pDefPcs[i]), nC, nR);
+			pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, Rotate180(m_pPcr[1][nIdx]->m_pDefPcs[i]), nC, nR);
 			m_pPcr[1][nIdx]->m_arDefType[nR][nC] = m_pPcr[1][nIdx]->m_pDefType[i];
 			m_pPcr[1][nIdx]->m_arPcrLineNum[nR][nC] = i;
-			pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[0].MasterInfo.nActionCode, m_pPcr[1][nIdx]->m_pDefPcs[i], nC, nR);
+			pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, m_pPcr[1][nIdx]->m_pDefPcs[i], nC, nR);
 			m_pPcr[1][nIdx]->m_arDefTypeForIts[nR][nC] = m_pPcr[1][nIdx]->m_pDefType[i];
 			m_pPcr[1][nIdx]->m_arPcrLineNumForIts[nR][nC] = i;
 
@@ -14019,7 +14019,7 @@ int CGvisR2R_PunchDoc::IsOfflineFolder() // 0 : Not exist, 1 : Exist only Up, 2 
 	CFileFind finder;
 
 	str = _T("OFFLINE");
-	sPath.Format(_T("%s%s\\%s\\%s\\%s\\*.*"), pDoc->WorkingInfo.System.sPathOldFile,
+	sPath.Format(_T("%s%s\\%s\\%s\\%s\\*.pcr"), pDoc->WorkingInfo.System.sPathOldFile,
 		pDoc->WorkingInfo.LastJob.sModel,
 		pDoc->WorkingInfo.LastJob.sLot,
 		pDoc->WorkingInfo.LastJob.sLayerUp,
@@ -14034,7 +14034,7 @@ int CGvisR2R_PunchDoc::IsOfflineFolder() // 0 : Not exist, 1 : Exist only Up, 2 
 	if (bDualTest)
 	{
 		str = _T("OFFLINE");
-		sPath.Format(_T("%s%s\\%s\\%s\\%s\\*.*"), pDoc->WorkingInfo.System.sPathOldFile,
+		sPath.Format(_T("%s%s\\%s\\%s\\%s\\*.pcr"), pDoc->WorkingInfo.System.sPathOldFile,
 			pDoc->WorkingInfo.LastJob.sModel,
 			pDoc->WorkingInfo.LastJob.sLot,
 			pDoc->WorkingInfo.LastJob.sLayerDn,

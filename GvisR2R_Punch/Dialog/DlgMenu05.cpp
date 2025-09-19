@@ -3312,7 +3312,7 @@ void CDlgMenu05::MakeIts()
 
 			nSerial = _tstoi(sSerial);
 
-			if (LoadPCRUpFromMk(nSerial) == 1)
+			if (LoadPCRDnFromMk(nSerial) == 1)
 			{
 				MakeItsFile(nSerial, nLayer);
 				//if(nLayer == RMAP_UP || nLayer == RMAP_INNER_UP)
@@ -4703,12 +4703,12 @@ int CDlgMenu05::LoadPCRUpFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 	CFileFind findfile;
 
 	sPath.Format(_T("%s%s\\%s\\%s\\OFFLINE\\%04d.pcr"),
-		pDoc->WorkingInfo.System.sPathOldFile, m_sModel, m_sLot, m_sLayer, nSerial);
+		pDoc->WorkingInfo.System.sPathOldFile, m_sModel, m_sLot, m_sLayerUp, nSerial);
 
 	if (!findfile.FindFile(sPath))
 	{
 	sPath.Format(_T("%s%s\\%s\\%s\\%04d.pcr"),
-		pDoc->WorkingInfo.System.sPathOldFile, m_sModel, m_sLot, m_sLayer, nSerial);
+		pDoc->WorkingInfo.System.sPathOldFile, m_sModel, m_sLot, m_sLayerUp, nSerial);
 		if (!findfile.FindFile(sPath))
 		{
 			return(2);
@@ -4933,12 +4933,12 @@ int CDlgMenu05::LoadPCRDnFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 	CFileFind findfile;
 
 	sPath.Format(_T("%s%s\\%s\\%s\\OFFLINE\\%04d.pcr"),
-		pDoc->WorkingInfo.System.sPathOldFile, m_sModel, m_sLot, m_sLayer, nSerial);
+		pDoc->WorkingInfo.System.sPathOldFile, m_sModel, m_sLot, m_sLayerDn, nSerial);
 
 	if (!findfile.FindFile(sPath))
 	{
 		sPath.Format(_T("%s%s\\%s\\%s\\%04d.pcr"),
-		pDoc->WorkingInfo.System.sPathOldFile, m_sModel, m_sLot, m_sLayer, nSerial);
+		pDoc->WorkingInfo.System.sPathOldFile, m_sModel, m_sLot, m_sLayerDn, nSerial);
 		if (!findfile.FindFile(sPath))
 		{
 			return(2);

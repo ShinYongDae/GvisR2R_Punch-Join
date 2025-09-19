@@ -11677,7 +11677,7 @@ CString CGvisR2R_PunchView::GetMkInfo1(int nSerial, int nMkPcs, BOOL bDispJudge)
 
 	if (pDoc->m_Master[0].m_pPcsRgn)
 	{
-		pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[0].MasterInfo.nActionCode, nPcsIdx, nStrip, nCol, nRow);
+		pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, nPcsIdx, nStrip, nCol, nRow);
 		if (bDispJudge)
 			sInfo.Format(_T("%04d_%c_%d_%d_%d_%d"), nSerial, nStrip + 'A', nCol + 1, nRow + 1, nRef, nJudge);
 		else
@@ -16527,16 +16527,16 @@ void CGvisR2R_PunchView::DispDefImg()
 						SetSerialMkInfo(nSerialR);		// 불량이미지(우) Display Start
 				}
 			}
-			else
-			{
-				if (ChkLastProc())
-				{
-					if (pView->m_bSerialDecrese)
-						SetSerialMkInfo(m_nLotEndSerial - 1, TRUE);	// 불량이미지(우) Display Start
-					else
-						SetSerialMkInfo(m_nLotEndSerial + 1, TRUE);	// 불량이미지(우) Display Start
-				}
-			}
+			//else
+			//{
+			//	if (ChkLastProc())
+			//	{
+			//		if (pView->m_bSerialDecrese)
+			//			SetSerialMkInfo(m_nLotEndSerial - 1, TRUE);	// 불량이미지(우) Display Start
+			//		else
+			//			SetSerialMkInfo(m_nLotEndSerial + 1, TRUE);	// 불량이미지(우) Display Start
+			//	}
+			//}
 			m_nStepTHREAD_DISP_DEF++;
 		}
 		break;
@@ -33936,7 +33936,7 @@ int CGvisR2R_PunchView::IsOfflineFolder() // 0 : Not exist, 1 : Exist only Up, 2
 	CFileFind finder;
 
 	str = _T("OFFLINE");
-	sPath.Format(_T("%s%s\\%s\\%s\\%s\\*.*"), pDoc->WorkingInfo.System.sPathOldFile,
+	sPath.Format(_T("%s%s\\%s\\%s\\%s\\*.pcr"), pDoc->WorkingInfo.System.sPathOldFile,
 		pDoc->WorkingInfo.LastJob.sModel,
 		pDoc->WorkingInfo.LastJob.sLot,
 		pDoc->WorkingInfo.LastJob.sLayerUp,
@@ -33949,7 +33949,7 @@ int CGvisR2R_PunchView::IsOfflineFolder() // 0 : Not exist, 1 : Exist only Up, 2
 		nRtn |= 0x01;
 
 	str = _T("OFFLINE");
-	sPath.Format(_T("%s%s\\%s\\%s\\%s\\*.*"), pDoc->WorkingInfo.System.sPathOldFile,
+	sPath.Format(_T("%s%s\\%s\\%s\\%s\\*.pcr"), pDoc->WorkingInfo.System.sPathOldFile,
 		pDoc->WorkingInfo.LastJob.sModel,
 		pDoc->WorkingInfo.LastJob.sLot,
 		pDoc->WorkingInfo.LastJob.sLayerDn,
@@ -36032,7 +36032,7 @@ CString CGvisR2R_PunchView::GetMkMtInfo1(int nSerial, int nMkPcs) // return Cam1
 
 	if (pDoc->m_Master[0].m_pPcsRgn)
 	{
-		pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[0].MasterInfo.nActionCode, nPcsIdx, nStrip, nCol, nRow);
+		pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, nPcsIdx, nStrip, nCol, nRow);
 		sInfo.Format(_T("%c_%d_%d"), nStrip + 'A', nCol + 1, nRow + 1);
 	}
 	else
