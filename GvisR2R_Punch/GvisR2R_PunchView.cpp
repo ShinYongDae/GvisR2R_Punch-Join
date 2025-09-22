@@ -14938,6 +14938,8 @@ void CGvisR2R_PunchView::DoMark0()
 	case 12:
 		if (!WaitDelay0(1))		// F:Done, T:On Waiting....
 		{
+			if (IsNoMk0())
+				Sleep(300);
 			m_dwStMkDn[0] = GetTickCount();
 			m_nStepMk[0]++;
 		}
@@ -15738,6 +15740,8 @@ void CGvisR2R_PunchView::DoMark1()
 	case 12:
 		if (!WaitDelay1(6))		// F:Done, T:On Waiting....
 		{
+			if (IsNoMk0())
+				Sleep(300);
 			m_dwStMkDn[1] = GetTickCount();
 			m_nStepMk[1]++;
 		}
@@ -29686,6 +29690,8 @@ void CGvisR2R_PunchView::DoMark0Its()
 	case 12:
 		if (!WaitDelay0(1))		// F:Done, T:On Waiting....
 		{
+			if (IsNoMk0())
+				Sleep(300);
 			m_dwStMkDn[0] = GetTickCount();
 			m_nStepMk[0]++;
 		}
@@ -30476,6 +30482,8 @@ void CGvisR2R_PunchView::DoMark1Its()
 	case 12:
 		if (!WaitDelay1(6))		// F:Done, T:On Waiting....
 		{
+			if (IsNoMk0())
+				Sleep(300);
 			m_dwStMkDn[1] = GetTickCount();
 			m_nStepMk[1]++;
 		}

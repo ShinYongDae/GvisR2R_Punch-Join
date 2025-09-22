@@ -86,6 +86,7 @@ CCamIRayple::CCamIRayple(int nIdx, HWND hCtrl, CWnd* pParent /*=NULL*/)
 	m_dFrameRateEdit = 0.0;
 	m_dGainEdit = 0.0;
 	m_dDisplayInterval = 0.0;
+	m_bLockGrab = FALSE;
 
 	setDisplayFPS(30);   // Default display 30 frames
 
@@ -229,6 +230,9 @@ char* CCamIRayple::TCHARToChar(const TCHAR *tszStr)
 
 BOOL CCamIRayple::OneshotGrab()
 {
+	m_bLockGrab = TRUE;
+	Sleep(30);
+
 	CString sMsg;
 
 	FrameBuffer* pConvertedImage = getConvertedImage();
@@ -252,9 +256,11 @@ BOOL CCamIRayple::OneshotGrab()
 	{
 		pView->ClrDispMsg();
 		AfxMessageBox(_T("Get frame failed!"));
+		m_bLockGrab = FALSE;
 		return FALSE;
 	}
 
+	m_bLockGrab = FALSE;
 	return TRUE;
 }
 
@@ -263,26 +269,31 @@ void CCamIRayple::displayProc()
 {
 	while (m_bRunning)
 	{
-		FrameBuffer* pConvertedImage = getConvertedImage();
-
-		if (NULL != pConvertedImage)
+		if (!m_bLockGrab)
 		{
-			m_nWidth = (int)pConvertedImage->Width();
-			m_nHeight = (int)pConvertedImage->Height();
+			FrameBuffer* pConvertedImage = getConvertedImage();
+
+			if (NULL != pConvertedImage)
+			{
+				m_nWidth = (int)pConvertedImage->Width();
+				m_nHeight = (int)pConvertedImage->Height();
 #ifdef USE_MIL
-			if(((CVision*)m_pParent)->m_pMil)
-			{ 
-				if(m_nIdxCam == 0)
-					((CVision*)m_pParent)->m_pMil->BufPutColor2d0(m_nWidth, m_nHeight, (TCHAR*)pConvertedImage->bufPtr());
-				else if(m_nIdxCam == 1)
-					((CVision*)m_pParent)->m_pMil->BufPutColor2d1(m_nWidth, m_nHeight, (TCHAR*)pConvertedImage->bufPtr());
-			}
+				if (((CVision*)m_pParent)->m_pMil)
+				{
+					if (m_nIdxCam == 0)
+						((CVision*)m_pParent)->m_pMil->BufPutColor2d0(m_nWidth, m_nHeight, (TCHAR*)pConvertedImage->bufPtr());
+					else if (m_nIdxCam == 1)
+						((CVision*)m_pParent)->m_pMil->BufPutColor2d1(m_nWidth, m_nHeight, (TCHAR*)pConvertedImage->bufPtr());
+				}
 #else
-			m_Render.display(pConvertedImage->bufPtr(), (int)pConvertedImage->Width(), (int)pConvertedImage->Height(), pConvertedImage->PixelFormat());
+				m_Render.display(pConvertedImage->bufPtr(), (int)pConvertedImage->Width(), (int)pConvertedImage->Height(), pConvertedImage->PixelFormat());
 #endif
-			delete pConvertedImage;
-			pConvertedImage = NULL;
+				delete pConvertedImage;
+				pConvertedImage = NULL;
+			}
 		}
+		else
+			Sleep(100);
 	}
 
 	clearConvertedImage();

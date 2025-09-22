@@ -76,5 +76,7 @@ public:
 	void SetTriggermode(CString sTriggerMode);
 
 	BOOL OneshotGrab();
+
+	BOOL m_bLockGrab;
 };
 
