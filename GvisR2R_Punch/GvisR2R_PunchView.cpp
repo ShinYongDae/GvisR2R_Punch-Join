@@ -16663,46 +16663,23 @@ void CGvisR2R_PunchView::DoAuto()
 	str.Format(_T("%d : %d"), m_nStepTHREAD_DISP_DEF, m_bTHREAD_DISP_DEF ? 1 : 0);
 	pView->DispStsBar(str, 6);
 
-	//DWORD dwSt = GetTickCount();
-	//DWORD dwSt2 = GetTickCount();
-
 	// LotEnd Start
 	if (DoAutoGetLotEndSignal())
 	{
 		return;
 	}
 
-	//dwSt2 = GetTickCount();
-	//str.Format(_T("1:%d"), dwSt2 - dwSt);
-	//pDoc->LogAuto(str);
-
 	// 마킹시작 신호를 확인 (PLC)
 	DoAtuoGetMkStSignal();
-
-	//dwSt = GetTickCount();
-	//str.Format(_T("2:%d"), dwSt - dwSt2);
-	//pDoc->LogAuto(str);
 
 	// LastProc Start (PLC)
 	DoAutoSetLastProcAtPlc();
 
-	//dwSt2 = GetTickCount();
-	//str.Format(_T("3:%d"), dwSt2 - dwSt);
-	//pDoc->LogAuto(str);
-
 	// AOI Feeding Offset Start on LastProc (PLC)
 	DoAutoSetFdOffsetLastProc();
 
-	//dwSt = GetTickCount();
-	//str.Format(_T("4:%d"), dwSt - dwSt2);
-	//pDoc->LogAuto(str);
-
 	// AOI Feeding Offset Start (PLC)
 	DoAutoSetFdOffset();
-
-	//dwSt2 = GetTickCount();
-	//str.Format(_T("5:%d"), dwSt2 - dwSt);
-	//pDoc->LogAuto(str);
 
 	// Engrave Feeding Offset Start (PLC)
 	//DoAutoSetFdOffsetEngrave();
@@ -16710,16 +16687,8 @@ void CGvisR2R_PunchView::DoAuto()
 	// 알람발생시 CycleStop : ChkReTestAlarmOnAoiUp/Dn() - 잔량처리시 재검사요구에 PCR파일 Received 신호 On됨
 	DoAutoChkCycleStop();
 
-	//dwSt = GetTickCount();
-	//str.Format(_T("6:%d"), dwSt - dwSt2);
-	//pDoc->LogAuto(str);
-
 	// DispMsg (m_pDlgMenu01에 메인상태표시 - 정지, 운전, ...)
 	DoAutoDispMsg();
-
-	//dwSt2 = GetTickCount();
-	//str.Format(_T("7:%d"), dwSt2 - dwSt);
-	//pDoc->LogAuto(str);
 
 	// Check Share Folder Start
 	if (pDoc->m_bVsStatusUp) // WorkingInfo.System.sPathAoiUpCurrInfo : _T("Infomation"), _T("Current VS Status")
@@ -16727,24 +16696,12 @@ void CGvisR2R_PunchView::DoAuto()
 	else
 		DoAutoChkShareFolder();
 
-	//dwSt = GetTickCount();
-	//str.Format(_T("8:%d"), dwSt - dwSt2);
-	//pDoc->LogAuto(str);
-
 	// Marking Start
 	DoAutoMarking();
-
-	//dwSt2 = GetTickCount();
-	//str.Format(_T("9:%d"), dwSt2 - dwSt);
-	//pDoc->LogAuto(str);
 
 	// Engrave Marking Start
 	if (m_bContEngraveF)
 		DoAutoMarkingEngrave();
-
-	//dwSt = GetTickCount();
-	//str.Format(_T("10:%d"), dwSt - dwSt2);
-	//pDoc->LogAuto(str);
 }
 
 BOOL CGvisR2R_PunchView::DoAutoGetLotEndSignal()
@@ -18924,13 +18881,7 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 			}
 
 			bChange = GetAoiUpInfo(m_nShareUpS, &nNewLot); // Buffer에서 PCR파일의 헤드 정보를 얻음.
-			//if (!bNewModel)
-			//{
-			//	Stop();
-			//	break;
-			//}
 
-			//if (bNewModel)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
 			if (nNewLot)
 			{
 				if (pDoc->GetTestMode() == MODE_OUTER)
@@ -18950,19 +18901,10 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 				{
 					if (IsLastJob(0)) // Up
 					{
-						//if (pDoc->GetTestMode() == MODE_OUTER)
-						//{
-						//	if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
-						//	{
-						//		MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
-						//	}
-						//}
 						pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
 							pDoc->WorkingInfo.LastJob.sModel,
 							pDoc->WorkingInfo.LastJob.sLayerUp);
 						pDoc->m_Master[0].LoadMstInfo();
-						//if (m_pDlgMenu01)
-						//	m_pDlgMenu01->ChkAoiVsStatus();
 						pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
 						ApplyListTorq();
 
@@ -19021,7 +18963,6 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 
 				if (m_pDlgMenu02)
 				{
-					//m_pDlgMenu02->ChgModelUp(); // PinImg, AlignImg를 Display함.
 					m_pDlgMenu02->InitCadImg();
 				}
 
@@ -19201,13 +19142,7 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 
 
 			bChange = GetAoiDnInfo(m_nShareDnS, &nNewLot);
-			//if (!bNewModel)
-			//{
-			//	Stop();
-			//	break;
-			//}
 
-			//if (bNewModel)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
 			if (nNewLot)
 			{
 				if (pDoc->GetTestMode() == MODE_OUTER)
@@ -19221,19 +19156,10 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 				{
 					if (IsLastJob(0)) // Up
 					{
-						//if (pDoc->GetTestMode() == MODE_OUTER)
-						//{
-						//	if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
-						//	{
-						//		MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
-						//	}
-						//}
 						pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
 							pDoc->WorkingInfo.LastJob.sModel,
 							pDoc->WorkingInfo.LastJob.sLayerUp);
 						pDoc->m_Master[0].LoadMstInfo();
-						//if (m_pDlgMenu01)
-						//	m_pDlgMenu01->ChkAoiVsStatus();
 						pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
 						ApplyListTorq();
 
@@ -19402,27 +19328,6 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 	case AT_LP + 7:
 		if (IsRun())
 		{
-			// 2025.03.21
-			//if (pDoc->GetTestMode() == MODE_OUTER)
-			//{
-			//	if (m_bTHREAD_UPDATE_REELMAP_INNER_UP) // Write Reelmap
-			//		break;
-			//	if (pDoc->WorkingInfo.LastJob.bDualTestInner)
-			//	{
-			//		if (m_bTHREAD_UPDATE_REELMAP_INNER_DN || m_bTHREAD_UPDATE_REELMAP_INNER_ALLUP || m_bTHREAD_UPDATE_REELMAP_INNER_ALLDN) // Write Reelmap
-			//			break;
-			//	}
-			//}
-			//if (bDualTest)
-			//{
-			//	if (m_bTHREAD_UPDATE_REELMAP_UP || m_bTHREAD_UPDATE_REELMAP_DN || m_bTHREAD_UPDATE_REELMAP_ALLUP || m_bTHREAD_UPDATE_REELMAP_ALLDN) // Write Reelmap
-			//		break;
-			//}
-			//else
-			//{
-			//	if (m_bTHREAD_UPDATE_REELMAP_UP) // Write Reelmap
-			//		break;
-			//}
 			m_nStepAuto++;
 		}
 		break;
