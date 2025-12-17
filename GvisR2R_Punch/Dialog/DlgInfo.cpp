@@ -85,6 +85,7 @@ BEGIN_MESSAGE_MAP(CDlgInfo, CDialog)
 	ON_BN_CLICKED(IDC_STC_174, OnStc174)
 	ON_BN_CLICKED(IDC_STC_178, OnStc178)
 	ON_BN_CLICKED(IDC_STC_32, OnStc32)
+	ON_BN_CLICKED(IDC_STC_94, OnStc94)
 	ON_BN_CLICKED(IDC_STC_183, OnStc183)
 	ON_WM_CTLCOLOR()
 	ON_BN_CLICKED(IDC_STC_61, OnStc61)
@@ -507,13 +508,12 @@ void CDlgInfo::InitStcTitle()
 	myStcTitle[80].SubclassDlgItem(IDC_STC_217, this);
 	myStcTitle[81].SubclassDlgItem(IDC_STC_198, this);
 
+	myStcTitle[82].SubclassDlgItem(IDC_STC_224, this); //초음파 세정기 운전 확인 시간[초] 
+
 	for(int i=0; i<MAX_INFO_STC; i++)
 	{
 		myStcTitle[i].SetFontName(_T("Arial"));
-// 		if(47 == i)
-// 			myStcTitle[i].SetFontSize(12);
-// 		else
-			myStcTitle[i].SetFontSize(14);
+		myStcTitle[i].SetFontSize(14);
 		
 		switch(i)
 		{
@@ -612,13 +612,12 @@ void CDlgInfo::InitStcData()
 	myStcData[27].SubclassDlgItem(IDC_STC_199, this);	// 마킹부 마킹여부 확인 White Dn L
 	myStcData[28].SubclassDlgItem(IDC_STC_218, this);	// 마킹부 마킹여부 확인 White Dn R
 
+	myStcData[29].SubclassDlgItem(IDC_STC_94, this);	// 초음파 세정기 운전 확인 시간[초]
+
 	for(int i=0; i<MAX_INFO_STC_DATA; i++)
 	{
 		myStcData[i].SetFontName(_T("Arial"));
-// 		if(12==i)
-// 			myStcData[i].SetFontSize(12);
-// 		else
-			myStcData[i].SetFontSize(20);
+		myStcData[i].SetFontSize(20);
 		myStcData[i].SetFontBold(TRUE);
 		myStcData[i].SetTextColor(RGB_BLACK);
 		myStcData[i].SetBkColor(RGB_WHITE);
@@ -682,13 +681,14 @@ void CDlgInfo::Disp()
 	myStcData[14].SetText(pDoc->WorkingInfo.LastJob.sCustomNeedRatio);
 	str.Format(_T("%d"), pDoc->WorkingInfo.LastJob.nVerifyPeriod);
 	myStcData[15].SetText(str);
-	myStcData[16].SetText(pDoc->WorkingInfo.LastJob.sEngItsCode);		// IDC_STC_17	ITS코드
-	myStcData[17].SetText(pDoc->WorkingInfo.LastJob.sCurrentShotNum);	// IDC_STC_41	Shot수 현재값
-	myStcData[18].SetText(pDoc->WorkingInfo.LastJob.sSettingShotNum);	// IDC_STC_43	Shot수 설정값
+	myStcData[16].SetText(pDoc->WorkingInfo.LastJob.sEngItsCode);					// IDC_STC_17	ITS코드
+	myStcData[17].SetText(pDoc->WorkingInfo.LastJob.sCurrentShotNum);				// IDC_STC_41	Shot수 현재값
+	myStcData[18].SetText(pDoc->WorkingInfo.LastJob.sSettingShotNum);				// IDC_STC_43	Shot수 설정값
 	str.Format(_T("%d"), pDoc->WorkingInfo.LastJob.nAlarmTimeAoi);
-	myStcData[19].SetText(str);											// IDC_STC_82	검사부 AOI 상하면 재작업 알람 시간
+	myStcData[19].SetText(str);														// IDC_STC_82	검사부 AOI 상하면 재작업 알람 시간
 	str.Format(_T("%d"), pDoc->WorkingInfo.LastJob.nAlarmTimePunch);
-	myStcData[20].SetText(str);											// IDC_STC_83	마킹부 재작업 알람 시간
+	myStcData[20].SetText(str);														// IDC_STC_83	마킹부 재작업 알람 시간
+	myStcData[29].SetText(pDoc->WorkingInfo.LastJob.sUltraSonicRunCheckTime);		// IDC_STC_224	초음파 세정기 운전 확인 시간[초] 
 
 	if(pDoc->WorkingInfo.LastJob.bLotSep)
 		myBtn[1].SetCheck(TRUE);
@@ -1225,6 +1225,30 @@ void CDlgInfo::OnStc32()
 	if (pView && pView->m_pEngrave)
 		pView->m_pEngrave->SetUltraSonicStTim();	//_ItemInx::_UltraSonicStTim
 #endif
+}
+
+void CDlgInfo::OnStc94() // IDC_STC_94
+{
+	// TODO: Add your control notification handler code here
+	myStcData[29].SetBkColor(RGB_RED);
+	myStcData[29].RedrawWindow();
+
+	CPoint pt;	CRect rt;
+	GetDlgItem(IDC_STC_94)->GetWindowRect(&rt);
+	pt.x = rt.right; pt.y = rt.bottom;
+	ShowKeypad(IDC_STC_94, pt, TO_BOTTOM | TO_RIGHT);
+
+	myStcData[29].SetBkColor(RGB_WHITE);
+	myStcData[29].RedrawWindow();
+
+	CString sVal;
+	GetDlgItem(IDC_STC_94)->GetWindowText(sVal);
+	pDoc->WorkingInfo.LastJob.sUltraSonicRunCheckTime = sVal;
+	::WritePrivateProfileString(_T("Last Job"), _T("UltraSonic Run Check Time"), sVal, PATH_WORKING_INFO);
+
+	double dTime = _tstof(sVal) * 100.0;
+	int nTime = int(dTime);
+	pView->MpeWrite(pView->Plc.DlgInfo.UltraSonicRunCheckTime, (long)nTime);	// (단위 [초] * 100) : 1 is 10 mSec.
 }
 
 void CDlgInfo::OnChk000() 

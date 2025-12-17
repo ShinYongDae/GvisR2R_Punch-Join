@@ -1038,6 +1038,7 @@
 #define IDC_STC_93                      1262
 #define IDC_STC_UTIL04_31               1262
 #define IDC_STATIC_MK_PM_SCORE3         1262
+#define IDC_STC_224                     1262
 #define IDC_CHK_32                      1263
 #define IDC_STC_94                      1263
 #define IDC_STC_UTIL04_32               1263

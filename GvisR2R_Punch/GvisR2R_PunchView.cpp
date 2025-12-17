@@ -25132,6 +25132,9 @@ void CGvisR2R_PunchView::InitPLC()
 	MpeWrite(Plc.DlgInfo.Laser380mm, (pDoc->WorkingInfo.LastJob.bUse380mm) ? 1 : 0);
 	MpeWrite(Plc.DlgInfo.Laser346mm, (pDoc->WorkingInfo.LastJob.bUse346mm) ? 1 : 0);
 	MpeWrite(Plc.DlgInfo.Laser340mm, (pDoc->WorkingInfo.LastJob.bUse340mm) ? 1 : 0);
+
+	lData = (long)(_tstof(pDoc->WorkingInfo.LastJob.sUltraSonicRunCheckTime) * 100.0);
+	MpeWrite(Plc.DlgInfo.UltraSonicRunCheckTime, lData);	// (¥‹¿ß [√ ] * 100) : 1 is 10 mSec.
 }
 
 BOOL CGvisR2R_PunchView::SetCollision(double dCollisionMargin)

@@ -2299,11 +2299,11 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	else
 		WorkingInfo.LastJob.nAlarmTimePunch = 10800;
 
+	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("UltraSonic Run Check Time"), NULL, szData, sizeof(szData), sPath))
+		WorkingInfo.LastJob.sUltraSonicRunCheckTime = CString(szData);
+	else
+		WorkingInfo.LastJob.sUltraSonicRunCheckTime = _T("0.0");
 
-	// 	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Light Value"), NULL, szData, sizeof(szData), sPath))
-	// 		WorkingInfo.LastJob.sLightVal = CString(szData);
-	// 	else
-	// 		WorkingInfo.LastJob.sLightVal = _T("");
 
 	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Light On"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.LastJob.bLightOn = _ttoi(szData) ? TRUE : FALSE;
@@ -4137,6 +4137,9 @@ void CGvisR2R_PunchDoc::SaveWorkingInfo()
 
 	sData = WorkingInfo.LastJob.sUltraSonicCleannerStTim;
 	::WritePrivateProfileString(_T("Last Job"), _T("Ultra Sonic Cleanner Start Time"), sData, sPath);
+
+	sData = WorkingInfo.LastJob.sUltraSonicRunCheckTime;
+	::WritePrivateProfileString(_T("Last Job"), _T("UltraSonic Run Check Time"), sData, sPath);
 
 	sData.Format(_T("%d"), WorkingInfo.LastJob.bRclDrSen ? 1 : 0);
 	::WritePrivateProfileString(_T("Last Job"), _T("Use Recoiler Door Sensor"), sData, sPath);

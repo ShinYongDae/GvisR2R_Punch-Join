@@ -811,6 +811,7 @@ struct stLastJob
 	BOOL bDispContRun, bDispLotEnd;
 	BOOL bUseJudgeMk, bUseJudgeMkHisto;
 	int nJudgeMkRatio[2], nJudgeMkHistoRatio[2], nJudgeMkHistoWhite[2];
+	CString sUltraSonicRunCheckTime;
 
 	stLastJob()
 	{
@@ -876,6 +877,8 @@ struct stLastJob
 		nJudgeMkHistoRatio[1] = 50;
 		nJudgeMkHistoWhite[0] = 240;
 		nJudgeMkHistoWhite[1] = 240;
+
+		sUltraSonicRunCheckTime = _T("0.0");
 	}
 };
 
@@ -2207,7 +2210,7 @@ struct stDlgInfoReg
 	CString TotalReelLength, LotLength, LotCutLength, StopLength, UseStopLength, UseLotLength, OneShotLength;
 	CString CleanRollerAoiUp, CleanRollerAoiDn, Laser380mm;
 	CString UltraSonicEngrave, UltraSonicAoi;
-	CString UltraSonicStTimeAoi, Laser346mm, Laser340mm;
+	CString UltraSonicStTimeAoi, UltraSonicRunCheckTime, Laser346mm, Laser340mm;
 	CString SenserSaftyPunch;
 
 	CString LampCleanRollerAoiUp, LampCleanRollerAoiDn, LampUltraSonicAoi, LampUltraSonicEngrave, LampTwoMetal, LampOneMetal;
@@ -2244,6 +2247,7 @@ struct stDlgInfoReg
 		UseLotLength = _T("MB40000C");
 		OneShotLength = _T("ML41030");
 		UltraSonicStTimeAoi = _T("MW41130");
+		UltraSonicRunCheckTime = _T("MW41142");
 		Laser380mm = _T("MB400054");
 		Laser346mm = _T("MB400053");
 		Laser340mm = _T("MB400052");
@@ -2337,6 +2341,8 @@ struct stDlgInfoReg
 			UltraSonicAoi = CString(szData);
 		if (0 < ::GetPrivateProfileString(sMenu, _T("UltraSonicStTimeAoi"), NULL, szData, sizeof(szData), sPath))
 			UltraSonicStTimeAoi = CString(szData);
+		if (0 < ::GetPrivateProfileString(sMenu, _T("UltraSonicRunCheckTime"), NULL, szData, sizeof(szData), sPath))
+			UltraSonicRunCheckTime = CString(szData);
 		if (0 < ::GetPrivateProfileString(sMenu, _T("Laser346mm"), NULL, szData, sizeof(szData), sPath))
 			Laser346mm = CString(szData);
 		if (0 < ::GetPrivateProfileString(sMenu, _T("Laser340mm"), NULL, szData, sizeof(szData), sPath))
