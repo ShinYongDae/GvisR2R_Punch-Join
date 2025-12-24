@@ -1350,7 +1350,9 @@ public:
 	BOOL ChkMkImgR(int nSerial, int nTotMk);
 	void ResetMkImgL(int nSerial);
 	void ResetMkImgR(int nSerial);
-
+	
+	BOOL IsMkPos0(double dTgtPosX, double dTgtPosY);
+	BOOL IsMkPos1(double dTgtPosX, double dTgtPosY);
 
 // 재정의입니다.
 public:

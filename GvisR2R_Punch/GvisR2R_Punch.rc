@@ -159,18 +159,19 @@ END
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
+IDD_ABOUTBOX DIALOGEX 0, 0, 194, 70
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "GvisR2R_Punch 정보"
 FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,14,7,20,20
-    LTEXT           "GvisR2R_Punch, 버전 3.2.8",IDC_STATIC,42,7,114,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2025.11.10",IDC_STATIC,42,16,114,8
-    DEFPUSHBUTTON   "확인",IDOK,113,43,50,14,WS_GROUP
-    LTEXT           "미마킹테스트(Histo) - White DN",IDC_STATIC,7,29,139,8
+    LTEXT           "GvisR2R_Punch, 버전 3.2.9",IDC_STATIC,42,7,114,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2025.12.24",IDC_STATIC,42,16,114,8
+    DEFPUSHBUTTON   "확인",IDOK,137,31,50,14,WS_GROUP
+    LTEXT           "미마킹테스트(Histo) - White DN",IDC_STATIC,7,29,115,8
     LTEXT           "보이스코일 펌웨어 변경",IDC_STATIC,7,38,96,8
-    LTEXT           "GUI 초음파 세정기 운전 확인 시간 추가",IDC_STATIC,6,48,105,8
+    LTEXT           "Sleep(300); // Wait for moving for RTR14",IDC_STATIC,7,57,141,8
+    LTEXT           "마킹전에 마킹 위치 확인",IDC_STATIC,7,48,96,8
 END
 
 IDD_GVISR2R_PUNCH_FORM DIALOGEX 0, 0, 630, 461
@@ -2487,9 +2488,9 @@ BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 163
+        RIGHTMARGIN, 187
         TOPMARGIN, 7
-        BOTTOMMARGIN, 54
+        BOTTOMMARGIN, 62
     END
 
     IDD_GVISR2R_PUNCH_FORM, DIALOG
