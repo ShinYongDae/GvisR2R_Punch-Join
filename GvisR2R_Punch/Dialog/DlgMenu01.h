@@ -121,6 +121,7 @@ public:
 	void SetTitleStcDef();
 	void ChkAoiVsStatus();
 	void SelMap(int nSel);
+	void DispTq();
 	//BOOL OpenReelmap(CString sPath); // for Test
 	void OpenReelmap(int nSelRmap);
 	BOOL DispReelmap(int nSerial, BOOL bDumy=FALSE);

@@ -351,14 +351,20 @@ BOOL CDlgMenu01::OnInitDialog()
 	m_bTIM_DISP_MK_CNT = TRUE;
 	SetTimer(TIM_DISP_MK_CNT, 300, NULL);
 
+	DispTq();
+
+
+	return TRUE;  // return TRUE unless you set the focus to a control
+}
+
+void CDlgMenu01::DispTq()
+{
 	myStcData[87].SetText(pDoc->WorkingInfo.Marking[0].sMarkingDisp1Toq); // IDC_STC_TQ_DISP1_VAL_L
 	myStcData[88].SetText(pDoc->WorkingInfo.Marking[1].sMarkingDisp1Toq); // IDC_STC_TQ_DISP1_VAL_R
 	myStcData[89].SetText(pDoc->WorkingInfo.Marking[0].sMarkingDisp2Toq); // IDC_STC_TQ_DISP2_VAL_L
 	myStcData[90].SetText(pDoc->WorkingInfo.Marking[1].sMarkingDisp2Toq); // IDC_STC_TQ_DISP2_VAL_R
 	myStcData[93].SetText(pDoc->WorkingInfo.Marking[0].sMarkingDisp3Toq); // IDC_STC_TQ_DISP3_VAL_L
 	myStcData[94].SetText(pDoc->WorkingInfo.Marking[1].sMarkingDisp3Toq); // IDC_STC_TQ_DISP3_VAL_R
-
-	return TRUE;  // return TRUE unless you set the focus to a control
 }
 
 void CDlgMenu01::SelMap(int nSel)
@@ -2834,7 +2840,7 @@ void CDlgMenu01::ChkAoiVsStatus()
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
 	if (bDualTest)
 	{
-		if ((pView->GetAoiUpVsStatus() && pView->GetAoiDnVsStatus()) && !GetDlgItem(IDC_STC_VS)->IsWindowVisible())
+		if ((pView->GetAoiUpVsStatus() || pView->GetAoiDnVsStatus()) && !GetDlgItem(IDC_STC_VS)->IsWindowVisible())
 			GetDlgItem(IDC_STC_VS)->ShowWindow(SW_SHOW);
 		else if (!pView->GetAoiUpVsStatus() && !pView->GetAoiDnVsStatus() && GetDlgItem(IDC_STC_VS)->IsWindowVisible())
 			GetDlgItem(IDC_STC_VS)->ShowWindow(SW_HIDE);
@@ -4477,6 +4483,11 @@ void CDlgMenu01::OnChkJoinProc()
 				myBtn[6].SetCheck(FALSE);
 			}
 		}
+		pView->m_bCont = pView->m_bJoinContinue;
+		pDoc->SetStatus(_T("General"), _T("bCont"), pView->m_bCont);
+		pView->Delay();
+		pView->m_pEngrave->SwEngAutoInitCont(pView->m_bCont);
+
 	}
 	else
 	{
@@ -6172,6 +6183,7 @@ void CDlgMenu01::OnBnClickedChkMkJudge()
 			if (IDYES == pView->MsgBox(_T("CamMaster에서 해당 모델의 데이터를 다시 업로드 할까요?"), 0, MB_YESNO))
 			{
 				pView->m_bLoadMstInfo = TRUE; pDoc->SetStatus(_T("General"), _T("bLoadMstInfo"), pView->m_bLoadMstInfo);
+				pView->m_bDoInitReelmap = FALSE;
 				pDoc->WorkingInfo.LastJob.bUseJudgeMk = TRUE;
 			}
 			else

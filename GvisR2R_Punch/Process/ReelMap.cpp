@@ -2412,17 +2412,19 @@ BOOL CReelMap::UpdateYield(int nSerial)
 
 	if (pView->m_bSerialDecrese)
 	{
-		if (nSerial >= m_nBeforeSerial)
-		{
-			m_nBeforeSerial = nSerial + 1;
-		}
+		m_nBeforeSerial = nSerial + 1;
+		//if (nSerial >= m_nBeforeSerial)
+		//{
+		//	m_nBeforeSerial = nSerial + 1;
+		//}
 	}
 	else
 	{
-		if (m_nBeforeSerial >= nSerial)
-		{
-			m_nBeforeSerial = nSerial - 1;
-		}
+		m_nBeforeSerial = nSerial - 1;
+		//if (m_nBeforeSerial >= nSerial)
+		//{
+		//	m_nBeforeSerial = nSerial - 1;
+		//}
 	}
 
 	int nPnl = m_nBeforeSerial;
@@ -5035,6 +5037,7 @@ BOOL CReelMap::MakeDirIts()
 
 	if (sItsInnerPath.IsEmpty() || sItsOuterPath.IsEmpty())
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->MsgBox(_T("ITS의 내층/외층 저장경로가 없습니다."));
 		return FALSE;
 	}
@@ -5090,6 +5093,7 @@ BOOL CReelMap::RemakeReelmap()
 	else
 	{
 		nLastShot = 0; // Failed.
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->MsgBox(_T("릴맵에 Marked Shot 정보가 없습니다."));
 		return FALSE;
 	}
@@ -5098,6 +5102,7 @@ BOOL CReelMap::RemakeReelmap()
 		sModel = CString(szData);
 	else
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->MsgBox(_T("Model 정보가 없습니다."));
 		return FALSE;
 	}
@@ -6888,6 +6893,7 @@ BOOL CReelMap::GetLastRmapInfo()
 	else
 	{
 		nLastShot = 0; // Failed.
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->MsgBox(_T("릴맵에 Marked Shot 정보가 없습니다."));
 		return FALSE;
 	}
@@ -6960,6 +6966,7 @@ BOOL CReelMap::WriteLastRmapInfoOnOffline()
 		else
 		{
 			nLastShot = 0; // Failed.
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			pView->MsgBox(_T("릴맵에 Marked Shot 정보가 없습니다."));
 			return FALSE;
 		}
@@ -7224,6 +7231,7 @@ BOOL CReelMap::GetInnerReelmapPath(int nItsSerial, CString  &sUp, CString &sDn, 
 	CString sLot, sLayerUp, sLayerDn;
 	if (!GetItsSerialInfo(nItsSerial, bDualTest, sLot, sLayerUp, sLayerDn, 0))
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		CString str;
 		str.Format(_T("It is trouble to read GetItsSerialInfo()."));
 		pView->MsgBox(str);
@@ -7305,6 +7313,7 @@ BOOL CReelMap::GetItsSerialInfo(int nItsSerial, BOOL &bDualTest, CString &sLot, 
 		sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], sName); // ITS_Code.txt
 		if (finder.FindFile(sPath) == FALSE)
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			strTemp.Format(_T("GetItsSerialInfo - Didn't find file.\r\n%s"), sPath);
 			pView->MsgBox(strTemp);
 			return FALSE;
@@ -7339,6 +7348,7 @@ BOOL CReelMap::GetItsSerialInfo(int nItsSerial, BOOL &bDualTest, CString &sLot, 
 
 		if (sLot.IsEmpty())
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			strTemp.Format(_T("내층 작업정보에 %d 시리얼에 대한 정보가 없습니다.\r\n%s"), nItsSerial, sPath);
 			pView->MsgBox(strTemp);
 			return FALSE;
@@ -7397,6 +7407,7 @@ int CReelMap::SearchFirstShotOnIts()
 
 		if (!pDataFile->Open(sPath))
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			sMsg.Format(_T("%s File not found."), sPath);
 			pView->MsgBox(sMsg);
 			delete pDataFile;
@@ -7457,6 +7468,7 @@ BOOL CReelMap::SetItsSerialInfo(int nItsSerial)
 
 	if (Path[0].IsEmpty() || Path[1].IsEmpty() || Path[2].IsEmpty() || Path[3].IsEmpty() || Path[4].IsEmpty())
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], sName); // ITS_Code.txt
 		str.Format(_T("It is trouble to write SetItsSerialInfo.txt\r\n%s"), sPath);
 		pView->MsgBox(str);
@@ -7828,6 +7840,7 @@ BOOL CReelMap::WriteYieldOnOffline(int nSerial)
 	fp = fopen(FileName, "a+");
 	if (fp == NULL)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->MsgBox(_T("It is trouble to open Yield.txt"));
 		return FALSE;
 	}
@@ -8251,6 +8264,7 @@ BOOL CReelMap::WriteYieldOffline(int nSerial, CString sPath)
 	fp = fopen(FileName, "a+");
 	if (fp == NULL)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->MsgBox(_T("It is trouble to open Yield.txt"));
 		return FALSE;
 	}
@@ -8559,6 +8573,7 @@ BOOL CReelMap::WriteLastRmapInfo()
 	sPath = GetRmapPath(m_nLayer);
 	if (!findfile.FindFile(sPath))
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		sMsg.Format(_T("Reelmap이 존재하지 않습니다.\r\n%s"), sPath);
 		pView->MsgBox(sMsg);
 		return FALSE;
@@ -8578,6 +8593,7 @@ BOOL CReelMap::WriteLastRmapInfo()
 	else
 	{
 		nLastShot = 0; // Failed.
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->MsgBox(_T("릴맵에 Marked Shot 정보가 없습니다."));
 		return FALSE;
 	}

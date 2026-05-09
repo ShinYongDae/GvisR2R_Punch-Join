@@ -4072,7 +4072,7 @@ BOOL CDlgMenu02::PreTranslateMessage(MSG* pMsg)
 			dResX = _tstof(pDoc->WorkingInfo.Vision[0].sResX);
 			dResY = _tstof(pDoc->WorkingInfo.Vision[0].sResY);
 			sMsg.Format(_T("%d,%d"), pMsg->pt.x, pMsg->pt.y);
-			pFrm->DispStatusBar(sMsg, 6);
+			//pFrm->DispStatusBar(sMsg, 6);
 
 			double fLen, fVel, fAcc, fJerk;
 			fLen = 1.0 * sqrt(((pMsg->pt.x - dCenterX[0]) * dResX * (pMsg->pt.x - dCenterX[0]) * dResX) + ((pMsg->pt.y - dCenterY[0]) * dResY * (pMsg->pt.y - dCenterY[0]) * dResY));
@@ -4103,7 +4103,7 @@ BOOL CDlgMenu02::PreTranslateMessage(MSG* pMsg)
 			dResX = _tstof(pDoc->WorkingInfo.Vision[1].sResX);
 			dResY = _tstof(pDoc->WorkingInfo.Vision[1].sResY);
 			sMsg.Format(_T("%d,%d"), pMsg->pt.x, pMsg->pt.y);
-			pFrm->DispStatusBar(sMsg, 6);
+			//pFrm->DispStatusBar(sMsg, 6);
 
 			double fLen, fVel, fAcc, fJerk;
 			fLen = 1.0 * sqrt(((pMsg->pt.x - dCenterX[1]) * dResX * (pMsg->pt.x - dCenterX[1]) * dResX) + ((pMsg->pt.y - dCenterY[1]) * dResY * (pMsg->pt.y - dCenterY[1]) * dResY));
@@ -5078,6 +5078,7 @@ void CDlgMenu02::OnChkElecTest()
 	if (IDYES == pView->MsgBox(_T("CamMaster에서 해당 모델의 데이터를 다시 업로드 할까요?"), 0, MB_YESNO))
 	{
 		pView->m_bLoadMstInfo = TRUE; pDoc->SetStatus(_T("General"), _T("bLoadMstInfo"), pView->m_bLoadMstInfo);
+		pView->m_bDoInitReelmap = FALSE;
 	}
 
 	myBtn[16].SetCheck(FALSE);

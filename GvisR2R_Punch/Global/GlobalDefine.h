@@ -604,7 +604,7 @@ typedef struct {
 
 #define MYGL_GAP_PNL				5
 #define MAX_DISP_PNL				6
-#define MAX_PCR_PNL					500	//24
+#define MAX_PCR_PNL					1000	//24
 
 #define MENU01_STC_DEFINFO_HARF		6
 #define MAX_PCR						4
@@ -655,7 +655,7 @@ struct stSystem
 	CString sPathMkMenu01, sPathMkMenu03, sPathMkInfo, sPathMonDispMain;
 	CString sPathMkWork, sPathMkStatus;
 
-	CString sPathOldFile, sPathItsFile, sPathItsInner, sPathItsOuter; //sPathIts, 
+	CString sPathOldFile, sPathItsFile, sPathItsInner, sPathItsOuter, sPathIts;
 	CString sIpPathOldFile, sIpPathItsFile, sIpPathIts;
 	CString sPathSapp3;
 	BOOL bSaveLog, bSaveReelmapTable, bRemakeReelmapInner, bDuplicateRmap, bInsertPunchingToDts, bDebugEngSig, bHideTotalMarkingTest;
@@ -703,7 +703,7 @@ struct stSystem
 
 		sPathOldFile = _T("");
 		sPathItsFile = _T("");
-		//sPathIts = _T("");
+		sPathIts = _T("");
 		sPathItsInner = _T("");
 		sPathItsOuter = _T("");
 		sIpPathOldFile = _T("");
@@ -2407,7 +2407,7 @@ struct stDlgFrameHighReg
 	{
 		FeedOffsetPunch = _T("ML41066");
 		FeedOffsetAoiUp = _T("ML41062");
-		FeedOffsetAoiDn = _T("ML45064");
+		FeedOffsetAoiDn = _T("ML41064");
 		FeedOffsetEngrave = _T("ML41060");
 		FeedOffsetWriteDoneAoiUp = _T("MB40024D");
 		FeedOffsetWriteDoneAoiDn = _T("MB40024E");

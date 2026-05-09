@@ -180,6 +180,7 @@ void CDlgMyMsgSub02::ClickOk()
 	SetRtnVal(IDOK);
 	if (myBtn00.m_hParentWnd)
 		myBtn00.Refresh();
+	pView->MpeWrite(_T("MB400183"), 1); // 알람메시지 확인
 	OnOK();
 }
 

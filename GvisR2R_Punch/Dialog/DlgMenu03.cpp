@@ -3118,7 +3118,7 @@ void CDlgMenu03::SetAoiOnePnl(BOOL bOn)
 BOOL CDlgMenu03::DoReset()
 {
 	pView->DispThreadTick();
-
+	pView->ResetMonAlm();
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
 
 	// 자신의 로컬파일에 설정
@@ -3159,6 +3159,11 @@ BOOL CDlgMenu03::DoReset()
 				pView->m_pDlgMenu01->ClrInfo();
 
 			pView->ResetYield();
+
+
+			pDoc->SetStatus(_T("General"), _T("bCont"), pView->m_bCont);
+			pView->Delay(300);
+			pView->m_pEngrave->SwEngAutoInitCont(pView->m_bCont);
 		}
 
 		if(!bInit)
@@ -3168,10 +3173,13 @@ BOOL CDlgMenu03::DoReset()
 			if(IDNO == pView->MsgBox(_T("이어가기를 하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, TRUE))
 			{
 				pView->m_bCont = FALSE; pDoc->SetStatus(_T("General"), _T("bCont"), pView->m_bCont);
+				pView->Delay();
+				pView->m_pEngrave->SwEngAutoInitCont(pView->m_bCont);
 				return FALSE;
 			}
-			pView->m_pEngrave->SwEngAutoInitCont(TRUE);
 			pView->m_bCont = TRUE; pDoc->SetStatus(_T("General"), _T("bCont"), pView->m_bCont);
+			pView->Delay();
+			pView->m_pEngrave->SwEngAutoInitCont(pView->m_bCont);
 		}
 
 		pView->InitAuto(bInit);

@@ -675,6 +675,7 @@ public:
 	void SetListBuf();
 
 	void DispMainOnAutoStart();
+	void Delay(int mSec = 10);
 
 	static UINT ThreadProc0(LPVOID lpContext); // DoMark0(), DoMark1()
 	static UINT ThreadProc1(LPVOID lpContext); // ChkCollision()
@@ -1213,6 +1214,7 @@ public:
 	BOOL m_bSetSig, m_bSetSigF, m_bSetData, m_bSetDataF;
 	BOOL m_bLoadMstInfo, m_bLoadMstInfoF;
 	BOOL m_bTIM_START_UPDATE;
+	BOOL m_bDoInitReelmap;
 
 
 	BOOL m_bEscape;

@@ -197,34 +197,42 @@ CGvisR2R_PunchDoc::CGvisR2R_PunchDoc()
 	m_cBigDefCode[22] = 'Q';	//	UDD1
 	m_cBigDefCode[23] = 'R';	//	Narrow
 	m_cBigDefCode[24] = 'W';	//	Wide
-	m_cBigDefCode[25] = '?';	//	Light
+	m_cBigDefCode[25] = 'F';	//	FixedDefect
+	m_cBigDefCode[26] = 'Y';	//	VH.Size
+	m_cBigDefCode[27] = 'Z';	//	VHEdge
+	m_cBigDefCode[28] = '?';	//	Light
+	m_cBigDefCode[29] = '@';	//	Inner
 
 	m_cSmallDefCode[0] = '*';	//	None
 	m_cSmallDefCode[1] = 'n';	//	NICK
 	m_cSmallDefCode[2] = 'd';	//	PROTRUSION
 	m_cSmallDefCode[3] = 'a';	//	SPACE
-	m_cSmallDefCode[4] = 'o';
-	m_cSmallDefCode[5] = 's';
-	m_cSmallDefCode[6] = 'u';
-	m_cSmallDefCode[7] = 'i';
-	m_cSmallDefCode[8] = 'h';
-	m_cSmallDefCode[9] = 'e';
-	m_cSmallDefCode[10] = 'p';
-	m_cSmallDefCode[11] = 'l';
-	m_cSmallDefCode[12] = 'x';
-	m_cSmallDefCode[13] = 't';
-	m_cSmallDefCode[14] = 'm';
-	m_cSmallDefCode[15] = 'f';
-	m_cSmallDefCode[16] = 'c';
-	m_cSmallDefCode[17] = 'g';
-	m_cSmallDefCode[18] = 'v';
+	m_cSmallDefCode[4] = 'o';	//	OPEN
+	m_cSmallDefCode[5] = 's';	//	SHORT
+	m_cSmallDefCode[6] = 'u';	//	USHORT
+	m_cSmallDefCode[7] = 'i';	//	PINHOLE
+	m_cSmallDefCode[8] = 'h';	//	HOLE_MISS
+	m_cSmallDefCode[9] = 'e';	//	EXTRA
+	m_cSmallDefCode[10] = 'p';	//	PAD
+	m_cSmallDefCode[11] = 'l';	//	HOLE_POSITION
+	m_cSmallDefCode[12] = 'x';	//	POI
+	m_cSmallDefCode[13] = 't';	//	VH_POSITION
+	m_cSmallDefCode[14] = 'm';	//	VH_MISS
+	m_cSmallDefCode[15] = 'f';	//	HOLE_DEFECT
+	m_cSmallDefCode[16] = 'c';	//	HOLE_OPEN
+	m_cSmallDefCode[17] = 'g';	//	VH_OPEN
+	m_cSmallDefCode[18] = 'v';	//	VH_DEF
 	m_cSmallDefCode[19] = 'k';	//	E.Nick
 	m_cSmallDefCode[20] = 'b';	//	E.Prot
 	m_cSmallDefCode[21] = 'j';	//	E.Space
 	m_cSmallDefCode[22] = 'q';	//	UDD1
 	m_cSmallDefCode[23] = 'r';	//	Narrow
 	m_cSmallDefCode[24] = 'w';	//	Wide
-	m_cSmallDefCode[25] = '?';	//	Light
+	m_cSmallDefCode[25] = 'f';	//	FixedDefect
+	m_cSmallDefCode[26] = 'y';	//	VH.Size
+	m_cSmallDefCode[27] = 'z';	//	VHEdge
+	m_cSmallDefCode[28] = '?';	//	Light
+	m_cSmallDefCode[29] = '@';	//	Inner
 
 // 	for(i=19; i<MAX_DEF; i++)
 // 	{
@@ -1507,13 +1515,13 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 		WorkingInfo.System.sPathItsFile = CString(_T(""));
 	}
 
-	//if (0 < ::GetPrivateProfileString(_T("System"), _T("ItsFileDirPath"), NULL, szData, sizeof(szData), sPath))
-	//	WorkingInfo.System.sPathIts = CString(szData);
-	//else
-	//{
-	//	pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("ItsFileDirPath가 설정되어 있지 않습니다."), MB_ICONWARNING | MB_OK);
-	//	WorkingInfo.System.sPathIts = CString(_T(""));
-	//}
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("ItsFileDirPath"), NULL, szData, sizeof(szData), sPath))
+		WorkingInfo.System.sPathIts = CString(szData);
+	else
+	{
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg(); AfxMessageBox(_T("ItsFileDirPath가 설정되어 있지 않습니다."), MB_ICONWARNING | MB_OK);
+		WorkingInfo.System.sPathIts = CString(_T(""));
+	}
 
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("ItsFileInnerDirPath"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.System.sPathItsInner = CString(szData);
@@ -1872,15 +1880,15 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 
 
 	// [Last Job]
-	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("MkSt0"), NULL, szData, sizeof(szData), sPath))
-		pView->m_bMkSt[0] = _ttoi(szData) > 0 ? TRUE : FALSE;
-	else
-		pView->m_bMkSt[0] = FALSE;
+	//if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("MkSt0"), NULL, szData, sizeof(szData), sPath))
+	//	pView->m_bMkSt[0] = _ttoi(szData) > 0 ? TRUE : FALSE;
+	//else
+	//	pView->m_bMkSt[0] = FALSE;
 
-	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("MkSt1"), NULL, szData, sizeof(szData), sPath))
-		pView->m_bMkSt[1] = _ttoi(szData) > 0 ? TRUE : FALSE;
-	else
-		pView->m_bMkSt[1] = FALSE;
+	//if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("MkSt1"), NULL, szData, sizeof(szData), sPath))
+	//	pView->m_bMkSt[1] = _ttoi(szData) > 0 ? TRUE : FALSE;
+	//else
+	//	pView->m_bMkSt[1] = FALSE;
 
 	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("MkStAuto"), NULL, szData, sizeof(szData), sPath))
 		pView->m_nMkStAuto = _ttoi(szData);
@@ -4722,6 +4730,7 @@ BOOL CGvisR2R_PunchDoc::InitReelmapUp()
 	if (!m_Master[0].m_pPcsRgn)
 	{
 		CString strMsg;
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strMsg.Format(_T("피스 영역이 존재하지 않습니다."));
 		pView->MsgBox(strMsg);
 		return FALSE;
@@ -4796,6 +4805,7 @@ BOOL CGvisR2R_PunchDoc::InitReelmapDn()
 	if (!m_Master[0].m_pPcsRgn)
 	{
 		CString strMsg;
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strMsg.Format(_T("피스 영역이 존재하지 않습니다."));
 		pView->MsgBox(strMsg);
 		return FALSE;
@@ -5143,6 +5153,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoUp(int nSerial, int *pNewLot, BOOL bFromBuf) /
 
 	if (nSerial < 1)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR파일이 설정되지 않았습니다."));
 		pView->MsgBox(strFileData);
 		return(FALSE);
@@ -5174,6 +5185,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoUp(int nSerial, int *pNewLot, BOOL bFromBuf) /
 	}
 	else
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR 파일이 존재하지 않습니다.\r\n%s"), sPath);
 		pView->MsgBox(strFileData);
 		return(FALSE);
@@ -5224,6 +5236,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoUp(int nSerial, int *pNewLot, BOOL bFromBuf) /
 
 	if (Status.PcrShare[0].sModel.IsEmpty() || Status.PcrShare[0].sLayer.IsEmpty() || Status.PcrShare[0].sLot.IsEmpty())
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->MsgBox(_T("Error - Aoi Information."));
 		return FALSE;
 	}
@@ -5239,6 +5252,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoUp(int nSerial, int *pNewLot, BOOL bFromBuf) /
 	}
 	else if (Status.PcrShare[0].sItsCode.IsEmpty())
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		sMsg.Format(_T("%d Serial의 pcr파일 정보에서 로트번호와 ITS코드 위치가 비었습니다."), nSerial);
 		pView->MsgBox(sMsg);
 	}
@@ -5310,6 +5324,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoUp(int nSerial, int *pNewLot, BOOL bFromBuf) /
 			{
 				if ((m_nAoiCamInfoStrPcs[0] == 1 ? TRUE : FALSE) != WorkingInfo.System.bStripPcsRgnBin)
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					pView->MsgBox(_T("WorkingInfo.ini 파일의 StripPcsRgnBin정보와 상부 AOI CamMst정보가 다릅니다."));
 					return FALSE;
 				}
@@ -5336,6 +5351,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoUp(int nSerial, int *pNewLot, BOOL bFromBuf) /
 			CString sLot, sLayerUp, sLayerDn, str;
 			if (!pDoc->GetItsSerialInfo(nSerial, bDualTestInner, sLot, sLayerUp, sLayerDn))
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				str.Format(_T("It is trouble to read GetItsSerialInfo()."));
 				pView->MsgBox(str);
 				return FALSE; // TRUE: CHANGED, FALSE: NO CHANGED 
@@ -5378,6 +5394,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoDn(int nSerial, int *pNewLot, BOOL bFromBuf) /
 
 	if (nSerial < 1)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR파일이 설정되지 않았습니다."));
 		pView->MsgBox(strFileData);
 		return(FALSE);
@@ -5409,6 +5426,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoDn(int nSerial, int *pNewLot, BOOL bFromBuf) /
 	}
 	else
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR 파일이 존재하지 않습니다.\r\n%s"), sPath);
 		pView->MsgBox(strFileData);
 		return(FALSE);
@@ -5459,6 +5477,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoDn(int nSerial, int *pNewLot, BOOL bFromBuf) /
 
 	if (Status.PcrShare[1].sModel.IsEmpty() || Status.PcrShare[1].sLayer.IsEmpty() || Status.PcrShare[1].sLot.IsEmpty())
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->MsgBox(_T("Error - Aoi Information."));
 		return FALSE;
 	}
@@ -5474,6 +5493,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoDn(int nSerial, int *pNewLot, BOOL bFromBuf) /
 	}
 	else if (Status.PcrShare[1].sItsCode.IsEmpty())
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		sMsg.Format(_T("%d Serial의 pcr파일 정보에서 로트번호와 ITS코드 위치가 비었습니다."), nSerial);
 		pView->MsgBox(sMsg);
 	}
@@ -5538,6 +5558,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoDn(int nSerial, int *pNewLot, BOOL bFromBuf) /
 			{
 				if ((m_nAoiCamInfoStrPcs[1] == 1 ? TRUE : FALSE) != WorkingInfo.System.bStripPcsRgnBin)
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					pView->MsgBox(_T("WorkingInfo.ini 파일의 StripPcsRgnBin정보와 하부 AOI CamMst정보가 다릅니다."));
 					return FALSE;
 				}
@@ -5766,6 +5787,7 @@ int CGvisR2R_PunchDoc::LoadPCRAllUp(int nSerial, BOOL bFromShare)	// return : 2(
 
 	if (nSerial < 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("PCR파일이 설정되지 않았습니다."));
 		pView->MsgBox(str);
 		return(2);
@@ -5773,6 +5795,7 @@ int CGvisR2R_PunchDoc::LoadPCRAllUp(int nSerial, BOOL bFromShare)	// return : 2(
 
 	if (!m_pPcr[2])
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("PCR[2]관련 메모리가 할당되지 않았습니다."));
 		pView->MsgBox(str);
 		return(2);
@@ -5822,6 +5845,7 @@ int CGvisR2R_PunchDoc::LoadPCRAllUp(int nSerial, BOOL bFromShare)	// return : 2(
 	//if (nTotPcs < 0 || nTotPcsInner < 0 || nTotPcsInner != nTotPcs || nNodeXInner != nNodeX || nNodeYInner != nNodeY)
 	if (nTotPcs < 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("It is trouble to run LoadPCRAllUp()."));
 		pView->MsgBox(str);
 		return 0;
@@ -5946,6 +5970,7 @@ int CGvisR2R_PunchDoc::LoadPCRAllDn(int nSerial, BOOL bFromShare)	// return : 2(
 
 	if (nSerial <= 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("PCR파일이 설정되지 않았습니다."));
 		pView->MsgBox(str);
 		return(2);
@@ -5953,6 +5978,7 @@ int CGvisR2R_PunchDoc::LoadPCRAllDn(int nSerial, BOOL bFromShare)	// return : 2(
 
 	if (!m_pPcr[3])
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("PCR[3]관련 메모리가 할당되지 않았습니다."));
 		pView->MsgBox(str);
 		return(2);
@@ -6002,6 +6028,7 @@ int CGvisR2R_PunchDoc::LoadPCRAllDn(int nSerial, BOOL bFromShare)	// return : 2(
 	//if (nTotPcs < 0 || nTotPcsInner < 0 || nTotPcsInner != nTotPcs || nNodeXInner != nNodeX || nNodeYInner != nNodeY)
 	if (nTotPcs < 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("It is trouble to run LoadPCRAllDn()."));
 		pView->MsgBox(str);
 		return 0;
@@ -6133,6 +6160,7 @@ int CGvisR2R_PunchDoc::LoadPCRUp(int nSerial, BOOL bFromShare)	// return : 2(Fai
 
 	if (nSerial <= 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR파일이 설정되지 않았습니다."));
 		pView->MsgBox(strFileData);
 		return(2);
@@ -6140,6 +6168,7 @@ int CGvisR2R_PunchDoc::LoadPCRUp(int nSerial, BOOL bFromShare)	// return : 2(Fai
 
 	if (!m_pPcr[0])
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR[0]관련 메모리가 할당되지 않았습니다."));
 		pView->MsgBox(strFileData);
 		return(2);
@@ -6180,6 +6209,7 @@ int CGvisR2R_PunchDoc::LoadPCRUp(int nSerial, BOOL bFromShare)	// return : 2(Fai
 	}
 	else
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR[Up] 파일이 존재하지 않습니다.\r\n%s"), sPath);
 		pView->MsgBox(strFileData);
 		return(2);
@@ -6254,6 +6284,7 @@ int CGvisR2R_PunchDoc::LoadPCRUp(int nSerial, BOOL bFromShare)	// return : 2(Fai
 	}
 	else if (sItsCode.IsEmpty())
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		sMsg.Format(_T("%d Serial의 pcr파일 정보에서 로트번호와 ITS코드 위치가 비었습니다."), nSerial);
 		pView->MsgBox(sMsg);
 	}
@@ -6325,6 +6356,7 @@ int CGvisR2R_PunchDoc::LoadPCRUp(int nSerial, BOOL bFromShare)	// return : 2(Fai
 			CString sLot, sLayerUp, sLayerDn, str;
 			if (!pDoc->GetItsSerialInfo(nSerial, bDualTestInner, sLot, sLayerUp, sLayerDn))
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				str.Format(_T("It is trouble to read GetItsSerialInfo()."));
 				pView->MsgBox(str);
 				return FALSE; // TRUE: CHANGED, FALSE: NO CHANGED 
@@ -6457,6 +6489,7 @@ int CGvisR2R_PunchDoc::LoadPCRDn(int nSerial, BOOL bFromShare)	// return : 2(Fai
 
 	if (nSerial <= 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR파일이 설정되지 않았습니다."));
 		pView->MsgBox(strFileData);
 		return(2);
@@ -6464,6 +6497,7 @@ int CGvisR2R_PunchDoc::LoadPCRDn(int nSerial, BOOL bFromShare)	// return : 2(Fai
 
 	if (!m_pPcr[1])
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR[1]관련 메모리가 할당되지 않았습니다."));
 		pView->MsgBox(strFileData);
 		return(2);
@@ -6503,6 +6537,7 @@ int CGvisR2R_PunchDoc::LoadPCRDn(int nSerial, BOOL bFromShare)	// return : 2(Fai
 	}
 	else
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR[Dn] 파일이 존재하지 않습니다.\r\n%s"), sPath);
 		pView->MsgBox(strFileData);
 		return(2);
@@ -6576,6 +6611,7 @@ int CGvisR2R_PunchDoc::LoadPCRDn(int nSerial, BOOL bFromShare)	// return : 2(Fai
 	}
 	else if (sItsCode.IsEmpty())
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		sMsg.Format(_T("%d Serial의 pcr파일 정보에서 로트번호와 ITS코드 위치가 비었습니다."), nSerial);
 		pView->MsgBox(sMsg);
 	}
@@ -6694,10 +6730,11 @@ int CGvisR2R_PunchDoc::LoadPCRDn(int nSerial, BOOL bFromShare)	// return : 2(Fai
 			m_pPcr[1][nIdx]->m_pDefType[i] = _tstoi(strBadName);
 
 			// Temp for ITS - m_pPcr[0][nIdx]->m_pDefPcs[i] = Rotate180(_tstoi(strPieceID));
-			pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, Rotate180(m_pPcr[1][nIdx]->m_pDefPcs[i]), nC, nR);
+			//pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, Rotate180(m_pPcr[1][nIdx]->m_pDefPcs[i]), nC, nR);
+			pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, pDoc->m_pPcr[1][nIdx]->m_pDefPcs[i], nC, nR);
 			m_pPcr[1][nIdx]->m_arDefType[nR][nC] = m_pPcr[1][nIdx]->m_pDefType[i];
 			m_pPcr[1][nIdx]->m_arPcrLineNum[nR][nC] = i;
-			pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, m_pPcr[1][nIdx]->m_pDefPcs[i], nC, nR);
+			//pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, m_pPcr[1][nIdx]->m_pDefPcs[i], nC, nR);
 			m_pPcr[1][nIdx]->m_arDefTypeForIts[nR][nC] = m_pPcr[1][nIdx]->m_pDefType[i];
 			m_pPcr[1][nIdx]->m_arPcrLineNumForIts[nR][nC] = i;
 
@@ -7002,6 +7039,7 @@ BOOL CGvisR2R_PunchDoc::CopyDefImgUp(int nSerial, CString sNewLot)
 				{
 					if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
 					{
+						pView->SetAlarmToPlc(UNIT_PUNCH);
 						strTemp.Format(_T("%s \r\n: Defect Image File Copy Fail"), strDefImgPathS);
 						pView->MsgBox(strTemp);
 						return FALSE;
@@ -7059,6 +7097,7 @@ BOOL CGvisR2R_PunchDoc::CopyDefImgUp(int nSerial, CString sNewLot)
 				{
 					if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
 					{
+						pView->SetAlarmToPlc(UNIT_PUNCH);
 						strTemp.Format(_T("%s \r\n: Defect Image Position File Copy Fail"), strDefImgPathS);
 						pView->MsgBox(strTemp);
 						return FALSE;
@@ -7311,6 +7350,7 @@ BOOL CGvisR2R_PunchDoc::CopyDefImgDn(int nSerial, CString sNewLot)
 				{
 					if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
 					{
+						pView->SetAlarmToPlc(UNIT_PUNCH);
 						strTemp.Format(_T("%s \r\n: Defect Image File Copy Fail"), strDefImgPathS);
 						pView->MsgBox(strTemp);
 						return FALSE;
@@ -7368,6 +7408,7 @@ BOOL CGvisR2R_PunchDoc::CopyDefImgDn(int nSerial, CString sNewLot)
 				{
 					if (!CopyFile((LPCTSTR)strDefImgPathS, (LPCTSTR)strDefImgPathD, FALSE))
 					{
+						pView->SetAlarmToPlc(UNIT_PUNCH);
 						strTemp.Format(_T("%s \r\n: Defect Image Position File Copy Fail"), strDefImgPathS);
 						pView->MsgBox(strTemp);
 						return FALSE;
@@ -9486,6 +9527,7 @@ BOOL CGvisR2R_PunchDoc::GetPcrInfo(CString sPath, stModelInfo &stInfo)
 	}
 	else
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR 파일이 존재하지 않습니다.\r\n%s"), sPath);
 		pView->MsgBox(strFileData);
 		return(FALSE);
@@ -10640,6 +10682,7 @@ BOOL CGvisR2R_PunchDoc::SetItsSerialInfo(int nItsSerial)
 
 	if (Path[0].IsEmpty() || Path[1].IsEmpty() || Path[2].IsEmpty() || Path[3].IsEmpty() || Path[4].IsEmpty())
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], sName); // ITS_Code.txt
 		str.Format(_T("It is trouble to write SetItsSerialInfo.txt\r\n%s"), sPath);
 		pView->MsgBox(str);
@@ -10705,6 +10748,7 @@ int CGvisR2R_PunchDoc::SearchFirstShotOnIts()
 
 		if (!pDataFile->Open(sPath))
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			sMsg.Format(_T("%s File not found."), sPath);
 			pView->MsgBox(sMsg);
 			delete pDataFile;
@@ -10758,6 +10802,7 @@ BOOL CGvisR2R_PunchDoc::GetItsSerialInfo(int nItsSerial, BOOL &bDualTest, CStrin
 		sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], sName); // ITS_Code.txt
 		if (finder.FindFile(sPath) == FALSE)
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			strTemp.Format(_T("GetItsSerialInfo - Didn't find file.\r\n%s"), sPath);
 			pView->MsgBox(strTemp);
 			return FALSE;
@@ -10794,6 +10839,7 @@ BOOL CGvisR2R_PunchDoc::GetItsSerialInfo(int nItsSerial, BOOL &bDualTest, CStrin
 		else
 		{
 			//bRtn = FALSE;
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			strTemp.Format(_T("내층 작업정보에 %d 시리얼에 대한 정보가 없습니다.\r\n%s"), nItsSerial, sPath);
 			pView->MsgBox(strTemp);
 			return FALSE;
@@ -10829,6 +10875,7 @@ BOOL CGvisR2R_PunchDoc::GetItsSerialInfo(int nItsSerial, BOOL &bDualTest, CStrin
 
 	if (!bRtn)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strTemp.Format(_T("내층정보에 시리얼 (%d)이 없습니다.\r\n%s"), nItsSerial, sPath);
 		pView->MsgBox(strTemp);
 	}
@@ -10881,6 +10928,7 @@ BOOL CGvisR2R_PunchDoc::GetInnerYieldPath(int nItsSerial, CString  &sUp, CString
 	if (!GetItsSerialInfo(nItsSerial, bDualTest, sLot, sLayerUp, sLayerDn, 0))
 	{
 		CString str;
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("It is trouble to read GetItsSerialInfo()."));
 		pView->MsgBox(str);
 		return FALSE;
@@ -10926,6 +10974,7 @@ BOOL CGvisR2R_PunchDoc::GetInnerReelmapPath(int nItsSerial, CString  &sUp, CStri
 	if (!GetItsSerialInfo(nItsSerial, bDualTest, sLot, sLayerUp, sLayerDn, 0))
 	{
 		CString str;
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("It is trouble to read GetItsSerialInfo()."));
 		pView->MsgBox(str);
 		return FALSE;
@@ -10990,6 +11039,7 @@ BOOL CGvisR2R_PunchDoc::GetInnerFolderPath(int nItsSerial, CString  &sUp, CStrin
 	if (!GetItsSerialInfo(nItsSerial, bDualTest, sLot, sLayerUp, sLayerDn, 0))
 	{
 		CString str;
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("It is trouble to read GetItsSerialInfo()."));
 		pView->MsgBox(str);
 		return FALSE;
@@ -11063,11 +11113,14 @@ CString CGvisR2R_PunchDoc::GetItsTargetFolderPath()
 	CString sItsPath = _T("");// = WorkingInfo.System.sPathIts;
 	if (GetTestMode() == MODE_INNER)
 		sItsPath = pDoc->WorkingInfo.System.sPathItsInner;
-	else if(GetTestMode() == MODE_OUTER || pDoc->WorkingInfo.System.bUseDualIts || pDoc->WorkingInfo.System.bUseDual2dIts)
+	else if(GetTestMode() == MODE_OUTER)
 		sItsPath = pDoc->WorkingInfo.System.sPathItsOuter;
+	else if(pDoc->WorkingInfo.System.bUseDualIts || pDoc->WorkingInfo.System.bUseDual2dIts)
+		sItsPath = pDoc->WorkingInfo.System.sPathIts;
 
 	if (sItsPath.IsEmpty())
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->MsgBox(_T("내/외층 설정이 않되어서 ITS 폴더를 설정할 수 없습니다."));
 		return _T("");
 	}
@@ -11110,6 +11163,7 @@ int CGvisR2R_PunchDoc::LoadPCRAllUpInner(int nSerial, BOOL bFromShare)	// return
 	if (!GetItsSerialInfo(nSerial, bDualTest, sLot, sLayerUp, sLayerDn, 1))
 	{
 		CString str;
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("It is trouble to read GetItsSerialInfo()."));
 		pView->MsgBox(str);
 		return 0;
@@ -11131,6 +11185,7 @@ int CGvisR2R_PunchDoc::LoadPCRAllUpInner(int nSerial, BOOL bFromShare)	// return
 
 	if (nSerial < 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("PCR파일이 설정되지 않았습니다."));
 		pView->MsgBox(str);
 		return(2);
@@ -11138,6 +11193,7 @@ int CGvisR2R_PunchDoc::LoadPCRAllUpInner(int nSerial, BOOL bFromShare)	// return
 
 	if (!m_pPcrInner[2])
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("PCR[2]관련 메모리가 할당되지 않았습니다."));
 		pView->MsgBox(str);
 		return(2);
@@ -11186,6 +11242,7 @@ int CGvisR2R_PunchDoc::LoadPCRAllUpInner(int nSerial, BOOL bFromShare)	// return
 	int nNodeYInner = m_MasterInner[0].m_pPcsRgn->m_nRow;
 	if (nTotPcs < 0 || nTotPcsInner < 0 || nTotPcsInner != nTotPcs || nNodeXInner != nNodeX || nNodeYInner != nNodeY)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("It is trouble to run LoadPCRAllUpInner()."));
 		pView->MsgBox(str);
 		return 0;
@@ -11308,6 +11365,7 @@ int CGvisR2R_PunchDoc::LoadPCRAllDnInner(int nSerial, BOOL bFromShare)	// return
 	if (!GetItsSerialInfo(nSerial, bDualTest, sLot, sLayerUp, sLayerDn, 1))
 	{
 		CString str;
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("It is trouble to read GetItsSerialInfo()."));
 		pView->MsgBox(str);
 		return 0;
@@ -11321,6 +11379,7 @@ int CGvisR2R_PunchDoc::LoadPCRAllDnInner(int nSerial, BOOL bFromShare)	// return
 
 	if (nSerial <= 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("PCR파일이 설정되지 않았습니다."));
 		pView->MsgBox(str);
 		// 		AfxMessageBox(strFileData);
@@ -11329,6 +11388,7 @@ int CGvisR2R_PunchDoc::LoadPCRAllDnInner(int nSerial, BOOL bFromShare)	// return
 
 	if (!m_pPcr[3])
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("PCR[3]관련 메모리가 할당되지 않았습니다."));
 		pView->MsgBox(str);
 		// 		AfxMessageBox(strFileData);
@@ -11378,6 +11438,7 @@ int CGvisR2R_PunchDoc::LoadPCRAllDnInner(int nSerial, BOOL bFromShare)	// return
 	int nNodeYInner = m_MasterInner[0].m_pPcsRgn->m_nRow;
 	if (nTotPcs < 0 || nTotPcsInner < 0 || nTotPcsInner != nTotPcs || nNodeXInner != nNodeX || nNodeYInner != nNodeY)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("It is trouble to run LoadPCRAllDnInner()."));
 		pView->MsgBox(str);
 		return 0;
@@ -11494,6 +11555,7 @@ int CGvisR2R_PunchDoc::LoadPCRUpInner(int nSerial, BOOL bFromShare)	// return : 
 
 	if (nSerial <= 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR파일이 설정되지 않았습니다."));
 		pView->MsgBox(strFileData);
 		//AfxMessageBox(strFileData);
@@ -11502,6 +11564,7 @@ int CGvisR2R_PunchDoc::LoadPCRUpInner(int nSerial, BOOL bFromShare)	// return : 
 
 	if (!m_pPcrInner[0])
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR[0]관련 메모리가 할당되지 않았습니다."));
 		pView->MsgBox(strFileData);
 		//AfxMessageBox(strFileData);
@@ -11518,6 +11581,7 @@ int CGvisR2R_PunchDoc::LoadPCRUpInner(int nSerial, BOOL bFromShare)	// return : 
 	
 	if (!GetInnerFolderPath(nSerial, sUpPath, sDnPath))
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("GetInnerFolderPath가 설정되지 않았습니다."));
 		pView->MsgBox(strFileData);
 		return(2);
@@ -11546,6 +11610,7 @@ int CGvisR2R_PunchDoc::LoadPCRUpInner(int nSerial, BOOL bFromShare)	// return : 
 	}
 	else
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCRInner[Up] 파일이 존재하지 않습니다.\r\n%s"), sPath);
 		pView->MsgBox(strFileData);
 		return(2);
@@ -11697,6 +11762,7 @@ int CGvisR2R_PunchDoc::LoadPCRDnInner(int nSerial, BOOL bFromShare)	// return : 
 	if (!GetItsSerialInfo(nSerial, bDualTest, sLot, sLayerUp, sLayerDn, 1))
 	{
 		CString str;
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("It is trouble to read GetItsSerialInfo()."));
 		pView->MsgBox(str);
 		return 0;
@@ -11717,6 +11783,7 @@ int CGvisR2R_PunchDoc::LoadPCRDnInner(int nSerial, BOOL bFromShare)	// return : 
 
 	if (nSerial <= 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR파일이 설정되지 않았습니다."));
 		pView->MsgBox(strFileData);
 		return(2);
@@ -11724,6 +11791,7 @@ int CGvisR2R_PunchDoc::LoadPCRDnInner(int nSerial, BOOL bFromShare)	// return : 
 
 	if (!m_pPcrInner[1])
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR[1]관련 메모리가 할당되지 않았습니다."));
 		pView->MsgBox(strFileData);
 		return(2);
@@ -11739,6 +11807,7 @@ int CGvisR2R_PunchDoc::LoadPCRDnInner(int nSerial, BOOL bFromShare)	// return : 
 
 	if (!GetInnerFolderPath(nSerial, sUpPath, sDnPath))
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("GetInnerFolderPath가 설정되지 않았습니다."));
 		pView->MsgBox(strFileData);
 		return(2);
@@ -11768,6 +11837,7 @@ int CGvisR2R_PunchDoc::LoadPCRDnInner(int nSerial, BOOL bFromShare)	// return : 
 	}
 	else
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCRInner[Dn] 파일이 존재하지 않습니다.\r\n%s"), sPath);
 		pView->MsgBox(strFileData);
 		return(2);
@@ -11935,6 +12005,7 @@ int CGvisR2R_PunchDoc::LoadPCRIts(int nSerial, BOOL bFromShare)	// return : 2(Fa
 
 	if (!m_pPcrIts)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
 		pView->MsgBox(_T("PCR[2]관련 메모리가 할당되지 않았습니다."));
 		//AfxMessageBox(strFileData);
@@ -11946,6 +12017,7 @@ int CGvisR2R_PunchDoc::LoadPCRIts(int nSerial, BOOL bFromShare)	// return : 2(Fa
 	if (!GetItsSerialInfo(nSerial, bDualTestInner, sLot, sLayerUp, sLayerDn, 0))
 	{
 		CString str;
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("It is trouble to read GetItsSerialInfo()."));
 		pView->MsgBox(str);
 		return FALSE;
@@ -12011,6 +12083,7 @@ void CGvisR2R_PunchDoc::LoadPCRIts11(int nSerial) // 11 -> 외층 : 양면, 내층 : �
 	int nNodeYInner = m_MasterInner[0].m_pPcsRgn->m_nRow;
 	if (nTotPcs < 0 || nTotPcsInner < 0 || nTotPcsInner != nTotPcs || nNodeXInner != nNodeX || nNodeYInner != nNodeY)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("It is trouble to run LoadPCRIts11()."));
 		pView->MsgBox(str);
 		return;
@@ -12167,6 +12240,7 @@ void CGvisR2R_PunchDoc::LoadPCRIts10(int nSerial) // 10 -> 외층 : 양면, 내층 : �
 	int nNodeYInner = m_MasterInner[0].m_pPcsRgn->m_nRow;
 	if (nTotPcs < 0 || nTotPcsInner < 0 || nTotPcsInner != nTotPcs || nNodeXInner != nNodeX || nNodeYInner != nNodeY)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("It is trouble to run LoadPCRIts10()."));
 		pView->MsgBox(str);
 		return;
@@ -12322,6 +12396,7 @@ void CGvisR2R_PunchDoc::LoadPCRIts01(int nSerial) // 01 -> 외층 : 단면, 내층 : �
 	int nNodeYInner = m_MasterInner[0].m_pPcsRgn->m_nRow;
 	if (nTotPcs < 0 || nTotPcsInner < 0 || nTotPcsInner != nTotPcs || nNodeXInner != nNodeX || nNodeYInner != nNodeY)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("It is trouble to run LoadPCRIts01()."));
 		pView->MsgBox(str);
 		return;
@@ -12433,6 +12508,7 @@ void CGvisR2R_PunchDoc::LoadPCRIts01(int nSerial) // 01 -> 외층 : 단면, 내층 : �
 
 void CGvisR2R_PunchDoc::LoadPCRIts00(int nSerial) // 00 -> 외층 : 단면, 내층 : 단면
 {
+	pView->SetAlarmToPlc(UNIT_PUNCH);
 	pView->ClrDispMsg();
 	pView->MsgBox(_T("LoadPCRIts00 - 내외층 모두 단면인 경우는 프로그램이 없습니다."));
 	return;
@@ -12504,6 +12580,7 @@ BOOL CGvisR2R_PunchDoc::InitReelmapInnerUp()
 {
 	if (!m_MasterInner[0].m_pPcsRgn)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		CString strMsg;
 		strMsg.Format(_T("피스 영역이 존재하지 않습니다."));
 		pView->MsgBox(strMsg);
@@ -12553,6 +12630,7 @@ BOOL CGvisR2R_PunchDoc::InitReelmapInnerDn()
 
 	if (!m_MasterInner[0].m_pPcsRgn)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		CString strMsg;
 		strMsg.Format(_T("피스 영역이 존재하지 않습니다."));
 		pView->MsgBox(strMsg);
@@ -13043,6 +13121,7 @@ int CGvisR2R_PunchDoc::LoadPcrUp(CString sPath)	// return : 2(Failed), 1(정상), 
 
 	if (nSerial <= 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR파일이 설정되지 않았습니다."));
 		pView->MsgBox(strFileData);
 		return(2);
@@ -13050,6 +13129,7 @@ int CGvisR2R_PunchDoc::LoadPcrUp(CString sPath)	// return : 2(Failed), 1(정상), 
 
 	if (!m_pPcr[0])
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR[0]관련 메모리가 할당되지 않았습니다."));
 		pView->MsgBox(strFileData);
 		return(2);
@@ -13076,6 +13156,7 @@ int CGvisR2R_PunchDoc::LoadPcrUp(CString sPath)	// return : 2(Failed), 1(정상), 
 	}
 	else
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR[Up] 파일이 존재하지 않습니다.\r\n%s"), sPath);
 		pView->MsgBox(strFileData);
 		return(2);
@@ -13150,6 +13231,7 @@ int CGvisR2R_PunchDoc::LoadPcrUp(CString sPath)	// return : 2(Failed), 1(정상), 
 	}
 	else if (sItsCode.IsEmpty())
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		sMsg.Format(_T("%d Serial의 pcr파일 정보에서 로트번호와 ITS코드 위치가 비었습니다."), nSerial);
 		pView->MsgBox(sMsg);
 	}
@@ -13218,6 +13300,7 @@ int CGvisR2R_PunchDoc::LoadPcrUp(CString sPath)	// return : 2(Failed), 1(정상), 
 			CString sLot, sLayerUp, sLayerDn, str;
 			if (!pDoc->GetItsSerialInfo(nSerial, bDualTestInner, sLot, sLayerUp, sLayerDn))
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				str.Format(_T("It is trouble to read GetItsSerialInfo()."));
 				pView->MsgBox(str);
 				return FALSE; // TRUE: CHANGED, FALSE: NO CHANGED 
@@ -13361,6 +13444,7 @@ int CGvisR2R_PunchDoc::LoadPcrDn(CString sPath)	// return : 2(Failed), 1(정상), 
 
 	if (nSerial <= 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR파일이 설정되지 않았습니다."));
 		pView->MsgBox(strFileData);
 		return(2);
@@ -13368,6 +13452,7 @@ int CGvisR2R_PunchDoc::LoadPcrDn(CString sPath)	// return : 2(Failed), 1(정상), 
 
 	if (!m_pPcr[1])
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR[1]관련 메모리가 할당되지 않았습니다."));
 		pView->MsgBox(strFileData);
 		return(2);
@@ -13394,6 +13479,7 @@ int CGvisR2R_PunchDoc::LoadPcrDn(CString sPath)	// return : 2(Failed), 1(정상), 
 	}
 	else
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		strFileData.Format(_T("PCR[Dn] 파일이 존재하지 않습니다.\r\n%s"), sPath);
 		pView->MsgBox(strFileData);
 		return(2);
@@ -13469,6 +13555,7 @@ int CGvisR2R_PunchDoc::LoadPcrDn(CString sPath)	// return : 2(Failed), 1(정상), 
 	}
 	else if (sItsCode.IsEmpty())
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		sMsg.Format(_T("%d Serial의 pcr파일 정보에서 로트번호와 ITS코드 위치가 비었습니다."), nSerial);
 		pView->MsgBox(sMsg);
 	}
@@ -13585,10 +13672,11 @@ int CGvisR2R_PunchDoc::LoadPcrDn(CString sPath)	// return : 2(Failed), 1(정상), 
 			m_pPcr[1][nIdx]->m_pDefType[i] = _tstoi(strBadName);
 
 			// Temp for ITS - m_pPcr[0][nIdx]->m_pDefPcs[i] = Rotate180(_tstoi(strPieceID));
-			pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, Rotate180(m_pPcr[1][nIdx]->m_pDefPcs[i]), nC, nR);
+			//pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, Rotate180(m_pPcr[1][nIdx]->m_pDefPcs[i]), nC, nR);
+			pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, pDoc->m_pPcr[1][nIdx]->m_pDefPcs[i], nC, nR);
 			m_pPcr[1][nIdx]->m_arDefType[nR][nC] = m_pPcr[1][nIdx]->m_pDefType[i];
 			m_pPcr[1][nIdx]->m_arPcrLineNum[nR][nC] = i;
-			pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, m_pPcr[1][nIdx]->m_pDefPcs[i], nC, nR);
+			//pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, m_pPcr[1][nIdx]->m_pDefPcs[i], nC, nR);
 			m_pPcr[1][nIdx]->m_arDefTypeForIts[nR][nC] = m_pPcr[1][nIdx]->m_pDefType[i];
 			m_pPcr[1][nIdx]->m_arPcrLineNumForIts[nR][nC] = i;
 
@@ -13655,6 +13743,7 @@ int CGvisR2R_PunchDoc::LoadPcrAllUp(CString sPath)	// return : 2(Failed), 1(정상
 
 	if (nSerial < 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("PCR파일이 설정되지 않았습니다."));
 		pView->MsgBox(str);
 		return(2);
@@ -13662,6 +13751,7 @@ int CGvisR2R_PunchDoc::LoadPcrAllUp(CString sPath)	// return : 2(Failed), 1(정상
 
 	if (!m_pPcr[2])
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("PCR[2]관련 메모리가 할당되지 않았습니다."));
 		pView->MsgBox(str);
 		return(2);
@@ -13713,6 +13803,7 @@ int CGvisR2R_PunchDoc::LoadPcrAllUp(CString sPath)	// return : 2(Failed), 1(정상
 	}
 	if (nTotPcs < 0 || nTotPcsInner < 0 || nTotPcsInner != nTotPcs || nNodeXInner != nNodeX || nNodeYInner != nNodeY)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("It is trouble to run LoadPcrAllUp()."));
 		pView->MsgBox(str);
 		return 0;
@@ -13849,6 +13940,7 @@ int CGvisR2R_PunchDoc::LoadPcrAllDn(CString sPath)	// return : 2(Failed), 1(정상
 
 	if (nSerial <= 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("PCR파일이 설정되지 않았습니다."));
 		pView->MsgBox(str);
 		return(2);
@@ -13856,6 +13948,7 @@ int CGvisR2R_PunchDoc::LoadPcrAllDn(CString sPath)	// return : 2(Failed), 1(정상
 
 	if (!m_pPcr[3])
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("PCR[3]관련 메모리가 할당되지 않았습니다."));
 		pView->MsgBox(str);
 		return(2);
@@ -13909,6 +14002,7 @@ int CGvisR2R_PunchDoc::LoadPcrAllDn(CString sPath)	// return : 2(Failed), 1(정상
 	}
 	if (nTotPcs < 0 || nTotPcsInner < 0 || nTotPcsInner != nTotPcs || nNodeXInner != nNodeX || nNodeYInner != nNodeY)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		str.Format(_T("It is trouble to run LoadPcrAllDn()."));
 		pView->MsgBox(str);
 		return 0;
@@ -14144,15 +14238,15 @@ BOOL CGvisR2R_PunchDoc::LoadStatus()
 	else
 		pView->m_bLastProc = pView->m_pDlgMenu01->m_bLastProc = FALSE;
 
-	if (0 < ::GetPrivateProfileString(_T("General"), _T("bMkSt0"), NULL, szData, sizeof(szData), sPath))
-		pView->m_bMkSt[0] = _ttoi(szData) ? TRUE : FALSE;
-	else
-		pView->m_bMkSt[0] = FALSE;
+	//if (0 < ::GetPrivateProfileString(_T("General"), _T("bMkSt0"), NULL, szData, sizeof(szData), sPath))
+	//	pView->m_bMkSt[0] = _ttoi(szData) ? TRUE : FALSE;
+	//else
+	//	pView->m_bMkSt[0] = FALSE;
 
-	if (0 < ::GetPrivateProfileString(_T("General"), _T("bMkSt1"), NULL, szData, sizeof(szData), sPath))
-		pView->m_bMkSt[1] = _ttoi(szData) ? TRUE : FALSE;
-	else
-		pView->m_bMkSt[1] = FALSE;
+	//if (0 < ::GetPrivateProfileString(_T("General"), _T("bMkSt1"), NULL, szData, sizeof(szData), sPath))
+	//	pView->m_bMkSt[1] = _ttoi(szData) ? TRUE : FALSE;
+	//else
+	//	pView->m_bMkSt[1] = FALSE;
 
 	if (0 < ::GetPrivateProfileString(_T("General"), _T("bCam"), NULL, szData, sizeof(szData), sPath))
 		pView->m_bCam = _ttoi(szData) ? TRUE : FALSE;
@@ -15054,6 +15148,7 @@ BOOL CGvisR2R_PunchDoc::CopyReelmapInner(int nItsSerial) // 외층 펀칭 작업 처음 
 			{
 				if (!CopyFile((LPCTSTR)sPathSrc, (LPCTSTR)sPathDest, FALSE))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					sMsg.Format(_T("%s \r\n: 내층 릴맵 Up File Copy Fail"), sPathDest);
 					pView->MsgBox(sMsg);
 					return FALSE;
@@ -15061,6 +15156,7 @@ BOOL CGvisR2R_PunchDoc::CopyReelmapInner(int nItsSerial) // 외층 펀칭 작업 처음 
 			}
 			else
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				sMsg.Format(_T("%s \r\n: 내층 릴맵 Up File이 없습니다."), sPathSrc);
 				pView->MsgBox(sMsg);
 				return FALSE;
@@ -15072,6 +15168,7 @@ BOOL CGvisR2R_PunchDoc::CopyReelmapInner(int nItsSerial) // 외층 펀칭 작업 처음 
 			{
 				if (!CopyFile((LPCTSTR)sPathSrc, (LPCTSTR)sPathDest, FALSE))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					sMsg.Format(_T("%s \r\n: 내층 릴맵 Dn File Copy Fail"), sPathDest);
 					pView->MsgBox(sMsg);
 					return FALSE;
@@ -15079,6 +15176,7 @@ BOOL CGvisR2R_PunchDoc::CopyReelmapInner(int nItsSerial) // 외층 펀칭 작업 처음 
 			}
 			else
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				sMsg.Format(_T("%s \r\n: 내층 릴맵 Dn File이 없습니다."), sPathSrc);
 				pView->MsgBox(sMsg);
 				return FALSE;
@@ -15090,6 +15188,7 @@ BOOL CGvisR2R_PunchDoc::CopyReelmapInner(int nItsSerial) // 외층 펀칭 작업 처음 
 			{
 				if (!CopyFile((LPCTSTR)sPathSrc, (LPCTSTR)sPathDest, FALSE))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					sMsg.Format(_T("%s \r\n: 내층 AllUp 릴맵 File Copy Fail"), sPathDest);
 					pView->MsgBox(sMsg);
 					return FALSE;
@@ -15097,6 +15196,7 @@ BOOL CGvisR2R_PunchDoc::CopyReelmapInner(int nItsSerial) // 외층 펀칭 작업 처음 
 			}
 			else
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				sMsg.Format(_T("%s \r\n: 내층 릴맵 AllUp File이 없습니다."), sPathSrc);
 				pView->MsgBox(sMsg);
 				return FALSE;
@@ -15108,6 +15208,7 @@ BOOL CGvisR2R_PunchDoc::CopyReelmapInner(int nItsSerial) // 외층 펀칭 작업 처음 
 			{
 				if (!CopyFile((LPCTSTR)sPathSrc, (LPCTSTR)sPathDest, FALSE))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					sMsg.Format(_T("%s \r\n: 내층 릴맵 AllDn File Copy Fail"), sPathDest);
 					pView->MsgBox(sMsg);
 					return FALSE;
@@ -15115,6 +15216,7 @@ BOOL CGvisR2R_PunchDoc::CopyReelmapInner(int nItsSerial) // 외층 펀칭 작업 처음 
 			}
 			else
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				sMsg.Format(_T("%s \r\n: 내층 릴맵 AllDn File이 없습니다."), sPathSrc);
 				pView->MsgBox(sMsg);
 				return FALSE;
@@ -15129,6 +15231,7 @@ BOOL CGvisR2R_PunchDoc::CopyReelmapInner(int nItsSerial) // 외층 펀칭 작업 처음 
 			{
 				if (!CopyFile((LPCTSTR)sPathSrc, (LPCTSTR)sPathDest, FALSE))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					sMsg.Format(_T("%s \r\n: 내층 수율 Up File Copy Fail"), sPathDest);
 					pView->MsgBox(sMsg);
 					return FALSE;
@@ -15136,6 +15239,7 @@ BOOL CGvisR2R_PunchDoc::CopyReelmapInner(int nItsSerial) // 외층 펀칭 작업 처음 
 			}
 			else
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				sMsg.Format(_T("%s \r\n: 내층 수율 Up File이 없습니다."), sPathSrc);
 				pView->MsgBox(sMsg);
 				return FALSE;
@@ -15147,6 +15251,7 @@ BOOL CGvisR2R_PunchDoc::CopyReelmapInner(int nItsSerial) // 외층 펀칭 작업 처음 
 			{
 				if (!CopyFile((LPCTSTR)sPathSrc, (LPCTSTR)sPathDest, FALSE))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					sMsg.Format(_T("%s \r\n: 내층 수율 Dn File Copy Fail"), sPathDest);
 					pView->MsgBox(sMsg);
 					return FALSE;
@@ -15154,6 +15259,7 @@ BOOL CGvisR2R_PunchDoc::CopyReelmapInner(int nItsSerial) // 외층 펀칭 작업 처음 
 			}
 			else
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				sMsg.Format(_T("%s \r\n: 내층 수율 Dn File이 없습니다."), sPathSrc);
 				pView->MsgBox(sMsg);
 				return FALSE;
@@ -15165,6 +15271,7 @@ BOOL CGvisR2R_PunchDoc::CopyReelmapInner(int nItsSerial) // 외층 펀칭 작업 처음 
 			{
 				if (!CopyFile((LPCTSTR)sPathSrc, (LPCTSTR)sPathDest, FALSE))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					sMsg.Format(_T("%s \r\n: 내층 수율 AllUp File Copy Fail"), sPathDest);
 					pView->MsgBox(sMsg);
 					return FALSE;
@@ -15172,6 +15279,7 @@ BOOL CGvisR2R_PunchDoc::CopyReelmapInner(int nItsSerial) // 외층 펀칭 작업 처음 
 			}
 			else
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				sMsg.Format(_T("%s \r\n: 내층 수율 AllUp File이 없습니다."), sPathSrc);
 				pView->MsgBox(sMsg);
 				return FALSE;
@@ -15183,6 +15291,7 @@ BOOL CGvisR2R_PunchDoc::CopyReelmapInner(int nItsSerial) // 외층 펀칭 작업 처음 
 			{
 				if (!CopyFile((LPCTSTR)sPathSrc, (LPCTSTR)sPathDest, FALSE))
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					sMsg.Format(_T("%s \r\n: 내층 수율 AllDn File Copy Fail"), sPathDest);
 					pView->MsgBox(sMsg);
 					return FALSE;
@@ -15190,6 +15299,7 @@ BOOL CGvisR2R_PunchDoc::CopyReelmapInner(int nItsSerial) // 외층 펀칭 작업 처음 
 			}
 			else
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				sMsg.Format(_T("%s \r\n: 내층 수율 AllDn File이 없습니다."), sPathSrc);
 				pView->MsgBox(sMsg);
 				return FALSE;

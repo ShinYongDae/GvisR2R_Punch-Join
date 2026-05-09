@@ -1153,6 +1153,7 @@ void CEngrave::GetInfo(SOCKET_DATA SockData)
 			break;
 		case _ItemInx::_LoadMstInfo:
 			pView->m_bLoadMstInfo = TRUE; pDoc->SetStatus(_T("General"), _T("bLoadMstInfo"), pView->m_bLoadMstInfo);
+			pView->m_bDoInitReelmap = FALSE;
 			break;
 		case _ItemInx::_TotReelLen:
 			m_bGetInfo = TRUE;

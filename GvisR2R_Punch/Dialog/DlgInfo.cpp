@@ -2461,6 +2461,7 @@ void CDlgInfo::OnChk26()
 			if (IDYES == pView->MsgBox(_T("CamMaster에서 해당 모델의 데이터를 다시 업로드 할까요?"), 0, MB_YESNO))
 			{
 				pView->m_bLoadMstInfo = TRUE; pDoc->SetStatus(_T("General"), _T("bLoadMstInfo"), pView->m_bLoadMstInfo);
+				pView->m_bDoInitReelmap = FALSE;
 				pDoc->WorkingInfo.LastJob.bUseJudgeMk = TRUE;
 			}
 			else
@@ -2706,8 +2707,8 @@ void CDlgInfo::DispDualTest()
 	{
 		GetDlgItem(IDC_CHK_USE_AOI_DUAL_ITS)->ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_CHK_USE_AOI_DUAL_2D_ITS)->ShowWindow(SW_HIDE);
-		pView->MpeWrite(_T("MB40009A"), 1);															// 각인부\r미사용
-		SetTestMode(MODE_NONE);
+		//pView->MpeWrite(_T("MB40009A"), 1);															// 각인부\r미사용
+		//SetTestMode(MODE_NONE);
 		//if(bDualTest)
 		//	SetDualTest(TRUE);
 		//else

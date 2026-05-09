@@ -725,6 +725,7 @@ BOOL CCamMaster::LoadPcsRgnFromCam() // 기존 RTR
 		if (!file.Open(FileN, CFile::modeRead))
 		{
 			nPieceRgnNum = 0;
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			pView->MsgBox(_T("캠마스터에 피스정보가 설정되지 않았습니다."));
 // 			AfxMessageBox(_T("캠마스터에 피스정보가 설정되지 않았습니다."));
 			return FALSE;
@@ -853,6 +854,7 @@ BOOL CCamMaster::LoadStripPieceRegion_Binary()	//20121120-ndy for PairPanel
 
 	if (!find.FindFile(strFileNCam))
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->MsgBox(_T("캠마스터에 피스정보가 설정되지 않았습니다.")); // syd-20231127
 		return(FALSE);
 	}
@@ -868,6 +870,7 @@ BOOL CCamMaster::LoadStripPieceRegion_Binary()	//20121120-ndy for PairPanel
 	{
 		if (!file.Open(FileNLoc, CFile::modeRead))
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			pView->MsgBox(_T("캠마스터에 피스정보파일을 Open하지 못했습니다."));
 			return(FALSE);
 		}
@@ -917,6 +920,7 @@ BOOL CCamMaster::LoadStripPieceRegion_Binary()	//20121120-ndy for PairPanel
 
 	if (PieceRgnNum > MAX_PIECE_RGN_NUM) // 110803 jsy
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		file.Close();
 		pView->MsgBox(_T("캠마스터에서 설정한 피스 갯수가 최대치를 초과했습니다."));
 		return FALSE;
@@ -997,6 +1001,7 @@ BOOL CCamMaster::LoadStripPieceRegion_Binary()	//20121120-ndy for PairPanel
 	}
 	else
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		file.Close();
 		Size = 0;
 		pView->MsgBox(_T("캠마스터에서 설정한 피스 갯수가 없습니다."));

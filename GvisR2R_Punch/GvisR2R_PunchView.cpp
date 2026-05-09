@@ -518,8 +518,8 @@ CGvisR2R_PunchView::CGvisR2R_PunchView()
 	m_nClrAlmF = 0;
 
 	m_bMkSt[0] = FALSE;
-	m_bMkSt[0] = FALSE;
-	m_bMkStSw[1] = FALSE;
+	m_bMkSt[1] = FALSE;
+	m_bMkStSw[0] = FALSE;
 	m_bMkStSw[1] = FALSE;
 	m_nMkStAuto = 0;
 
@@ -602,6 +602,7 @@ CGvisR2R_PunchView::CGvisR2R_PunchView()
 
 	m_bLoadMstInfo = FALSE;
 	m_bLoadMstInfoF = FALSE;
+	m_bDoInitReelmap = TRUE;
 
 	m_sGet2dCodeLot = _T("");
 	m_nGet2dCodeSerial = 0;
@@ -932,6 +933,7 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 		case 15:
 			m_nStepInitView++;
 			m_bLoadMstInfo = TRUE; pDoc->SetStatus(_T("General"), _T("bLoadMstInfo"), m_bLoadMstInfo);
+			m_bDoInitReelmap = TRUE;
 			DispMsg(_T("H/W를 초기화합니다."), _T("알림"), RGB_GREEN, DELAY_TIME_MSG);
 			InitAct();
 			m_bStopFeeding = TRUE;
@@ -1256,6 +1258,7 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 	if (nIDEvent == TIM_SAFTY_STOP)
 	{
 		KillTimer(TIM_SAFTY_STOP);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("일시정지 - 마킹부 안전센서가 감지되었습니다."));
 		m_bTIM_SAFTY_STOP = FALSE;
 	}
@@ -3187,7 +3190,7 @@ void CGvisR2R_PunchView::DispThreadTick()
 		//	m_bTHREAD_REELMAP_YIELD_UP ? 1 : 0, m_bTHREAD_REELMAP_YIELD_DN ? 1 : 0);
 	if (pView->m_pVoiceCoil[0])
 		str.Format(_T("%.3f"), m_pVoiceCoil[0]->GetMkFinalPos());
-	pFrm->DispStatusBar(str, 5);
+	//pFrm->DispStatusBar(str, 5);
 #ifdef USE_IDS
 		double dFPS[2];
 		if (m_pVision[0])
@@ -3200,7 +3203,7 @@ void CGvisR2R_PunchView::DispThreadTick()
 		//str.Format(_T("%d,%d,%d,%d"), m_nStepAuto, m_nMkStAuto, m_nStepMk[0], m_nStepMk[1]);//pView->m_nLotEndAuto
 	if (pView->m_pVoiceCoil[1])
 		str.Format(_T("%.3f"), m_pVoiceCoil[1]->GetMkFinalPos());
-	pFrm->DispStatusBar(str, 6);
+	//pFrm->DispStatusBar(str, 6);
 #endif
 }
 
@@ -4043,6 +4046,7 @@ BOOL CGvisR2R_PunchView::ChkYield() // 수율 양호 : TRUE , 수율 불량 : FALSE
 			Buzzer(TRUE, 0);
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			sMsg.Format(_T("일시정지 - Failed ChkYield()."));
 			MsgBox(sMsg);
 			return FALSE;
@@ -4057,6 +4061,7 @@ BOOL CGvisR2R_PunchView::ChkYield() // 수율 양호 : TRUE , 수율 불량 : FALSE
 			Buzzer(TRUE, 0);
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			sMsg.Format(_T("일시정지 - Failed ChkYield()."));
 			MsgBox(sMsg);
 			return FALSE;
@@ -4077,6 +4082,7 @@ BOOL CGvisR2R_PunchView::ChkYield() // 수율 양호 : TRUE , 수율 불량 : FALSE
 			Buzzer(TRUE, 0);
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			sMsg.Format(_T("일시정지 - 전체 수율 제한범위 : %.1f 미달 ( %.1f )"), dTotLmt, dRatio);
 			MsgBox(sMsg);
 			return FALSE;
@@ -4097,6 +4103,7 @@ BOOL CGvisR2R_PunchView::ChkYield() // 수율 양호 : TRUE , 수율 불량 : FALSE
 					TowerLamp(RGB_RED, TRUE);
 					Stop();
 					sMsg.Format(_T("일시정지 - 구간 수율 제한범위 : %.1f 미달 ( %.1f )"), dPrtLmt, dRatio);
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					MsgBox(sMsg);
 					return FALSE;
 				}
@@ -4114,6 +4121,7 @@ BOOL CGvisR2R_PunchView::ChkYield() // 수율 양호 : TRUE , 수율 불량 : FALSE
 					TowerLamp(RGB_RED, TRUE);
 					Stop();
 					sMsg.Format(_T("일시정지 - 구간 수율 제한범위 : %.1f 미달 ( %.1f )"), dPrtLmt, dRatio);
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					MsgBox(sMsg);
 					return FALSE;
 				}
@@ -4205,6 +4213,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			Stop();
 			//pView->DispStsBar(_T("정지-5"), 0);
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 검사부 상 전면 중앙 도어 Open"));
 		}
 
@@ -4225,6 +4234,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 검사부 상 전면 좌측 도어 Open"));
 		}
 
@@ -4245,6 +4255,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 검사부 상 전면 우측 도어 Open"));
 		}
 
@@ -4265,6 +4276,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 검사부 상 후면 중앙 도어 Open"));
 		}
 
@@ -4285,6 +4297,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 검사부 상 후면 좌측 도어 Open"));
 		}
 
@@ -4305,6 +4318,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 검사부 상 후면 우측 도어 Open"));
 		}
 	}
@@ -4328,6 +4342,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 검사부 하 전면 중앙 도어 Open"));
 		}
 
@@ -4348,6 +4363,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 검사부 하 전면 좌측 도어 Open"));
 		}
 
@@ -4368,6 +4384,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 검사부 하 전면 우측 도어 Open"));
 		}
 
@@ -4388,6 +4405,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 검사부 하 후면 중앙 도어 Open"));
 		}
 
@@ -4408,6 +4426,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 검사부 하 후면 좌측 도어 Open"));
 		}
 
@@ -4428,6 +4447,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 검사부 하 후면 우측 도어 Open"));
 		}
 	}
@@ -4451,6 +4471,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 마킹부 전면 좌측 도어 Open"));
 		}
 
@@ -4471,6 +4492,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 마킹부 전면 우측 도어 Open"));
 		}
 
@@ -4491,6 +4513,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 마킹부 후면 좌측 도어 Open"));
 		}
 
@@ -4511,6 +4534,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 마킹부 후면 우측 도어 Open"));
 		}
 	}
@@ -4534,6 +4558,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 각인부 전면 좌측 도어 Open"));
 		}
 
@@ -4554,6 +4579,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 각인부 전면 우측 도어 Open"));
 		}
 
@@ -4574,6 +4600,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 각인부 후면 좌측 도어 Open"));
 		}
 
@@ -4594,6 +4621,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 각인부 후면 우측 도어 Open"));
 		}
 	}
@@ -4617,6 +4645,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 언코일러부 전면 좌측 도어 Open"));
 		}
 
@@ -4637,6 +4666,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 언코일러부 측면 도어 Open"));
 		}
 
@@ -4657,6 +4687,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 언코일러부 후면 좌측 도어 Open"));
 		}
 
@@ -4677,6 +4708,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 언코일러부 후면 우측 도어 Open"));
 		}
 	}
@@ -4701,6 +4733,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			Stop();
 			//pView->DispStsBar(_T("정지-19"), 0);
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 리코일러부 전면 우측 도어 Open"));
 		}
 
@@ -4721,6 +4754,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 리코일러부 측면 도어 Open"));
 		}
 
@@ -4741,6 +4775,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 리코일러부 후면 좌측 도어 Open"));
 		}
 
@@ -4761,6 +4796,7 @@ unsigned long CGvisR2R_PunchView::ChkDoor() // 0: All Closed , Open Door Index :
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("일시정지 - 리코일러부 후면 우측 도어 Open"));
 		}
 	}
@@ -4779,6 +4815,7 @@ void CGvisR2R_PunchView::ChkEmg()
 		TowerLamp(RGB_RED, TRUE);
 		Stop();
 		DispMain(_T("정 지"), RGB_RED);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("비상정지 - 검사부 상 전면 스위치"));
 	}
 	else if (!pDoc->Status.bEmgAoi[EMG_F_AOI_UP] && pDoc->Status.bEmgAoiF[EMG_F_AOI_UP])
@@ -4798,6 +4835,7 @@ void CGvisR2R_PunchView::ChkEmg()
 		TowerLamp(RGB_RED, TRUE);
 		Stop();
 		DispMain(_T("정 지"), RGB_RED);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("비상정지 - 검사부 상 후면 스위치"));
 	}
 	else if (!pDoc->Status.bEmgAoi[EMG_B_AOI_UP] && pDoc->Status.bEmgAoiF[EMG_B_AOI_UP])
@@ -4817,6 +4855,7 @@ void CGvisR2R_PunchView::ChkEmg()
 		TowerLamp(RGB_RED, TRUE);
 		Stop();
 		DispMain(_T("정 지"), RGB_RED);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("비상정지 - 검사부 하 전면 스위치"));
 	}
 	else if (!pDoc->Status.bEmgAoi[EMG_F_AOI_DN] && pDoc->Status.bEmgAoiF[EMG_F_AOI_DN])
@@ -4836,6 +4875,7 @@ void CGvisR2R_PunchView::ChkEmg()
 		TowerLamp(RGB_RED, TRUE);
 		Stop();
 		DispMain(_T("정 지"), RGB_RED);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("비상정지 - 검사부 하 후면 스위치"));
 	}
 	else if (!pDoc->Status.bEmgAoi[EMG_B_AOI_DN] && pDoc->Status.bEmgAoiF[EMG_B_AOI_DN])
@@ -4855,6 +4895,7 @@ void CGvisR2R_PunchView::ChkEmg()
 		TowerLamp(RGB_RED, TRUE);
 		Stop();
 		DispMain(_T("정 지"), RGB_RED);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("비상정지 - 마킹부 메인 스위치"));
 	}
 	else if (!pDoc->Status.bEmgMk[EMG_M_MK] && pDoc->Status.bEmgMkF[EMG_M_MK])
@@ -4874,6 +4915,7 @@ void CGvisR2R_PunchView::ChkEmg()
 		TowerLamp(RGB_RED, TRUE);
 		Stop();
 		DispMain(_T("정 지"), RGB_RED);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("비상정지 - 마킹부 스위치"));
 	}
 	else if (!pDoc->Status.bEmgMk[EMG_B_MK] && pDoc->Status.bEmgMkF[EMG_B_MK])
@@ -4893,6 +4935,7 @@ void CGvisR2R_PunchView::ChkEmg()
 		TowerLamp(RGB_RED, TRUE);
 		Stop();
 		DispMain(_T("정 지"), RGB_RED);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("비상정지 - 언코일러부 스위치"));
 	}
 	else if (!pDoc->Status.bEmgUc && pDoc->Status.bEmgUcF)
@@ -4912,6 +4955,7 @@ void CGvisR2R_PunchView::ChkEmg()
 		TowerLamp(RGB_RED, TRUE);
 		Stop();
 		DispMain(_T("정 지"), RGB_RED);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("비상정지 - 리코일러부 스위치"));
 	}
 	else if (!pDoc->Status.bEmgRc && pDoc->Status.bEmgRcF)
@@ -4931,6 +4975,7 @@ void CGvisR2R_PunchView::ChkEmg()
 		TowerLamp(RGB_RED, TRUE);
 		Stop();
 		DispMain(_T("정 지"), RGB_RED);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("비상정지 - 각인부 모니터"));
 	}
 	else if (!pDoc->Status.bEmgEngv[0] && pDoc->Status.bEmgEngvF[0])
@@ -4950,6 +4995,7 @@ void CGvisR2R_PunchView::ChkEmg()
 		TowerLamp(RGB_RED, TRUE);
 		Stop();
 		DispMain(_T("정 지"), RGB_RED);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("비상정지 - 각인부 스위치"));
 	}
 	else if (!pDoc->Status.bEmgEngv[1] && pDoc->Status.bEmgEngvF[1])
@@ -9273,7 +9319,7 @@ double CGvisR2R_PunchView::GetMkFdLen()
 {
 	int nLast = pDoc->GetLastShotMk();
 	double dLen = (double)nLast * _tstof(pDoc->WorkingInfo.LastJob.sOnePnlLen);
-
+	pView->MpeWrite(_T("ML41008"), (long)dLen);
 	return dLen;
 }
 
@@ -10351,6 +10397,10 @@ void CGvisR2R_PunchView::InitAuto(BOOL bInit)
 #endif
 		DispLotStTime();
 		RestoreReelmap();
+
+		pView->m_bCont = TRUE; pDoc->SetStatus(_T("General"), _T("bCont"), pView->m_bCont);
+		pView->Delay();
+		pView->m_pEngrave->SwEngAutoInitCont(pView->m_bCont);
 	}
 
 }
@@ -11506,6 +11556,7 @@ CString CGvisR2R_PunchView::GetMkInfo0(int nSerial, int nMkPcs, BOOL bDispJudge)
 	{
 		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("좌측 마킹위치 정보 실패."));
 
 		if (bDispJudge)
@@ -11532,6 +11583,7 @@ CString CGvisR2R_PunchView::GetMkInfo0(int nSerial, int nMkPcs, BOOL bDispJudge)
 
 		if (nPcsIdx < 0)
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("외층 작업에서 좌측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
 			//pDoc->LogAuto(_T("외층 작업에서 좌측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
 			if (bDispJudge)
@@ -11563,6 +11615,7 @@ CString CGvisR2R_PunchView::GetMkInfo0(int nSerial, int nMkPcs, BOOL bDispJudge)
 
 		if (nPcsIdx < 0)
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("양면or내층 작업에서 좌측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
 			//pDoc->LogAuto(_T("양면or내층 작업에서 좌측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
 			if (bDispJudge)
@@ -11589,6 +11642,7 @@ CString CGvisR2R_PunchView::GetMkInfo0(int nSerial, int nMkPcs, BOOL bDispJudge)
 		else
 			sInfo.Format(_T("%04d_%c_%d_%d"), nSerial, '?', 0, 0);
 
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("좌측 마킹위치 정보 실패."));
 	}
 //#endif
@@ -11633,6 +11687,7 @@ CString CGvisR2R_PunchView::GetMkInfo1(int nSerial, int nMkPcs, BOOL bDispJudge)
 
 		if (nPcsIdx < 0)
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("외층 작업에서 우측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
 			//pDoc->LogAuto(_T("외층 작업에서 우측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
 			if (bDispJudge)
@@ -11664,6 +11719,7 @@ CString CGvisR2R_PunchView::GetMkInfo1(int nSerial, int nMkPcs, BOOL bDispJudge)
 
 		if (nPcsIdx < 0)
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("양면or내층 작업에서 우측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
 			//pDoc->LogAuto(_T("양면or내층 작업에서 우측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
 			if (bDispJudge)
@@ -11689,6 +11745,7 @@ CString CGvisR2R_PunchView::GetMkInfo1(int nSerial, int nMkPcs, BOOL bDispJudge)
 			sInfo.Format(_T("%04d_%c_%d_%d_%d_%d"), nSerial, '?', 0, 0, nRef, 0);
 		else
 			sInfo.Format(_T("%04d_%c_%d_%d"), nSerial, '?', 0, 0);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("우측 마킹위치 정보 실패."));
 	}
 //#endif
@@ -11936,6 +11993,7 @@ void CGvisR2R_PunchView::Move0(CfPoint pt, BOOL bCam, BOOL bWait)
 				{
 					if ((_tstof(pDoc->WorkingInfo.Marking[0].sWaitPos) + 1.0) < dPosVoice)
 					{
+						pView->SetAlarmToPlc(UNIT_PUNCH);
 						MsgBox(_T("좌측 보이스코일의 마킹 팁의 위치가 인터록 조건보다 아래로 내려와 있습니다."));
 						return;
 					}
@@ -11999,6 +12057,7 @@ void CGvisR2R_PunchView::Move1(CfPoint pt, BOOL bCam, BOOL bWait)
 				{
 					if ((_tstof(pDoc->WorkingInfo.Marking[1].sWaitPos) + 1.0) < dPosVoice)
 					{
+						pView->SetAlarmToPlc(UNIT_PUNCH);
 						MsgBox(_T("우측 보이스코일의 마킹 팁의 위치가 인터록 조건보다 아래로 내려와 있습니다."));
 						return;
 					}
@@ -12100,6 +12159,7 @@ BOOL CGvisR2R_PunchView::LoadPcrUp(int nSerial, BOOL bFromShare)
 	int nHeadInfo = pDoc->LoadPCR0(nSerial); // 2(Failed), 1(정상), -1(Align Error, 노광불량), -2(Lot End)
 	if (nHeadInfo >= 2)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("Error-LoadPCR0()"));
 		return FALSE;
 	}
@@ -12123,6 +12183,7 @@ BOOL CGvisR2R_PunchView::LoadPcrDn(int nSerial, BOOL bFromShare)
 	int nHeadInfo = pDoc->LoadPCR1(nSerial); // 2(Failed), 1(정상), -1(Align Error, 노광불량), -2(Lot End)
 	if (nHeadInfo >= 2)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("Error-LoadPCR1()"));
 		return FALSE;
 	}
@@ -12358,7 +12419,7 @@ BOOL CGvisR2R_PunchView::LoadMstInfo()
 	bGetCurrentInfoEng = GetCurrentInfoEng(); // TRUE: MODE_INNER or MODE_OUTER
 	pDoc->GetCamPxlRes();
 
-	if (IsLastJob(0)) // Up
+	//if (IsLastJob(0)) // Up
 	{
 		//if (pDoc->GetTestMode() == MODE_OUTER)
 		//{
@@ -12403,7 +12464,7 @@ BOOL CGvisR2R_PunchView::LoadMstInfo()
 		}
 	}
 
-	if (IsLastJob(1)) // Dn
+	//if (IsLastJob(1)) // Dn
 	{
 		if (bGetCurrentInfoEng)
 		{
@@ -12443,7 +12504,8 @@ BOOL CGvisR2R_PunchView::LoadMstInfo()
 	SetAlignPos();
 
 	// Reelmap 정보 Loading.....
-	InitReelmap(); // Delete & New
+	if(m_bDoInitReelmap)
+		InitReelmap(); // Delete & New
 
 	if (bGetCurrentInfoEng)
 	{
@@ -12472,6 +12534,7 @@ BOOL CGvisR2R_PunchView::LoadMstInfo()
 				}
 				else
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					MsgBox(_T("InitReelmapInner()를 위한 GetItsSerialInfo의 정보가 없습니다.")); // syd-20231127
 					return FALSE;
 				}
@@ -13188,6 +13251,7 @@ BOOL CGvisR2R_PunchView::IsFixPcsUp(int nSerial)
 		int nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
 		int nStPcsY = nNodeY / MAX_STRIP_NUM;
 
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		if(bCont)
 			sMsg.Format(_T("상면 연속 고정불량 발생"));
 		else
@@ -13243,6 +13307,7 @@ BOOL CGvisR2R_PunchView::IsFixPcsDn(int nSerial)
 		int nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
 		int nStPcsY = nNodeY / MAX_STRIP_NUM;
 
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		if (bCont)
 			sMsg.Format(_T("하면 연속 고정불량 발생"));
 		else
@@ -13425,6 +13490,7 @@ BOOL CGvisR2R_PunchView::GetAoiUpVsStatus()
 	{
 		sMsg.Format(_T("%s파일의 Infomation에 Current VS Status 정보가 없습니다.\r\n상면 AOI가 꺼진 것 같습니다."), sPath);
 		pView->ClrDispMsg();
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(sMsg);
 		//AfxMessageBox(sMsg);
 	}
@@ -13480,6 +13546,7 @@ BOOL CGvisR2R_PunchView::GetAoiDnVsStatus()
 	{
 		sMsg.Format(_T("%s파일의 Infomation에 Current VS Status 정보가 없습니다.\r\n하면 AOI가 꺼진 것 같습니다."), sPath);
 		pView->ClrDispMsg();
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(sMsg);
 		//AfxMessageBox(sMsg);
 	}
@@ -13683,6 +13750,7 @@ void CGvisR2R_PunchView::DoReject0()
 					if (m_pVoiceCoil[0])
 						m_pVoiceCoil[0]->SetEsc();
 
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					nRtn = MsgBox(_T("보이스코일(좌) 통신완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 					if (IDYES == nRtn)
 					{
@@ -13738,6 +13806,7 @@ void CGvisR2R_PunchView::DoReject0()
 						m_pVoiceCoil[0]->SetEsc();
 						//m_pVoiceCoil[0]->SearchHomeSmac();
 
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					nRtn = MsgBox(_T("보이스코일(좌) 통신완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 					if (IDYES == nRtn)
 					{
@@ -14014,6 +14083,7 @@ void CGvisR2R_PunchView::DoReject1()
 					if (m_pVoiceCoil[1])
 						m_pVoiceCoil[1]->SetEsc();
 
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					nRtn = MsgBox(_T("보이스코일(우) 통신완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 					if (IDYES == nRtn)
 					{
@@ -14067,6 +14137,7 @@ void CGvisR2R_PunchView::DoReject1()
 					if (m_pVoiceCoil[1])
 						m_pVoiceCoil[1]->SetEsc();
 						//m_pVoiceCoil[1]->SearchHomeSmac();
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 
 					nRtn = MsgBox(_T("보이스코일(우) 통신완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 2, MB_YESNO);
 					if (IDYES == nRtn)
@@ -14279,6 +14350,7 @@ void CGvisR2R_PunchView::DoMark0All()
 					DispMain(_T("정 지"), RGB_RED);
 					if (m_pVoiceCoil[0])
 						m_pVoiceCoil[0]->SetEsc();
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 
 					nRtn = MsgBox(_T("보이스코일(좌) 통신완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 					if (IDYES == nRtn)
@@ -14489,6 +14561,7 @@ void CGvisR2R_PunchView::DoMark1All()
 					DispMain(_T("정 지"), RGB_RED);
 					if (m_pVoiceCoil[1])
 						m_pVoiceCoil[1]->SetEsc();
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 
 					nRtn = MsgBox(_T("보이스코일(우) 통신완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 					if (IDYES == nRtn)
@@ -14724,6 +14797,7 @@ void CGvisR2R_PunchView::DoMark0()
 		else
 		{
 			StopFromThread();
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("버퍼의 시리얼이 맞지않습니다."), 1);
 			BuzzerFromThread(TRUE, 0);
 			DispMain(_T("정 지"), RGB_RED);
@@ -14958,6 +15032,7 @@ void CGvisR2R_PunchView::DoMark0()
 						DispMain(_T("정 지"), RGB_RED);
 						if (m_pVoiceCoil[0])
 							m_pVoiceCoil[0]->SetEsc();
+						pView->SetAlarmToPlc(UNIT_PUNCH);
 
 						nRtn = MsgBox(_T("보이스코일(좌) 통신완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 						if (IDYES == nRtn)
@@ -14985,8 +15060,10 @@ void CGvisR2R_PunchView::DoMark0()
 			}		
 		}
 		else
+		{
 			SetDelay0(pDoc->m_nDelayShow, 1);		// [mSec]
-		//m_nStepMk[0]++;
+			m_nStepMk[0]++;
+		}
 		break;
 	case 14:
 		if (IsNoMk0())
@@ -15072,6 +15149,7 @@ void CGvisR2R_PunchView::DoMark0()
 				// One more MK On Start....
 				if (IsMk0Miss())
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					nRtn = MsgBox(_T("보이스코일(좌) 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 					if (IDYES == nRtn)
 					{
@@ -15103,10 +15181,12 @@ void CGvisR2R_PunchView::DoMark0()
 						//m_pVoiceCoil[0]->SearchHomeSmac();
 					if (IsMk0Miss())
 					{
+						pView->SetAlarmToPlc(UNIT_PUNCH);
 						nRtn = MsgBox(_T("보이스코일(좌) 마킹완료가 않되고 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 					}
 					else
 					{
+						pView->SetAlarmToPlc(UNIT_PUNCH);
 						nRtn = MsgBox(_T("보이스코일(좌) 마킹완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 					}
 					if (IDYES == nRtn)
@@ -15136,6 +15216,7 @@ void CGvisR2R_PunchView::DoMark0()
 						// One more MK On Start....
 						if (IsMk0Miss())
 						{
+							pView->SetAlarmToPlc(UNIT_PUNCH);
 							nRtn = MsgBox(_T("보이스코일(좌) 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 							if (IDYES == nRtn)
 							{
@@ -15170,10 +15251,12 @@ void CGvisR2R_PunchView::DoMark0()
 								m_pVoiceCoil[0]->SetEsc();
 							if (IsMk0Miss())
 							{
+								pView->SetAlarmToPlc(UNIT_PUNCH);
 								nRtn = MsgBox(_T("보이스코일(좌) 마킹완료가 않되고 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 							}
 							else
 							{
+								pView->SetAlarmToPlc(UNIT_PUNCH);
 								nRtn = MsgBox(_T("보이스코일(좌) 마킹완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 							}
 							if (IDYES == nRtn)
@@ -15333,6 +15416,7 @@ void CGvisR2R_PunchView::DoMark0()
 			if (!ChkMkImgL(m_nBufUpSerial[0], nTotMked))
 			{
 				Stop();
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				nRtn = MsgBox(_T("좌측 불량수와 마킹이미지 파일수가 다릅니다.\r\n계속 작업을 진행하시겠습니까?"), 1, MB_YESNO);
 				if (IDYES == nRtn)
 				{
@@ -15375,6 +15459,7 @@ void CGvisR2R_PunchView::DoMark0()
 		DispMain(_T("정 지"), RGB_RED);
 		if (m_pVoiceCoil[0])
 			m_pVoiceCoil[0]->SearchHomeSmac();
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("보이스코일(좌) 초기위치 이동이 되지 않습니다.\r\n마킹상태를 확인하세요."), 1);
 		m_nStepMk[0]++;
 		break;
@@ -15389,6 +15474,7 @@ void CGvisR2R_PunchView::DoMark0()
 		m_nRtnMyMsgBoxIdx = 0;
 		m_bRtnMyMsgBox[0] = FALSE;
 		m_nRtnMyMsgBox[0] = -1;
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(sMsg, 1, MB_YESNO);
 		sMsg.Empty();
 		m_nStepMk[0]++;
@@ -15406,6 +15492,7 @@ void CGvisR2R_PunchView::DoMark0()
 				m_bRtnMyMsgBox[0] = FALSE;
 				m_nRtnMyMsgBox[0] = -1;
 				sMsg.Format(_T("계속 다음 작업을 진행하시겠습니까?"), nSerial);
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				MsgBox(sMsg, 1, MB_YESNO);
 				sMsg.Empty();
 
@@ -15512,6 +15599,7 @@ void CGvisR2R_PunchView::DoMark1()
 		else
 		{
 			StopFromThread();
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("버퍼의 시리얼이 맞지않습니다."), 2);
 			BuzzerFromThread(TRUE, 0);
 			DispMain(_T("정 지"), RGB_RED);
@@ -15766,6 +15854,7 @@ void CGvisR2R_PunchView::DoMark1()
 						if (m_pVoiceCoil[1])
 							m_pVoiceCoil[1]->SetEsc();
 
+						pView->SetAlarmToPlc(UNIT_PUNCH);
 						nRtn = MsgBox(_T("보이스코일(우) 통신완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 						if (IDYES == nRtn)
 						{
@@ -15792,8 +15881,10 @@ void CGvisR2R_PunchView::DoMark1()
 			}
 		}
 		else
+		{
 			SetDelay1(pDoc->m_nDelayShow, 6);		// [mSec]
-		//m_nStepMk[1]++;
+			m_nStepMk[1]++;
+		}
 		break;
 	case 14:
 		if (IsNoMk1())
@@ -15878,6 +15969,7 @@ void CGvisR2R_PunchView::DoMark1()
 			{
 				if (IsMk1Miss())
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					nRtn = MsgBox(_T("보이스코일(우) 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 					if (IDYES == nRtn)
 					{
@@ -15910,10 +16002,12 @@ void CGvisR2R_PunchView::DoMark1()
 
 					if (IsMk1Miss())
 					{
+						pView->SetAlarmToPlc(UNIT_PUNCH);
 						nRtn = MsgBox(_T("보이스코일(우) 마킹완료가 않되고 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 					}
 					else
 					{
+						pView->SetAlarmToPlc(UNIT_PUNCH);
 						nRtn = MsgBox(_T("보이스코일(우) 통신완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 2, MB_YESNO);
 					}
 					if (IDYES == nRtn)
@@ -15943,6 +16037,7 @@ void CGvisR2R_PunchView::DoMark1()
 						// One more MK On Start....
 						if (IsMk1Miss())
 						{
+							pView->SetAlarmToPlc(UNIT_PUNCH);
 							nRtn = MsgBox(_T("보이스코일(우) 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 							if (IDYES == nRtn)
 							{
@@ -15977,10 +16072,12 @@ void CGvisR2R_PunchView::DoMark1()
 								m_pVoiceCoil[1]->SetEsc();
 							if (IsMk1Miss())
 							{
+								pView->SetAlarmToPlc(UNIT_PUNCH);
 								nRtn = MsgBox(_T("보이스코일(우) 마킹완료가 않되고 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 							}
 							else
 							{
+								pView->SetAlarmToPlc(UNIT_PUNCH);
 								nRtn = MsgBox(_T("보이스코일(우) 마킹완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 							}
 							if (IDYES == nRtn)
@@ -16140,6 +16237,7 @@ void CGvisR2R_PunchView::DoMark1()
 			if (!ChkMkImgR(m_nBufUpSerial[1], nTotMked))
 			{
 				Stop();
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				nRtn = MsgBox(_T("우측 불량수와 마킹이미지 파일수가 다릅니다.\r\n계속 작업을 진행하시겠습니까?"), 1, MB_YESNO);
 				if (IDYES == nRtn)
 				{
@@ -16183,6 +16281,7 @@ void CGvisR2R_PunchView::DoMark1()
 		DispMain(_T("정 지"), RGB_RED);
 		if (m_pVoiceCoil[1])
 			m_pVoiceCoil[1]->SearchHomeSmac();
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("보이스코일(우) 초기위치 이동이 되지 않습니다.\r\n마킹상태를 확인하세요."), 2);
 		m_nStepMk[1]++;
 		break;
@@ -16197,6 +16296,7 @@ void CGvisR2R_PunchView::DoMark1()
 		m_nRtnMyMsgBoxIdx = 1;
 		m_bRtnMyMsgBox[1] = FALSE;
 		m_nRtnMyMsgBox[1] = -1;
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(sMsg, 2, MB_YESNO);
 		sMsg.Empty();
 		m_nStepMk[1]++;
@@ -16214,6 +16314,7 @@ void CGvisR2R_PunchView::DoMark1()
 				m_bRtnMyMsgBox[1] = FALSE;
 				m_nRtnMyMsgBox[1] = -1;
 				sMsg.Format(_T("계속 다음 작업을 진행하시겠습니까?"), nSerial);
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				MsgBox(sMsg, 2, MB_YESNO);
 				sMsg.Empty();
 
@@ -16811,6 +16912,7 @@ BOOL CGvisR2R_PunchView::DoAutoGetLotEndSignal()
 			break;
 
 		case LOT_END + 4:
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("작업이 종료되었습니다."));
 			m_nLotEndAuto++;
 			m_bLastProc = FALSE; pDoc->SetStatus(_T("General"), _T("bLastProc"), m_bLastProc);
@@ -16845,7 +16947,13 @@ void CGvisR2R_PunchView::DoAtuoGetMkStSignal()
 				if (bMk0 || bMk1)
 				{
 					if (!IsSetPinPos())
+					{
+						pView->SetAlarmToPlc(UNIT_PUNCH);
+						pView->MsgBox(_T("핀위치가 설정되지 않았습니다."));
+						m_bMkSt[0] = FALSE;
+						m_bMkSt[1] = FALSE;
 						return;
+					}
 				}
 
 				if (bMk1 || m_bMkStSw[1])	// 마킹시작(PC가 확인하고 Reset시킴.)
@@ -17300,6 +17408,7 @@ void CGvisR2R_PunchView::DoAutoDispMsg()
 			m_bDispMsgDoAuto[0] = FALSE;
 			m_nStepDispMsg[0] = 0;
 			Stop();
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("버퍼(우) Serial이 맞지않습니다."));
 			TowerLamp(RGB_YELLOW, TRUE);
 			break;
@@ -17307,6 +17416,7 @@ void CGvisR2R_PunchView::DoAutoDispMsg()
 			m_bDispMsgDoAuto[1] = FALSE;
 			m_nStepDispMsg[1] = 0;
 			Stop();
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("버퍼(우) Serial이 맞지않습니다."));
 			TowerLamp(RGB_YELLOW, TRUE);
 			break;
@@ -17319,6 +17429,7 @@ void CGvisR2R_PunchView::DoAutoDispMsg()
 			m_bSwStopNow = TRUE;
 			m_bSwRunF = FALSE;
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(m_sFixMsg[0]);
 			m_sFixMsg[0] = _T("");
 			break;
@@ -17331,6 +17442,7 @@ void CGvisR2R_PunchView::DoAutoDispMsg()
 			m_bSwStopNow = TRUE;
 			m_bSwRunF = FALSE;
 			DispMain(_T("정 지"), RGB_RED);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(m_sFixMsg[1]);
 			m_sFixMsg[1] = _T("");
 			break;
@@ -17340,6 +17452,7 @@ void CGvisR2R_PunchView::DoAutoDispMsg()
 			m_bDispMsgDoAuto[5] = FALSE;
 			m_nStepDispMsg[5] = 0;
 			Stop();
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("버퍼(좌) Serial이 맞지않습니다."));
 			TowerLamp(RGB_YELLOW, TRUE);
 			break;
@@ -17918,7 +18031,7 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 				}
 			}
 
-			bChange = GetAoiUpInfo(m_nShareUpS, &nNewLot); // Buffer에서 PCR파일의 헤드 정보를 얻음.
+			bChange = GetAoiUpInfo(m_nShareUpS, &m_nNewLot); // Buffer에서 PCR파일의 헤드 정보를 얻음.
 			//if (!bNewModel)
 			//{
 			//	Stop();
@@ -17926,7 +18039,7 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 			//}
 
 			//if (bNewModel)	// AOI 정보(AoiCurrentInfoPath) -> AOI Feeding Offset
-			if (nNewLot)
+			if (m_nNewLot)
 			{
 				if (pDoc->GetTestMode() == MODE_OUTER)
 				{
@@ -17959,7 +18072,7 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 						//if (m_pDlgMenu01)
 						//	m_pDlgMenu01->ChkAoiVsStatus();
 						pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
-						ApplyListTorq();
+						//ApplyListTorq();
 
 						if (m_pEngrave)
 							m_pEngrave->SwMenu01UpdateWorking(TRUE);
@@ -17999,6 +18112,7 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 				SetAlignPos();
 
 				InitReelmap();
+				ApplyListTorq();
 
 				if (pDoc->m_Master[0].IsMstSpec(pDoc->WorkingInfo.System.sPathCamSpecDir, pDoc->WorkingInfo.LastJob.sModel, pDoc->WorkingInfo.LastJob.sInnerLayerUp))
 					InitReelmapInner();	
@@ -18053,7 +18167,7 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 				}
 			}
 
-			if (nNewLot)
+			if (m_nNewLot)
 			{
 				if (!pDoc->m_bNewLotShare[0])
 				{
@@ -18194,6 +18308,8 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 
 
 			bChange = GetAoiDnInfo(m_nShareDnS, &nNewLot);
+			if (m_nNewLot > 0 || nNewLot > 0)
+				nNewLot = 1;
 			//if (!bNewModel)
 			//{
 			//	Stop();
@@ -18228,7 +18344,7 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 						//if (m_pDlgMenu01)
 						//	m_pDlgMenu01->ChkAoiVsStatus();
 						pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
-						ApplyListTorq();
+						//ApplyListTorq();
 
 						if (m_pEngrave)
 							m_pEngrave->SwMenu01UpdateWorking(TRUE);
@@ -18892,9 +19008,9 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 					pDoc->GetItsSerialInfo(m_nShareUpS, bDualTestInner, sLot, sLayerUp, sLayerDn, 0);
 			}
 
-			bChange = GetAoiUpInfo(m_nShareUpS, &nNewLot); // Buffer에서 PCR파일의 헤드 정보를 얻음.
+			bChange = GetAoiUpInfo(m_nShareUpS, &m_nNewLot); // Buffer에서 PCR파일의 헤드 정보를 얻음.
 
-			if (nNewLot)
+			if (m_nNewLot)
 			{
 				if (pDoc->GetTestMode() == MODE_OUTER)
 				{
@@ -18918,7 +19034,7 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 							pDoc->WorkingInfo.LastJob.sLayerUp);
 						pDoc->m_Master[0].LoadMstInfo();
 						pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
-						ApplyListTorq();
+						//ApplyListTorq();
 
 						if (m_pEngrave)
 							m_pEngrave->SwMenu01UpdateWorking(TRUE);
@@ -18957,6 +19073,7 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 				}
 				SetAlignPos();
 				InitReelmap();
+				ApplyListTorq();
 
 				if (pDoc->m_Master[0].IsMstSpec(pDoc->WorkingInfo.System.sPathCamSpecDir, pDoc->WorkingInfo.LastJob.sModel, pDoc->WorkingInfo.LastJob.sInnerLayerUp))
 					InitReelmapInner();
@@ -19012,7 +19129,7 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 				}
 			}
 			
-			if (nNewLot)
+			if (m_nNewLot)
 			{
 				if (!pDoc->m_bNewLotShare[0])
 				{
@@ -19154,6 +19271,8 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 
 
 			bChange = GetAoiDnInfo(m_nShareDnS, &nNewLot);
+			if (m_nNewLot > 0 || nNewLot > 0)
+				nNewLot = 1;
 
 			if (nNewLot)
 			{
@@ -19173,7 +19292,7 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 							pDoc->WorkingInfo.LastJob.sLayerUp);
 						pDoc->m_Master[0].LoadMstInfo();
 						pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
-						ApplyListTorq();
+						//ApplyListTorq();
 
 						if (m_pEngrave)
 							m_pEngrave->SwMenu01UpdateWorking(TRUE);
@@ -19249,6 +19368,7 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 			if (!CheckCamMstInfo(RMAP_DN, m_nShareDnS))
 			{
 				sMsg.Format(_T("Error - 하부AOI에서 생성된 파일이 캠마스터 정보와 다릅니다.\r\n버퍼의 파일을 리셋 후 다시 시작해야 합니다."));
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				MsgBox(sMsg);
 				ClearBuffer();
 				ExitProgram();
@@ -19526,6 +19646,8 @@ void CGvisR2R_PunchView::Mk2PtReady()
 					}
 				}
 #endif
+				sMsg.Format(_T("MK_ST"));
+				pFrm->DispStatusBar(sMsg, 5);
 				m_nMkStAuto++;
 			}
 			break;
@@ -19718,6 +19840,7 @@ void CGvisR2R_PunchView::Mk2PtChkSerial()
 			{
 				Stop();
 				pView->ClrDispMsg();
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				MsgBox(_T("좌/우 마킹 시리얼이 같습니다."));
 				SetListBuf();
 				m_nMkStAuto = MK_ST + (Mk2PtIdx::Start); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
@@ -19730,6 +19853,7 @@ void CGvisR2R_PunchView::Mk2PtChkSerial()
 				{
 					Stop();
 					pView->ClrDispMsg();
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					MsgBox(_T("좌측 상/하면 시리얼이 다릅니다."));
 					SetListBuf();
 					m_nMkStAuto = MK_ST + (Mk2PtIdx::Start); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
@@ -19740,12 +19864,16 @@ void CGvisR2R_PunchView::Mk2PtChkSerial()
 				{
 					Stop();
 					pView->ClrDispMsg();
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					MsgBox(_T("우측 상/하면 시리얼이 다릅니다."));
 					SetListBuf();
 					m_nMkStAuto = MK_ST + (Mk2PtIdx::Start); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
 					break;
 				}
 			}
+
+			sMsg.Format(_T("Disp"));
+			pFrm->DispStatusBar(sMsg, 6);
 
 			if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER)
 			{
@@ -19805,10 +19933,12 @@ void CGvisR2R_PunchView::Mk2PtChkSerial()
 					}
 				}
 
-				bChange = GetAoiUpInfo(nSerial, &nNewLot, TRUE);
+				bChange = GetAoiUpInfo(nSerial, &m_nNewLot, TRUE);
 				if (bDualTest)
 				{
 					bChange = GetAoiDnInfo(nSerial, &nNewLot, TRUE);
+					if (m_nNewLot > 0 || nNewLot > 0)
+						nNewLot = 1;
 
 					if (!IsSameUpDnLot() && !m_bContDiffLot)
 					{
@@ -19839,6 +19969,7 @@ void CGvisR2R_PunchView::Mk2PtChkSerial()
 			else
 			{
 				Stop();
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				MsgBox(_T("버퍼(좌) Serial이 1 이하입니다."));
 				TowerLamp(RGB_YELLOW, TRUE);
 			}
@@ -19925,6 +20056,7 @@ void CGvisR2R_PunchView::Mk2PtInit()
 			else // Same Serial
 			{
 				Stop();
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				MsgBox(_T("Serial 연속 되지않습니다."));
 				TowerLamp(RGB_YELLOW, TRUE);
 			}
@@ -19973,6 +20105,9 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 				break;
 			if (pView->IsClampOff())
 				break;
+
+			sMsg.Format(_T("MV1"));
+			pFrm->DispStatusBar(sMsg, 6);
 
 			if (bDualTest)
 			{
@@ -20128,6 +20263,7 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 					m_bDoMk[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bDoMk[1]"), m_bDoMk[1]);
 					m_bDoneMk[1] = TRUE; pDoc->SetStatus(_T("General"), _T("bDoneMk[1]"), m_bDoneMk[1]);
 					//m_nMkStAuto++;
+
 					m_nMkStAuto = MK_ST + (Mk2PtIdx::Move0Cam0); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
 				}
 			}
@@ -20139,6 +20275,10 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 			}
 			break;
 		case MK_ST + (Mk2PtIdx::Move0Cam0) :	// Move - Cam0 - Pt0
+
+			sMsg.Format(_T("MV0"));
+			pFrm->DispStatusBar(sMsg, 5);
+
 			if (MoveAlign0(0))
 				m_nMkStAuto++;
 			break;
@@ -20224,6 +20364,7 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 			{
 				Buzzer(TRUE, 0);
 				TowerLamp(RGB_YELLOW, TRUE);
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				if (IDNO == MsgBox(_T("카메라(좌)의 검사판넬을 다시 정렬하시겠습니까?"), 0, MB_YESNO))
 				{
 					Buzzer(FALSE, 0);
@@ -20272,6 +20413,7 @@ void CGvisR2R_PunchView::Mk2PtAlignPt0()
 			{
 				Buzzer(TRUE, 0);
 
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				if (IDNO == MsgBox(_T("카메라(우)의 검사판넬을 다시 정렬하시겠습니까?"), 0, MB_YESNO))
 				{
 					Buzzer(FALSE, 0);
@@ -20627,6 +20769,7 @@ void CGvisR2R_PunchView::Mk2PtAlignPt1()
 				Buzzer(TRUE, 0);
 				TowerLamp(RGB_YELLOW, TRUE);
 
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				if (IDNO == MsgBox(_T("카메라(좌)의 검사판넬을 다시 정렬하시겠습니까?"), 0, MB_YESNO))
 				{
 					Buzzer(FALSE, 0);
@@ -20669,6 +20812,7 @@ void CGvisR2R_PunchView::Mk2PtAlignPt1()
 				Buzzer(TRUE, 0);
 				TowerLamp(RGB_YELLOW, TRUE);
 
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				if (IDNO == MsgBox(_T("카메라(우)의 검사판넬을 다시 정렬하시겠습니까?"), 0, MB_YESNO))
 				{
 					Buzzer(FALSE, 0);
@@ -20842,6 +20986,7 @@ void CGvisR2R_PunchView::Mk2PtElecChk()
 				else
 				{
 					Stop();
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					MsgBox(_T("마킹부 모션이 비활성화 되었습니다."));
 					TowerLamp(RGB_RED, TRUE);
 				}
@@ -20851,6 +20996,7 @@ void CGvisR2R_PunchView::Mk2PtElecChk()
 				if (!m_bChkLightErr)
 				{
 					m_bChkLightErr = TRUE;
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					MsgBox(_T("노광불량 정지 - 기판을 확인하세요.\r\n계속진행하려면 운전스위치를 누르세요."));
 				}
 			}
@@ -20886,6 +21032,7 @@ void CGvisR2R_PunchView::Mk2PtDoMarking()
 			}
 			else
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				MsgBox(_T("캠마스터의 마킹위치좌표가 설정되어 있지않습니다.\r\n확인하세요."));
 				Stop();
 				TowerLamp(RGB_RED, TRUE);
@@ -20976,6 +21123,7 @@ void CGvisR2R_PunchView::Mk2PtDoMarking()
 			{
 				m_bInitAuto = FALSE; pDoc->SetStatus(_T("General"), _T("bInitAuto"), m_bInitAuto);
 				Stop();
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				MsgBox(_T("마킹위치를 확인하세요."));
 				TowerLamp(RGB_YELLOW, TRUE);
 				break;
@@ -21068,16 +21216,98 @@ void CGvisR2R_PunchView::Mk2PtDoMarking()
 			if (IsNoMk() || IsShowLive())
 				ShowLive(FALSE);
 
+			sMsg.Format(_T("FdOn"));
+			pFrm->DispStatusBar(sMsg, 5);
+
 			m_nMkStAuto++;
 			break;
 
 		case MK_ST + (Mk2PtIdx::DoneMk) + 2:
+			if (!m_bTHREAD_SHIFT2MK)
+			{
+				m_bShift2Mk = TRUE;
+				DoShift2Mk();
+
+				sMsg.Format(_T("FileMv"));
+				pFrm->DispStatusBar(sMsg, 6);
+
+				m_nMkStAuto++;
+			}
+			break;
+
+		case MK_ST + (Mk2PtIdx::DoneMk) + 3:
 			//bChk = MpeRead(_T("MB400243")); // PLC 마킹 피딩 완료
 			//if (bChk)	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)
 			if (pDoc->m_pMpeSignal && pDoc->m_pMpeSignal[4] & (0x01 << 3))	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)
 			{
 				MpeWrite(_T("MB400243"), 0);// PLC 마킹 피딩 완료
 				//pDoc->LogAuto(_T("PLC: 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)"));
+				sMsg.Format(_T("FdOk"));
+				pFrm->DispStatusBar(sMsg, 5);
+				m_nMkStAuto++;
+			}
+			break;
+		case MK_ST + (Mk2PtIdx::DoneMk) + 4:
+			//if (!m_bTHREAD_SHIFT2MK)
+			{
+				MpeWrite(Plc.DlgMenu01.TableVacuumAoiUp, 0);	// 마킹부 Feeding완료
+				//pDoc->LogAuto(_T("PC: 마킹부 Feeding완료 OFF"));
+
+				SetMkFdLen();
+				SetCycTime();
+				m_dwCycSt = GetTickCount();
+
+				UpdateRst();
+				sMsg.Format(_T("Rst"));
+				pFrm->DispStatusBar(sMsg, 6);
+
+				m_nMkStAuto++;
+			}
+			break;
+		case MK_ST + (Mk2PtIdx::DoneMk) + 5:
+			if (/*!m_bTHREAD_SHIFT2MK && */!m_bTHREAD_REELMAP_YIELD_UP && !m_bTHREAD_REELMAP_YIELD_DN && !m_bTHREAD_REELMAP_YIELD_ALLUP && !m_bTHREAD_REELMAP_YIELD_ALLDN) // Yield Reelmap
+			{
+				if (pDoc->GetTestMode() == MODE_OUTER)
+				{
+					if (m_bTHREAD_REELMAP_YIELD_ITS) // Yield Reelmap
+						break;
+				}
+
+				sMsg.Format(_T("Yield"));
+				pFrm->DispStatusBar(sMsg, 5);
+
+				ChkYield();
+				m_nMkStAuto++;
+			}
+			break;
+		case MK_ST + (Mk2PtIdx::DoneMk) + 6:
+			//if (!m_bTHREAD_SHIFT2MK)
+			{
+				SetListBuf();
+				ChkLotCutPos();
+				UpdateWorking();	// Update Working Info...
+				sMsg.Format(_T("Update"));
+				pFrm->DispStatusBar(sMsg, 6);
+				m_nMkStAuto++;
+			}
+			break;
+		case MK_ST + (Mk2PtIdx::DoneMk) + 7:
+			::WritePrivateProfileString(_T("Last Job"), _T("MkSt"), _T("0"), PATH_WORKING_INFO);
+			m_bMkSt[0] = FALSE; pDoc->SetStatus(_T("General"), _T("bMkSt0"), m_bMkSt[0]);
+			m_bMkSt[1] = FALSE; pDoc->SetStatus(_T("General"), _T("bMkSt1"), m_bMkSt[1]);
+			m_nMkStAuto++;
+			break;
+		case MK_ST + (Mk2PtIdx::DoneMk) + 8:
+			break;
+
+/*
+		case MK_ST + (Mk2PtIdx::DoneMk) + 2:
+			//bChk = MpeRead(_T("MB400243")); // PLC 마킹 피딩 완료
+			//if (bChk)	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)
+			if (pDoc->m_pMpeSignal && pDoc->m_pMpeSignal[4] & (0x01 << 3))	// 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)
+			{
+				MpeWrite(_T("MB400243"), 0);// PLC 마킹 피딩 완료
+											//pDoc->LogAuto(_T("PLC: 마킹부 Feeding완료(PLC가 On시키고 PC가 확인하고 Reset시킴.)"));
 				m_nMkStAuto++;
 			}
 			break;
@@ -21086,7 +21316,7 @@ void CGvisR2R_PunchView::Mk2PtDoMarking()
 			if (!m_bTHREAD_SHIFT2MK)
 			{
 				MpeWrite(Plc.DlgMenu01.TableVacuumAoiUp, 0);	// 마킹부 Feeding완료
-				//pDoc->LogAuto(_T("PC: 마킹부 Feeding완료 OFF"));
+																//pDoc->LogAuto(_T("PC: 마킹부 Feeding완료 OFF"));
 
 				m_bShift2Mk = TRUE;
 				DoShift2Mk();
@@ -21133,6 +21363,7 @@ void CGvisR2R_PunchView::Mk2PtDoMarking()
 			break;
 		case MK_ST + (Mk2PtIdx::DoneMk) + 8:
 			break;
+*/
 		}
 	}
 }
@@ -21144,7 +21375,7 @@ void CGvisR2R_PunchView::Mk2PtShift2Mk() // MODE_INNER
 	int a, b, nSerial, nPrevSerial;
 	BOOL bChk = FALSE;
 
-	if ((m_bMkSt[0] || m_bMkSt[1]) && IsBuffer())
+	if ((m_bMkSt[0] || m_bMkSt[1]))// && IsBuffer())
 	{
 		switch (m_nMkStAuto)
 		{
@@ -21177,6 +21408,9 @@ void CGvisR2R_PunchView::Mk2PtShift2Mk() // MODE_INNER
 		case MK_ST + (Mk2PtIdx::Shift2Mk) + 2:
 			MpeWrite(Plc.DlgMenu01.MarkingDoing, 0);	// 마킹부 마킹중 ON (PC가 ON, OFF)
 			MpeWrite(Plc.DlgMenu01.MarkingDone, 1);	// 마킹완료(PLC가 확인하고 Reset시킴.)-20141029
+			MpeWrite(Plc.DlgMenu03.PcrMarkedSerialLeft, m_nBufUpSerial[0]);
+			MpeWrite(Plc.DlgMenu03.PcrMarkedSerialRight, m_nBufUpSerial[1]);
+			MpeWrite(Plc.DlgMenu03.FeedingReadyPunch, 1);
 			//pDoc->LogAuto(_T("PC: 마킹완료(PLC가 확인하고 Reset시킴.)"));
 			m_nMkStAuto++;
 			break;
@@ -21262,6 +21496,8 @@ void CGvisR2R_PunchView::Mk2PtLotDiff()
 			m_nMkStAuto++;
 			break;
 		case MK_ST + (Mk2PtIdx::LotDiff) + 1:
+			pView->SetAlarmToPlc(UNIT_PUNCH);
+
 			if (IDYES == MsgBox(_T("상면과 하면의 Lot가 다릅니다.\r\n계속 작업을 진행하시겠습니까?"), 0, MB_YESNO))
 			{
 				m_bContDiffLot = TRUE; pDoc->SetStatus(_T("General"), _T("bContDiffLot"), m_bContDiffLot);
@@ -21307,6 +21543,7 @@ void CGvisR2R_PunchView::Mk2PtReject()
 			Buzzer(TRUE, 0);
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 
 			if (IDYES == MsgBox(_T("쇼트 체크 불량입니다.\r\n리젝 처리를 진행하시겠습니까?"), 0, MB_YESNO))
 			{
@@ -21415,6 +21652,7 @@ void CGvisR2R_PunchView::Mk2PtErrStop()
 		case ERROR_ST:
 			Stop();
 			TowerLamp(RGB_RED, TRUE);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 
 			//if(IDYES == DoMyMsgBox(_T("쇼트 체크 Error입니다.\r\n다시 쇼트 체크를 진행하시겠습니까?"), MB_YESNO))
 			if (IDYES == MsgBox(_T("쇼트 체크 Error입니다.\r\n다시 쇼트 체크를 진행하시겠습니까?"), 0, MB_YESNO))
@@ -21696,6 +21934,7 @@ void CGvisR2R_PunchView::Mk4PtChkSerial()
 				{
 					Stop();
 					pView->ClrDispMsg();
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					MsgBox(_T("좌측 상/하면 시리얼이 다릅니다."));
 					SetListBuf();
 					m_nMkStAuto = MK_ST + (Mk4PtIdx::Start); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
@@ -21706,6 +21945,7 @@ void CGvisR2R_PunchView::Mk4PtChkSerial()
 				{
 					Stop();
 					pView->ClrDispMsg();
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					MsgBox(_T("우측 상/하면 시리얼이 다릅니다."));
 					SetListBuf();
 					m_nMkStAuto = MK_ST + (Mk4PtIdx::Start); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
@@ -21771,10 +22011,12 @@ void CGvisR2R_PunchView::Mk4PtChkSerial()
 					}
 				}
 
-				bChange = GetAoiUpInfo(nSerial, &nNewLot, TRUE);
+				bChange = GetAoiUpInfo(nSerial, &m_nNewLot, TRUE);
 				if (bDualTest)
 				{
 					bChange = GetAoiDnInfo(nSerial, &nNewLot, TRUE);
+					if (m_nNewLot > 0 || nNewLot > 0)
+						nNewLot = 1;
 
 					if (!IsSameUpDnLot() && !m_bContDiffLot)
 					{
@@ -21805,6 +22047,7 @@ void CGvisR2R_PunchView::Mk4PtChkSerial()
 			else
 			{
 				Stop();
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				MsgBox(_T("버퍼(좌) Serial이 1 이하입니다."));
 				TowerLamp(RGB_YELLOW, TRUE);
 			}
@@ -21851,6 +22094,7 @@ void CGvisR2R_PunchView::Mk4PtInit()
 			else // Same Serial
 			{
 				Stop();
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				MsgBox(_T("Serial 연속 되지않습니다."));
 				TowerLamp(RGB_YELLOW, TRUE);
 			}
@@ -22122,6 +22366,7 @@ void CGvisR2R_PunchView::Mk4PtAlignPt0()
 				Buzzer(TRUE, 0);
 				TowerLamp(RGB_YELLOW, TRUE);
 
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				if (IDNO == MsgBox(_T("카메라(좌)의 검사판넬을 다시 정렬하시겠습니까?"), 0, MB_YESNO))
 				{
 					Buzzer(FALSE, 0);
@@ -22171,6 +22416,7 @@ void CGvisR2R_PunchView::Mk4PtAlignPt0()
 				Buzzer(TRUE, 0);
 				TowerLamp(RGB_YELLOW, TRUE);
 
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				if (IDNO == MsgBox(_T("카메라(우)의 검사판넬을 다시 정렬하시겠습니까?"), 0, MB_YESNO))
 				{
 					Buzzer(FALSE, 0);
@@ -22502,6 +22748,7 @@ void CGvisR2R_PunchView::Mk4PtAlignPt1()
 				Buzzer(TRUE, 0);
 				TowerLamp(RGB_YELLOW, TRUE);
 
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				if (IDNO == MsgBox(_T("카메라(좌)의 검사판넬을 다시 정렬하시겠습니까?"), 0, MB_YESNO))
 				{
 					Buzzer(FALSE, 0);
@@ -22544,6 +22791,7 @@ void CGvisR2R_PunchView::Mk4PtAlignPt1()
 				Buzzer(TRUE, 0);
 				TowerLamp(RGB_YELLOW, TRUE);
 
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				if (IDNO == MsgBox(_T("카메라(우)의 검사판넬을 다시 정렬하시겠습니까?"), 0, MB_YESNO))
 				{
 					Buzzer(FALSE, 0);
@@ -22870,6 +23118,7 @@ void CGvisR2R_PunchView::Mk4PtAlignPt2()
 				Buzzer(TRUE, 0);
 				TowerLamp(RGB_YELLOW, TRUE);
 
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				if (IDNO == MsgBox(_T("카메라(좌)의 검사판넬을 다시 정렬하시겠습니까?"), 0, MB_YESNO))
 				{
 					Buzzer(FALSE, 0);
@@ -22912,6 +23161,7 @@ void CGvisR2R_PunchView::Mk4PtAlignPt2()
 				Buzzer(TRUE, 0);
 				TowerLamp(RGB_YELLOW, TRUE);
 
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				if (IDNO == MsgBox(_T("카메라(우)의 검사판넬을 다시 정렬하시겠습니까?"), 0, MB_YESNO))
 				{
 					Buzzer(FALSE, 0);
@@ -23258,6 +23508,7 @@ void CGvisR2R_PunchView::Mk4PtAlignPt3()
 			{
 				Buzzer(TRUE, 0);
 
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				if (IDNO == MsgBox(_T("카메라(좌)의 검사판넬을 다시 정렬하시겠습니까?"), 0, MB_YESNO))
 				{
 					Buzzer(FALSE, 0);
@@ -23301,6 +23552,7 @@ void CGvisR2R_PunchView::Mk4PtAlignPt3()
 			{
 				Buzzer(TRUE, 0);
 
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				if (IDNO == MsgBox(_T("카메라(우)의 검사판넬을 다시 정렬하시겠습니까?"), 0, MB_YESNO))
 				{
 					Buzzer(FALSE, 0);
@@ -23460,6 +23712,7 @@ void CGvisR2R_PunchView::Mk4PtElecChk()
 				else
 				{
 					Stop();
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					MsgBox(_T("마킹부 모션이 비활성화 되었습니다."));
 					TowerLamp(RGB_RED, TRUE);
 				}
@@ -23469,6 +23722,7 @@ void CGvisR2R_PunchView::Mk4PtElecChk()
 				if (!m_bChkLightErr)
 				{
 					m_bChkLightErr = TRUE;
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					MsgBox(_T("노광불량 정지 - 기판을 확인하세요.\r\n계속진행하려면 운전스위치를 누르세요."));
 				}
 			}
@@ -23504,6 +23758,7 @@ void CGvisR2R_PunchView::Mk4PtDoMarking()
 			}
 			else
 			{
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				MsgBox(_T("캠마스터의 마킹위치좌표가 설정되어 있지않습니다.\r\n확인하세요."));
 				Stop();
 				TowerLamp(RGB_RED, TRUE);
@@ -23590,6 +23845,7 @@ void CGvisR2R_PunchView::Mk4PtDoMarking()
 			{
 				m_bInitAuto = FALSE; pDoc->SetStatus(_T("General"), _T("bInitAuto"), m_bInitAuto);
 				Stop();
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				MsgBox(_T("마킹위치를 확인하세요."));
 				TowerLamp(RGB_YELLOW, TRUE);
 				break;
@@ -23768,6 +24024,7 @@ void CGvisR2R_PunchView::Mk4PtLotDiff()
 			m_nMkStAuto++;
 			break;
 		case MK_ST + (Mk4PtIdx::LotDiff) + 1:
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			if (IDYES == MsgBox(_T("상면과 하면의 Lot가 다릅니다.\r\n계속 작업을 진행하시겠습니까?"), 0, MB_YESNO))
 			{
 				m_bContDiffLot = TRUE; pDoc->SetStatus(_T("General"), _T("bContDiffLot"), m_bContDiffLot);
@@ -23813,6 +24070,7 @@ void CGvisR2R_PunchView::Mk4PtReject()
 			Buzzer(TRUE, 0);
 			TowerLamp(RGB_RED, TRUE);
 			Stop();
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 
 			if (IDYES == MsgBox(_T("쇼트 체크 불량입니다.\r\n리젝 처리를 진행하시겠습니까?"), 0, MB_YESNO))
 			{
@@ -23921,6 +24179,7 @@ void CGvisR2R_PunchView::Mk4PtErrStop()
 		case ERROR_ST:
 			Stop();
 			TowerLamp(RGB_RED, TRUE);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 
 			if (IDYES == MsgBox(_T("쇼트 체크 Error입니다.\r\n다시 쇼트 체크를 진행하시겠습니까?"), 0, MB_YESNO))
 			{
@@ -26535,11 +26794,11 @@ void CGvisR2R_PunchView::MonPlcSignal()
 
 	//bChk = MpeRead(_T("MB400009")); // GUI 자동 이어가기 운전
 	//if (bChk)		// 내층 제품시 이어가기 상태 표시 - MB440125
-	if (pDoc->m_pMpeSignal[20] & (0x01 << 9) && !pDoc->WorkingInfo.LastJob.bDispContRun)		// 내층 제품시 이어가기 상태 표시 - MB440125
+	if ((pDoc->m_pMpeSignal[20] & (0x01 << 9)) && !pDoc->WorkingInfo.LastJob.bDispContRun)		// 내층 제품시 이어가기 상태 표시 - MB440125
 	{
 		DispContRun(TRUE);
 	}
-	else if (!pDoc->m_pMpeSignal[20] & (0x01 << 9) && pDoc->WorkingInfo.LastJob.bDispContRun)
+	else if (!(pDoc->m_pMpeSignal[20] & (0x01 << 9)) && pDoc->WorkingInfo.LastJob.bDispContRun)
 	{
 		DispContRun(FALSE);
 	}
@@ -26694,10 +26953,11 @@ void CGvisR2R_PunchView::MonDispMain() // PLC의 운전상태 표시
 void CGvisR2R_PunchView::MonPlcAlm()
 {
 	BOOL bMon, bClr;
-	long lOn = MpeRead(Plc.DlgMenu01.AlarmMonitor);
-
-	bMon = lOn & (0x01 << 0);
-	bClr = lOn & (0x01 << 1);
+	//long lOn = MpeRead(Plc.DlgMenu01.AlarmMonitor);
+	//bMon = lOn & (0x01 << 0);
+	//bClr = lOn & (0x01 << 1);
+	bMon = MpeRead(Plc.DlgMenu01.AlarmMonitor);
+	bClr = MpeRead(Plc.DlgMenu01.AlarmClear);
 	if (bMon)
 		PlcAlm(bMon, 0);
 	else if (bClr)
@@ -26719,6 +26979,7 @@ void CGvisR2R_PunchView::PlcAlm(BOOL bMon, BOOL bClr)
 {
 	if (bMon && !m_nMonAlmF)
 	{
+		MpeWrite(Plc.DlgMenu01.AlarmMonitor, 0);
 		m_nMonAlmF = 1;
 		FindAlarm();
 		if (pView->m_pEngrave)
@@ -26739,6 +27000,7 @@ void CGvisR2R_PunchView::PlcAlm(BOOL bMon, BOOL bClr)
 
 	if (bClr && !m_nClrAlmF)
 	{
+		MpeWrite(Plc.DlgMenu01.AlarmClear, 0);
 		m_nClrAlmF = 1;
 		ClrAlarm();
 		if (pView->m_pEngrave)
@@ -26754,6 +27016,14 @@ void CGvisR2R_PunchView::PlcAlm(BOOL bMon, BOOL bClr)
 		m_nClrAlmF = 0;
 		ResetClear();
 	}
+
+	//if (bMon && bClr)
+	//{
+	//	m_nMonAlmF = 0;
+	//	ResetMonAlm();
+	//	m_nClrAlmF = 0;
+	//	ResetClear();
+	//}
 }
 
 void CGvisR2R_PunchView::FindAlarm()
@@ -27010,6 +27280,7 @@ BOOL CGvisR2R_PunchView::ChkStShotNum()
 		if (m_nShareUpS > 0 && !(m_nShareUpS % 2))
 		{
 			sMsg.Format(_T("AOI 상면의 시리얼이 짝수로 시작하였습니다.\r\n- 시리얼 번호: %d"), m_nShareUpS);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(sMsg);
 			return FALSE;
 		}
@@ -27022,6 +27293,7 @@ BOOL CGvisR2R_PunchView::ChkStShotNum()
 			if (m_nShareDnS > 0 && !(m_nShareDnS % 2))
 			{
 				sMsg.Format(_T("AOI 하면의 시리얼이 짝수로 시작하였습니다.\r\n- 시리얼 번호: %d"), m_nShareDnS);
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				MsgBox(sMsg);
 				return FALSE;
 			}
@@ -27043,6 +27315,7 @@ BOOL CGvisR2R_PunchView::ChkContShotNum()
 	{
 		if (m_nShareUpS > 0 && m_pDlgFrameHigh->m_nMkLastShot + 1 != m_nShareUpS)
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			sMsg.Format(_T("AOI 상면의 시작Shot(%d)이 마지막Shot(%d)과 불연속입니다.\r\n계속 진행하시겠습니까?"), m_nShareUpS, m_pDlgFrameHigh->m_nMkLastShot);
 			if (IDNO == MsgBox(sMsg, 0, MB_YESNO))
 				return FALSE;
@@ -29399,6 +29672,7 @@ void CGvisR2R_PunchView::DoMark0Its()
 		else
 		{
 			StopFromThread();
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("버퍼의 시리얼이 맞지않습니다."), 1);
 			BuzzerFromThread(TRUE, 0);
 			DispMain(_T("정 지"), RGB_RED);
@@ -29631,6 +29905,7 @@ void CGvisR2R_PunchView::DoMark0Its()
 						if (m_pVoiceCoil[0])
 							m_pVoiceCoil[0]->SetEsc();
 
+						pView->SetAlarmToPlc(UNIT_PUNCH);
 						nRtn = MsgBox(_T("보이스코일(좌) 통신완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 						if (IDYES == nRtn)
 						{
@@ -29734,6 +30009,7 @@ void CGvisR2R_PunchView::DoMark0Its()
 			{
 				if (IsMk0Miss())
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					nRtn = MsgBox(_T("보이스코일(좌) 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 					if (IDYES == nRtn)
 					{
@@ -29766,10 +30042,12 @@ void CGvisR2R_PunchView::DoMark0Its()
 
 					if (IsMk0Miss())
 					{
+						pView->SetAlarmToPlc(UNIT_PUNCH);
 						nRtn = MsgBox(_T("보이스코일(좌) 마킹완료가 않되고 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 					}
 					else
 					{
+						pView->SetAlarmToPlc(UNIT_PUNCH);
 						nRtn = MsgBox(_T("보이스코일(좌) 마킹완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 					}
 					if (IDYES == nRtn)
@@ -29799,6 +30077,7 @@ void CGvisR2R_PunchView::DoMark0Its()
 						// One more MK On Start....
 						if (IsMk0Miss())
 						{
+							pView->SetAlarmToPlc(UNIT_PUNCH);
 							nRtn = MsgBox(_T("보이스코일(좌) 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 							if (IDYES == nRtn)
 							{
@@ -29833,10 +30112,12 @@ void CGvisR2R_PunchView::DoMark0Its()
 								m_pVoiceCoil[0]->SetEsc();
 							if (IsMk0Miss())
 							{
+								pView->SetAlarmToPlc(UNIT_PUNCH);
 								nRtn = MsgBox(_T("보이스코일(좌) 마킹완료가 않되고 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 							}
 							else
 							{
+								pView->SetAlarmToPlc(UNIT_PUNCH);
 								nRtn = MsgBox(_T("보이스코일(좌) 마킹완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 							}
 							if (IDYES == nRtn)
@@ -29995,6 +30276,7 @@ void CGvisR2R_PunchView::DoMark0Its()
 			if (!ChkMkImgL(m_nBufUpSerial[0], nTotMked))
 			{
 				Stop();
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				nRtn = MsgBox(_T("좌측 불량수와 마킹이미지 파일수가 다릅니다.\r\n계속 작업을 진행하시겠습니까?"), 1, MB_YESNO);
 				if (IDYES == nRtn)
 				{
@@ -30037,6 +30319,7 @@ void CGvisR2R_PunchView::DoMark0Its()
 		DispMain(_T("정 지"), RGB_RED);
 		if (m_pVoiceCoil[0])
 			m_pVoiceCoil[0]->SearchHomeSmac();
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("보이스코일(좌) 초기위치 이동이 되지 않습니다.\r\n마킹상태를 확인하세요."), 1);
 		m_nStepMk[0]++;
 		break;
@@ -30051,6 +30334,7 @@ void CGvisR2R_PunchView::DoMark0Its()
 		m_nRtnMyMsgBoxIdx = 0;
 		m_bRtnMyMsgBox[0] = FALSE;
 		m_nRtnMyMsgBox[0] = -1;
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(sMsg, 1, MB_YESNO);
 		sMsg.Empty();
 		m_nStepMk[0]++;
@@ -30068,6 +30352,7 @@ void CGvisR2R_PunchView::DoMark0Its()
 				m_bRtnMyMsgBox[0] = FALSE;
 				m_nRtnMyMsgBox[0] = -1;
 				sMsg.Format(_T("계속 다음 작업을 진행하시겠습니까?"), nSerial);
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				MsgBox(sMsg, 1, MB_YESNO);
 				sMsg.Empty();
 
@@ -30177,6 +30462,7 @@ void CGvisR2R_PunchView::DoMark1Its()
 		else
 		{
 			StopFromThread();
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("버퍼의 시리얼이 맞지않습니다."), 2);
 			BuzzerFromThread(TRUE, 0);
 			DispMain(_T("정 지"), RGB_RED);
@@ -30431,6 +30717,7 @@ void CGvisR2R_PunchView::DoMark1Its()
 						if (m_pVoiceCoil[1])
 							m_pVoiceCoil[1]->SetEsc();
 
+						pView->SetAlarmToPlc(UNIT_PUNCH);
 						nRtn = MsgBox(_T("보이스코일(우) 통신완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 						if (IDYES == nRtn)
 						{
@@ -30534,6 +30821,7 @@ void CGvisR2R_PunchView::DoMark1Its()
 			{
 				if (IsMk1Miss())
 				{
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					nRtn = MsgBox(_T("보이스코일(우) 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 					if (IDYES == nRtn)
 					{
@@ -30564,6 +30852,7 @@ void CGvisR2R_PunchView::DoMark1Its()
 						m_pVoiceCoil[1]->SetEsc();
 						//m_pVoiceCoil[1]->SearchHomeSmac();
 
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					nRtn = MsgBox(_T("보이스코일(우) 통신완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 2, MB_YESNO);
 					if (IDYES == nRtn)
 					{
@@ -30592,6 +30881,7 @@ void CGvisR2R_PunchView::DoMark1Its()
 						// One more MK On Start....
 						if (IsMk1Miss())
 						{
+							pView->SetAlarmToPlc(UNIT_PUNCH);
 							nRtn = MsgBox(_T("보이스코일(우) 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 							if (IDYES == nRtn)
 							{
@@ -30626,10 +30916,12 @@ void CGvisR2R_PunchView::DoMark1Its()
 								m_pVoiceCoil[1]->SetEsc();
 							if (IsMk1Miss())
 							{
+								pView->SetAlarmToPlc(UNIT_PUNCH);
 								nRtn = MsgBox(_T("보이스코일(우) 마킹완료가 않되고 미마킹된 것 같습니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 							}
 							else
 							{
+								pView->SetAlarmToPlc(UNIT_PUNCH);
 								nRtn = MsgBox(_T("보이스코일(우) 마킹완료가 않됩니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 							}
 							if (IDYES == nRtn)
@@ -30789,6 +31081,7 @@ void CGvisR2R_PunchView::DoMark1Its()
 			if (!ChkMkImgR(m_nBufUpSerial[1], nTotMked))
 			{
 				Stop();
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				nRtn = MsgBox(_T("우측 불량수와 마킹이미지 파일수가 다릅니다.\r\n계속 작업을 진행하시겠습니까?"), 1, MB_YESNO);
 				if (IDYES == nRtn)
 				{
@@ -30832,6 +31125,7 @@ void CGvisR2R_PunchView::DoMark1Its()
 		DispMain(_T("정 지"), RGB_RED);
 		if (m_pVoiceCoil[1])
 			m_pVoiceCoil[1]->SearchHomeSmac();
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("보이스코일(우) 초기위치 이동이 되지 않습니다.\r\n마킹상태를 확인하세요."), 2);
 		m_nStepMk[1]++;
 		break;
@@ -30846,6 +31140,7 @@ void CGvisR2R_PunchView::DoMark1Its()
 		m_nRtnMyMsgBoxIdx = 1;
 		m_bRtnMyMsgBox[1] = FALSE;
 		m_nRtnMyMsgBox[1] = -1;
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(sMsg, 2, MB_YESNO);
 		sMsg.Empty();
 		m_nStepMk[1]++;
@@ -30863,6 +31158,7 @@ void CGvisR2R_PunchView::DoMark1Its()
 				m_bRtnMyMsgBox[1] = FALSE;
 				m_nRtnMyMsgBox[1] = -1;
 				sMsg.Format(_T("계속 다음 작업을 진행하시겠습니까?"), nSerial);
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				MsgBox(sMsg, 2, MB_YESNO);
 				sMsg.Empty();
 
@@ -32279,6 +32575,7 @@ BOOL CGvisR2R_PunchView::IsDoneRemakeReelmap()
 
 		if (!bSuccess[0] || !bSuccess[2] || !bSuccess[1])
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("ReelMap Converting Failed."));
 			return FALSE;
 		}
@@ -32287,6 +32584,7 @@ BOOL CGvisR2R_PunchView::IsDoneRemakeReelmap()
 	{
 		if (!pDoc->m_pReelMapUp->m_bRtnThreadRemakeReelmap)
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("ReelMap Converting Failed."));
 			return FALSE;
 		}
@@ -32342,6 +32640,7 @@ BOOL CGvisR2R_PunchView::IsDoneRemakeReelmapInner()
 
 		if (!bSuccess[0] || !bSuccess[1] || !bSuccess[2] || !bSuccess[3])
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("ReelMap Converting Failed."));
 			return FALSE;
 		}
@@ -32353,6 +32652,7 @@ BOOL CGvisR2R_PunchView::IsDoneRemakeReelmapInner()
 
 		if (!bSuccess[0] || !bSuccess[1])
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("ReelMap Converting Failed."));
 			return FALSE;
 		}
@@ -32873,6 +33173,7 @@ void CGvisR2R_PunchView::DuplicateRmap(int nRmap)
 	{
 		Sleep(30);
 		strTemp.Format(_T("%s \r\n: Reelmap File Not Exist"), sSrcPath);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(strTemp);
 		return;
 	}
@@ -32934,6 +33235,7 @@ void CGvisR2R_PunchView::LoadSerial()
 				{
 					Stop();
 					pView->ClrDispMsg();
+					pView->SetAlarmToPlc(UNIT_PUNCH);
 					MsgBox(_T("좌/우 마킹 시리얼이 같습니다."));
 					SetListBuf();
 					m_nMkStAuto = MK_ST + (Mk2PtIdx::Start); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
@@ -32945,6 +33247,7 @@ void CGvisR2R_PunchView::LoadSerial()
 					{
 						Stop();
 						pView->ClrDispMsg();
+						pView->SetAlarmToPlc(UNIT_PUNCH);
 						MsgBox(_T("좌측 상/하면 시리얼이 다릅니다."));
 						SetListBuf();
 						m_nMkStAuto = MK_ST + (Mk2PtIdx::Start); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
@@ -32954,6 +33257,7 @@ void CGvisR2R_PunchView::LoadSerial()
 					{
 						Stop();
 						pView->ClrDispMsg();
+						pView->SetAlarmToPlc(UNIT_PUNCH);
 						MsgBox(_T("우측 상/하면 시리얼이 다릅니다."));
 						SetListBuf();
 						m_nMkStAuto = MK_ST + (Mk2PtIdx::Start); pDoc->SetStatusInt(_T("General"), _T("nMkStAuto"), pView->m_nMkStAuto);
@@ -33646,7 +33950,14 @@ void CGvisR2R_PunchView::SetAlarmToPlc(int nFromUnit)
 		//MpeWrite(_T(""), 1);
 		break;
 	case UNIT_ENGRAVE:
+		MpeWrite(_T("MB40019A"), 0);
+		Sleep(500);
 		MpeWrite(_T("MB40019A"), 1);
+		Sleep(500);
+		MpeWrite(_T("MB40019A"), 0);
+		Sleep(500);
+		MpeWrite(_T("MB40019A"), 1);
+		Sleep(500);
 		break;
 	case UNIT_AOIUP:
 		//MpeWrite(_T(""), 1);
@@ -33655,7 +33966,14 @@ void CGvisR2R_PunchView::SetAlarmToPlc(int nFromUnit)
 		//MpeWrite(_T(""), 1);
 		break;
 	case UNIT_PUNCH:
+		MpeWrite(_T("MB40019B"), 0);
+		Sleep(500);
 		MpeWrite(_T("MB40019B"), 1);
+		Sleep(500);
+		MpeWrite(_T("MB40019B"), 0);
+		Sleep(500);
+		MpeWrite(_T("MB40019B"), 1);
+		Sleep(500);
 		break;
 	case UNIT_RECOILER:
 		//MpeWrite(_T(""), 1);
@@ -33674,8 +33992,11 @@ BOOL CGvisR2R_PunchView::IsClampOff()
 	BOOL bClampDown = pDoc->m_pMpeSignal[14] & (0x01 << 11);
 	if(!bClampDown)
 	{
-		if(!m_bTIM_INIT_VIEW)
+		if (!m_bTIM_INIT_VIEW)
+		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("마킹부 클램프 테이블 척이 올라와 있습니다."));
+		}
 		return TRUE;
 	}
 	return FALSE;
@@ -33732,6 +34053,7 @@ BOOL CGvisR2R_PunchView::CheckCamMstInfo(int nLayer, int nSerial)
 	else
 	{
 		sMsg.Format(_T("Error - m_pPcr[%d][%d]의 메모리가 설정되지 않았습니다."), nLayer, nIdx);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(sMsg);
 		return FALSE;
 	}
@@ -33742,6 +34064,7 @@ BOOL CGvisR2R_PunchView::CheckCamMstInfo(int nLayer, int nSerial)
 		if ((nNodeX * nNodeY - 1) < nPcsId)
 		{
 			sMsg.Format(_T("Error - Defect Pcs Index(%d) is over total pcs - 1 ."), nPcsId);
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(sMsg);
 			return FALSE;
 		}
@@ -33804,6 +34127,7 @@ BOOL CGvisR2R_PunchView::RemakeReelmapFromPcr(CString sModel, CString sLot, CStr
 	if (!pDoc->m_pReelMapUp)
 	{
 		sMsg.Format(_T("m_pReelMapUp이 Create되지않았습니다.\r\n%s"));
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->MsgBox(sMsg);
 		return FALSE;
 	}
@@ -35208,21 +35532,21 @@ BOOL CGvisR2R_PunchView::IsSetPinPos()
 		double dPinPosX[2], dPinPosY[2];
 		m_pMotion->GetPinPos(0, dPinPosX[0], dPinPosY[0]);
 		m_pMotion->GetPinPos(1, dPinPosX[1], dPinPosY[1]);
-		if (dPinPosX[0] < 1.0 && dPinPosY[0] < 1.0)
+		if (dPinPosX[0] < 0.0 || dPinPosY[0] < 0.0)
 		{
-			pView->SetAlarmToPlc(UNIT_PUNCH);
 			sMsg.Format(_T("좌측 핀위치가 설정되지 않았습니다."));
 			Sleep(1000);
 			ClrDispMsg();
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(sMsg);
 			return FALSE;
 		}
-		if (dPinPosX[1] < 1.0 && dPinPosY[1] < 1.0)
+		if (dPinPosX[1] < 0.0 || dPinPosY[1] < 0.0)
 		{
-			pView->SetAlarmToPlc(UNIT_PUNCH);
 			sMsg.Format(_T("우측 핀위치가 설정되지 않았습니다."));
 			Sleep(1000);
 			ClrDispMsg();
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(sMsg);
 			return FALSE;
 		}
@@ -35355,6 +35679,7 @@ BOOL CGvisR2R_PunchView::ApplyListTorq()
 	if (nThick < 1)
 	{
 		sMsg.Format(_T("캠마스터의 토크 리스트에 %s 모델의 토크값이 설정되지 않았습니다.\r\n%s"), sModel, sPathList);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(sMsg);
 		return FALSE;
 	}
@@ -35365,6 +35690,7 @@ BOOL CGvisR2R_PunchView::ApplyListTorq()
 	if (!GetTorque(nUnit, nThick, dTorqL, dTorqR))
 	{
 		sMsg.Format(_T("캠마스터의 토크 리스트에 %s 설비의 %s 에대한 토크값이 설정되지 않았습니다.\r\n"), pDoc->WorkingInfo.System.sMcName, GetThicknessName(nThick));
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(sMsg);
 		return FALSE;
 	}
@@ -35372,6 +35698,7 @@ BOOL CGvisR2R_PunchView::ApplyListTorq()
 	if (dTorqL <= 0.0 || dTorqR <= 0.0)
 	{
 		sMsg.Format(_T("캠마스터의 토크 리스트에 %s 설비의 %s 에대한 토크값이 설정되지 않았습니다.\r\n좌측 토크 : %.3f, 우측 토크 : %.3f"), pDoc->WorkingInfo.System.sMcName, GetThicknessName(nThick), dTorqL, dTorqR);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(sMsg);
 		return FALSE;
 	}
@@ -35379,10 +35706,13 @@ BOOL CGvisR2R_PunchView::ApplyListTorq()
 	if(!ApplyTorq(dTorqL, dTorqR))
 	{
 		sMsg.Format(_T("%s 에대한 토크값이 %s 설비에 적용되지 않았습니다.\r\n - 토크값 적용 실패."), GetThicknessName(nThick), pDoc->WorkingInfo.System.sMcName);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(sMsg);
 		return FALSE;
 	}
 
+	if (m_pDlgMenu01)
+		m_pDlgMenu01->DispTq();
 	//if (m_pDlgMenu04)
 	//	m_pDlgMenu04->Disp();
 
@@ -35483,7 +35813,7 @@ int CGvisR2R_PunchView::GetModelThickness(CString sModel)
 	TCHAR sep[] = { _T(",;\r\n\t") };
 
 	nModelIdx = SearchModel(sModel);
-	if (nModelIdx < 1)
+	if (nModelIdx < 0)
 		return -1; // Not found.
 
 	sModelIdx.Format(_T("%d"), nModelIdx);
@@ -35863,6 +36193,7 @@ CString CGvisR2R_PunchView::GetMkMtInfo0(int nSerial, int nMkPcs) // return Cam0
 
 		if (nPcsIdx < 0)
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("외층 작업에서 좌측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
 			//pDoc->LogAuto(_T("외층 작업에서 좌측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
 			sInfo.Format(_T("%c_%d_%d"), '?', 0, 0);
@@ -35890,6 +36221,7 @@ CString CGvisR2R_PunchView::GetMkMtInfo0(int nSerial, int nMkPcs) // return Cam0
 
 		if (nPcsIdx < 0)
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("양면or내층 작업에서 좌측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
 			//pDoc->LogAuto(_T("양면or내층 작업에서 좌측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
 			sInfo.Format(_T("%c_%d_%d"), '?', 0, 0);
@@ -35905,6 +36237,7 @@ CString CGvisR2R_PunchView::GetMkMtInfo0(int nSerial, int nMkPcs) // return Cam0
 	else
 	{
 		sInfo.Format(_T("%c_%d_%d"), '?', 0, 0);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("좌측 마킹위치 정보 실패."));
 	}
 
@@ -35919,6 +36252,7 @@ CString CGvisR2R_PunchView::GetMkMtInfo1(int nSerial, int nMkPcs) // return Cam1
 	{
 		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pView->ClrDispMsg();
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("우측 마킹위치 정보 실패."));
 		sInfo.Format(_T("%c_%d_%d"), '?', 0, 0);
 		return sInfo;
@@ -35940,6 +36274,7 @@ CString CGvisR2R_PunchView::GetMkMtInfo1(int nSerial, int nMkPcs) // return Cam1
 
 		if (nPcsIdx < 0)
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("외층 작업에서 우측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
 			//pDoc->LogAuto(_T("외층 작업에서 우측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
 			sInfo.Format(_T("%c_%d_%d"), '?', 0, 0);
@@ -35967,6 +36302,7 @@ CString CGvisR2R_PunchView::GetMkMtInfo1(int nSerial, int nMkPcs) // return Cam1
 
 		if (nPcsIdx < 0)
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("양면or내층 작업에서 우측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
 			//pDoc->LogAuto(_T("양면or내층 작업에서 우측 마킹이미지의 PCS Index를 설정하지 못했습니다."));
 			sInfo.Format(_T("%c_%d_%d"), '?', 0, 0);
@@ -35982,6 +36318,7 @@ CString CGvisR2R_PunchView::GetMkMtInfo1(int nSerial, int nMkPcs) // return Cam1
 	else
 	{
 		sInfo.Format(_T("%c_%d_%d"), '?', 0, 0);
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		MsgBox(_T("우측 마킹위치 정보 실패."));
 	}
 
@@ -36079,6 +36416,7 @@ BOOL CGvisR2R_PunchView::ChkRepunching(int nCam) // 0 : Left, 1 : Right
 
 	if (nCam == 0)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pDoc->LogAuto(_T("좌측 펀칭 미마킹 알람 발생"));
 		nRtn = MsgBox(_T("좌측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 		pDoc->LogAuto(_T("좌측 펀칭 미마킹 알람 해제"));
@@ -36098,6 +36436,7 @@ BOOL CGvisR2R_PunchView::ChkRepunching(int nCam) // 0 : Left, 1 : Right
 				if (m_pVoiceCoil[0])
 					m_pVoiceCoil[0]->SetEsc();
 
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				nRtn = MsgBox(_T("보이스코일(좌) 통신완료가 않됩니다."));
 			}
 
@@ -36110,6 +36449,7 @@ BOOL CGvisR2R_PunchView::ChkRepunching(int nCam) // 0 : Left, 1 : Right
 	}
 	else if (nCam == 1)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH);
 		pDoc->LogAuto(_T("우측 펀칭 미마킹 알람 발생"));
 		nRtn = MsgBox(_T("우측 펀칭이 미마킹으로 보입니다.\r\n마킹을 다시 시도하시겠습니까?"), 1, MB_YESNO);
 		pDoc->LogAuto(_T("우측 펀칭 미마킹 알람 해제"));
@@ -36129,6 +36469,7 @@ BOOL CGvisR2R_PunchView::ChkRepunching(int nCam) // 0 : Left, 1 : Right
 				if (m_pVoiceCoil[1])
 					m_pVoiceCoil[1]->SetEsc();
 
+				pView->SetAlarmToPlc(UNIT_PUNCH);
 				nRtn = MsgBox(_T("보이스코일(우) 통신완료가 않됩니다."));
 			}
 
@@ -36154,6 +36495,7 @@ BOOL CGvisR2R_PunchView::WriteLastRmapInfo()
 	{
 		if (GetTickCount() >= (dwStartTick + dwTimeOut))
 		{
+			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("수율처리가 끝나지않았습니다."));
 			break;
 		}
@@ -36235,6 +36577,7 @@ BOOL CGvisR2R_PunchView::ChkMkImgR(int nSerial, int nTotMk)
 	}
 	//sMsg.Format(_T("시리얼: %d, 마킹이미지수(중복수): %d(%d), 총마킹수: %d\r\n%s"), nSerial, nCount, m_nOverSaveMkImg[1], nTotMk, arSerial);
 	sMsg.Format(_T("시리얼: %d, 마킹이미지수(중복수): %d(%d), 총마킹수: %d"), nSerial, nCount, m_nOverSaveMkImg[1], nTotMk);
+	pView->SetAlarmToPlc(UNIT_PUNCH);
 	MsgBox(sMsg);
 	return FALSE;
 }
@@ -36289,6 +36632,7 @@ BOOL CGvisR2R_PunchView::ChkMkImgL(int nSerial, int nTotMk)
 	}
 	//sMsg.Format(_T("시리얼: %d, 마킹이미지수(중복수): %d(%d), 총마킹수: %d\r\n%s"), nSerial, nCount, m_nOverSaveMkImg[0], nTotMk, arSerial);
 	sMsg.Format(_T("시리얼: %d, 마킹이미지수(중복수): %d(%d), 총마킹수: %d"), nSerial, nCount, m_nOverSaveMkImg[0], nTotMk);
+	pView->SetAlarmToPlc(UNIT_PUNCH);
 	MsgBox(sMsg);
 	return FALSE;
 }
@@ -36395,4 +36739,23 @@ BOOL CGvisR2R_PunchView::IsMkPos1(double dTgtPosX, double dTgtPosY)
 		return FALSE;
 
 	return TRUE;
+}
+
+void CGvisR2R_PunchView::Delay(int mSec)
+{
+	DWORD dwStartTick = GetTickCount();
+	MSG message;
+	while (TRUE) 
+	{
+		// Time Out Check
+		if (GetTickCount() >= (dwStartTick + mSec))
+		{
+			return;
+		}
+		if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+		{
+			::TranslateMessage(&message);
+			::DispatchMessage(&message);
+		}
+	}
 }

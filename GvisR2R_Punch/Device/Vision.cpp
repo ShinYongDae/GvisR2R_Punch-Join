@@ -1326,6 +1326,9 @@ void CVision::CropCadImg(int nIdxMkInfo, int nSerial, int nLayer, int nIdxDef)
 #endif
 	}
 
+	if (cx < 0 || cy < 0)
+		return;
+
 	CropCadImg(cell, cx, cy, nIdxMkInfo, nLayer);
 }
 
@@ -2578,6 +2581,8 @@ void CVision::LoadCADBuf(int CurrCell, long OrgStX, long OrgStY, long DesStX, lo
 				OrgY = OrgStY;
 				SzY = SizeY;
 			}
+			if ((OrgX + SzX > pCellRgn[nLayer]->ProcSizeX) || (OrgY + SzY > pCellRgn[nLayer]->ProcSizeY))
+				return;
 			MbufChild2d(MilCADImgBuf, OrgX, OrgY, SzX, SzY, &MilBufCADCld);
 		}
 
@@ -2603,6 +2608,8 @@ void CVision::LoadCADBuf(int CurrCell, long OrgStX, long OrgStY, long DesStX, lo
 				DstY = DesStY;
 				SzY = SizeY;
 			}
+			if ((DstX + SzX > DEF_IMG_DISP_SIZEX) || (DstY + SzY > DEF_IMG_DISP_SIZEY))
+				return;
 			MbufChild2d(MilBufCADTemp, DstX, DstY, SzX, SzY, &MilBufCADTempCld);
 		}
 	}
@@ -5356,8 +5363,10 @@ BOOL CVision::FitSizeBlobModel()
 	// Resizing From CamMaster Resolution To Camera Resolution.
 	double dRsRtoX = (_tstof(pDoc->WorkingInfo.Vision[m_nIdx].sCamPxlRes) / 10000.0) / _tstof(pDoc->WorkingInfo.Vision[m_nIdx].sResX);
 	double dRsRtoY = (_tstof(pDoc->WorkingInfo.Vision[m_nIdx].sCamPxlRes) / 10000.0) / _tstof(pDoc->WorkingInfo.Vision[m_nIdx].sResY);
-	long lSzX = (long)((double)PIN_IMG_DISP_SIZEX * dRsRtoX);
-	long lSzY = (long)((double)PIN_IMG_DISP_SIZEY * dRsRtoY);
+	long lSzX = (long)((double)1024 * dRsRtoX);
+	long lSzY = (long)((double)1024 * dRsRtoY);
+	//long lSzX = (long)((double)PIN_IMG_DISP_SIZEX * dRsRtoX);
+	//long lSzY = (long)((double)PIN_IMG_DISP_SIZEY * dRsRtoY);
 
 	if (m_pMilBufRejectRz)
 	{
