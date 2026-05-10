@@ -5180,23 +5180,7 @@ void CDlgMenu05::OnStnClickedStcIts()
 		sMsg.Format(_T("기존 ITS코드: %s\r\n새로운 ITS코드: %s\r\n기존의 ITS코드를 새로운 ITS코드로 바꾸시겠습니까?"), pDoc->m_sItsCode, sData);
 
 		if (IDYES == pView->MsgBox(sMsg, 0, MB_YESNO))
-		{
 			pDoc->m_sItsCode = sData;
-#ifndef TEST_MODE
-			CFileFind finder;
-			if (finder.FindFile(sPath))
-			{
-				::WritePrivateProfileString(_T("Infomation"), _T("Its Code"), pDoc->m_sItsCode, sPath);
-			}
-			else
-			{
-				pView->SetAlarmToPlc(UNIT_PUNCH);
-				sMsg.Format(_T("%s파일의 Infomation에 Its Code 정보가 없습니다."), sPath);
-				pView->ClrDispMsg();
-				AfxMessageBox(sMsg);
-			}
-#endif
-		}
 		else
 			myStcIts.SetText(pDoc->m_sItsCode);
 	}
