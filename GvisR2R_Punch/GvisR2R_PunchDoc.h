@@ -199,7 +199,7 @@ public:
 	void SetOnePnlAcc(double dAcc);
 	double GetOnePnlAcc();
 	void SetEngFdPitch(double dPitch);
-	double GetEngFdPitch();
+	//double GetEngFdPitch();
 	void SetAoiFdPitch(double dPitch);
 	double GetAoiFdPitch();
 	void SetMkFdPitch(double dPitch);
@@ -485,7 +485,8 @@ public:
 
 	// For ITS
 	BOOL m_bEngDualTest;
-	CString m_sItsCode;
+	int m_nEngTestMode;
+	CString m_sEngItsCode;
 	CString m_sEngLotNum, m_sEngProcessNum;
 	CString m_sEngModel, m_sEngLayerUp;
 	CString m_sEngLayerDn;
@@ -566,6 +567,7 @@ public:
 	void SetDoorAoiUp();
 
 	CString m_sEngAlarm;
+	int GetMarkedPcrUpSerial();
 
 // 재정의입니다.
 public:

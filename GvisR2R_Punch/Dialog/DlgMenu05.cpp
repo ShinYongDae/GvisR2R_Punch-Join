@@ -3363,7 +3363,7 @@ void CDlgMenu05::MakeItsFile(int nSerial, int nLayer)
 CString CDlgMenu05::GetItsFileData(int nSerial, int nLayer) // RMAP_UP, RMAP_DN, RMAP_INNER_UP, RMAP_INNER_DN
 {
 	CString str = _T(""), sSide = _T(""), sTemp = _T(""), sItsData = _T("");
-	CString sItsCode = pDoc->m_sItsCode;
+	CString sItsCode = pDoc->m_sEngItsCode;
 
 	int nNodeX = pDoc->m_Master[0].m_pPcsRgn->m_nCol;
 	int nNodeY = pDoc->m_Master[0].m_pPcsRgn->m_nRow;
@@ -4707,7 +4707,7 @@ int CDlgMenu05::LoadPCRUpFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 
 	if (!findfile.FindFile(sPath))
 	{
-	sPath.Format(_T("%s%s\\%s\\%s\\%04d.pcr"),
+		sPath.Format(_T("%s%s\\%s\\%s\\%04d.pcr"),
 		pDoc->WorkingInfo.System.sPathOldFile, m_sModel, m_sLot, m_sLayerUp, nSerial);
 		if (!findfile.FindFile(sPath))
 		{
@@ -4800,7 +4800,7 @@ int CDlgMenu05::LoadPCRUpFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 		pDoc->m_sEngLotNum = strLot;
 		pDoc->m_sEngLayerUp = strLayer;
 		if (pDoc->WorkingInfo.System.bUseITS)
-			pDoc->m_sItsCode = sItsCode;
+			pDoc->m_sEngItsCode = sItsCode;
 	}
 
 
@@ -5024,7 +5024,7 @@ int CDlgMenu05::LoadPCRDnFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 		pDoc->m_sEngLotNum = strLot;
 		pDoc->m_sEngLayerDn = strLayer;
 		if (pDoc->WorkingInfo.System.bUseITS)
-			pDoc->m_sItsCode = sItsCode;
+			pDoc->m_sEngItsCode = sItsCode;
 	}
 
 	int nTotDef = _tstoi(strTotalBadPieceNum);
@@ -5175,14 +5175,14 @@ void CDlgMenu05::OnStnClickedStcIts()
 	if (sData.IsEmpty())
 		pView->MsgBox(_T("ITS코드 정보가 없습니다."));
 
-	if (pDoc->m_sItsCode.Compare(sData)) // FALSE: Ideal Equal, TRUE: Different. 
+	if (pDoc->m_sEngItsCode.Compare(sData)) // FALSE: Ideal Equal, TRUE: Different. 
 	{
-		sMsg.Format(_T("기존 ITS코드: %s\r\n새로운 ITS코드: %s\r\n기존의 ITS코드를 새로운 ITS코드로 바꾸시겠습니까?"), pDoc->m_sItsCode, sData);
+		sMsg.Format(_T("기존 ITS코드: %s\r\n새로운 ITS코드: %s\r\n기존의 ITS코드를 새로운 ITS코드로 바꾸시겠습니까?"), pDoc->m_sEngItsCode, sData);
 
 		if (IDYES == pView->MsgBox(sMsg, 0, MB_YESNO))
-			pDoc->m_sItsCode = sData;
+			pDoc->m_sEngItsCode = sData;
 		else
-			myStcIts.SetText(pDoc->m_sItsCode);
+			myStcIts.SetText(pDoc->m_sEngItsCode);
 	}
 }
 

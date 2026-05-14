@@ -815,7 +815,7 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
 	BOOL bRtn = FALSE;
 	BOOL bTempStop = FALSE;
-	int nLastShot;
+	int nLastShot, nFirstShot;
 
 	if (nIDEvent == TIM_INIT_VIEW)	
 	{
@@ -1127,10 +1127,15 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 
 			if (pDoc->m_pReelMap) //&& bRtn
 			{
-				//ReloadYield();
-				nLastShot = _tstoi(pDoc->WorkingInfo.LastJob.sSerialUp);
-				ReloadReelmap(nLastShot);
-				UpdateYield(nLastShot);
+				////ReloadYield();
+				nFirstShot = GetFirstBufferSerial(1); // 0: Up, 1: Dn
+				//nLastShot = _tstoi(pDoc->WorkingInfo.LastJob.sSerialUp);
+				nLastShot = pDoc->GetMarkedPcrUpSerial();
+				if (nFirstShot == nLastShot + 1)
+				{
+					ReloadReelmap(nLastShot);
+					UpdateYield(nLastShot);
+				}
 			}
 			break;
 		case 23:
@@ -1314,6 +1319,8 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 
 			if (m_pEngrave->m_bGetOpInfo || m_pEngrave->m_bGetInfo)
 			{
+				ApplyCurrentInfoEng();
+
 				if (m_pDlgInfo)
 					m_pDlgInfo->UpdateData();
 
@@ -5035,7 +5042,7 @@ void CGvisR2R_PunchView::ChkBufUp()
 			if (m_bShift2Mk)
 				return;
 
-			DelOverLotEndSerialUp(m_pBufSerial[0][i]);
+			//DelOverLotEndSerialUp(m_pBufSerial[0][i]);
 
 			if (i == m_nBufTot[0] - 1)
 				sTemp.Format(_T("%d"), m_pBufSerial[0][i]);
@@ -5080,7 +5087,7 @@ void CGvisR2R_PunchView::ChkBufDn()
 			if (m_bShift2Mk)
 				return;
 
-			DelOverLotEndSerialDn(m_pBufSerial[1][i]);
+			//DelOverLotEndSerialDn(m_pBufSerial[1][i]);
 
 			if (i == m_nBufTot[1] - 1)
 				sTemp.Format(_T("%d"), m_pBufSerial[1][i]);
@@ -18088,26 +18095,26 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 					}
 				}
 
-				if (m_bPcrInShare[1])
-				{
-					if (IsLastJob(1)) // Dn
-					{
-						pDoc->m_Master[1].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
-							pDoc->WorkingInfo.LastJob.sModel,
-							pDoc->WorkingInfo.LastJob.sLayerDn,
-							pDoc->WorkingInfo.LastJob.sLayerUp);
-						pDoc->m_Master[1].LoadMstInfo();
-
-						if (pDoc->GetTestMode() == MODE_OUTER)
-						{
-							pDoc->m_MasterInner[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
-								pDoc->WorkingInfo.LastJob.sModel,
-								pDoc->WorkingInfo.LastJob.sInnerLayerDn,
-								pDoc->WorkingInfo.LastJob.sInnerLayerUp);
-							pDoc->m_MasterInner[0].LoadMstInfo();
-						}
-					}
-				}
+				//if (m_bPcrInShare[1])
+				//{
+				//	if (IsLastJob(1)) // Dn
+				//	{
+				//		pDoc->m_Master[1].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
+				//			pDoc->WorkingInfo.LastJob.sModel,
+				//			pDoc->WorkingInfo.LastJob.sLayerDn,
+				//			pDoc->WorkingInfo.LastJob.sLayerUp);
+				//		pDoc->m_Master[1].LoadMstInfo();
+				//
+				//		if (pDoc->GetTestMode() == MODE_OUTER)
+				//		{
+				//			pDoc->m_MasterInner[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
+				//				pDoc->WorkingInfo.LastJob.sModel,
+				//				pDoc->WorkingInfo.LastJob.sInnerLayerDn,
+				//				pDoc->WorkingInfo.LastJob.sInnerLayerUp);
+				//			pDoc->m_MasterInner[0].LoadMstInfo();
+				//		}
+				//	}
+				//}
 
 				SetAlignPos();
 
@@ -18326,39 +18333,39 @@ void CGvisR2R_PunchView::DoAutoChkShareVsFolder()	// 잔량처리 시 계속적으로 반복
 					pDoc->CopyReelmapInner(m_nShareDnS);
 				}
 
-				if (m_bPcrInShare[0])
-				{
-					if (IsLastJob(0)) // Up
-					{
-						//if (pDoc->GetTestMode() == MODE_OUTER)
-						//{
-						//	if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
-						//	{
-						//		MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
-						//	}
-						//}
-						pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
-							pDoc->WorkingInfo.LastJob.sModel,
-							pDoc->WorkingInfo.LastJob.sLayerUp);
-						pDoc->m_Master[0].LoadMstInfo();
-						//if (m_pDlgMenu01)
-						//	m_pDlgMenu01->ChkAoiVsStatus();
-						pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
-						//ApplyListTorq();
-
-						if (m_pEngrave)
-							m_pEngrave->SwMenu01UpdateWorking(TRUE);
-
-
-						if (pDoc->GetTestMode() == MODE_OUTER)
-						{
-							pDoc->m_MasterInner[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
-								pDoc->WorkingInfo.LastJob.sModel,
-								pDoc->WorkingInfo.LastJob.sInnerLayerUp);
-							pDoc->m_MasterInner[0].LoadMstInfo();
-						}
-					}
-				}
+				//if (m_bPcrInShare[0])
+				//{
+				//	if (IsLastJob(0)) // Up
+				//	{
+				//		//if (pDoc->GetTestMode() == MODE_OUTER)
+				//		//{
+				//		//	if (!pDoc->IsOfflineFolder()) // 0 : Not exist, 1 : Exist only Up, 2 : Exist only Dn, 3 : Exist Up and Dn
+				//		//	{
+				//		//		MsgBox(_T("내층 모델의 OFFLINE 폴더가 없습니다."));
+				//		//	}
+				//		//}
+				//		pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
+				//			pDoc->WorkingInfo.LastJob.sModel,
+				//			pDoc->WorkingInfo.LastJob.sLayerUp);
+				//		pDoc->m_Master[0].LoadMstInfo();
+				//		//if (m_pDlgMenu01)
+				//		//	m_pDlgMenu01->ChkAoiVsStatus();
+				//		pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
+				//		//ApplyListTorq();
+				//
+				//		if (m_pEngrave)
+				//			m_pEngrave->SwMenu01UpdateWorking(TRUE);
+				//
+				//
+				//		if (pDoc->GetTestMode() == MODE_OUTER)
+				//		{
+				//			pDoc->m_MasterInner[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
+				//				pDoc->WorkingInfo.LastJob.sModel,
+				//				pDoc->WorkingInfo.LastJob.sInnerLayerUp);
+				//			pDoc->m_MasterInner[0].LoadMstInfo();
+				//		}
+				//	}
+				//}
 
 				if (m_bPcrInShare[1])
 				{
@@ -19050,27 +19057,28 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 					}
 				}
 
-				if (m_bPcrInShare[1])
-				{
-					if (IsLastJob(1)) // Dn
-					{
-						pDoc->m_Master[1].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
-							pDoc->WorkingInfo.LastJob.sModel,
-							pDoc->WorkingInfo.LastJob.sLayerDn,
-							pDoc->WorkingInfo.LastJob.sLayerUp);
-						pDoc->m_Master[1].LoadMstInfo();
+				//if (m_bPcrInShare[1])
+				//{
+				//	if (IsLastJob(1)) // Dn
+				//	{
+				//		pDoc->m_Master[1].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
+				//			pDoc->WorkingInfo.LastJob.sModel,
+				//			pDoc->WorkingInfo.LastJob.sLayerDn,
+				//			pDoc->WorkingInfo.LastJob.sLayerUp);
+				//		pDoc->m_Master[1].LoadMstInfo();
 
-						if (pDoc->GetTestMode() == MODE_OUTER)
-						{
-							pDoc->m_MasterInner[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
-								pDoc->WorkingInfo.LastJob.sModel,
-								pDoc->WorkingInfo.LastJob.sInnerLayerDn,
-								pDoc->WorkingInfo.LastJob.sInnerLayerUp);
-							pDoc->m_MasterInner[0].LoadMstInfo();
-						}
-					}
+				//		if (pDoc->GetTestMode() == MODE_OUTER)
+				//		{
+				//			pDoc->m_MasterInner[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
+				//				pDoc->WorkingInfo.LastJob.sModel,
+				//				pDoc->WorkingInfo.LastJob.sInnerLayerDn,
+				//				pDoc->WorkingInfo.LastJob.sInnerLayerUp);
+				//			pDoc->m_MasterInner[0].LoadMstInfo();
+				//		}
+				//	}
 
-				}
+				//}
+
 				SetAlignPos();
 				InitReelmap();
 				ApplyListTorq();
@@ -19283,30 +19291,30 @@ void CGvisR2R_PunchView::DoAutoChkShareFolder()	// 20170727-잔량처리 시 계속적으
 					pDoc->CopyReelmapInner(m_nShareDnS);
 				}
 
-				if (m_bPcrInShare[0])
-				{
-					if (IsLastJob(0)) // Up
-					{
-						pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
-							pDoc->WorkingInfo.LastJob.sModel,
-							pDoc->WorkingInfo.LastJob.sLayerUp);
-						pDoc->m_Master[0].LoadMstInfo();
-						pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
-						//ApplyListTorq();
+				//if (m_bPcrInShare[0])
+				//{
+				//	if (IsLastJob(0)) // Up
+				//	{
+				//		pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
+				//			pDoc->WorkingInfo.LastJob.sModel,
+				//			pDoc->WorkingInfo.LastJob.sLayerUp);
+				//		pDoc->m_Master[0].LoadMstInfo();
+				//		pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
+				//		//ApplyListTorq();
 
-						if (m_pEngrave)
-							m_pEngrave->SwMenu01UpdateWorking(TRUE);
+				//		if (m_pEngrave)
+				//			m_pEngrave->SwMenu01UpdateWorking(TRUE);
 
 
-						if (pDoc->GetTestMode() == MODE_OUTER)
-						{
-							pDoc->m_MasterInner[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
-								pDoc->WorkingInfo.LastJob.sModel,
-								pDoc->WorkingInfo.LastJob.sInnerLayerUp);
-							pDoc->m_MasterInner[0].LoadMstInfo();
-						}
-					}
-				}
+				//		if (pDoc->GetTestMode() == MODE_OUTER)
+				//		{
+				//			pDoc->m_MasterInner[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir,
+				//				pDoc->WorkingInfo.LastJob.sModel,
+				//				pDoc->WorkingInfo.LastJob.sInnerLayerUp);
+				//			pDoc->m_MasterInner[0].LoadMstInfo();
+				//		}
+				//	}
+				//}
 
 				if (m_bPcrInShare[1])
 				{
@@ -32295,6 +32303,9 @@ CString CGvisR2R_PunchView::GetTimeIts()
 
 void CGvisR2R_PunchView::MakeItsFileUp(int nSerial)
 {
+	if (!pDoc->WorkingInfo.System.bUseITS)
+		return;
+
 	if (pDoc->GetTestMode() == MODE_INNER)
 	{
 		if (pDoc->m_pReelMapUp)
@@ -32310,6 +32321,9 @@ void CGvisR2R_PunchView::MakeItsFileUp(int nSerial)
 
 void CGvisR2R_PunchView::MakeItsFileDn(int nSerial)
 {
+	if (!pDoc->WorkingInfo.System.bUseITS)
+		return;
+
 	if (pDoc->GetTestMode() == MODE_INNER)
 	{
 		if (pDoc->m_pReelMapDn)
@@ -32909,6 +32923,9 @@ BOOL CGvisR2R_PunchView::UpdateReelmapInner(int nSerial)
 
 BOOL CGvisR2R_PunchView::MakeItsFile(int nSerial)
 {
+	if (!pDoc->WorkingInfo.System.bUseITS)
+		return TRUE;
+
 	if (nSerial <= 0)
 	{
 		pView->SetAlarmToPlc(UNIT_PUNCH);
@@ -33940,6 +33957,11 @@ long CGvisR2R_PunchView::MpeRead(CString strRegAddr)
 int CGvisR2R_PunchView::GetLastBufferSerial(int nAoi) // 0: Up, 1: Dn
 {
 	return m_pBufSerial[nAoi][m_nBufTot[nAoi] - 1];
+}
+
+int CGvisR2R_PunchView::GetFirstBufferSerial(int nAoi) // 0: Up, 1: Dn
+{
+	return m_pBufSerial[nAoi][0];
 }
 
 void CGvisR2R_PunchView::SetAlarmToPlc(int nFromUnit)
@@ -36758,4 +36780,29 @@ void CGvisR2R_PunchView::Delay(int mSec)
 			::DispatchMessage(&message);
 		}
 	}
+}
+
+BOOL CGvisR2R_PunchView::ApplyCurrentInfoEng()
+{
+	if (GetCurrentInfoEng()) // TRUE: MODE_INNER or MODE_OUTER
+	{
+		pDoc->WorkingInfo.LastJob.bDualTest = pDoc->m_bEngDualTest;
+		pDoc->WorkingInfo.LastJob.sEngItsCode = pDoc->m_sEngItsCode;
+		pDoc->WorkingInfo.LastJob.sLot = pDoc->m_sEngLotNum;
+		pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->m_sEngProcessNum;
+		pDoc->WorkingInfo.LastJob.sLayerUp = pDoc->m_sEngLayerUp;
+		pDoc->WorkingInfo.LastJob.sLayerDn = pDoc->m_sEngLayerDn;
+
+		pDoc->SetTestMode(pDoc->m_nEngTestMode);
+
+		if (pDoc->WorkingInfo.LastJob.sModel != pDoc->m_sEngModel)
+		{
+			pDoc->WorkingInfo.LastJob.sModel = pDoc->m_sEngModel;
+			pView->m_bLoadMstInfo = TRUE;
+		}
+	}
+	else
+		return FALSE;
+
+	return TRUE;
 }

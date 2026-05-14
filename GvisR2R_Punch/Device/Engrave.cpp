@@ -3315,6 +3315,8 @@ void CEngrave::SetUltraSonicStTim()
 
 void CEngrave::SetEngItsCode()
 {
+	return;
+
 	if (!pDoc)
 		return;
 

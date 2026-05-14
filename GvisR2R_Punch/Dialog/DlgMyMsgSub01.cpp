@@ -415,3 +415,4 @@ BOOL CDlgMyMsgSub01::ThreadProc( LPVOID lpContext )
 
 	return 0;
 }
+

@@ -211,8 +211,8 @@ class CGvisR2R_PunchView : public CFormView
 	DWORD m_dwSetDlySt1[10], m_dwSetDlyEd1[10];
 
 	CString m_sShare[2], m_sBuf[2]; // [0]: AOI-Up , [1]: AOI-Dn
-	int		m_pBufSerial[2][100], m_nBufTot[2]; // [0]: AOI-Up , [1]: AOI-Dn
-	unsigned __int64 m_nBufSerialSorting[2][100]; // [0]: AOI-Up , [1]: AOI-Dn
+	int		m_pBufSerial[2][1000], m_nBufTot[2]; // [0]: AOI-Up , [1]: AOI-Dn --> 버퍼 최대 수용가능한 PCR : 1000
+	unsigned __int64 m_nBufSerialSorting[2][1000]; // [0]: AOI-Up , [1]: AOI-Dn --> 버퍼 최대 수용가능한 PCR : 1000
 	int		m_nBufSerial[2][2]; // [0]: AOI-Up , [1]: AOI-Dn // [0]: Cam0, [1]:Cam1
 
 	CString m_sDispMsg[10];
@@ -595,6 +595,7 @@ public:
 	afx_msg LRESULT OnMyMsgExit(WPARAM wPara, LPARAM lPara);
 
 	int GetLastBufferSerial(int nAoi); // 0: Up, 1: Dn
+	int GetFirstBufferSerial(int nAoi); // 0: Up, 1: Dn
 	void GetPlcParam();
 	BOOL WatiDispMain(int nDelay);
 
@@ -676,6 +677,8 @@ public:
 
 	void DispMainOnAutoStart();
 	void Delay(int mSec = 10);
+	BOOL ApplyCurrentInfoEng();
+
 
 	static UINT ThreadProc0(LPVOID lpContext); // DoMark0(), DoMark1()
 	static UINT ThreadProc1(LPVOID lpContext); // ChkCollision()

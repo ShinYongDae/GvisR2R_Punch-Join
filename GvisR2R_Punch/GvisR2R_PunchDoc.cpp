@@ -69,8 +69,8 @@ CGvisR2R_PunchDoc::CGvisR2R_PunchDoc()
 	m_bBufEmptyF[1] = FALSE; // Exist
 
 
-	// 	m_pCellRgn = NULL;
-	// 	m_pPcsRgn = NULL;
+							 // 	m_pCellRgn = NULL;
+							 // 	m_pPcsRgn = NULL;
 	m_pReelMapDisp = NULL;
 	m_pReelMap = NULL;
 	m_pReelMapUp = NULL;
@@ -234,11 +234,11 @@ CGvisR2R_PunchDoc::CGvisR2R_PunchDoc()
 	m_cSmallDefCode[28] = '?';	//	Light
 	m_cSmallDefCode[29] = '@';	//	Inner
 
-// 	for(i=19; i<MAX_DEF; i++)
-// 	{
-// 		m_cBigDefCode[i] = '?';	//	VH_DEF
-// 		m_cSmallDefCode[i] = '?';
-// 	}
+								// 	for(i=19; i<MAX_DEF; i++)
+								// 	{
+								// 		m_cBigDefCode[i] = '?';	//	VH_DEF
+								// 		m_cSmallDefCode[i] = '?';
+								// 	}
 
 	m_bUseDts = FALSE;
 	m_bUseIts = FALSE;
@@ -280,7 +280,8 @@ CGvisR2R_PunchDoc::CGvisR2R_PunchDoc()
 
 	// for ITS
 	m_bEngDualTest = TRUE;
-	m_sItsCode = _T("");
+	m_nEngTestMode = MODE_NONE;
+	m_sEngItsCode = _T("");
 	m_sEngLotNum = _T("");
 	m_sEngProcessNum = _T("");
 	m_sEngModel = _T("");
@@ -450,11 +451,11 @@ CGvisR2R_PunchDoc::~CGvisR2R_PunchDoc()
 		m_pMpeData = NULL;
 	}
 
-// 	if(m_pPrevMpeIo)
-// 	{
-// 		delete[] m_pPrevMpeIo;
-// 		m_pPrevMpeIo = NULL;
-// 	}
+	// 	if(m_pPrevMpeIo)
+	// 	{
+	// 		delete[] m_pPrevMpeIo;
+	// 		m_pPrevMpeIo = NULL;
+	// 	}
 
 	if (m_pSpecLocal)
 	{
@@ -548,7 +549,7 @@ void CGvisR2R_PunchDoc::OnDrawThumbnail(CDC& dc, LPRECT lprcBounds)
 	CString strText = _T("TODO: implement thumbnail drawing here");
 	LOGFONT lf;
 
-	CFont* pDefaultGUIFont = CFont::FromHandle((HFONT) GetStockObject(DEFAULT_GUI_FONT));
+	CFont* pDefaultGUIFont = CFont::FromHandle((HFONT)GetStockObject(DEFAULT_GUI_FONT));
 	pDefaultGUIFont->GetLogFont(&lf);
 	lf.lfHeight = 36;
 
@@ -660,7 +661,7 @@ BOOL CGvisR2R_PunchDoc::LoadIoInfo()
 	int nSeg, k;
 	CString strPath;
 
-	TCHAR sep[] = { _T(",;\r\n\t")};
+	TCHAR sep[] = { _T(",;\r\n\t") };
 	TCHAR szData[200];
 	TCHAR *token1, *token2, *token3, *token4;// , *token5;
 
@@ -921,7 +922,7 @@ BOOL CGvisR2R_PunchDoc::LoadDataInfo()
 	int nSeg, k;
 	CString strPath;
 
-	TCHAR sep[] = {_T(",;\r\n\t")};
+	TCHAR sep[] = { _T(",;\r\n\t") };
 	TCHAR szData[200];
 	TCHAR *token1, *token2, *token3;// , *token4;
 
@@ -1609,7 +1610,7 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("NO_MARKING"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.System.bNoMk = _ttoi(szData);	// 0 : 마킹모드, 1 : 비젼모드
 	else
-		WorkingInfo.System.bNoMk = FALSE;			
+		WorkingInfo.System.bNoMk = FALSE;
 
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("VerifyPunching"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.System.bVerifyPunching = _ttoi(szData);	// 0 : 마킹여부 확인 않함, 1 : 마킹여부 확인
@@ -1617,9 +1618,9 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 		WorkingInfo.System.bVerifyPunching = FALSE;
 
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("SaveMkImage"), NULL, szData, sizeof(szData), sPath))
-		WorkingInfo.System.bSaveMkImg = _ttoi(szData);	
+		WorkingInfo.System.bSaveMkImg = _ttoi(szData);
 	else
-		WorkingInfo.System.bSaveMkImg = FALSE;			
+		WorkingInfo.System.bSaveMkImg = FALSE;
 
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("SaveGrabImage"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.System.bSaveGrabImg = _ttoi(szData);
@@ -1712,7 +1713,7 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	else
 		m_nJudgeMkModelHistoSize = 300; // [um]
 
-	// 마킹 금지 구역 - Left
+										// 마킹 금지 구역 - Left
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("NoMkLeft0_Lt_X"), NULL, szData, sizeof(szData), sPath))
 		m_pntNoMkLeft[0][0].x = _ttof(szData);
 	else
@@ -2283,9 +2284,9 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	pDoc->SetMkInfo(_T("Signal"), _T("CleanRolerAoiDn"), pDoc->WorkingInfo.LastJob.bUseAoiDnCleanRoler);
 
 	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Engrave Its Code"), NULL, szData, sizeof(szData), sPath))
-		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = CString(szData);
+		m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = CString(szData);
 	else
-		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = _T("");
+		m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = _T("");
 
 	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Current ShotNum"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.LastJob.sCurrentShotNum = CString(szData);
@@ -2475,7 +2476,7 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Use Engrave Cleanner"), NULL, szData, sizeof(szData), sPath))
 		WorkingInfo.LastJob.bUseEngraveUltrasonic = _ttoi(szData);
 	else
-		WorkingInfo.LastJob.bUseEngraveUltrasonic= FALSE;
+		WorkingInfo.LastJob.bUseEngraveUltrasonic = FALSE;
 
 	pDoc->SetMkInfo(_T("Signal"), _T("UltrasonicEngrave"), pDoc->WorkingInfo.LastJob.bUseEngraveUltrasonic);
 
@@ -3883,7 +3884,10 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	if (0 < ::GetPrivateProfileString(_T("Sapp3Code"), _T("OPEN"), NULL, szData, sizeof(szData), sPath))
 		m_nSapp3Code[SAPP3_OPEN] = _ttoi(szData);
 	else
+	{
 		m_nSapp3Code[SAPP3_OPEN] = 0;
+		pView->MsgBox(_T("WorkingInfo.ini에 [Sapp3Code]항목에서 OPEN 코드가 없습니다."));
+	}
 
 	// 	if (0 < ::GetPrivateProfileString(_T("Sapp3Code"), _T("SHORT_USHORT"), NULL, szData, sizeof(szData), sPath))
 	// 		m_nSapp3Code[SAPP3_SHORT_USHORT] = _ttoi(szData);
@@ -3893,22 +3897,34 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	if (0 < ::GetPrivateProfileString(_T("Sapp3Code"), _T("SHORT"), NULL, szData, sizeof(szData), sPath))
 		m_nSapp3Code[SAPP3_SHORT] = _ttoi(szData);
 	else
+	{
 		m_nSapp3Code[SAPP3_SHORT] = 0;
+		pView->MsgBox(_T("WorkingInfo.ini에 [Sapp3Code]항목에서 SHORT 코드가 없습니다."));
+	}
 
 	if (0 < ::GetPrivateProfileString(_T("Sapp3Code"), _T("USHORT"), NULL, szData, sizeof(szData), sPath))
 		m_nSapp3Code[SAPP3_USHORT] = _ttoi(szData);
 	else
+	{
 		m_nSapp3Code[SAPP3_USHORT] = 0;
+		pView->MsgBox(_T("WorkingInfo.ini에 [Sapp3Code]항목에서 USHORT 코드가 없습니다."));
+	}
 
 	if (0 < ::GetPrivateProfileString(_T("Sapp3Code"), _T("NICK"), NULL, szData, sizeof(szData), sPath))
 		m_nSapp3Code[SAPP3_NICK] = _tstoi(szData);
 	else
+	{
 		m_nSapp3Code[SAPP3_NICK] = 0;
+		pView->MsgBox(_T("WorkingInfo.ini에 [Sapp3Code]항목에서 NICK 코드가 없습니다."));
+	}
 
 	if (0 < ::GetPrivateProfileString(_T("Sapp3Code"), _T("SPACE_EXTRA_PROTRUSION"), NULL, szData, sizeof(szData), sPath))
 		m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] = _ttoi(szData);
 	else
+	{
 		m_nSapp3Code[SAPP3_SPACE_EXTRA_PROTRUSION] = 0;
+		pView->MsgBox(_T("WorkingInfo.ini에 [Sapp3Code]항목에서 SPACE_EXTRA_PROTRUSION 코드가 없습니다."));
+	}
 
 	// 	if (0 < ::GetPrivateProfileString(_T("Sapp3Code"), _T("PINHOLE_PAD"), NULL, szData, sizeof(szData), sPath))
 	// 		m_nSapp3Code[SAPP3_PINHOLE_PAD] = _ttoi(szData);
@@ -3918,27 +3934,42 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	if (0 < ::GetPrivateProfileString(_T("Sapp3Code"), _T("PINHOLE"), NULL, szData, sizeof(szData), sPath))
 		m_nSapp3Code[SAPP3_PINHOLE] = _ttoi(szData);
 	else
+	{
 		m_nSapp3Code[SAPP3_PINHOLE] = 0;
+		pView->MsgBox(_T("WorkingInfo.ini에 [Sapp3Code]항목에서 PINHOLE 코드가 없습니다."));
+	}
 
 	if (0 < ::GetPrivateProfileString(_T("Sapp3Code"), _T("PAD"), NULL, szData, sizeof(szData), sPath))
 		m_nSapp3Code[SAPP3_PAD] = _ttoi(szData);
 	else
+	{
 		m_nSapp3Code[SAPP3_PAD] = 0;
+		pView->MsgBox(_T("WorkingInfo.ini에 [Sapp3Code]항목에서 PAD 코드가 없습니다."));
+	}
 
 	if (0 < ::GetPrivateProfileString(_T("Sapp3Code"), _T("HOPEN"), NULL, szData, sizeof(szData), sPath))
 		m_nSapp3Code[SAPP3_HOPEN] = _ttoi(szData);
 	else
+	{
 		m_nSapp3Code[SAPP3_HOPEN] = 0;
+		pView->MsgBox(_T("WorkingInfo.ini에 [Sapp3Code]항목에서 HOPEN 코드가 없습니다."));
+	}
 
 	if (0 < ::GetPrivateProfileString(_T("Sapp3Code"), _T("HMISS_HPOS_HBAD"), NULL, szData, sizeof(szData), sPath))
 		m_nSapp3Code[SAPP3_HMISS_HPOS_HBAD] = _tstoi(szData);
 	else
+	{
 		m_nSapp3Code[SAPP3_HMISS_HPOS_HBAD] = 0;
+		pView->MsgBox(_T("WorkingInfo.ini에 [Sapp3Code]항목에서 HMISS_HPOS_HBAD 코드가 없습니다."));
+	}
 
 	if (0 < ::GetPrivateProfileString(_T("Sapp3Code"), _T("VHOPEN_NOVH_VHALIGN_VHDEF"), NULL, szData, sizeof(szData), sPath))
 		m_nSapp3Code[SAPP3_VHOPEN_NOVH_VHALIGN_VHDEF] = _tstoi(szData);
 	else
+	{
 		m_nSapp3Code[SAPP3_VHOPEN_NOVH_VHALIGN_VHDEF] = 0;
+		pView->MsgBox(_T("WorkingInfo.ini에 [Sapp3Code]항목에서 VHOPEN_NOVH_VHALIGN_VHDEF 코드가 없습니다."));
+	}
 
 
 	return TRUE;
@@ -3971,10 +4002,10 @@ void CGvisR2R_PunchDoc::SetMkCntL(int nNum) // 1[year] = 31536000[sec]
 	WorkingInfo.Marking[0].nMkCnt = nNum;
 	::WritePrivateProfileString(_T("Marking0"), _T("Marking Count"), sData, sPath);
 
-//#ifdef USE_ENGRAVE
-//	if (pView && pView->m_pEngrave)
-//		pView->m_pEngrave->SetMkNumLf();	//_ItemInx::_MkNumLf
-//#endif
+	//#ifdef USE_ENGRAVE
+	//	if (pView && pView->m_pEngrave)
+	//		pView->m_pEngrave->SetMkNumLf();	//_ItemInx::_MkNumLf
+	//#endif
 }
 
 int CGvisR2R_PunchDoc::GetMkLimitL() // 1[year] = 31536000[sec]
@@ -3989,10 +4020,10 @@ void CGvisR2R_PunchDoc::SetMkLimitL(int nNum) // 1[year] = 31536000[sec]
 	WorkingInfo.Marking[0].nMkLimit = nNum;
 	::WritePrivateProfileString(_T("Marking0"), _T("Marking Limit"), sData, sPath);
 
-//#ifdef USE_ENGRAVE
-//	if (pView && pView->m_pEngrave)
-//		pView->m_pEngrave->SetMkMaxNumLf();	//_ItemInx::_MkMaxNumLf
-//#endif
+	//#ifdef USE_ENGRAVE
+	//	if (pView && pView->m_pEngrave)
+	//		pView->m_pEngrave->SetMkMaxNumLf();	//_ItemInx::_MkMaxNumLf
+	//#endif
 }
 
 int CGvisR2R_PunchDoc::GetMkCntR() // 1[year] = 31536000[sec]
@@ -4021,10 +4052,10 @@ void CGvisR2R_PunchDoc::SetMkCntR(int nNum) // 1[year] = 31536000[sec]
 	WorkingInfo.Marking[1].nMkCnt = nNum;
 	::WritePrivateProfileString(_T("Marking1"), _T("Marking Count"), sData, sPath);
 
-//#ifdef USE_ENGRAVE
-//	if (pView && pView->m_pEngrave)
-//		pView->m_pEngrave->SetMkNumRt();	//_ItemInx::_MkNumRt
-//#endif
+	//#ifdef USE_ENGRAVE
+	//	if (pView && pView->m_pEngrave)
+	//		pView->m_pEngrave->SetMkNumRt();	//_ItemInx::_MkNumRt
+	//#endif
 }
 
 int CGvisR2R_PunchDoc::GetMkLimitR() // 1[year] = 31536000[sec]
@@ -4039,10 +4070,10 @@ void CGvisR2R_PunchDoc::SetMkLimitR(int nNum) // 1[year] = 31536000[sec]
 	WorkingInfo.Marking[1].nMkLimit = nNum;
 	::WritePrivateProfileString(_T("Marking1"), _T("Marking Limit"), sData, sPath);
 
-//#ifdef USE_ENGRAVE
-//	if (pView && pView->m_pEngrave)
-//		pView->m_pEngrave->SetMkMaxNumRt();	//_ItemInx::_MkMaxNumRt
-//#endif
+	//#ifdef USE_ENGRAVE
+	//	if (pView && pView->m_pEngrave)
+	//		pView->m_pEngrave->SetMkMaxNumRt();	//_ItemInx::_MkMaxNumRt
+	//#endif
 }
 
 void CGvisR2R_PunchDoc::SaveWorkingInfo()
@@ -4676,7 +4707,7 @@ BOOL CGvisR2R_PunchDoc::InitReelmap()
 		}
 		m_pReelMapAllDn = new CReelMap(RMAP_ALLDN, MAX_DISP_PNL, nTotPcs);
 
-		if(pDoc->GetTestMode() != MODE_OUTER)
+		if (pDoc->GetTestMode() != MODE_OUTER)
 			m_pReelMap = m_pReelMapAllUp;
 		else
 		{
@@ -4756,7 +4787,7 @@ BOOL CGvisR2R_PunchDoc::InitReelmapUp()
 		m_pReelMapAllUp = new CReelMap(RMAP_ALLUP, MAX_DISP_PNL, nTotPcs);
 
 		if (pDoc->GetTestMode() != MODE_OUTER)
- 			m_pReelMap = m_pReelMapAllUp;
+			m_pReelMap = m_pReelMapAllUp;
 		else
 		{
 			if (m_pReelMapIts)
@@ -4765,7 +4796,7 @@ BOOL CGvisR2R_PunchDoc::InitReelmapUp()
 				m_pReelMapIts = NULL;
 			}
 			m_pReelMapIts = new CReelMap(RMAP_ITS, MAX_DISP_PNL, nTotPcs); // Default: RMAP_NONE (RMAP_INNER -> RMAP_INNER_UP)
-				m_pReelMap = m_pReelMapIts;
+			m_pReelMap = m_pReelMapIts;
 		}
 	}
 	else
@@ -5246,7 +5277,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoUp(int nSerial, int *pNewLot, BOOL bFromBuf) /
 
 	if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[0].sItsCode && !Status.PcrShare[0].sItsCode.IsEmpty())
 	{
-		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[0].sItsCode;
+		m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[0].sItsCode;
 		sMsg.Format(_T("ITS Change %s"), Status.PcrShare[0].sItsCode);
 		pDoc->LogAuto(sMsg);
 	}
@@ -5262,24 +5293,24 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoUp(int nSerial, int *pNewLot, BOOL bFromBuf) /
 		bUpdate = TRUE;
 		//if (WorkingInfo.LastJob.sLot != Status.PcrShare[0].sLot)
 		//{
-			WorkingInfo.LastJob.sLot = Status.PcrShare[0].sLot;
-			//if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[0].sItsCode)
-			//{
-			//	m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[0].sItsCode;
-			//	sMsg.Format(_T("ITS%s Lot%s SN:%d"), Status.PcrShare[0].sItsCode, Status.PcrShare[0].sLot, nSerial);
-			//	pDoc->LogAuto(sMsg);
-			//}
-			//else
-			//{
-				sMsg.Format(_T("Lot Change %s"), Status.PcrShare[0].sLot);
-				pDoc->LogAuto(sMsg);
-			//}
+		WorkingInfo.LastJob.sLot = Status.PcrShare[0].sLot;
+		//if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[0].sItsCode)
+		//{
+		//	m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[0].sItsCode;
+		//	sMsg.Format(_T("ITS%s Lot%s SN:%d"), Status.PcrShare[0].sItsCode, Status.PcrShare[0].sLot, nSerial);
+		//	pDoc->LogAuto(sMsg);
+		//}
+		//else
+		//{
+		sMsg.Format(_T("Lot Change %s"), Status.PcrShare[0].sLot);
+		pDoc->LogAuto(sMsg);
+		//}
 		//}
 		//else
 		//{
 		//	if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[0].sItsCode)
 		//	{
-		//		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[0].sItsCode;
+		//		m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[0].sItsCode;
 		//		sMsg.Format(_T("ITS Change %s"), Status.PcrShare[0].sItsCode);
 		//		pDoc->LogAuto(sMsg);
 		//	}
@@ -5357,7 +5388,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoUp(int nSerial, int *pNewLot, BOOL bFromBuf) /
 				return FALSE; // TRUE: CHANGED, FALSE: NO CHANGED 
 			}
 
-			if(m_pReelMapInnerUp)
+			if (m_pReelMapInnerUp)
 				m_pReelMapInnerUp->ResetReelmapPath();
 
 			if (bDualTestInner)
@@ -5483,11 +5514,11 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoDn(int nSerial, int *pNewLot, BOOL bFromBuf) /
 	}
 
 	BOOL bUpdate = FALSE;
-	CString sMsg; 
-	
+	CString sMsg;
+
 	if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[1].sItsCode && !Status.PcrShare[1].sItsCode.IsEmpty())
 	{
-		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[1].sItsCode;
+		m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[1].sItsCode;
 		sMsg.Format(_T("ITS Change %s"), Status.PcrShare[1].sItsCode);
 		pDoc->LogAuto(sMsg);
 	}
@@ -5505,7 +5536,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoDn(int nSerial, int *pNewLot, BOOL bFromBuf) /
 		//{
 		//	if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[1].sItsCode)
 		//	{
-		//		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[1].sItsCode;
+		//		m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[1].sItsCode;
 		//		sMsg.Format(_T("ITS%s Lot%s SN:%d"), Status.PcrShare[1].sItsCode, Status.PcrShare[1].sLot, nSerial);
 		//		pDoc->LogAuto(sMsg);
 		//	}
@@ -5520,7 +5551,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiInfoDn(int nSerial, int *pNewLot, BOOL bFromBuf) /
 		//{
 		//	if (WorkingInfo.LastJob.sEngItsCode != Status.PcrShare[1].sItsCode)
 		//	{
-		//		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[1].sItsCode;
+		//		m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = Status.PcrShare[1].sItsCode;
 		//		sMsg.Format(_T("ITS Change %s"), Status.PcrShare[1].sItsCode);
 		//		pDoc->LogAuto(sMsg);
 		//	}
@@ -5854,7 +5885,7 @@ int CGvisR2R_PunchDoc::LoadPCRAllUp(int nSerial, BOOL bFromShare)	// return : 2(
 
 	int nPcsId;
 	int nTotVerifyed[2] = { 0 };												// nPcsId : CamMaster Pcs Index
-															//pPcrMgr테이블의 nIdx에 하면의 불량을 먼저 기록하고 상면의 불량을 엎어서 최종 merge불량 테이블을 만듬.
+																				//pPcrMgr테이블의 nIdx에 하면의 불량을 먼저 기록하고 상면의 불량을 엎어서 최종 merge불량 테이블을 만듬.
 	for (i = 0; i < nTotDef[1]; i++)						// 하면 불량 피스 수
 	{
 		if (m_pPcr[1][nIdx]->m_pMk[i] != -2)				// -2 (NoMarking)
@@ -6264,13 +6295,13 @@ int CGvisR2R_PunchDoc::LoadPCRUp(int nSerial, BOOL bFromShare)	// return : 2(Fai
 	strFileData.Delete(0, nTemp + 1);
 	nFileSize = nFileSize - nTemp - 1;
 
-	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER)
+	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER || pDoc->GetTestMode() == MODE_ITS)
 	{
 		pDoc->m_sEngModel = strModel;
 		pDoc->m_sEngLotNum = strLot;
 		pDoc->m_sEngLayerUp = strLayer;
 		if (WorkingInfo.System.bUseITS)
-			pDoc->m_sItsCode = sItsCode;
+			pDoc->m_sEngItsCode = sItsCode;
 	}
 
 	BOOL bUpdate = FALSE;
@@ -6278,7 +6309,7 @@ int CGvisR2R_PunchDoc::LoadPCRUp(int nSerial, BOOL bFromShare)	// return : 2(Fai
 
 	if (WorkingInfo.LastJob.sEngItsCode != sItsCode && !sItsCode.IsEmpty())
 	{
-		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
 		sMsg.Format(_T("ITS Change %s"), sItsCode);
 		pDoc->LogAuto(sMsg);
 	}
@@ -6294,26 +6325,26 @@ int CGvisR2R_PunchDoc::LoadPCRUp(int nSerial, BOOL bFromShare)	// return : 2(Fai
 		bUpdate = TRUE;
 		//if (WorkingInfo.LastJob.sLot != strLot)
 		//{
-			WorkingInfo.LastJob.sLot = strLot;
-			if(pView->m_pEngrave)
-				pView->m_pEngrave->SetLotName();
-			//if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
-			//{
-			//	m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
-			//	sMsg.Format(_T("ITS%s Lot%s SN:%d"), sItsCode, strLot, nSerial);
-			//	pDoc->LogAuto(sMsg);
-			//}
-			//else
-			//{
-				sMsg.Format(_T("Lot Change %s"), strLot);
-				pDoc->LogAuto(sMsg);
-			//}
+		WorkingInfo.LastJob.sLot = strLot;
+		if (pView->m_pEngrave)
+			pView->m_pEngrave->SetLotName();
+		//if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
+		//{
+		//	m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		//	sMsg.Format(_T("ITS%s Lot%s SN:%d"), sItsCode, strLot, nSerial);
+		//	pDoc->LogAuto(sMsg);
+		//}
+		//else
+		//{
+		sMsg.Format(_T("Lot Change %s"), strLot);
+		pDoc->LogAuto(sMsg);
+		//}
 		//}
 		//else
 		//{
 		//	if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
 		//	{
-		//		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		//		m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
 		//		sMsg.Format(_T("ITS Change %s"), sItsCode);
 		//		pDoc->LogAuto(sMsg);
 		//	}
@@ -6411,7 +6442,7 @@ int CGvisR2R_PunchDoc::LoadPCRUp(int nSerial, BOOL bFromShare)	// return : 2(Fai
 
 			m_pPcr[0][nIdx]->m_pLayer[i] = 0; // Up
 
-			// BadPointPosX
+											  // BadPointPosX
 			nTemp = strFileData.Find(',', 0);
 			strBadPointPosX = strFileData.Left(nTemp);
 			strFileData.Delete(0, nTemp + 1);
@@ -6597,7 +6628,7 @@ int CGvisR2R_PunchDoc::LoadPCRDn(int nSerial, BOOL bFromShare)	// return : 2(Fai
 		pDoc->m_sEngLotNum = strLot;
 		pDoc->m_sEngLayerDn = strLayer;
 		if (WorkingInfo.System.bUseITS)
-			pDoc->m_sItsCode = sItsCode;
+			pDoc->m_sEngItsCode = sItsCode;
 	}
 
 	BOOL bUpdate = FALSE;
@@ -6605,7 +6636,7 @@ int CGvisR2R_PunchDoc::LoadPCRDn(int nSerial, BOOL bFromShare)	// return : 2(Fai
 
 	if (WorkingInfo.LastJob.sEngItsCode != sItsCode && !sItsCode.IsEmpty())
 	{
-		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
 		sMsg.Format(_T("ITS Change %s"), sItsCode);
 		pDoc->LogAuto(sMsg);
 	}
@@ -6622,26 +6653,26 @@ int CGvisR2R_PunchDoc::LoadPCRDn(int nSerial, BOOL bFromShare)	// return : 2(Fai
 		bUpdate = TRUE;
 		//if (WorkingInfo.LastJob.sLot != strLot)
 		//{
-			WorkingInfo.LastJob.sLot = strLot;
-			if (pView->m_pEngrave)
-				pView->m_pEngrave->SetLotName();
-			//if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
-			//{
-			//	m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
-			//	sMsg.Format(_T("ITS%s Lot%s SN:%d"), sItsCode, strLot, nSerial);
-			//	pDoc->LogAuto(sMsg);
-			//}
-			//else
-			//{
-			sMsg.Format(_T("Lot Change %s"), strLot);
-			pDoc->LogAuto(sMsg);
-			//}
+		WorkingInfo.LastJob.sLot = strLot;
+		if (pView->m_pEngrave)
+			pView->m_pEngrave->SetLotName();
+		//if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
+		//{
+		//	m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		//	sMsg.Format(_T("ITS%s Lot%s SN:%d"), sItsCode, strLot, nSerial);
+		//	pDoc->LogAuto(sMsg);
+		//}
+		//else
+		//{
+		sMsg.Format(_T("Lot Change %s"), strLot);
+		pDoc->LogAuto(sMsg);
+		//}
 		//}
 		//else
 		//{
 		//	if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
 		//	{
-		//		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		//		m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
 		//		sMsg.Format(_T("ITS Change %s"), sItsCode);
 		//		pDoc->LogAuto(sMsg);
 		//	}
@@ -6708,7 +6739,7 @@ int CGvisR2R_PunchDoc::LoadPCRDn(int nSerial, BOOL bFromShare)	// return : 2(Fai
 
 			m_pPcr[1][nIdx]->m_pLayer[i] = 1; // Dn
 
-			// BadPointPosX
+											  // BadPointPosX
 			nTemp = strFileData.Find(',', 0);
 			strBadPointPosX = strFileData.Left(nTemp);
 			strFileData.Delete(0, nTemp + 1);
@@ -7712,10 +7743,10 @@ void CGvisR2R_PunchDoc::SetOnePnlLen(double dLen)
 	long lData = (long)(dLen * 1000.0);
 	pView->MpeWrite(pView->Plc.DlgInfo.OneShotLength, lData);	// 한 판넬 길이 (단위 mm * 1000)
 
-//#ifdef USE_ENGRAVE
-//	if (pView && pView->m_pEngrave)
-//		pView->m_pEngrave->SetOnePnlLen();	//_ItemInx::_OnePnlLen
-//#endif
+																//#ifdef USE_ENGRAVE
+																//	if (pView && pView->m_pEngrave)
+																//		pView->m_pEngrave->SetOnePnlLen();	//_ItemInx::_OnePnlLen
+																//#endif
 }
 
 double CGvisR2R_PunchDoc::GetOnePnlLen()
@@ -7746,10 +7777,10 @@ void CGvisR2R_PunchDoc::SetFdJogVel(double dVel)
 	long lData = (long)(dVel * 1000.0);
 	pView->MpeWrite(pView->Plc.DlgMenu04.FeedOnSpeed, lData);	// 연속공급 속도 (단위 mm/sec * 1000)
 
-//#ifdef USE_ENGRAVE
-//	if (pView && pView->m_pEngrave)
-//		pView->m_pEngrave->SetFdVel();	//_ItemInx::_FdVel
-//#endif
+																//#ifdef USE_ENGRAVE
+																//	if (pView && pView->m_pEngrave)
+																//		pView->m_pEngrave->SetFdVel();	//_ItemInx::_FdVel
+																//#endif
 }
 
 void CGvisR2R_PunchDoc::SetFdJogAcc(double dVel)
@@ -7763,10 +7794,10 @@ void CGvisR2R_PunchDoc::SetFdJogAcc(double dVel)
 	long lData = (long)(dVel * 1000.0);
 	pView->MpeWrite(pView->Plc.DlgMenu04.FeedOnAcc, lData);	// 연속공급 가속도 (단위 mm/s^2 * 1000)
 
-//#ifdef USE_ENGRAVE
-//	if (pView && pView->m_pEngrave)
-//		pView->m_pEngrave->SetFdAcc();	//_ItemInx::_FdAcc
-//#endif
+															//#ifdef USE_ENGRAVE
+															//	if (pView && pView->m_pEngrave)
+															//		pView->m_pEngrave->SetFdAcc();	//_ItemInx::_FdAcc
+															//#endif
 }
 
 double CGvisR2R_PunchDoc::GetOnePnlVel()
@@ -7795,10 +7826,10 @@ void CGvisR2R_PunchDoc::SetOnePnlAcc(double dAcc)
 	long lData = (long)(dAcc * 1000.0);
 	pView->MpeWrite(pView->Plc.DlgMenu04.FeedAcc, lData);	// 한 판넬 Feeding 가속도 (단위 mm/s^2 * 1000)
 
-//#ifdef USE_ENGRAVE
-//	if (pView && pView->m_pEngrave)
-//		pView->m_pEngrave->SetOnePnlAcc();	//_ItemInx::_OnePnlAcc
-//#endif
+															//#ifdef USE_ENGRAVE
+															//	if (pView && pView->m_pEngrave)
+															//		pView->m_pEngrave->SetOnePnlAcc();	//_ItemInx::_OnePnlAcc
+															//#endif
 }
 
 double CGvisR2R_PunchDoc::GetOnePnlAcc()
@@ -7826,7 +7857,7 @@ void CGvisR2R_PunchDoc::SetAoiFdPitch(double dPitch)
 	::WritePrivateProfileString(_T("Motion"), _T("AOI_FEEDING_DRUM_LEAD_PITCH"), sVal, sPath);
 	long lData = (long)(dPitch * 1000.0);
 	pView->MpeWrite(pView->Plc.DlgMenu04.FeedLeadPitchAoi, lData);	// 검사부 Feeding 롤러 Lead Pitch (단위 mm * 1000)
-	//pView->MpeWrite(pView->Plc.DlgMenu04.FeedLeadPitchEngrave, lData);	// 검사부 Feeding 롤러 Lead Pitch (단위 mm * 1000)
+																	//pView->MpeWrite(pView->Plc.DlgMenu04.FeedLeadPitchEngrave, lData);	// 검사부 Feeding 롤러 Lead Pitch (단위 mm * 1000)
 }
 
 double CGvisR2R_PunchDoc::GetAoiFdPitch()
@@ -7858,10 +7889,10 @@ void CGvisR2R_PunchDoc::SetFdErrLmt(double dLmt)
 	WorkingInfo.Motion.sLmtFdErr = sVal;
 	::WritePrivateProfileString(_T("Motion"), _T("ADJUST_LIMIT_FEEDING_ERROR_VAL"), sVal, sPath);
 
-//#ifdef USE_ENGRAVE
-//	if (pView && pView->m_pEngrave)
-//		pView->m_pEngrave->SetFdDiffMax();	//_ItemInx::_FdDiffMax
-//#endif
+	//#ifdef USE_ENGRAVE
+	//	if (pView && pView->m_pEngrave)
+	//		pView->m_pEngrave->SetFdDiffMax();	//_ItemInx::_FdDiffMax
+	//#endif
 }
 
 double CGvisR2R_PunchDoc::GetFdErrLmt()
@@ -7877,10 +7908,10 @@ void CGvisR2R_PunchDoc::SetFdErrRng(double dRng)
 	WorkingInfo.Motion.sLmtFdAdjOffSet = sVal;
 	::WritePrivateProfileString(_T("Motion"), _T("ADJUST_LIMIT_FEEDING_OFFSET"), sVal, sPath);
 
-//#ifdef USE_ENGRAVE
-//	if (pView && pView->m_pEngrave)
-//		pView->m_pEngrave->SetFdDiffRng();	//_ItemInx::_FdDiffRng
-//#endif
+	//#ifdef USE_ENGRAVE
+	//	if (pView && pView->m_pEngrave)
+	//		pView->m_pEngrave->SetFdDiffRng();	//_ItemInx::_FdDiffRng
+	//#endif
 }
 
 double CGvisR2R_PunchDoc::GetFdErrRng()
@@ -7896,10 +7927,10 @@ void CGvisR2R_PunchDoc::SetFdErrNum(int nNum)
 	WorkingInfo.Motion.sLmtFdOvrNum = sVal;
 	::WritePrivateProfileString(_T("Motion"), _T("ADJUST_LIMIT_FEEDING_OVER_NUM"), sVal, sPath);
 
-//#ifdef USE_ENGRAVE
-//	if (pView && pView->m_pEngrave)
-//		pView->m_pEngrave->SetFdDiffNum();	//_ItemInx::_FdDiffNum
-//#endif
+	//#ifdef USE_ENGRAVE
+	//	if (pView && pView->m_pEngrave)
+	//		pView->m_pEngrave->SetFdDiffNum();	//_ItemInx::_FdDiffNum
+	//#endif
 }
 
 int CGvisR2R_PunchDoc::GetFdErrNum()
@@ -7916,10 +7947,10 @@ void CGvisR2R_PunchDoc::SetBufInitPos(double dPos)
 	long lData = (long)(dPos * 1000.0);
 	pView->MpeWrite(pView->Plc.DlgMenu04.BufferPosStAoi, lData);	// 버퍼 관련 설정 롤러 초기위치(단위 mm * 1000)
 
-//#ifdef USE_ENGRAVE
-//	if (pView && pView->m_pEngrave)
-//		pView->m_pEngrave->SetMkBuffInitPos();	//_ItemInx::_MkBuffInitPos
-//#endif
+																	//#ifdef USE_ENGRAVE
+																	//	if (pView && pView->m_pEngrave)
+																	//		pView->m_pEngrave->SetMkBuffInitPos();	//_ItemInx::_MkBuffInitPos
+																	//#endif
 }
 
 void CGvisR2R_PunchDoc::SetEngBufInitPos(double dPos)
@@ -7958,10 +7989,10 @@ void CGvisR2R_PunchDoc::SetAoiMkDist(double dLen)
 	long lData = (long)(dLen * 1000.0);
 	pView->MpeWrite(pView->Plc.DlgMenu04.FeedLengthFromAoiToPunch, lData);	// AOI(하)에서 마킹까지 거리 (단위 mm * 1000)
 
-//#ifdef USE_ENGRAVE
-//	if (pView && pView->m_pEngrave)
-//		pView->m_pEngrave->SetAoiMkLen();	//_ItemInx::_AoiMkLen
-//#endif
+																			//#ifdef USE_ENGRAVE
+																			//	if (pView && pView->m_pEngrave)
+																			//		pView->m_pEngrave->SetAoiMkLen();	//_ItemInx::_AoiMkLen
+																			//#endif
 }
 
 void CGvisR2R_PunchDoc::SetAoiAoiDist(int nShot)
@@ -8431,7 +8462,7 @@ void CGvisR2R_PunchDoc::SetTotalReelDist(double dDist)
 	::WritePrivateProfileString(_T("Last Job"), _T("Reel Total Length"), sData, PATH_WORKING_INFO);
 
 	long lData = (long)(dDist * 1000.0);
-	if(pView && pView->m_pMpe)
+	if (pView && pView->m_pMpe)
 		pView->MpeWrite(pView->Plc.DlgInfo.TotalReelLength, lData);	// 전체 Reel 길이 (단위 M * 1000)
 }
 
@@ -8623,7 +8654,7 @@ void CGvisR2R_PunchDoc::DelSharePcrUp()
 
 	if (m_pFile)
 	{
-		while(m_pFile->IsPcrExist(sPath))
+		while (m_pFile->IsPcrExist(sPath))
 		{
 			m_pFile->DelPcrAll(sPath);
 			Sleep(30);
@@ -9208,7 +9239,7 @@ BOOL CGvisR2R_PunchDoc::GetAoiDnOffset(CfPoint &OfSt)
 	//if (finder.FindFile(sPath))
 	{
 		if (0 < ::GetPrivateProfileString(_T("OFFSET"), _T("ALIGN X"), NULL, szData, sizeof(szData), sPath))
-		OfSt.x = -1.0*_tstof(szData);
+			OfSt.x = -1.0*_tstof(szData);
 		else
 		{
 			OfSt.x = 0.0;
@@ -9880,7 +9911,7 @@ void CGvisR2R_PunchDoc::WriteElecData(CString sData)
 	nSerial = pView->m_nBufUpSerial[1];
 
 	sPnl.Format(_T("%04d"), nSerial);
-	::WritePrivateProfileString( sLot, sPnl, sData, strDestPath );
+	::WritePrivateProfileString(sLot, sPnl, sData, strDestPath);
 }
 
 double CGvisR2R_PunchDoc::GetEngraveAoiDist()
@@ -10068,75 +10099,71 @@ int CGvisR2R_PunchDoc::GetTestMode()
 
 void CGvisR2R_PunchDoc::SetTestMode(int nMode)
 {
-	//if (!pView->m_bJoinContinue)
+	WorkingInfo.LastJob.nTestMode = nMode; // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2, MODE_LASER = 3, MODE_ITS = 4
+
+	CString sData;
+	sData.Format(_T("%d"), nMode);
+	::WritePrivateProfileString(_T("Last Job"), _T("Test Mode"), sData, PATH_WORKING_INFO);
+
+	CString sPath = WorkingInfo.System.sPathMkCurrInfo;
+
+	if (sPath.IsEmpty())
+		return;
+
+	::WritePrivateProfileString(_T("Infomation"), _T("Test Mode"), sData, sPath);
+
+	::WritePrivateProfileString(_T("Infomation"), _T("Lot End"), _T("0"), sPath);
+	::WritePrivateProfileString(_T("Infomation"), _T("Last Shot"), _T("10000"), pDoc->WorkingInfo.System.sPathMkCurrInfo);
+
+	if (pView && pView->m_pMpe)
 	{
-		WorkingInfo.LastJob.nTestMode = nMode; // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2 .
-
-		CString sData;
-		sData.Format(_T("%d"), nMode);
-		::WritePrivateProfileString(_T("Last Job"), _T("Test Mode"), sData, PATH_WORKING_INFO);
-
-		CString sPath = WorkingInfo.System.sPathMkCurrInfo;
-
-		if (sPath.IsEmpty())
-			return;
-
-		::WritePrivateProfileString(_T("Infomation"), _T("Test Mode"), sData, sPath);
-
-		::WritePrivateProfileString(_T("Infomation"), _T("Lot End"), _T("0"), sPath);
-		::WritePrivateProfileString(_T("Infomation"), _T("Last Shot"), _T("10000"), pDoc->WorkingInfo.System.sPathMkCurrInfo);
-
-		if (pView && pView->m_pMpe)
+		if (pDoc->GetTestMode() == MODE_INNER)
 		{
-			if (pDoc->GetTestMode() == MODE_INNER)
-			{
-				pView->MpeWrite(_T("MB40009A"), 0);															// 각인부 사용
-				pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 1);// 내층 검사 사용/미사용 
-				pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 0);// 외층 검사 사용/미사용
-				pDoc->SetMkInfo(_T("Signal"), _T("Inner Test On"), TRUE);
-				pDoc->SetMkInfo(_T("Signal"), _T("Outer Test On"), FALSE);
-				if (pView->m_pDlgMenu01)
-					pView->m_pDlgMenu01->EnableItsMode(FALSE);
-			}
-			else if (pDoc->GetTestMode() == MODE_OUTER)
-			{
-				pView->MpeWrite(_T("MB40009A"), 1);															// 각인부 미사용
-				pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 0);// 내층 검사 사용/미사용
-				pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 1);// 외층 검사 사용/미사용
-				pDoc->SetMkInfo(_T("Signal"), _T("Inner Test On"), FALSE);
-				pDoc->SetMkInfo(_T("Signal"), _T("Outer Test On"), TRUE);
-				if (pView->m_pDlgMenu01)
-					pView->m_pDlgMenu01->EnableItsMode();
-			}
-			else if(pDoc->GetTestMode() == MODE_LASER)
-			{
-				pView->MpeWrite(_T("MB40009A"), 0);															// 각인부 사용
-				pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 0);// 내층 검사 사용/미사용
-				pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 0);// 외층 검사 사용/미사용
-				pDoc->SetMkInfo(_T("Signal"), _T("Inner Test On"), FALSE);
-				pDoc->SetMkInfo(_T("Signal"), _T("Outer Test On"), FALSE);
-				if (pView->m_pDlgMenu01)
-					pView->m_pDlgMenu01->EnableItsMode(FALSE);
-			}
-			else
-			{
-				pView->MpeWrite(_T("MB40009A"), 1);															// 각인부 미사용
-				pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 0);// 내층 검사 사용/미사용
-				pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 0);// 외층 검사 사용/미사용
-				pDoc->SetMkInfo(_T("Signal"), _T("Inner Test On"), FALSE);
-				pDoc->SetMkInfo(_T("Signal"), _T("Outer Test On"), FALSE);
-				if (pView->m_pDlgMenu01)
-					pView->m_pDlgMenu01->EnableItsMode(FALSE);
-			}
+			pView->MpeWrite(_T("MB40009A"), 0);															// 각인부 사용
+			pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 1);// 내층 검사 사용/미사용 
+			pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 0);// 외층 검사 사용/미사용
+			pDoc->SetMkInfo(_T("Signal"), _T("Inner Test On"), TRUE);
+			pDoc->SetMkInfo(_T("Signal"), _T("Outer Test On"), FALSE);
+			if (pView->m_pDlgMenu01)
+				pView->m_pDlgMenu01->EnableItsMode(FALSE);
+		}
+		else if (pDoc->GetTestMode() == MODE_OUTER)
+		{
+			pView->MpeWrite(_T("MB40009A"), 1);															// 각인부 미사용
+			pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 0);// 내층 검사 사용/미사용
+			pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 1);// 외층 검사 사용/미사용
+			pDoc->SetMkInfo(_T("Signal"), _T("Inner Test On"), FALSE);
+			pDoc->SetMkInfo(_T("Signal"), _T("Outer Test On"), TRUE);
+			if (pView->m_pDlgMenu01)
+				pView->m_pDlgMenu01->EnableItsMode();
+		}
+		else if (pDoc->GetTestMode() == MODE_LASER)
+		{
+			pView->MpeWrite(_T("MB40009A"), 0);															// 각인부 사용
+			pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 0);// 내층 검사 사용/미사용
+			pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 0);// 외층 검사 사용/미사용
+			pDoc->SetMkInfo(_T("Signal"), _T("Inner Test On"), FALSE);
+			pDoc->SetMkInfo(_T("Signal"), _T("Outer Test On"), FALSE);
+			if (pView->m_pDlgMenu01)
+				pView->m_pDlgMenu01->EnableItsMode(FALSE);
+		}
+		else
+		{
+			pView->MpeWrite(_T("MB40009A"), 1);															// 각인부 미사용
+			pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 0);// 내층 검사 사용/미사용
+			pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 0);// 외층 검사 사용/미사용
+			pDoc->SetMkInfo(_T("Signal"), _T("Inner Test On"), FALSE);
+			pDoc->SetMkInfo(_T("Signal"), _T("Outer Test On"), FALSE);
+			if (pView->m_pDlgMenu01)
+				pView->m_pDlgMenu01->EnableItsMode(FALSE);
 		}
 	}
-
 }
 
 
 void CGvisR2R_PunchDoc::SetEngItsCode(CString sItsCode)
 {
-	m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+	m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
 	::WritePrivateProfileString(_T("Last Job"), _T("Engrave Its Code"), sItsCode, PATH_WORKING_INFO);
 }
 
@@ -10216,19 +10243,27 @@ BOOL CGvisR2R_PunchDoc::GetCurrentInfoEng()
 #ifdef TEST_MODE
 	return bRtn;
 #endif
-	if (sPath.IsEmpty() || (GetTestMode() != MODE_INNER && GetTestMode() != MODE_OUTER))
+	if (sPath.IsEmpty() || (GetTestMode() != MODE_INNER && GetTestMode() != MODE_OUTER && GetTestMode() != MODE_LASER && GetTestMode() != MODE_ITS))
 		return bRtn;
-	
+
 #ifndef TEST_MODE
 	CString sMsg;
 	CFileFind finder;
 	if (finder.FindFile(sPath))
 	{
+		if (0 < ::GetPrivateProfileString(_T("Infomation"), _T("Test Mode"), NULL, szData, sizeof(szData), sPath)) // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2, MODE_LASER = 3, MODE_ITS = 4
+			m_nEngTestMode = _ttoi(szData) > 0 ? TRUE : FALSE;
+		else
+			m_nEngTestMode = MODE_NONE;
+
+
 		if (0 < ::GetPrivateProfileString(_T("Infomation"), _T("Dual Test"), NULL, szData, sizeof(szData), sPath))
 			m_bEngDualTest = _ttoi(szData) > 0 ? TRUE : FALSE;
+		else
+			m_bEngDualTest = TRUE;
 
 		if (0 < ::GetPrivateProfileString(_T("Infomation"), _T("Its Code"), NULL, szData, sizeof(szData), sPath))
-			m_sItsCode = CString(szData);
+			m_sEngItsCode = CString(szData);
 
 		if (0 < ::GetPrivateProfileString(_T("Infomation"), _T("Current Lot"), NULL, szData, sizeof(szData), sPath))
 			m_sEngLotNum = CString(szData);
@@ -10248,7 +10283,7 @@ BOOL CGvisR2R_PunchDoc::GetCurrentInfoEng()
 				m_sEngLayerDn = CString(szData);
 		}
 
-		if (m_sItsCode.IsEmpty() || m_sEngLotNum.IsEmpty() || m_sEngModel.IsEmpty() || m_sEngLayerUp.IsEmpty())
+		if (m_sEngItsCode.IsEmpty() || m_sEngLotNum.IsEmpty() || m_sEngModel.IsEmpty() || m_sEngLayerUp.IsEmpty())
 			return bRtn;
 	}
 	else
@@ -10634,8 +10669,8 @@ int CGvisR2R_PunchDoc::Rotate180(int nPcsId) // 180도 회전
 		else
 			nRow = nNodeY * (nNodeX - nCol) - nPcsId - 1; // 0 ~
 
-		//nR = (nNodeY - 1) - nRow; // 0 ~
-		//nC = (nNodeX - 1) - nCol; // 0 ~
+														  //nR = (nNodeY - 1) - nRow; // 0 ~
+														  //nC = (nNodeX - 1) - nCol; // 0 ~
 		nR = nRow;
 		nC = nCol;
 
@@ -10652,8 +10687,8 @@ int CGvisR2R_PunchDoc::Rotate180(int nPcsId) // 180도 회전
 		else
 			nRow = nPcsId - nNodeY * (nNodeX - nCol - 1); // 0 ~
 
-		//nR = (nNodeY - 1) - nRow; // 0 ~
-		//nC = (nNodeX - 1) - nCol; // 0 ~
+														  //nR = (nNodeY - 1) - nRow; // 0 ~
+														  //nC = (nNodeX - 1) - nCol; // 0 ~
 		nR = nRow;
 		nC = nCol;
 
@@ -10675,7 +10710,7 @@ BOOL CGvisR2R_PunchDoc::SetItsSerialInfo(int nItsSerial)
 
 	Path[0] = pDoc->WorkingInfo.System.sPathItsFile;
 	Path[1] = pDoc->m_sEngModel;
-	Path[2] = pDoc->m_sItsCode;
+	Path[2] = pDoc->m_sEngItsCode;
 	Path[3] = pDoc->m_sEngLotNum;
 	Path[4] = pDoc->m_sEngLayerUp;
 	Path[5] = pDoc->m_sEngLayerDn;
@@ -10703,7 +10738,7 @@ BOOL CGvisR2R_PunchDoc::SetItsSerialInfo(int nItsSerial)
 	if (!pDoc->DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
 
-	sName.Format(_T("%s.txt"), pDoc->m_sItsCode);
+	sName.Format(_T("%s.txt"), pDoc->m_sEngItsCode);
 	sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], sName); // ITS_Code.txt
 
 	CString sItsSerail;
@@ -10716,7 +10751,7 @@ BOOL CGvisR2R_PunchDoc::SetItsSerialInfo(int nItsSerial)
 	::WritePrivateProfileString(sItsSerail, _T("Dual Test"), str, sPath);
 	::WritePrivateProfileString(sItsSerail, _T("Process Unit Code"), pDoc->m_sEngProcessNum, sPath);
 	::WritePrivateProfileString(sItsSerail, _T("Current Model"), pDoc->m_sEngModel, sPath);
-	::WritePrivateProfileString(sItsSerail, _T("Its Code"), pDoc->m_sItsCode, sPath);
+	::WritePrivateProfileString(sItsSerail, _T("Its Code"), pDoc->m_sEngItsCode, sPath);
 	::WritePrivateProfileString(sItsSerail, _T("Current Lot"), pDoc->m_sEngLotNum, sPath);
 	::WritePrivateProfileString(sItsSerail, _T("Current Layer Up"), pDoc->m_sEngLayerUp, sPath);
 
@@ -10734,9 +10769,9 @@ int CGvisR2R_PunchDoc::SearchFirstShotOnIts()
 
 	Path[0] = pDoc->WorkingInfo.System.sPathItsFile;
 	Path[1] = pDoc->WorkingInfo.LastJob.sModel;
-	Path[2] = pDoc->m_sItsCode;
+	Path[2] = pDoc->m_sEngItsCode;
 
-	sName.Format(_T("%s.txt"), pDoc->m_sItsCode);
+	sName.Format(_T("%s.txt"), pDoc->m_sEngItsCode);
 	sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], sName); // ITS_Code.txt
 
 	CDataFile *pDataFile = new CDataFile;
@@ -10756,7 +10791,7 @@ int CGvisR2R_PunchDoc::SearchFirstShotOnIts()
 		}
 	}
 
-	int i = 0, nLastShot = 0; 
+	int i = 0, nLastShot = 0;
 	CString sLine;
 	int nTotLine = pDataFile->GetTotalLines();
 	for (i = 1; i <= nTotLine; i++)
@@ -10765,7 +10800,7 @@ int CGvisR2R_PunchDoc::SearchFirstShotOnIts()
 		int nPos = sLine.Find(_T('['), 0);
 		if (nPos >= 0)
 		{
-			sLine.Delete(0, nPos+1);
+			sLine.Delete(0, nPos + 1);
 			nPos = sLine.ReverseFind(_T(']'));
 			sLine = sLine.Left(nPos);
 			nLastShot = _ttoi(sLine);
@@ -10786,9 +10821,9 @@ BOOL CGvisR2R_PunchDoc::GetItsSerialInfo(int nItsSerial, BOOL &bDualTest, CStrin
 
 	Path[0] = WorkingInfo.System.sPathItsFile;
 	Path[1] = WorkingInfo.LastJob.sModel;
-	Path[2] = m_sItsCode;
+	Path[2] = m_sEngItsCode;
 
-	sName.Format(_T("%s.txt"), pDoc->m_sItsCode);
+	sName.Format(_T("%s.txt"), pDoc->m_sEngItsCode);
 	sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], sName); // ITS_Code.txt
 
 	if (sPath.IsEmpty())
@@ -11074,7 +11109,7 @@ BOOL CGvisR2R_PunchDoc::GetInnerFolderPath(int nItsSerial, CString  &sUp, CStrin
 			sDn.Format(_T("%s%s\\%s\\%s\\"), Path[0], Path[1], Path[2], Path[4]); // ITS Inner Dn Folder Path
 	}
 	else
-		sDn = _T("");	
+		sDn = _T("");
 
 	return TRUE;
 }
@@ -11094,7 +11129,7 @@ CString CGvisR2R_PunchDoc::GetItsFolderPath()
 		{
 			if (pDoc->GetCurrentInfoEng())
 			{
-				pDoc->WorkingInfo.LastJob.sEngItsCode = m_sItsCode;
+				pDoc->WorkingInfo.LastJob.sEngItsCode = m_sEngItsCode;
 				Path[2] = pDoc->WorkingInfo.LastJob.sEngItsCode;
 			}
 		}
@@ -11113,9 +11148,9 @@ CString CGvisR2R_PunchDoc::GetItsTargetFolderPath()
 	CString sItsPath = _T("");// = WorkingInfo.System.sPathIts;
 	if (GetTestMode() == MODE_INNER)
 		sItsPath = pDoc->WorkingInfo.System.sPathItsInner;
-	else if(GetTestMode() == MODE_OUTER)
+	else if (GetTestMode() == MODE_OUTER)
 		sItsPath = pDoc->WorkingInfo.System.sPathItsOuter;
-	else if(pDoc->WorkingInfo.System.bUseDualIts || pDoc->WorkingInfo.System.bUseDual2dIts)
+	else if (pDoc->WorkingInfo.System.bUseDualIts || pDoc->WorkingInfo.System.bUseDual2dIts)
 		sItsPath = pDoc->WorkingInfo.System.sPathIts;
 
 	if (sItsPath.IsEmpty())
@@ -11251,7 +11286,7 @@ int CGvisR2R_PunchDoc::LoadPCRAllUpInner(int nSerial, BOOL bFromShare)	// return
 
 	int nPcsId;												// nPcsId : CamMaster Pcs Index
 															//pPcrMgr테이블의 nIdx에 하면의 불량을 먼저 기록하고 상면의 불량을 엎어서 최종 merge불량 테이블을 만듬.
-	
+
 	int nTotVerifyed[2] = { 0 };
 
 	for (i = 0; i < nTotDef[1]; i++)						// 하면 불량 피스 수
@@ -11578,7 +11613,7 @@ int CGvisR2R_PunchDoc::LoadPCRUpInner(int nSerial, BOOL bFromShare)	// return : 
 		nIdx = GetPcrIdx0(nSerial);
 
 	CString sPath, sUpPath, sDnPath;
-	
+
 	if (!GetInnerFolderPath(nSerial, sUpPath, sDnPath))
 	{
 		pView->SetAlarmToPlc(UNIT_PUNCH);
@@ -11637,7 +11672,7 @@ int CGvisR2R_PunchDoc::LoadPCRUpInner(int nSerial, BOOL bFromShare)	// return : 
 	{
 		int syd = 1;
 	}
-	
+
 	// Model
 	nTemp = strFileData.Find(',', 0);
 	strModel = strFileData.Left(nTemp);
@@ -11701,7 +11736,7 @@ int CGvisR2R_PunchDoc::LoadPCRUpInner(int nSerial, BOOL bFromShare)	// return : 
 
 			m_pPcrInner[0][nIdx]->m_pLayer[i] = 0; // Up
 
-											  // BadPointPosX
+												   // BadPointPosX
 			nTemp = strFileData.Find(',', 0);
 			strBadPointPosX = strFileData.Left(nTemp);
 			strFileData.Delete(0, nTemp + 1);
@@ -11926,7 +11961,7 @@ int CGvisR2R_PunchDoc::LoadPCRDnInner(int nSerial, BOOL bFromShare)	// return : 
 
 			m_pPcrInner[1][nIdx]->m_pLayer[i] = 1; // Dn
 
-											  // BadPointPosX
+												   // BadPointPosX
 			nTemp = strFileData.Find(',', 0);
 			strBadPointPosX = strFileData.Left(nTemp);
 			strFileData.Delete(0, nTemp + 1);
@@ -12178,7 +12213,7 @@ void CGvisR2R_PunchDoc::LoadPCRIts11(int nSerial) // 11 -> 외층 : 양면, 내층 : �
 				// BadName
 				//m_pPcrIts[nIdx]->m_pDefType[idx] = m_pPcrInner[2][nIdx]->m_pDefType[Ord];
 				m_pPcrIts[nIdx]->m_pDefType[idx] = DEF_INNER;									// 내층 불량 표시
-				// CellNum
+																								// CellNum
 				m_pPcrIts[nIdx]->m_pCell[idx] = m_pPcrInner[2][nIdx]->m_pCell[Ord];
 				// ImageSize
 				m_pPcrIts[nIdx]->m_pImgSz[idx] = m_pPcrInner[2][nIdx]->m_pImgSz[Ord];
@@ -12225,7 +12260,7 @@ void CGvisR2R_PunchDoc::LoadPCRIts10(int nSerial) // 10 -> 외층 : 양면, 내층 : �
 	m_pPcrIts[nIdx]->m_sLayerInUp = m_pPcrInner[0][nIdx]->m_sLayer;
 	m_pPcrIts[nIdx]->m_sLayerInDn = _T(""); // m_pPcrInner[1][nIdx]->m_sLayer;
 
-	// Lot
+											// Lot
 	m_pPcrIts[nIdx]->m_sLot = m_pPcr[0][nIdx]->m_sLot;
 
 	int nTotDef[3] = { 0 };									// [0]: 외층, [1]: 내층, [2]: 내/외층 Merge
@@ -12334,7 +12369,7 @@ void CGvisR2R_PunchDoc::LoadPCRIts10(int nSerial) // 10 -> 외층 : 양면, 내층 : �
 				// BadName
 				//m_pPcrIts[nIdx]->m_pDefType[idx] = m_pPcrInner[0][nIdx]->m_pDefType[Ord];
 				m_pPcrIts[nIdx]->m_pDefType[idx] = DEF_INNER;									// 내층 불량 표시
-				// CellNum
+																								// CellNum
 				m_pPcrIts[nIdx]->m_pCell[idx] = m_pPcrInner[0][nIdx]->m_pCell[Ord];
 				// ImageSize
 				m_pPcrIts[nIdx]->m_pImgSz[idx] = m_pPcrInner[0][nIdx]->m_pImgSz[Ord];
@@ -12431,7 +12466,7 @@ void CGvisR2R_PunchDoc::LoadPCRIts01(int nSerial) // 01 -> 외층 : 단면, 내층 : �
 			nTotVerifyed[1]++;
 		}
 	}
-	
+
 	nTotDef[2] = 0;
 	for (i = 0; i < nTotPcs; i++)								// Shot내 총 Piece수
 	{
@@ -12490,7 +12525,7 @@ void CGvisR2R_PunchDoc::LoadPCRIts01(int nSerial) // 01 -> 외층 : 단면, 내층 : �
 				// BadName
 				//m_pPcrIts[nIdx]->m_pDefType[idx] = m_pPcrInner[2][nIdx]->m_pDefType[Ord];
 				m_pPcrIts[nIdx]->m_pDefType[idx] = DEF_INNER;									// 내층 불량 표시
-				// CellNum
+																								// CellNum
 				m_pPcrIts[nIdx]->m_pCell[idx] = m_pPcrInner[2][nIdx]->m_pCell[Ord];
 				// ImageSize
 				m_pPcrIts[nIdx]->m_pImgSz[idx] = m_pPcrInner[2][nIdx]->m_pImgSz[Ord];
@@ -12526,7 +12561,7 @@ BOOL CGvisR2R_PunchDoc::InitReelmapInner()
 		AfxMessageBox(strMsg, MB_ICONSTOP);
 		return FALSE;
 	}
-	
+
 	//GetCurrentInfoEng();
 	int nTotPcs = m_MasterInner[0].m_pPcsRgn->GetTotPcs();
 	BOOL bDualTest = WorkingInfo.LastJob.bDualTestInner;
@@ -12569,7 +12604,7 @@ BOOL CGvisR2R_PunchDoc::InitReelmapInner()
 
 	if (pDoc->GetTestMode() == MODE_OUTER)
 	{
-		if(m_pReelMapIts)
+		if (m_pReelMapIts)
 			m_pReelMap = m_pReelMapIts;
 	}
 
@@ -12740,20 +12775,26 @@ CString CGvisR2R_PunchDoc::GetItsTargetPath(int nSerial, int nLayer)	// RMAP_UP,
 
 	switch (nLayer)
 	{
-	case RMAP_UP: // 외층 Top
-		str.Format(_T("%s_L2_%04d_T_%s_%s_AVR01_%s.dat"), m_sItsCode, nSerial, WorkingInfo.LastJob.sSelUserName, WorkingInfo.System.sMcName, sTime);
+	case RMAP_UP:
+		if (pDoc->GetTestMode() == MODE_OUTER) // 외층 Top
+			str.Format(_T("%s_L1_%04d_T_%s_%s_AVR01_%s.dat"), m_sEngItsCode, nSerial, WorkingInfo.LastJob.sSelUserName, WorkingInfo.System.sMcName, sTime);
+		else
+			str.Format(_T("%s_L0_%04d_T_%s_%s_AVR01_%s.dat"), m_sEngItsCode, nSerial, WorkingInfo.LastJob.sSelUserName, WorkingInfo.System.sMcName, sTime);
 		sPath.Format(_T("%s\\%s"), sItsFolderPath, str);
 		break;
-	case RMAP_DN: // 외층 Bottom
-		str.Format(_T("%s_L2_%04d_B_%s_%s_AVR01_%s.dat"), m_sItsCode, nSerial, WorkingInfo.LastJob.sSelUserName, WorkingInfo.System.sMcName, sTime);
+	case RMAP_DN:
+		if (pDoc->GetTestMode() == MODE_OUTER) // 외층 Bottom
+			str.Format(_T("%s_L1_%04d_B_%s_%s_AVR01_%s.dat"), m_sEngItsCode, nSerial, WorkingInfo.LastJob.sSelUserName, WorkingInfo.System.sMcName, sTime);
+		else
+			str.Format(_T("%s_L0_%04d_B_%s_%s_AVR01_%s.dat"), m_sEngItsCode, nSerial, WorkingInfo.LastJob.sSelUserName, WorkingInfo.System.sMcName, sTime);
 		sPath.Format(_T("%s\\%s"), sItsFolderPath, str);
 		break;
 	case RMAP_INNER_UP: // 내층 Top
-		str.Format(_T("%s_L1_%04d_T_%s_%s_AVR01_%s.dat"), m_sItsCode, nSerial, WorkingInfo.LastJob.sSelUserName, WorkingInfo.System.sMcName, sTime);
+		str.Format(_T("%s_L0_%04d_T_%s_%s_AVR01_%s.dat"), m_sEngItsCode, nSerial, WorkingInfo.LastJob.sSelUserName, WorkingInfo.System.sMcName, sTime);
 		sPath.Format(_T("%s\\%s"), sItsFolderPath, str);
 		break;
 	case RMAP_INNER_DN: // 내층 Bottom
-		str.Format(_T("%s_L1_%04d_B_%s_%s_AVR01_%s.dat"), m_sItsCode, nSerial, WorkingInfo.LastJob.sSelUserName, WorkingInfo.System.sMcName, sTime);
+		str.Format(_T("%s_L0_%04d_B_%s_%s_AVR01_%s.dat"), m_sEngItsCode, nSerial, WorkingInfo.LastJob.sSelUserName, WorkingInfo.System.sMcName, sTime);
 		sPath.Format(_T("%s\\%s"), sItsFolderPath, str);
 		break;
 	}
@@ -12774,20 +12815,26 @@ CString CGvisR2R_PunchDoc::GetItsPath(int nSerial, int nLayer)	// RMAP_UP, RMAP_
 
 	switch (nLayer)
 	{
-	case RMAP_UP: // 외층 Top
-		str.Format(_T("%s_L2_%04d_T_%s_%s_AVR01_%s.dat"), m_sItsCode, nSerial, WorkingInfo.LastJob.sSelUserName, WorkingInfo.System.sMcName, sTime);
+	case RMAP_UP:
+		if (pDoc->GetTestMode() == MODE_OUTER) // 외층 Top
+			str.Format(_T("%s_L1_%04d_T_%s_%s_AVR01_%s.dat"), m_sEngItsCode, nSerial, WorkingInfo.LastJob.sSelUserName, WorkingInfo.System.sMcName, sTime);
+		else
+			str.Format(_T("%s_L0_%04d_T_%s_%s_AVR01_%s.dat"), m_sEngItsCode, nSerial, WorkingInfo.LastJob.sSelUserName, WorkingInfo.System.sMcName, sTime);
 		sPath.Format(_T("%s\\Outer\\%s"), sItsFolderPath, str);
 		break;
 	case RMAP_DN: // 외층 Bottom
-		str.Format(_T("%s_L2_%04d_B_%s_%s_AVR01_%s.dat"), m_sItsCode, nSerial, WorkingInfo.LastJob.sSelUserName, WorkingInfo.System.sMcName, sTime);
+		if (pDoc->GetTestMode() == MODE_OUTER)
+			str.Format(_T("%s_L1_%04d_B_%s_%s_AVR01_%s.dat"), m_sEngItsCode, nSerial, WorkingInfo.LastJob.sSelUserName, WorkingInfo.System.sMcName, sTime);
+		else
+			str.Format(_T("%s_L0_%04d_B_%s_%s_AVR01_%s.dat"), m_sEngItsCode, nSerial, WorkingInfo.LastJob.sSelUserName, WorkingInfo.System.sMcName, sTime);
 		sPath.Format(_T("%s\\Outer\\%s"), sItsFolderPath, str);
 		break;
 	case RMAP_INNER_UP: // 내층 Top
-		str.Format(_T("%s_L1_%04d_T_%s_%s_AVR01_%s.dat"), m_sItsCode, nSerial, WorkingInfo.LastJob.sSelUserName, WorkingInfo.System.sMcName, sTime);
+		str.Format(_T("%s_L0_%04d_T_%s_%s_AVR01_%s.dat"), m_sEngItsCode, nSerial, WorkingInfo.LastJob.sSelUserName, WorkingInfo.System.sMcName, sTime);
 		sPath.Format(_T("%s\\Inner\\%s"), sItsFolderPath, str);
 		break;
 	case RMAP_INNER_DN: // 내층 Bottom
-		str.Format(_T("%s_L1_%04d_B_%s_%s_AVR01_%s.dat"), m_sItsCode, nSerial, WorkingInfo.LastJob.sSelUserName, WorkingInfo.System.sMcName, sTime);
+		str.Format(_T("%s_L0_%04d_B_%s_%s_AVR01_%s.dat"), m_sEngItsCode, nSerial, WorkingInfo.LastJob.sSelUserName, WorkingInfo.System.sMcName, sTime);
 		sPath.Format(_T("%s\\Inner\\%s"), sItsFolderPath, str);
 		break;
 	}
@@ -12863,6 +12910,9 @@ int CGvisR2R_PunchDoc::GetItsDefCode(int nDefCode)
 
 BOOL CGvisR2R_PunchDoc::MakeItsDir(CString sModel, CString sLot, CString sLayer)
 {
+	if (!WorkingInfo.System.bUseITS)
+		return TRUE;
+
 	CString sMsg = _T("");
 	CFileFind finder;
 	CString sPath;
@@ -12888,7 +12938,7 @@ BOOL CGvisR2R_PunchDoc::MakeItsDir(CString sModel, CString sLot, CString sLayer)
 
 	if (!pDoc->DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
-	
+
 	sPath.Format(_T("%s%s\\%s"), pDoc->WorkingInfo.System.sPathItsFile, sModel, WorkingInfo.LastJob.sEngItsCode);
 	if (!pDoc->DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
@@ -12948,7 +12998,7 @@ int CGvisR2R_PunchDoc::GetAoiUpCamMstInfo()
 		sPath.Format(_T("%s%s\\%s\\%s\\DataOut.ini"), pDoc->WorkingInfo.System.sPathAoiUpVrsData,
 			pDoc->WorkingInfo.LastJob.sModel, pDoc->WorkingInfo.LastJob.sLayerUp, pDoc->WorkingInfo.LastJob.sLot);
 	}
-		
+
 #ifndef TEST_MODE
 	CFileFind finder;
 	if (finder.FindFile(sPath))
@@ -13217,15 +13267,15 @@ int CGvisR2R_PunchDoc::LoadPcrUp(CString sPath)	// return : 2(Failed), 1(정상), 
 		pDoc->m_sEngLotNum = strLot;
 		pDoc->m_sEngLayerUp = strLayer;
 		if (WorkingInfo.System.bUseITS)
-			pDoc->m_sItsCode = sItsCode;
+			pDoc->m_sEngItsCode = sItsCode;
 	}
 
 	BOOL bUpdate = FALSE;
 	CString sMsg;
- 
+
 	if (WorkingInfo.LastJob.sEngItsCode != sItsCode && !sItsCode.IsEmpty())
 	{
-		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
 		sMsg.Format(_T("ITS Change %s"), sItsCode);
 		pDoc->LogAuto(sMsg);
 	}
@@ -13241,25 +13291,25 @@ int CGvisR2R_PunchDoc::LoadPcrUp(CString sPath)	// return : 2(Failed), 1(정상), 
 		bUpdate = TRUE;
 		//if (WorkingInfo.LastJob.sLot != strLot)
 		//{
-			WorkingInfo.LastJob.sLot = strLot;
-			pView->m_pEngrave->SetLotName();
-			//if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
-			//{
-			//	m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
-			//	sMsg.Format(_T("ITS%s Lot%s SN:%d"), sItsCode, strLot, nSerial);
-			//	pDoc->LogAuto(sMsg);
-			//}
-			//else
-			//{
-				sMsg.Format(_T("Lot Change %s"), strLot);
-				pDoc->LogAuto(sMsg);
-			//}
+		WorkingInfo.LastJob.sLot = strLot;
+		pView->m_pEngrave->SetLotName();
+		//if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
+		//{
+		//	m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		//	sMsg.Format(_T("ITS%s Lot%s SN:%d"), sItsCode, strLot, nSerial);
+		//	pDoc->LogAuto(sMsg);
+		//}
+		//else
+		//{
+		sMsg.Format(_T("Lot Change %s"), strLot);
+		pDoc->LogAuto(sMsg);
+		//}
 		//}
 		//else
 		//{
 		//	if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
 		//	{
-		//		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		//		m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
 		//		sMsg.Format(_T("ITS Change %s"), sItsCode);
 		//		pDoc->LogAuto(sMsg);
 		//	}
@@ -13541,15 +13591,15 @@ int CGvisR2R_PunchDoc::LoadPcrDn(CString sPath)	// return : 2(Failed), 1(정상), 
 		pDoc->m_sEngLotNum = strLot;
 		pDoc->m_sEngLayerDn = strLayer;
 		if (WorkingInfo.System.bUseITS)
-			pDoc->m_sItsCode = sItsCode;
+			pDoc->m_sEngItsCode = sItsCode;
 	}
 
 	BOOL bUpdate = FALSE;
 	CString sMsg;
-	
+
 	if (WorkingInfo.LastJob.sEngItsCode != sItsCode && !sItsCode.IsEmpty())
 	{
-		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
 		sMsg.Format(_T("ITS Change %s"), sItsCode);
 		pDoc->LogAuto(sMsg);
 	}
@@ -13560,30 +13610,30 @@ int CGvisR2R_PunchDoc::LoadPcrDn(CString sPath)	// return : 2(Failed), 1(정상), 
 		pView->MsgBox(sMsg);
 	}
 
-	if (WorkingInfo.LastJob.sLot != strLot) 
+	if (WorkingInfo.LastJob.sLot != strLot)
 	{
 		bUpdate = TRUE;
 		//if (WorkingInfo.LastJob.sLot != strLot)
 		//{
-			WorkingInfo.LastJob.sLot = strLot;
-			pView->m_pEngrave->SetLotName();
+		WorkingInfo.LastJob.sLot = strLot;
+		pView->m_pEngrave->SetLotName();
 		//	if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
 		//	{
-		//		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		//		m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
 		//		sMsg.Format(_T("ITS%s Lot%s SN:%d"), sItsCode, strLot, nSerial);
 		//		pDoc->LogAuto(sMsg);
 		//	}
 		//	else
 		//	{
-			sMsg.Format(_T("Lot Change %s"), strLot);
-			pDoc->LogAuto(sMsg);
+		sMsg.Format(_T("Lot Change %s"), strLot);
+		pDoc->LogAuto(sMsg);
 		//	}
 		//}
 		//else
 		//{
 		//	if (WorkingInfo.LastJob.sEngItsCode != sItsCode)
 		//	{
-		//		m_sItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
+		//		m_sEngItsCode = WorkingInfo.LastJob.sEngItsCode = sItsCode;
 		//		sMsg.Format(_T("ITS Change %s"), sItsCode);
 		//		pDoc->LogAuto(sMsg);
 		//	}
@@ -15448,7 +15498,7 @@ CString CGvisR2R_PunchDoc::GetRmapPath(int nRmap)
 		str = _T("ReelMapDataIts.txt");
 		sPath.Format(_T("%s%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathItsFile,
 			pDoc->WorkingInfo.LastJob.sModel,
-			pDoc->WorkingInfo.LastJob.sEngItsCode,	//pDoc->m_sItsCode,
+			pDoc->WorkingInfo.LastJob.sEngItsCode,	//pDoc->m_sEngItsCode,
 			str);
 		break;
 	}
@@ -15530,7 +15580,7 @@ CString CGvisR2R_PunchDoc::GetYieldPath(int nRmap)
 	case RMAP_ITS:
 		str = _T("YieldIts.txt");
 		sPath.Format(_T("%s%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathItsFile,
-			pDoc->WorkingInfo.LastJob.sModel, pDoc->WorkingInfo.LastJob.sEngItsCode, //pDoc->m_sItsCode,
+			pDoc->WorkingInfo.LastJob.sModel, pDoc->WorkingInfo.LastJob.sEngItsCode, //pDoc->m_sEngItsCode,
 			str);
 		break;
 	}
@@ -15905,7 +15955,7 @@ void CGvisR2R_PunchDoc::SetTestMode()
 			WorkingInfo.System.bUseDualIts = FALSE;
 			pView->MpeWrite(_T("MB40009A"), 0);															// 각인부 사용
 		}
-		else if(WorkingInfo.LastJob.nTestMode == MODE_ITS)
+		else if (WorkingInfo.LastJob.nTestMode == MODE_ITS)
 		{
 			WorkingInfo.System.bUseDual2dIts = FALSE;
 			WorkingInfo.System.bUseDualIts = TRUE;
@@ -15954,8 +16004,19 @@ void CGvisR2R_PunchDoc::SetTestMode()
 			if (pView->m_pDlgMenu01)
 				pView->m_pDlgMenu01->EnableItsMode();
 		}
+		else if (pDoc->GetTestMode() == MODE_LASER)
+		{
+			pView->MpeWrite(_T("MB40009A"), 0);															// 각인부 사용
+			pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 0);// 내층 검사 사용/미사용
+			pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 0);// 외층 검사 사용/미사용
+			pDoc->SetMkInfo(_T("Signal"), _T("Inner Test On"), FALSE);
+			pDoc->SetMkInfo(_T("Signal"), _T("Outer Test On"), FALSE);
+			if (pView->m_pDlgMenu01)
+				pView->m_pDlgMenu01->EnableItsMode(FALSE);
+		}
 		else
 		{
+			pView->MpeWrite(_T("MB40009A"), 1);															// 각인부 미사용
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 0);// 내층 검사 사용/미사용
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 0);// 외층 검사 사용/미사용
 			pDoc->SetMkInfo(_T("Signal"), _T("Inner Test On"), FALSE);
@@ -16160,4 +16221,47 @@ void CGvisR2R_PunchDoc::LogPunch(CString strMsg, int nType)
 	file.Write(cameraKey, nLenth2);
 	file.Flush();
 	file.Close();
+}
+
+
+int CGvisR2R_PunchDoc::GetMarkedPcrUpSerial()
+{
+	int nCopy = 0;
+
+	CFileFind cFile;
+	CString sPath, sDest;
+
+	sPath.Format(_T("%s%s\\%s\\%s\\%s"), WorkingInfo.System.sPathOldFile, WorkingInfo.LastJob.sModel,
+		WorkingInfo.LastJob.sLot, WorkingInfo.LastJob.sLayerUp, _T("*.pcr"));
+
+
+	BOOL bExist = cFile.FindFile(sPath);
+	if (!bExist) return 0; // pcr파일이 존재하지 않음.
+
+	int nPos, nSerial = 0;
+	CString sFileName, sFilePath, sSerial, sMsg;
+	while (bExist)
+	{
+		bExist = cFile.FindNextFile();
+		if (cFile.IsDots()) continue;
+		if (!cFile.IsDirectory())
+		{
+			// 파일 Path를 얻음.
+			sFilePath = cFile.GetFilePath();
+
+			// 파일명을 얻음.
+			sFileName = cFile.GetFileName();
+			nPos = sFileName.ReverseFind('.');
+			if (nPos > 0)
+				sSerial = sFileName.Left(nPos);
+
+			nSerial = _tstoi(sSerial);
+			if (nSerial > 0)
+			{
+				;
+			}
+		}
+	}
+
+	return nSerial;
 }

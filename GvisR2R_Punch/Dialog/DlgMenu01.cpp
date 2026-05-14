@@ -47,6 +47,7 @@ CDlgMenu01::CDlgMenu01(CWnd* pParent /*=NULL*/)
 	m_nIdxDef[1] = 0;
 	m_bTIM_DISP_DEF_IMG = FALSE;
 	m_bTIM_DISP_MK_CNT = FALSE;
+	m_nTIM_DISP_MK_CNT = 0;
 
 	m_bLastProc = FALSE;
 	m_bLastProcFromUp = TRUE;
@@ -2778,7 +2779,13 @@ void CDlgMenu01::OnTimer(UINT_PTR nIDEvent)//(UINT nIDEvent)
 
 		if (!pView->IsRun())
 		{
-			ChkAoiVsStatus();
+			if (m_nTIM_DISP_MK_CNT > 15)
+			{
+				m_nTIM_DISP_MK_CNT = 0;
+				ChkAoiVsStatus();
+			}
+			else
+				m_nTIM_DISP_MK_CNT++;
 		}
 
 		if(m_bTIM_DISP_MK_CNT)
@@ -3224,8 +3231,9 @@ void CDlgMenu01::UpdateData()
 	
 	myStcData[1].SetText(pDoc->WorkingInfo.LastJob.sModel);		// ¸ðµ¨
 	pDoc->SetMkMenu01(_T("Info"), _T("Model"), pDoc->WorkingInfo.LastJob.sModel);
-	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER)
-		myStcData[91].SetText(pDoc->m_sItsCode);					// ITS CODE
+	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER || pDoc->GetTestMode() == MODE_ITS)
+		myStcData[91].SetText(pDoc->WorkingInfo.LastJob.sEngItsCode);					// ITS CODE
+		//myStcData[91].SetText(pDoc->m_sEngItsCode);					// ITS CODE
 	else
 		myStcData[91].SetText(_T(""));
 	myStcData[3].SetText(pDoc->WorkingInfo.LastJob.sLot);			// ·ÎÆ®
@@ -5952,8 +5960,8 @@ void CDlgMenu01::DispChangedModel()
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
 
 	myStcData[1].SetText(pDoc->WorkingInfo.LastJob.sModel);		// ¸ðµ¨
-	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER)
-		myStcData[91].SetText(pDoc->m_sItsCode);					// ITS CODE
+	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER || pDoc->GetTestMode() == MODE_ITS)
+		myStcData[91].SetText(pDoc->m_sEngItsCode);					// ITS CODE
 	else
 		myStcData[91].SetText(_T(""));
 	myStcData[3].SetText(pDoc->WorkingInfo.LastJob.sLot);			// ·ÎÆ®

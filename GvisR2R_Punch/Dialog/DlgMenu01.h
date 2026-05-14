@@ -45,6 +45,7 @@ class CDlgMenu01 : public CDialog
 	int m_nSerial, m_nDef[2];	// [0]:AOI-Up , [1]:AOI-Dn
 	BOOL m_bTIM_DISP_DEF_IMG;
 	BOOL m_bTIM_DISP_MK_CNT;
+	int m_nTIM_DISP_MK_CNT;
 	int m_nIdxDef[2];			// [0]:AOI-Up , [1]:AOI-Dn
 
 	int m_nWinkMk[2]; // [nCam]

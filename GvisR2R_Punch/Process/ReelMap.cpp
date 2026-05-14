@@ -2359,7 +2359,7 @@ CString CReelMap::GetYieldPath(int nRmap)
 	case RMAP_ITS:
 		str = _T("YieldIts.txt");
 		sPath.Format(_T("%s%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathItsFile,
-			pDoc->WorkingInfo.LastJob.sModel, pDoc->WorkingInfo.LastJob.sEngItsCode, //pDoc->m_sItsCode,
+			pDoc->WorkingInfo.LastJob.sModel, pDoc->WorkingInfo.LastJob.sEngItsCode, //pDoc->m_sEngItsCode,
 			str);
 		break;
 	}
@@ -3241,7 +3241,7 @@ CString CReelMap::GetRmapPath(int nRmap)
 		str = _T("ReelMapDataIts.txt");
 		sPath.Format(_T("%s%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathItsFile,
 			pDoc->WorkingInfo.LastJob.sModel,
-			pDoc->WorkingInfo.LastJob.sEngItsCode,	//pDoc->m_sItsCode,
+			pDoc->WorkingInfo.LastJob.sEngItsCode,	//pDoc->m_sEngItsCode,
 			str);
 		break;
 	}
@@ -3387,7 +3387,7 @@ CString CReelMap::GetRmapTablePath(int nRmap)
 		str = _T("ReelMapTableIts.txt");
 		sPath.Format(_T("%s%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathItsFile,
 			pDoc->WorkingInfo.LastJob.sModel,
-			pDoc->WorkingInfo.LastJob.sEngItsCode,	//pDoc->m_sItsCode,
+			pDoc->WorkingInfo.LastJob.sEngItsCode,	//pDoc->m_sEngItsCode,
 			str);
 		break;
 	}
@@ -3622,7 +3622,7 @@ void CReelMap::RestoreReelmap()
 		//pDoc->GetCurrentInfoEng();
 		str = _T("ReelMapDataIts.txt");
 		sPath.Format(_T("%s%s\\%s\\%s"), pDoc->WorkingInfo.System.sPathItsFile,
-			pDoc->WorkingInfo.LastJob.sModel, pDoc->WorkingInfo.LastJob.sEngItsCode,	//pDoc->m_sItsCode,
+			pDoc->WorkingInfo.LastJob.sModel, pDoc->WorkingInfo.LastJob.sEngItsCode,	//pDoc->m_sEngItsCode,
 			str);
 		break;
 	}
@@ -4444,7 +4444,7 @@ CString CReelMap::GetPathReelmapIts()
 	sPath = _T("");
 	Path[0] = pDoc->WorkingInfo.System.sPathItsFile;
 	Path[1] = pDoc->WorkingInfo.LastJob.sModel;
-	Path[2] = pDoc->WorkingInfo.LastJob.sEngItsCode; // pDoc->m_sItsCode;
+	Path[2] = pDoc->WorkingInfo.LastJob.sEngItsCode; // pDoc->m_sEngItsCode;
 
 	if (Path[0].IsEmpty() || Path[1].IsEmpty() || Path[2].IsEmpty())
 		return _T("");
@@ -4464,7 +4464,7 @@ BOOL CReelMap::MakeItsReelmapHeader()
 	sPath = _T("");
 	Path[0] = pDoc->WorkingInfo.System.sPathItsFile;
 	Path[1] = pDoc->WorkingInfo.LastJob.sModel;
-	Path[2] = pDoc->WorkingInfo.LastJob.sEngItsCode; // pDoc->m_sItsCode;
+	Path[2] = pDoc->WorkingInfo.LastJob.sEngItsCode; // pDoc->m_sEngItsCode;
 
 	if (Path[0].IsEmpty() || Path[1].IsEmpty() || Path[2].IsEmpty())
 		return FALSE;
@@ -5513,6 +5513,8 @@ CString CReelMap::GetResultTxt()
 
 CString CReelMap::GetSapp3Txt()
 {
+	GetResult();
+
 	CString strFileData = _T("");
 	CString strData;
 	int nSum, nStripPcs;
@@ -5900,6 +5902,8 @@ CString CReelMap::GetSapp3Txt()
 
 CString CReelMap::GetSapp3TxtReverse()
 {
+	GetResult();
+
 	CString strFileData = _T("");
 	CString strData;
 	int nSum, nStripPcs;
@@ -7297,9 +7301,9 @@ BOOL CReelMap::GetItsSerialInfo(int nItsSerial, BOOL &bDualTest, CString &sLot, 
 
 	Path[0] = pDoc->WorkingInfo.System.sPathItsFile;
 	Path[1] = pDoc->WorkingInfo.LastJob.sModel;
-	Path[2] = pDoc->m_sItsCode;
+	Path[2] = pDoc->m_sEngItsCode;
 
-	sName.Format(_T("%s.txt"), pDoc->m_sItsCode);
+	sName.Format(_T("%s.txt"), pDoc->m_sEngItsCode);
 	sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], sName); // ITS_Code.txt
 
 	if (sPath.IsEmpty())
@@ -7393,9 +7397,9 @@ int CReelMap::SearchFirstShotOnIts()
 
 	Path[0] = pDoc->WorkingInfo.System.sPathItsFile;
 	Path[1] = pDoc->WorkingInfo.LastJob.sModel;
-	Path[2] = pDoc->m_sItsCode;
+	Path[2] = pDoc->m_sEngItsCode;
 
-	sName.Format(_T("%s.txt"), pDoc->m_sItsCode);
+	sName.Format(_T("%s.txt"), pDoc->m_sEngItsCode);
 	sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], sName); // ITS_Code.txt
 
 	CDataFile *pDataFile = new CDataFile;
@@ -7461,7 +7465,7 @@ BOOL CReelMap::SetItsSerialInfo(int nItsSerial)
 
 	Path[0] = pDoc->WorkingInfo.System.sPathItsFile;
 	Path[1] = pDoc->m_sEngModel;
-	Path[2] = pDoc->m_sItsCode;
+	Path[2] = pDoc->m_sEngItsCode;
 	Path[3] = pDoc->m_sEngLotNum;
 	Path[4] = pDoc->m_sEngLayerUp;
 	Path[5] = pDoc->m_sEngLayerDn;
@@ -7489,7 +7493,7 @@ BOOL CReelMap::SetItsSerialInfo(int nItsSerial)
 	if (!DirectoryExists(sPath))
 		CreateDirectory(sPath, NULL);
 
-	sName.Format(_T("%s.txt"), pDoc->m_sItsCode);
+	sName.Format(_T("%s.txt"), pDoc->m_sEngItsCode);
 	sPath.Format(_T("%s%s\\%s\\%s"), Path[0], Path[1], Path[2], sName); // ITS_Code.txt
 
 	CString sItsSerail;
@@ -7502,7 +7506,7 @@ BOOL CReelMap::SetItsSerialInfo(int nItsSerial)
 	::WritePrivateProfileString(sItsSerail, _T("Dual Test"), str, sPath);
 	::WritePrivateProfileString(sItsSerail, _T("Process Unit Code"), pDoc->m_sEngProcessNum, sPath);
 	::WritePrivateProfileString(sItsSerail, _T("Current Model"), pDoc->m_sEngModel, sPath);
-	::WritePrivateProfileString(sItsSerail, _T("Its Code"), pDoc->m_sItsCode, sPath);
+	::WritePrivateProfileString(sItsSerail, _T("Its Code"), pDoc->m_sEngItsCode, sPath);
 	::WritePrivateProfileString(sItsSerail, _T("Current Lot"), pDoc->m_sEngLotNum, sPath);
 	::WritePrivateProfileString(sItsSerail, _T("Current Layer Up"), pDoc->m_sEngLayerUp, sPath);
 
@@ -7534,20 +7538,34 @@ CString CReelMap::GetItsPath(int nSerial, int nLayer)	// RMAP_UP, RMAP_DN, RMAP_
 
 	switch (nLayer)
 	{
-	case RMAP_UP: // 諼類 Top
-		str.Format(_T("%s_L2_%04d_T_%s_%s_AVR01_%s.dat"), pDoc->m_sItsCode, nSerial, pDoc->WorkingInfo.LastJob.sSelUserName, pDoc->WorkingInfo.System.sMcName, sTime);
+	case RMAP_UP:
+		if (pDoc->GetTestMode() == MODE_OUTER) // 諼類 Top
+		{
+			str.Format(_T("%s_L1_%04d_T_%s_%s_AVR01_%s.dat"), pDoc->m_sEngItsCode, nSerial, pDoc->WorkingInfo.LastJob.sSelUserName, pDoc->WorkingInfo.System.sMcName, sTime);
+		}
+		else
+		{
+			str.Format(_T("%s_L0_%04d_T_%s_%s_AVR01_%s.dat"), pDoc->m_sEngItsCode, nSerial, pDoc->WorkingInfo.LastJob.sSelUserName, pDoc->WorkingInfo.System.sMcName, sTime);
+		}
 		sPath.Format(_T("%s\\Outer\\%s"), sItsFolderPath, str);
 		break;
-	case RMAP_DN: // 諼類 Bottom
-		str.Format(_T("%s_L2_%04d_B_%s_%s_AVR01_%s.dat"), pDoc->m_sItsCode, nSerial, pDoc->WorkingInfo.LastJob.sSelUserName, pDoc->WorkingInfo.System.sMcName, sTime);
+	case RMAP_DN:
+		if (pDoc->GetTestMode() == MODE_OUTER) // 諼類 Bottom
+		{
+			str.Format(_T("%s_L1_%04d_B_%s_%s_AVR01_%s.dat"), pDoc->m_sEngItsCode, nSerial, pDoc->WorkingInfo.LastJob.sSelUserName, pDoc->WorkingInfo.System.sMcName, sTime);
+		}
+		else
+		{
+			str.Format(_T("%s_L0_%04d_B_%s_%s_AVR01_%s.dat"), pDoc->m_sEngItsCode, nSerial, pDoc->WorkingInfo.LastJob.sSelUserName, pDoc->WorkingInfo.System.sMcName, sTime);
+		}
 		sPath.Format(_T("%s\\Outer\\%s"), sItsFolderPath, str);
 		break;
 	case RMAP_INNER_UP: // 頂類 Top
-		str.Format(_T("%s_L1_%04d_T_%s_%s_AVR01_%s.dat"), pDoc->m_sItsCode, nSerial, pDoc->WorkingInfo.LastJob.sSelUserName, pDoc->WorkingInfo.System.sMcName, sTime);
+		str.Format(_T("%s_L0_%04d_T_%s_%s_AVR01_%s.dat"), pDoc->m_sEngItsCode, nSerial, pDoc->WorkingInfo.LastJob.sSelUserName, pDoc->WorkingInfo.System.sMcName, sTime);
 		sPath.Format(_T("%s\\Inner\\%s"), sItsFolderPath, str);
 		break;
 	case RMAP_INNER_DN: // 頂類 Bottom
-		str.Format(_T("%s_L1_%04d_B_%s_%s_AVR01_%s.dat"), pDoc->m_sItsCode, nSerial, pDoc->WorkingInfo.LastJob.sSelUserName, pDoc->WorkingInfo.System.sMcName, sTime);
+		str.Format(_T("%s_L0_%04d_B_%s_%s_AVR01_%s.dat"), pDoc->m_sEngItsCode, nSerial, pDoc->WorkingInfo.LastJob.sSelUserName, pDoc->WorkingInfo.System.sMcName, sTime);
 		sPath.Format(_T("%s\\Inner\\%s"), sItsFolderPath, str);
 		break;
 	}
@@ -7570,7 +7588,7 @@ CString CReelMap::GetItsFolderPath()
 		{
 			if (pDoc->GetCurrentInfoEng())
 			{
-				pDoc->WorkingInfo.LastJob.sEngItsCode = pDoc->m_sItsCode;
+				pDoc->WorkingInfo.LastJob.sEngItsCode = pDoc->m_sEngItsCode;
 				Path[2] = pDoc->WorkingInfo.LastJob.sEngItsCode;
 			}
 		}
