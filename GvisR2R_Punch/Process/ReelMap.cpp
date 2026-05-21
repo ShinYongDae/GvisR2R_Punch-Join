@@ -712,6 +712,13 @@ BOOL CReelMap::Write(int nSerial)
 				else
 					nPcsId = pDoc->m_pPcrInner[nLayer][nIdx]->m_pDefPcs[i];
 
+				if (nPcsId < 0)
+				{
+					sMsg.Format(_T("Error - Defect Pcs Index(%d) is not exist on PCR."), nPcsId);
+					pView->MsgBox(sMsg);
+					return 0;
+				}
+
 				nDefCode = pDoc->m_pPcrInner[nLayer][nIdx]->m_pDefType[i];
 
 				nC = int(nPcsId / nNodeY);
@@ -6952,7 +6959,8 @@ BOOL CReelMap::WriteLastRmapInfoOnOffline()
 
 	if (!pView->m_bOnLine)
 	{
-		sPath = GetRmapPath(m_nLayer);
+		//sPath = GetRmapPath(m_nLayer);
+		sPath = GetRmapPathOnOffline(m_nLayer);
 		if (!findfile.FindFile(sPath))
 		{
 			sMsg.Format(_T("Reelmap이 존재하지 않습니다.\r\n%s"), sPath);
