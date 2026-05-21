@@ -802,8 +802,8 @@ BOOL CMyFile::ChkLotEnd(CString sPath)
 	strFileData.Delete(0, nTemp+1);
 	nFileSize = nFileSize - nTemp - 1;
 
-	if (pDoc->WorkingInfo.System.bUseITS)
-	{
+	//if (pDoc->WorkingInfo.System.bUseITS)
+	//{
 		// Lot
 		nTemp = strFileData.Find(',', 0);
 		strLot = strFileData.Left(nTemp);
@@ -815,15 +815,15 @@ BOOL CMyFile::ChkLotEnd(CString sPath)
 		sItsCode = strFileData.Left(nTemp);
 		strFileData.Delete(0, nTemp + 1);
 		nFileSize = nFileSize - nTemp - 1;
-	}
-	else
-	{
-		// Lot
-		nTemp = strFileData.Find('\n', 0);
-		strLot = strFileData.Left(nTemp);
-		strFileData.Delete(0, nTemp + 1);
-		nFileSize = nFileSize - nTemp - 1;
-	}
+	//}
+	//else
+	//{
+	//	// Lot
+	//	nTemp = strFileData.Find('\n', 0);
+	//	strLot = strFileData.Left(nTemp);
+	//	strFileData.Delete(0, nTemp + 1);
+	//	nFileSize = nFileSize - nTemp - 1;
+	//}
 
 	//strTotalBadPieceNum = strFileData;
 	nTemp = strFileData.Find('\n', 0);
