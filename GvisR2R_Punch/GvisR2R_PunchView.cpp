@@ -1348,7 +1348,7 @@ void CGvisR2R_PunchView::OnTimer(UINT_PTR nIDEvent)
 		}
 
 		if (m_bTIM_START_UPDATE)
-			SetTimer(TIM_START_UPDATE, 100, NULL);
+			SetTimer(TIM_START_UPDATE, 500, NULL);
 	}
 
 	if (nIDEvent == TIM_CAMMASTER_UPDATE)
@@ -10560,7 +10560,7 @@ void CGvisR2R_PunchView::ModelChange(int nAoi) // 0 : AOI-Up , 1 : AOI-Dn
 void CGvisR2R_PunchView::ResetMkInfo(int nAoi) // 0 : AOI-Up , 1 : AOI-Dn , 2 : AOI-UpDn
 {
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
-	BOOL bDualTestInner, bGetCurrentInfoEng;
+	BOOL bDualTestInner, bGetCurrentInfoEng = FALSE;
 	CString sLot, sLayerUp, sLayerDn;
 	bGetCurrentInfoEng = GetCurrentInfoEng();
 
@@ -36786,6 +36786,9 @@ BOOL CGvisR2R_PunchView::ApplyCurrentInfoEng()
 {
 	if (GetCurrentInfoEng()) // TRUE: MODE_INNER or MODE_OUTER
 	{
+		pDoc->SetTestMode(pDoc->m_nEngTestMode);
+		if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER || pDoc->GetTestMode() == MODE_ITS)
+		{
 		pDoc->WorkingInfo.LastJob.bDualTest = pDoc->m_bEngDualTest;
 		pDoc->WorkingInfo.LastJob.sEngItsCode = pDoc->m_sEngItsCode;
 		pDoc->WorkingInfo.LastJob.sLot = pDoc->m_sEngLotNum;
@@ -36793,13 +36796,13 @@ BOOL CGvisR2R_PunchView::ApplyCurrentInfoEng()
 		pDoc->WorkingInfo.LastJob.sLayerUp = pDoc->m_sEngLayerUp;
 		pDoc->WorkingInfo.LastJob.sLayerDn = pDoc->m_sEngLayerDn;
 
-		pDoc->SetTestMode(pDoc->m_nEngTestMode);
 
 		if (pDoc->WorkingInfo.LastJob.sModel != pDoc->m_sEngModel)
 		{
 			pDoc->WorkingInfo.LastJob.sModel = pDoc->m_sEngModel;
 			pView->m_bLoadMstInfo = TRUE;
 		}
+	}
 	}
 	else
 		return FALSE;

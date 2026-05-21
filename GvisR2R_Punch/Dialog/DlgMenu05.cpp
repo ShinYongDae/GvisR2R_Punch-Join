@@ -4794,7 +4794,7 @@ int CDlgMenu05::LoadPCRUpFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 	strFileData.Delete(0, nTemp + 1);
 	nFileSize = nFileSize - nTemp - 1;
 
-	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER)
+	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER || pDoc->GetTestMode() == MODE_ITS)
 	{
 		pDoc->m_sEngModel = strModel;
 		pDoc->m_sEngLotNum = strLot;
@@ -5018,7 +5018,7 @@ int CDlgMenu05::LoadPCRDnFromMk(int nSerial)	// return : 2(Failed), 1(정상), -1(
 	nFileSize = nFileSize - nTemp - 1;
 
 
-	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER)
+	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER || pDoc->GetTestMode() == MODE_ITS)
 	{
 		pDoc->m_sEngModel = strModel;
 		pDoc->m_sEngLotNum = strLot;

@@ -7300,7 +7300,7 @@ BOOL CReelMap::GetItsSerialInfo(int nItsSerial, BOOL &bDualTest, CString &sLot, 
 	CString str, sName, sPath, Path[3];
 
 	Path[0] = pDoc->WorkingInfo.System.sPathItsFile;
-	Path[1] = pDoc->WorkingInfo.LastJob.sModel;
+	Path[1] = pDoc->m_sEngModel;
 	Path[2] = pDoc->m_sEngItsCode;
 
 	sName.Format(_T("%s.txt"), pDoc->m_sEngItsCode);

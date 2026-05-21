@@ -80,6 +80,8 @@ public:
 		// NOTE: the ClassWizard will add data members here
 	//}}AFX_DATA
 
+public:
+
 
 // Overrides
 	// ClassWizard generated virtual function overrides

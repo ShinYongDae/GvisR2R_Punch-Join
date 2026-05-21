@@ -906,6 +906,7 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 			//{
 				m_bGetOpInfo = TRUE;
 				pDoc->SetTestMode();
+				pView->m_pDlgMenu01->UpdateData();
 				//pDoc->WorkingInfo.LastJob.nTestMode = (int)SockData.nData1; // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2
 				//m_bRcvSig[_SigInx::_TestMode] = TRUE;
 				//pDoc->SetTestMode(pDoc->WorkingInfo.LastJob.nTestMode); // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2
@@ -921,6 +922,7 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 					pDoc->m_pReelMap->m_sUser = pDoc->WorkingInfo.LastJob.sSelUserName;
 				if (pDoc)
 					::WritePrivateProfileString(_T("Last Job"), _T("Operator Name"), pDoc->WorkingInfo.LastJob.sSelUserName, PATH_WORKING_INFO);
+				pView->m_pDlgMenu01->UpdateData();
 			}
 			break;
 		case _ItemInx::_SampleShotNum:
@@ -1074,7 +1076,9 @@ void CEngrave::GetOpInfo(SOCKET_DATA SockData)
 			if (pDoc->WorkingInfo.LastJob.sEngItsCode != CharToString(SockData.strData))
 			{
 				m_bGetOpInfo = TRUE;
-				pDoc->SetEngItsCode();
+				if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER || pDoc->GetTestMode() == MODE_ITS)
+					pDoc->m_sEngItsCode = pDoc->WorkingInfo.LastJob.sEngItsCode = CharToString(SockData.strData);
+				//pDoc->SetEngItsCode();
 				//pDoc->m_sItsCode = pDoc->WorkingInfo.LastJob.sEngItsCode = CharToString(SockData.strData);
 				//pDoc->SetEngItsCode(pDoc->WorkingInfo.LastJob.sEngItsCode);
 
@@ -1117,38 +1121,53 @@ void CEngrave::GetInfo(SOCKET_DATA SockData)
 			}
 			break;
 		case _ItemInx::_ModelUpName:
+			if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER || pDoc->GetTestMode() == MODE_ITS)
+			{
 			if (pDoc->WorkingInfo.EngInfo.sModel != CharToString(SockData.strData))
 			{
 				m_bGetInfo = TRUE;
 				pDoc->WorkingInfo.EngInfo.sModel = CharToString(SockData.strData);
 			}
+			}
 			break;
 		case _ItemInx::_LotUpName:
+			if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER || pDoc->GetTestMode() == MODE_ITS)
+			{
 			if (pDoc->WorkingInfo.EngInfo.sLot != CharToString(SockData.strData))
 			{
 				m_bGetInfo = TRUE;
 				pDoc->WorkingInfo.EngInfo.sLot = CharToString(SockData.strData);
 			}
+			}
 			break;
 		case _ItemInx::_LotDnName:
+			if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER || pDoc->GetTestMode() == MODE_ITS)
+			{
 			//if (pDoc->WorkingInfo.EngInfo.sLotDn != CharToString(SockData.strData))
 			//{
 			//	m_bGetInfo = TRUE;
 			//	pDoc->WorkingInfo.EngInfo.sLotDn = CharToString(SockData.strData);
 			//}
+			}
 			break;
 		case _ItemInx::_LayerUpName:
+			if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER || pDoc->GetTestMode() == MODE_ITS)
+			{
 			if (pDoc->WorkingInfo.EngInfo.sLayerUp != CharToString(SockData.strData))
 			{
 				m_bGetInfo = TRUE;
 				pDoc->WorkingInfo.EngInfo.sLayerUp = CharToString(SockData.strData);
 			}
+			}
 			break;
 		case _ItemInx::_LayerDnName:
+			if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER || pDoc->GetTestMode() == MODE_ITS)
+			{
 			if (pDoc->WorkingInfo.EngInfo.sLayerDn = CharToString(SockData.strData))
 			{
 				m_bGetInfo = TRUE;
 				pDoc->WorkingInfo.EngInfo.sLayerDn = CharToString(SockData.strData);
+			}
 			}
 			break;
 		case _ItemInx::_LoadMstInfo:

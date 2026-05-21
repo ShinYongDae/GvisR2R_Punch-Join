@@ -3158,7 +3158,7 @@ BOOL CDlgMenu03::DoReset()
 			if (pView->m_pDlgMenu01)
 				pView->m_pDlgMenu01->ClrInfo();
 
-			pView->ResetYield();
+			//pView->ResetYield();
 
 
 			pDoc->SetStatus(_T("General"), _T("bCont"), pView->m_bCont);

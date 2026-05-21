@@ -6622,7 +6622,7 @@ int CGvisR2R_PunchDoc::LoadPCRDn(int nSerial, BOOL bFromShare)	// return : 2(Fai
 	nFileSize = nFileSize - nTemp - 1;
 
 
-	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER)
+	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER || pDoc->GetTestMode() == MODE_ITS)
 	{
 		pDoc->m_sEngModel = strModel;
 		pDoc->m_sEngLotNum = strLot;
@@ -11147,11 +11147,9 @@ CString CGvisR2R_PunchDoc::GetItsTargetFolderPath()
 {
 	CString sItsPath = _T("");// = WorkingInfo.System.sPathIts;
 	if (GetTestMode() == MODE_INNER)
-		sItsPath = pDoc->WorkingInfo.System.sPathItsInner;
-	else if (GetTestMode() == MODE_OUTER)
-		sItsPath = pDoc->WorkingInfo.System.sPathItsOuter;
-	else if (pDoc->WorkingInfo.System.bUseDualIts || pDoc->WorkingInfo.System.bUseDual2dIts)
-		sItsPath = pDoc->WorkingInfo.System.sPathIts;
+		sItsPath = WorkingInfo.System.sPathItsInner;
+	else if (GetTestMode() == MODE_OUTER || WorkingInfo.System.bUseDualIts || WorkingInfo.System.bUseDual2dIts)
+		sItsPath = WorkingInfo.System.sPathItsOuter;
 
 	if (sItsPath.IsEmpty())
 	{
@@ -13261,7 +13259,7 @@ int CGvisR2R_PunchDoc::LoadPcrUp(CString sPath)	// return : 2(Failed), 1(정상), 
 	strFileData.Delete(0, nTemp + 1);
 	nFileSize = nFileSize - nTemp - 1;
 
-	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER)
+	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER || pDoc->GetTestMode() == MODE_ITS)
 	{
 		pDoc->m_sEngModel = strModel;
 		pDoc->m_sEngLotNum = strLot;
@@ -13585,7 +13583,7 @@ int CGvisR2R_PunchDoc::LoadPcrDn(CString sPath)	// return : 2(Failed), 1(정상), 
 	nFileSize = nFileSize - nTemp - 1;
 
 
-	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->GetTestMode() == MODE_LASER)
+	if (GetTestMode() == MODE_INNER || GetTestMode() == MODE_OUTER || GetTestMode() == MODE_LASER || pDoc->GetTestMode() == MODE_ITS)
 	{
 		pDoc->m_sEngModel = strModel;
 		pDoc->m_sEngLotNum = strLot;
@@ -15844,7 +15842,8 @@ BOOL CGvisR2R_PunchDoc::MakeDirRmap(int nRmap)
 		sPath.Format(_T("%s%s\\%s\\%s\\%s\\%s"), Path[0], Path[1], Path[2], Path[3], Path[4], str);
 		break;
 	case RMAP_ITS:
-		pDoc->GetCurrentInfoEng();
+		if (pDoc->WorkingInfo.LastJob.sEngItsCode.IsEmpty())
+			pDoc->GetCurrentInfoEng();
 		str = _T("ReelMapDataIts.txt");
 		Path[0] = pDoc->WorkingInfo.System.sPathItsFile;
 		Path[1] = pDoc->WorkingInfo.LastJob.sModel;
