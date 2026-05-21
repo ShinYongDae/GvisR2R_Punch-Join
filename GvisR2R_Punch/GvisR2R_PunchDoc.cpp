@@ -6761,11 +6761,11 @@ int CGvisR2R_PunchDoc::LoadPCRDn(int nSerial, BOOL bFromShare)	// return : 2(Fai
 			m_pPcr[1][nIdx]->m_pDefType[i] = _tstoi(strBadName);
 
 			// Temp for ITS - m_pPcr[0][nIdx]->m_pDefPcs[i] = Rotate180(_tstoi(strPieceID));
-			//pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, Rotate180(m_pPcr[1][nIdx]->m_pDefPcs[i]), nC, nR);
-			pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, pDoc->m_pPcr[1][nIdx]->m_pDefPcs[i], nC, nR);
+			//pDoc->m_Master[1].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, Rotate180(m_pPcr[1][nIdx]->m_pDefPcs[i]), nC, nR);
+			pDoc->m_Master[1].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, pDoc->m_pPcr[1][nIdx]->m_pDefPcs[i], nC, nR);
 			m_pPcr[1][nIdx]->m_arDefType[nR][nC] = m_pPcr[1][nIdx]->m_pDefType[i];
 			m_pPcr[1][nIdx]->m_arPcrLineNum[nR][nC] = i;
-			//pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, m_pPcr[1][nIdx]->m_pDefPcs[i], nC, nR);
+			//pDoc->m_Master[1].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, m_pPcr[1][nIdx]->m_pDefPcs[i], nC, nR);
 			m_pPcr[1][nIdx]->m_arDefTypeForIts[nR][nC] = m_pPcr[1][nIdx]->m_pDefType[i];
 			m_pPcr[1][nIdx]->m_arPcrLineNumForIts[nR][nC] = i;
 
@@ -13720,11 +13720,11 @@ int CGvisR2R_PunchDoc::LoadPcrDn(CString sPath)	// return : 2(Failed), 1(Á¤»ó), 
 			m_pPcr[1][nIdx]->m_pDefType[i] = _tstoi(strBadName);
 
 			// Temp for ITS - m_pPcr[0][nIdx]->m_pDefPcs[i] = Rotate180(_tstoi(strPieceID));
-			//pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, Rotate180(m_pPcr[1][nIdx]->m_pDefPcs[i]), nC, nR);
-			pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, pDoc->m_pPcr[1][nIdx]->m_pDefPcs[i], nC, nR);
+			//pDoc->m_Master[1].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, Rotate180(m_pPcr[1][nIdx]->m_pDefPcs[i]), nC, nR);
+			pDoc->m_Master[1].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, pDoc->m_pPcr[1][nIdx]->m_pDefPcs[i], nC, nR);
 			m_pPcr[1][nIdx]->m_arDefType[nR][nC] = m_pPcr[1][nIdx]->m_pDefType[i];
 			m_pPcr[1][nIdx]->m_arPcrLineNum[nR][nC] = i;
-			//pDoc->m_Master[0].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, m_pPcr[1][nIdx]->m_pDefPcs[i], nC, nR);
+			//pDoc->m_Master[1].m_pPcsRgn->GetMkMatrix(pDoc->m_Master[1].MasterInfo.nActionCode, m_pPcr[1][nIdx]->m_pDefPcs[i], nC, nR);
 			m_pPcr[1][nIdx]->m_arDefTypeForIts[nR][nC] = m_pPcr[1][nIdx]->m_pDefType[i];
 			m_pPcr[1][nIdx]->m_arPcrLineNumForIts[nR][nC] = i;
 
