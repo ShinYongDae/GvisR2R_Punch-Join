@@ -68,6 +68,7 @@ void CSmac::Init()
 #ifdef USE_SMAC
 	if(!m_bRs232Run)
 	{
+		pView->SetAlarmToPlc(UNIT_PUNCH); pView->ClrDispMsg();
 		CString sMsg;
 		sMsg.Format(_T("보이스코일이 초기화되지 않았습니다.(COM%d)"), m_Rs232.m_nPort);
 //		pView->MsgBox(_T("보이스코일이 초기화되지 않았습니다.");
