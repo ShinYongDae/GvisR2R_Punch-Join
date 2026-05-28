@@ -3799,7 +3799,8 @@ BOOL CGvisR2R_PunchView::SortingInUp(CString sPath, int nIndex)
 
 		nSerial = _tstoi(sSerial);
 
-		t = localtime(&buf.st_ctime);
+		//t = localtime(&buf.st_ctime); // 만든 날짜
+		t = localtime(&buf.st_mtime); // 수정한 날짜.
 
 		CString sYear, sMonth, sDay, sHour, sMin, sSec;
 		sYear.Format(_T("%04d"), t->tm_year + 1900);
@@ -3988,7 +3989,8 @@ BOOL CGvisR2R_PunchView::SortingInDn(CString sPath, int nIndex)
 
 		nSerial = _tstoi(sSerial);
 
-		t = localtime(&buf.st_ctime);
+		//t = localtime(&buf.st_ctime); // 만든 날짜
+		t = localtime(&buf.st_mtime); // 수정한 날짜.
 
 		CString sYear, sMonth, sDay, sHour, sMin, sSec;
 		sYear.Format(_T("%04d"), t->tm_year + 1900);
