@@ -5054,7 +5054,8 @@ int CGvisR2R_PunchDoc::GetPcrIdx(int nSerial, BOOL bNewLot)
 		return 0;
 	}
 
-	int nIdx = (nSerial - 1) % MAX_PCR_PNL;
+	//int nIdx = (nSerial - 1) % MAX_PCR_PNL;
+	int nIdx = (nSerial - 1);
 
 	return nIdx;
 }
@@ -5071,27 +5072,28 @@ int CGvisR2R_PunchDoc::GetPcrIdx0(int nSerial, BOOL bNewLot)
 
 	int nIdx;
 
-	if (!bNewLot)
-	{
-		if (WorkingInfo.LastJob.bLotSep || m_bDoneChgLot)
-		{
-			if (!m_bDoneChgLot && nSerial <= m_nLotLastShot)
-				nIdx = (nSerial - 1) % MAX_PCR_PNL;
-			else // New Lot...
-				nIdx = (m_nLotLastShot + nSerial - 1) % MAX_PCR_PNL;
-		}
-		else
-		{
-			nIdx = (nSerial - 1) % MAX_PCR_PNL;
-		}
-	}
-	else
-	{
-		if (WorkingInfo.LastJob.bLotSep || m_bDoneChgLot)
-			nIdx = (m_nLotLastShot + nSerial - 1) % MAX_PCR_PNL;
-		else
-			nIdx = (nSerial - 1) % MAX_PCR_PNL;
-	}
+	//if (!bNewLot)
+	//{
+	//	if (WorkingInfo.LastJob.bLotSep || m_bDoneChgLot)
+	//	{
+	//		if (!m_bDoneChgLot && nSerial <= m_nLotLastShot)
+	//			nIdx = (nSerial - 1) % MAX_PCR_PNL;
+	//		else // New Lot...
+	//			nIdx = (m_nLotLastShot + nSerial - 1) % MAX_PCR_PNL;
+	//	}
+	//	else
+	//	{
+	//		nIdx = (nSerial - 1) % MAX_PCR_PNL;
+	//	}
+	//}
+	//else
+	//{
+	//	if (WorkingInfo.LastJob.bLotSep || m_bDoneChgLot)
+	//		nIdx = (m_nLotLastShot + nSerial - 1) % MAX_PCR_PNL;
+	//	else
+	//		nIdx = (nSerial - 1) % MAX_PCR_PNL;
+	//}
+	nIdx = (nSerial - 1);
 	return nIdx;
 }
 
@@ -5107,27 +5109,28 @@ int CGvisR2R_PunchDoc::GetPcrIdx1(int nSerial, BOOL bNewLot)
 
 	int nIdx;
 
-	if (!bNewLot)
-	{
-		if (WorkingInfo.LastJob.bLotSep || m_bDoneChgLot)
-		{
-			if (!m_bDoneChgLot && nSerial <= m_nLotLastShot)
-				nIdx = (nSerial - 1) % MAX_PCR_PNL;
-			else // New Lot...
-				nIdx = (m_nLotLastShot + nSerial - 1) % MAX_PCR_PNL;
-		}
-		else
-		{
-			nIdx = (nSerial - 1) % MAX_PCR_PNL;
-		}
-	}
-	else
-	{
-		if (WorkingInfo.LastJob.bLotSep || m_bDoneChgLot)
-			nIdx = (m_nLotLastShot + nSerial - 1) % MAX_PCR_PNL;
-		else
-			nIdx = (nSerial - 1) % MAX_PCR_PNL;
-	}
+	//if (!bNewLot)
+	//{
+	//	if (WorkingInfo.LastJob.bLotSep || m_bDoneChgLot)
+	//	{
+	//		if (!m_bDoneChgLot && nSerial <= m_nLotLastShot)
+	//			nIdx = (nSerial - 1) % MAX_PCR_PNL;
+	//		else // New Lot...
+	//			nIdx = (m_nLotLastShot + nSerial - 1) % MAX_PCR_PNL;
+	//	}
+	//	else
+	//	{
+	//		nIdx = (nSerial - 1) % MAX_PCR_PNL;
+	//	}
+	//}
+	//else
+	//{
+	//	if (WorkingInfo.LastJob.bLotSep || m_bDoneChgLot)
+	//		nIdx = (m_nLotLastShot + nSerial - 1) % MAX_PCR_PNL;
+	//	else
+	//		nIdx = (nSerial - 1) % MAX_PCR_PNL;
+	//}
+	nIdx = (nSerial - 1);
 	return nIdx;
 }
 

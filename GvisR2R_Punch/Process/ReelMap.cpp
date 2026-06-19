@@ -7459,8 +7459,9 @@ int CReelMap::GetPcrIdx(int nSerial)
 		return 0;
 	}
 
-	int nIdx;
-	nIdx = (nSerial - 1) % MAX_PCR_PNL;
+	//int nIdx;
+	//nIdx = (nSerial - 1) % MAX_PCR_PNL;
+	int nIdx = (nSerial - 1);
 	return nIdx;
 }
 
