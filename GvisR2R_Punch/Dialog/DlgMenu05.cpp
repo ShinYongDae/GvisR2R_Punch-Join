@@ -3259,7 +3259,8 @@ void CDlgMenu05::MakeIts()
 	//}
 
 	pDoc->m_Master[0].Init(pDoc->WorkingInfo.System.sPathCamSpecDir, m_sModel, m_sLayerUp);
-	pDoc->m_Master[0].LoadMstInfo();
+	if (!pDoc->m_Master[0].LoadMstInfo())
+		return;
 
 	int nPos, nSerial;
 

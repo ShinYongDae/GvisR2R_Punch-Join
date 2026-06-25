@@ -131,7 +131,8 @@ BOOL CCamMaster::LoadMstInfo()
 	CString sPath;
 
 	pDoc->GetCamPxlRes();
-	LoadMasterSpec();
+	if (!LoadMasterSpec())
+		return FALSE;
 	if (LoadStripRgnFromCam())
 	{
 		if (pDoc->WorkingInfo.System.bStripPcsRgnBin)
