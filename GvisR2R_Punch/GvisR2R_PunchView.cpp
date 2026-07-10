@@ -5021,7 +5021,11 @@ int CGvisR2R_PunchView::ChkSerial() // // 0: Continue, -: Previous, +: Discontin
 	int nSerial0 = GetBuffer0(); // 첫번째 버퍼 시리얼 : 상하 시리얼이 다르면 0
 	int nSerial1 = GetBuffer1(); // 두번째 버퍼 시리얼 : 상하 시리얼이 다르면 0
 	int nLastShot = pDoc->GetLastShotMk();
-	return (nSerial0 - nLastShot);
+	return (nSerial1 - nSerial0);
+	//int nSerial0 = GetBuffer0(); // 첫번째 버퍼 시리얼 : 상하 시리얼이 다르면 0
+	//int nSerial1 = GetBuffer1(); // 두번째 버퍼 시리얼 : 상하 시리얼이 다르면 0
+	//int nLastShot = pDoc->GetLastShotMk();
+	//return (nSerial0 - nLastShot);
 }
 
 void CGvisR2R_PunchView::ChkBuf()
