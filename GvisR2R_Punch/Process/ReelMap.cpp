@@ -2410,28 +2410,32 @@ BOOL CReelMap::UpdateYield(int nSerial)
 	if (findfile.FindFile(sPath))
 		bExist = TRUE;
 
+	// 이어가기시 이전 시리얼과 다를 수 있음.
+	int nBeforeSerial;
 	if (bExist)
 	{
 		TCHAR szData[MAX_PATH];
 		if (0 < ::GetPrivateProfileString(_T("Info"), _T("End Shot"), NULL, szData, sizeof(szData), sPath))
 			m_nBeforeSerial = _tstoi(szData);
-	}
-
-	if (pView->m_bSerialDecrese)
-	{
-		m_nBeforeSerial = nSerial + 1;
-		//if (nSerial >= m_nBeforeSerial)
-		//{
-		//	m_nBeforeSerial = nSerial + 1;
-		//}
+		if (pView->m_bSerialDecrese)
+		{
+			nBeforeSerial = nSerial + 1;
+			if (nBeforeSerial > m_nBeforeSerial)
+				m_nBeforeSerial = nBeforeSerial;
+		}
+		else
+		{
+			nBeforeSerial = nSerial - 1;
+			if (nBeforeSerial < m_nBeforeSerial)
+				m_nBeforeSerial = nBeforeSerial;
+		}
 	}
 	else
 	{
-		m_nBeforeSerial = nSerial - 1;
-		//if (m_nBeforeSerial >= nSerial)
-		//{
-		//	m_nBeforeSerial = nSerial - 1;
-		//}
+		if (pView->m_bSerialDecrese)
+			m_nBeforeSerial = nSerial + 1;
+		else
+			m_nBeforeSerial = nSerial - 1;
 	}
 
 	int nPnl = m_nBeforeSerial;
@@ -8026,26 +8030,32 @@ BOOL CReelMap::UpdateYieldOffline(int nSerial)
 	if (findfile.FindFile(sPath))
 		bExist = TRUE;
 
+	// 이어가기시 이전 시리얼과 다를 수 있음.
+	int nBeforeSerial;
 	if (bExist)
 	{
 		TCHAR szData[MAX_PATH];
 		if (0 < ::GetPrivateProfileString(_T("Info"), _T("End Shot"), NULL, szData, sizeof(szData), sPath))
 			m_nBeforeSerialOffline = _tstoi(szData);
-	}
-
-	if (pView->m_bSerialDecrese)
-	{
-		if (nSerial >= m_nBeforeSerialOffline)
+		if (pView->m_bSerialDecrese)
 		{
-			m_nBeforeSerialOffline = nSerial + 1;
+			nBeforeSerial = nSerial + 1;
+			if (nBeforeSerial > m_nBeforeSerialOffline)
+				m_nBeforeSerialOffline = nBeforeSerial;
+		}
+		else
+		{
+			nBeforeSerial = nSerial - 1;
+			if (nBeforeSerial < m_nBeforeSerialOffline)
+				m_nBeforeSerialOffline = nBeforeSerial;
 		}
 	}
 	else
 	{
-		if (m_nBeforeSerialOffline >= nSerial)
-		{
+		if (pView->m_bSerialDecrese)
+			m_nBeforeSerialOffline = nSerial + 1;
+		else
 			m_nBeforeSerialOffline = nSerial - 1;
-		}
 	}
 
 	int nPnl = m_nBeforeSerialOffline;

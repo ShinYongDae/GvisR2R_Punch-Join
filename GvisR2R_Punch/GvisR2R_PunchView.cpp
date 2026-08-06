@@ -21059,13 +21059,13 @@ void CGvisR2R_PunchView::Mk2PtDoMarking()
 			{
 				//if (!m_bTHREAD_UPDATAE_YIELD[0] && !m_bTHREAD_UPDATAE_YIELD[1])	// Left Shot의 수율과 Right Shot의 수율을 업데이트함.
 				//{
-				//	if (!m_bTHREAD_UPDATE_YIELD_UP && !m_bTHREAD_UPDATE_YIELD_DN && !m_bTHREAD_UPDATE_YIELD_INNER_UP && !m_bTHREAD_UPDATE_YIELD_INNER_DN 
-				//		&& !m_bTHREAD_UPDATE_YIELD_ALLUP && !m_bTHREAD_UPDATE_YIELD_ALLDN && !m_bTHREAD_UPDATE_YIELD_INNER_ALLUP && !m_bTHREAD_UPDATE_YIELD_INNER_ALLDN)	// Left Shot의 수율과 Right Shot의 수율을 업데이트함.
-				//	{
+					if (!m_bTHREAD_UPDATE_YIELD_UP && !m_bTHREAD_UPDATE_YIELD_DN && !m_bTHREAD_UPDATE_YIELD_INNER_UP && !m_bTHREAD_UPDATE_YIELD_INNER_DN 
+						&& !m_bTHREAD_UPDATE_YIELD_ALLUP && !m_bTHREAD_UPDATE_YIELD_ALLDN && !m_bTHREAD_UPDATE_YIELD_INNER_ALLUP && !m_bTHREAD_UPDATE_YIELD_INNER_ALLDN)	// Left Shot의 수율과 Right Shot의 수율을 업데이트함.
+					{
 						m_bUpdateYield = TRUE; pDoc->SetStatus(_T("General"), _T("bUpdateYield"), m_bUpdateYield);
 						UpdateYield(); // Cam[0],  Cam[1]
 						m_nMkStAuto++;
-				//	}
+					}
 				//}
 			}
 			else // Verify시에 실행.
@@ -23785,13 +23785,13 @@ void CGvisR2R_PunchView::Mk4PtDoMarking()
 			{
 				//if (!m_bTHREAD_UPDATAE_YIELD[0] && !m_bTHREAD_UPDATAE_YIELD[1])	// Left Shot의 수율과 Right Shot의 수율을 업데이트함.
 				//{
-				//	if (!m_bTHREAD_UPDATE_YIELD_UP && !m_bTHREAD_UPDATE_YIELD_DN && !m_bTHREAD_UPDATE_YIELD_INNER_UP && !m_bTHREAD_UPDATE_YIELD_INNER_DN
-				//		&& !m_bTHREAD_UPDATE_YIELD_ALLUP && !m_bTHREAD_UPDATE_YIELD_ALLDN && !m_bTHREAD_UPDATE_YIELD_INNER_ALLUP && !m_bTHREAD_UPDATE_YIELD_INNER_ALLDN)	// Left Shot의 수율과 Right Shot의 수율을 업데이트함.
-				//	{
+					if (!m_bTHREAD_UPDATE_YIELD_UP && !m_bTHREAD_UPDATE_YIELD_DN && !m_bTHREAD_UPDATE_YIELD_INNER_UP && !m_bTHREAD_UPDATE_YIELD_INNER_DN
+						&& !m_bTHREAD_UPDATE_YIELD_ALLUP && !m_bTHREAD_UPDATE_YIELD_ALLDN && !m_bTHREAD_UPDATE_YIELD_INNER_ALLUP && !m_bTHREAD_UPDATE_YIELD_INNER_ALLDN)	// Left Shot의 수율과 Right Shot의 수율을 업데이트함.
+					{
 						m_bUpdateYield = TRUE; pDoc->SetStatus(_T("General"), _T("bUpdateYield"), m_bUpdateYield);
 						UpdateYield(); // Cam[0],  Cam[1]
 						m_nMkStAuto++;
-				//	}
+					}
 				//}
 			}
 			else
