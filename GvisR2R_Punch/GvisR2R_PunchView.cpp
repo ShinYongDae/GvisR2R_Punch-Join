@@ -3056,6 +3056,7 @@ UINT CGvisR2R_PunchView::ThreadProc3(LPVOID lpContext)	// UpdateYield()
 	DWORD dwTick = GetTickCount();
 	DWORD dwShutdownEventCheckPeriod = 0; // thread shutdown event check period
 	int nSerial;
+	CString sLog;
 
 	pThread->m_bThread[3] = TRUE;
 	while (WAIT_OBJECT_0 != WaitForSingleObject(pThread->m_Thread[3].GetShutdownEvent(), dwShutdownEventCheckPeriod))
@@ -3069,6 +3070,7 @@ UINT CGvisR2R_PunchView::ThreadProc3(LPVOID lpContext)	// UpdateYield()
 			{
 				nSerial = pDoc->m_ListSerialYield.Pop();
 				pThread->UpdateYield(nSerial);
+				sLog.Format(_T("m_ListSerialYield.Pop(%d)"), nSerial); pDoc->LogDebug(sLog);
 				Sleep(0);
 			}
 		}
@@ -28241,8 +28243,10 @@ void CGvisR2R_PunchView::UpdateYield(int nSerial)
 		return;
 
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
+	CString sLog;
 
 	m_nSnTHREAD_UPDATAE_YIELD = nSerial; pDoc->SetStatusInt(_T("Thread"), _T("nSnTHREAD_UPDATAE_YIELD"), m_nSnTHREAD_UPDATAE_YIELD);
+	sLog.Format(_T("m_nSnTHREAD_UPDATAE_YIELD = %d"), m_nSnTHREAD_UPDATAE_YIELD); pDoc->LogDebug(sLog);
 	m_bTHREAD_UPDATE_YIELD_UP = TRUE; pDoc->SetStatus(_T("Thread"), _T("bTHREAD_UPDATE_YIELD_UP"), m_bTHREAD_UPDATE_YIELD_UP);
 	if (bDualTest)
 	{
@@ -28308,15 +28312,17 @@ void CGvisR2R_PunchView::UpdateYieldIts(int nSerial)
 void CGvisR2R_PunchView::UpdateYield()
 {
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
-
+	CString sLog;
 	if (m_nBufUpSerial[0] > 0) // Left 
 	{
-		pDoc->m_ListSerialYield.Push(m_nBufUpSerial[0]);
+		sLog.Format(_T("m_ListSerialYield.Push(%d)"), m_nBufUpSerial[0]);
+		pDoc->m_ListSerialYield.Push(m_nBufUpSerial[0]); pDoc->LogDebug(sLog);
 	}
 
 	if(m_nBufUpSerial[1] > 0) // Right
 	{
-		pDoc->m_ListSerialYield.Push(m_nBufUpSerial[1]);
+		sLog.Format(_T("m_ListSerialYield.Push(%d)"), m_nBufUpSerial[1]);
+		pDoc->m_ListSerialYield.Push(m_nBufUpSerial[1]); pDoc->LogDebug(sLog);
 	}
 
 	//int nSerial = m_nBufUpSerial[0];

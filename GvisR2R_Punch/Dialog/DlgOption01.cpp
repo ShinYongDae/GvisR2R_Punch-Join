@@ -68,6 +68,7 @@ BEGIN_MESSAGE_MAP(CDlgOption01, CDialog)
 	ON_EN_CHANGE(IDC_EDIT_MK_OFFSET, &CDlgOption01::OnEnChangeEditMkOffset)
 	ON_EN_CHANGE(IDC_EDIT_MK_OFFSET2, &CDlgOption01::OnEnChangeEditMkOffset2)
 	ON_BN_CLICKED(IDC_CHECK15, &CDlgOption01::OnBnClickedCheck15)
+	ON_BN_CLICKED(IDC_CHECK16, &CDlgOption01::OnBnClickedCheck16)
 END_MESSAGE_MAP()
 
 
@@ -320,6 +321,7 @@ void CDlgOption01::DispStatus()
 	((CButton*)GetDlgItem(IDC_CHECK1))->SetCheck(pDoc->m_bOffLogAuto);
 	((CButton*)GetDlgItem(IDC_CHECK2))->SetCheck(pDoc->m_bOffLogPLC);
 	((CButton*)GetDlgItem(IDC_CHECK3))->SetCheck(pDoc->m_bDebugGrabAlign);
+	((CButton*)GetDlgItem(IDC_CHECK16))->SetCheck(pDoc->m_bOffLogDebug);
 
 	((CButton*)GetDlgItem(IDC_CHECK4))->SetCheck(pDoc->m_bUseRTRYShiftAdjust);
 	str.Format(_T("%3.2f"), pDoc->m_dShiftAdjustRatio);
@@ -612,5 +614,22 @@ void CDlgOption01::OnBnClickedCheck15()
 	else
 	{
 		::WritePrivateProfileString(_T("System"), _T("ChkSmacWaitPos"), _T("0"), PATH_WORKING_INFO);
+	}
+}
+
+
+void CDlgOption01::OnBnClickedCheck16()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	BOOL bOn = ((CButton*)GetDlgItem(IDC_CHECK16))->GetCheck();
+	pDoc->m_bOffLogAuto = bOn;
+
+	if (bOn)
+	{
+		::WritePrivateProfileString(_T("System"), _T("OffLogDebug"), _T("1"), PATH_WORKING_INFO);
+	}
+	else
+	{
+		::WritePrivateProfileString(_T("System"), _T("OffLogDebug"), _T("0"), PATH_WORKING_INFO);
 	}
 }

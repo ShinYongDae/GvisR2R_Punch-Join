@@ -31,6 +31,7 @@ CGvisR2R_PunchDoc* pDoc;
 extern CGvisR2R_PunchView* pView;
 
 #include "safelockdoc.h"
+CCriticalSection g_LogLockDebug;
 CCriticalSection g_LogLockAuto;
 CCriticalSection g_LogLockPLC;
 
@@ -59,6 +60,7 @@ CGvisR2R_PunchDoc::CGvisR2R_PunchDoc()
 	m_bVsStatusDn = FALSE;
 
 	m_bOffLogAuto = FALSE;
+	m_bOffLogDebug = FALSE;
 	m_bOffLogPLC = FALSE;
 	m_bChkSmacWaitPos = TRUE;
 	m_strUserNameList = _T("");
@@ -1058,6 +1060,11 @@ BOOL CGvisR2R_PunchDoc::LoadWorkingInfo()
 	//	m_dVerifyPunchScore = _ttof(szData);
 	//else
 	//	m_dVerifyPunchScore = 80.0;
+
+	if (0 < ::GetPrivateProfileString(_T("System"), _T("OffLogDebug"), NULL, szData, sizeof(szData), PATH_WORKING_INFO))
+		m_bOffLogDebug = _ttoi(szData) ? TRUE : FALSE;
+	else
+		m_bOffLogDebug = FALSE;
 
 	if (0 < ::GetPrivateProfileString(_T("System"), _T("OffLogAuto"), NULL, szData, sizeof(szData), PATH_WORKING_INFO))
 		m_bOffLogAuto = _ttoi(szData) ? TRUE : FALSE;
@@ -8939,30 +8946,40 @@ void CGvisR2R_PunchDoc::UpdateYieldOnRmap()
 
 void CGvisR2R_PunchDoc::UpdateYieldUp(int nSerial)
 {
+	CString sLog;
+	sLog.Format(_T("UpdateYieldUp(%d)"), nSerial); pDoc->LogDebug(sLog);
 	if (m_pReelMapUp)
 		m_pReelMapUp->UpdateYield(nSerial);
 }
 
 void CGvisR2R_PunchDoc::UpdateYieldDn(int nSerial)
 {
+	CString sLog;
+	sLog.Format(_T("UpdateYieldDn(%d)"), nSerial); pDoc->LogDebug(sLog);
 	if (m_pReelMapDn)
 		m_pReelMapDn->UpdateYield(nSerial);
 }
 
 void CGvisR2R_PunchDoc::UpdateYieldAllUp(int nSerial)
 {
+	CString sLog;
+	sLog.Format(_T("UpdateYieldAllUp(%d)"), nSerial); pDoc->LogDebug(sLog);
 	if (m_pReelMapAllUp)
 		m_pReelMapAllUp->UpdateYield(nSerial);
 }
 
 void CGvisR2R_PunchDoc::UpdateYieldAllDn(int nSerial)
 {
+	CString sLog;
+	sLog.Format(_T("UpdateYieldAllDn(%d)"), nSerial); pDoc->LogDebug(sLog);
 	if (m_pReelMapAllDn)
 		m_pReelMapAllDn->UpdateYield(nSerial);
 }
 
 void CGvisR2R_PunchDoc::UpdateYieldInnerUp(int nSerial)
 {
+	CString sLog;
+	sLog.Format(_T("UpdateYieldInnerUp(%d)"), nSerial); pDoc->LogDebug(sLog);
 	if (m_pReelMapInnerUp)
 		m_pReelMapInnerUp->UpdateYield(nSerial);
 }
@@ -8975,12 +8992,16 @@ void CGvisR2R_PunchDoc::UpdateYieldInnerDn(int nSerial)
 
 void CGvisR2R_PunchDoc::UpdateYieldInnerAllUp(int nSerial)
 {
+	CString sLog;
+	sLog.Format(_T("UpdateYieldInnerAllUp(%d)"), nSerial); pDoc->LogDebug(sLog);
 	if (m_pReelMapInnerAllUp)
 		m_pReelMapInnerAllUp->UpdateYield(nSerial);
 }
 
 void CGvisR2R_PunchDoc::UpdateYieldInnerAllDn(int nSerial)
 {
+	CString sLog;
+	sLog.Format(_T("UpdateYieldInnerAllDn(%d)"), nSerial); pDoc->LogDebug(sLog);
 	if (m_pReelMapInnerAllDn)
 		m_pReelMapInnerAllDn->UpdateYield(nSerial);
 }
@@ -16266,4 +16287,59 @@ int CGvisR2R_PunchDoc::GetMarkedPcrUpSerial()
 	}
 
 	return nSerial;
+}
+
+// Write Log for Auto
+void CGvisR2R_PunchDoc::LogDebug(CString strMsg, int nType)
+{
+	if (m_bOffLogDebug)
+		return;
+
+	CSafeLockDoc lock(&g_LogLockDebug);
+
+	TCHAR szFile[MAX_PATH] = { 0, };
+	TCHAR szPath[MAX_PATH] = { 0, };
+	TCHAR* pszPos = NULL;
+
+	_stprintf(szPath, PATH_LOG);
+	if (!DirectoryExists(szPath))
+		CreateDirectory(szPath, NULL);
+
+	_stprintf(szPath, PATH_LOG_DEBUG);
+	if (!DirectoryExists(szPath))
+		CreateDirectory(szPath, NULL);
+
+	COleDateTime time = COleDateTime::GetCurrentTime();
+
+	switch (nType)
+	{
+	case 0:
+		_stprintf(szFile, _T("%s\\%s.txt"), szPath, COleDateTime::GetCurrentTime().Format(_T("%Y%m%d")));
+		break;
+	}
+
+	CString strDate;
+	CString strContents;
+	CTime now;
+
+	strDate.Format(_T("%s: "), COleDateTime::GetCurrentTime().Format(_T("%Y/%m/%d %H:%M:%S")));
+	strContents = strDate;
+	strContents += strMsg;
+	strContents += _T("\r\n");
+	//strContents += _T("\r\n");
+
+	CFile file;
+
+	if (file.Open(szFile, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeWrite | CFile::shareDenyNone) == 0)
+		return;
+
+	char cameraKey[1024];
+	StringToChar(strContents, cameraKey);
+
+	file.SeekToEnd();
+	int nLenth = strContents.GetLength();
+	int nLenth2 = strlen(cameraKey);
+	file.Write(cameraKey, nLenth2);
+	file.Flush();
+	file.Close();
 }

@@ -17,6 +17,7 @@
 #define PATH_LOG_AUTO	_T("C:\\Debuging\\Log\\Auto")
 #define PATH_LOG_PLC	_T("C:\\Debuging\\Log\\PLC")
 #define PATH_LOG_PUNCH	_T("C:\\Debuging\\Log\\PUNCH")
+#define PATH_LOG_DEBUG	_T("C:\\Debuging\\Log\\DEBUG")
 
 class CGvisR2R_PunchDoc : public CDocument
 {
@@ -38,7 +39,7 @@ protected: // serialization에서만 만들어집니다.
 public:
 	CfPoint m_pntNoMkLeft[2][4], m_pntNoMkRight[2][4]; // LT, LB, RB, RT
 	BOOL m_bVsStatusUp, m_bVsStatusDn;
-	BOOL m_bOffLogAuto, m_bOffLogPLC, m_bChkSmacWaitPos;
+	BOOL m_bOffLogAuto, m_bOffLogPLC, m_bChkSmacWaitPos, m_bOffLogDebug;
 	int m_nDelayShow, m_nJudgeMkModelSize, m_nJudgeMkModelHistoSize;
 	BOOL m_bBufEmpty[2]; // [0]: Up, [1]: Dn
 	BOOL m_bBufEmptyF[2]; // [0]: Up, [1]: Dn
@@ -153,6 +154,7 @@ public:
 	void SetVerifyPunchHistoWhite(int nDn);
 	void SetVerifyPunchHistoWhite2(int nDn);
 
+	void LogDebug(CString strMsg, int nType = 0);
 	void LogAuto(CString strMsg, int nType = 0);
 	void LogPLC(CString strMsg, int nType = 0);
 	void LogPunch(CString strMsg, int nType = 0);

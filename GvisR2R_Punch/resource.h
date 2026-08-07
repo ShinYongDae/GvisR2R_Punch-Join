@@ -1562,6 +1562,7 @@
 #define IDC_CHK_USE_AOI_OUTER           1429
 #define IDC_CHK_123                     1429
 #define IDC_BTN_JUDGE_MK                1429
+#define IDC_CHECK16                     1429
 #define IDC_STC_DEF_13                  1430
 #define IDC_CHK_USE_AOI_MIDDLE          1430
 #define IDC_STC_12_96                   1430
