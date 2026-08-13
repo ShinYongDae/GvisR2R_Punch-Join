@@ -2610,7 +2610,7 @@ void CDlgInfo::InitMkInfo()
 void CDlgInfo::OnBnClickedChkUseAoiDualIts()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	CString sData;
+	CString sData, sLog;
 	BOOL bOn = myBtn[29].GetCheck();
 	if (bOn)
 	{
@@ -2619,6 +2619,7 @@ void CDlgInfo::OnBnClickedChkUseAoiDualIts()
 		myBtn[30].SetCheck(FALSE);
 		pDoc->WorkingInfo.System.bUseDual2dIts = FALSE;
 		pView->MpeWrite(_T("MB40009A"), 1);															// 각인부\r미사용
+		sLog.Format(_T("Set MODE_LASER - 각인부 미사용 OnBnClickedChkUseAoiDualIts()")); pDoc->LogDebug(sLog);
 		SetTestMode(MODE_ITS);
 		sData = pDoc->WorkingInfo.System.bUseDual2dIts ? _T("1") : _T("0");
 		::WritePrivateProfileString(_T("System"), _T("UseDual2dIts"), sData, PATH_WORKING_INFO);
@@ -2640,12 +2641,13 @@ void CDlgInfo::OnBnClickedChkUseAoiDualIts()
 void CDlgInfo::OnBnClickedChkUseAoiDual2dIts()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	CString sData;
+	CString sData, sLog;
 	BOOL bOn = myBtn[30].GetCheck();
 	if (bOn)
 	{
 		pDoc->WorkingInfo.System.bUseDual2dIts = TRUE;
 		pView->MpeWrite(_T("MB40009A"), 0);															// 각인부 사용
+		sLog.Format(_T("Set MODE_LASER - 각인부 사용 OnBnClickedChkUseAoiDual2dIts()")); pDoc->LogDebug(sLog);
 		SetTestMode(MODE_LASER);
 		
 		myBtn[29].SetCheck(FALSE);
@@ -2658,6 +2660,7 @@ void CDlgInfo::OnBnClickedChkUseAoiDual2dIts()
 	{
 		pDoc->WorkingInfo.System.bUseDual2dIts = FALSE;
 		pView->MpeWrite(_T("MB40009A"), 1);															// 각인부\r미사용
+		sLog.Format(_T("Set MODE_LASER - 각인부 미사용 OnBnClickedChkUseAoiDual2dIts()")); pDoc->LogDebug(sLog);
 		SetTestMode(MODE_NONE);
 		SetDualTest(TRUE);
 	}
@@ -2669,7 +2672,7 @@ void CDlgInfo::OnBnClickedChkUseAoiDual2dIts()
 
 void CDlgInfo::DispDualTest()
 {
-	CString sMsg;
+	CString sMsg, sLog;
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
 //#ifdef USE_MPE
 //	bDualTest = pView->MpeRead(pView->Plc.DlgInfo.TwoMetal) > 0 ? TRUE : FALSE;
@@ -2688,6 +2691,7 @@ void CDlgInfo::DispDualTest()
 			myBtn[30].SetCheck(FALSE);
 			pDoc->WorkingInfo.System.bUseDual2dIts = FALSE;
 			pView->MpeWrite(_T("MB40009A"), 1);															// 각인부\r미사용
+			sLog.Format(_T("Set MODE_LASER - 각인부 미사용 DispDualTest()")); pDoc->LogDebug(sLog);
 			SetTestMode(MODE_ITS);
 			pDoc->SetMkInfo(_T("Signal"), _T("UseDual2dIts"), pDoc->WorkingInfo.System.bUseDual2dIts);	
 		}
@@ -2695,6 +2699,7 @@ void CDlgInfo::DispDualTest()
 		{
 			myBtn[30].SetCheck(TRUE);
 			pView->MpeWrite(_T("MB40009A"), 0);															// 각인부 사용
+			sLog.Format(_T("Set MODE_LASER - 각인부 사용 DispDualTest()")); pDoc->LogDebug(sLog);
 			SetTestMode(MODE_LASER);
 			pDoc->SetMkInfo(_T("Signal"), _T("UseDual2dIts"), pDoc->WorkingInfo.System.bUseDual2dIts);	
 

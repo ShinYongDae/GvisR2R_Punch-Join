@@ -19624,7 +19624,7 @@ void CGvisR2R_PunchView::DoAutoMarking()
 void CGvisR2R_PunchView::Mk2PtReady()
 {
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
-	CString sMsg;
+	CString sMsg, sLog;
 
 	if ( (m_bMkSt[0] || m_bMkSt[1]) && IsBuffer() )
 	{
@@ -19719,6 +19719,8 @@ void CGvisR2R_PunchView::Mk2PtReady()
 						m_nBufUpSerial[0] = pDoc->m_ListBuf[0].Pop(); pDoc->SetStatusInt(_T("General"), _T("nBufUpSerial[0]"), m_nBufUpSerial[0]);
 						m_nBufDnSerial[0] = pDoc->m_ListBuf[1].Pop(); pDoc->SetStatusInt(_T("General"), _T("nBufDnSerial[0]"), m_nBufDnSerial[0]);
 						//m_nBufUpSerial[0] = m_nBufDnSerial[0];
+						sLog.Format(_T("m_nBufUpSerial[0] = %d"), m_nBufUpSerial[0]); pDoc->LogDebug(sLog);
+						sLog.Format(_T("m_nBufDnSerial[0] = %d"), m_nBufDnSerial[0]); pDoc->LogDebug(sLog);
 					}
 					else
 					{
@@ -19740,6 +19742,8 @@ void CGvisR2R_PunchView::Mk2PtReady()
 							m_nBufUpSerial[1] = pDoc->m_ListBuf[0].Pop(); pDoc->SetStatusInt(_T("General"), _T("nBufUpSerial[1]"), m_nBufDnSerial[1]);
 							m_nBufDnSerial[1] = pDoc->m_ListBuf[1].Pop(); pDoc->SetStatusInt(_T("General"), _T("nBufDnSerial[1]"), m_nBufDnSerial[1]);
 							//m_nBufUpSerial[1] = m_nBufDnSerial[1]; pDoc->SetStatusInt(_T("General"), _T("nBufUpSerial[1]"), m_nBufUpSerial[1]);
+							sLog.Format(_T("m_nBufUpSerial[1] = %d"), m_nBufUpSerial[1]); pDoc->LogDebug(sLog);
+							sLog.Format(_T("m_nBufDnSerial[1] = %d"), m_nBufDnSerial[1]); pDoc->LogDebug(sLog);
 						}
 						else
 						{
@@ -19770,6 +19774,7 @@ void CGvisR2R_PunchView::Mk2PtReady()
 					{
 						// Serial - Left
 						m_nBufUpSerial[0] = pDoc->m_ListBuf[0].Pop(); pDoc->SetStatusInt(_T("General"), _T("nBufUpSerial[0]"), m_nBufUpSerial[0]);
+						sLog.Format(_T("m_nBufUpSerial[0] = %d"), m_nBufUpSerial[0]); pDoc->LogDebug(sLog);
 					}
 					else
 					{
@@ -19789,6 +19794,7 @@ void CGvisR2R_PunchView::Mk2PtReady()
 						{
 							// Serial - Right
 							m_nBufUpSerial[1] = pDoc->m_ListBuf[0].Pop(); pDoc->SetStatusInt(_T("General"), _T("nBufUpSerial[1]"), m_nBufUpSerial[1]);
+							sLog.Format(_T("m_nBufUpSerial[1] = %d"), m_nBufUpSerial[1]); pDoc->LogDebug(sLog);
 						}
 						else
 						{
@@ -21398,12 +21404,12 @@ void CGvisR2R_PunchView::Mk2PtShift2Mk() // MODE_INNER
 		case MK_ST + (Mk2PtIdx::Shift2Mk) :
 			//if (!m_bTHREAD_UPDATAE_YIELD[0] && !m_bTHREAD_UPDATAE_YIELD[1])
 			//{
-			//	if (!m_bTHREAD_UPDATE_YIELD_UP && !m_bTHREAD_UPDATE_YIELD_DN && !m_bTHREAD_UPDATE_YIELD_INNER_UP && !m_bTHREAD_UPDATE_YIELD_INNER_DN
-			//		&& !m_bTHREAD_UPDATE_YIELD_ALLUP && !m_bTHREAD_UPDATE_YIELD_ALLDN && !m_bTHREAD_UPDATE_YIELD_INNER_ALLUP && !m_bTHREAD_UPDATE_YIELD_INNER_ALLDN)	// Left Shot의 수율과 Right Shot의 수율을 업데이트함.
-			//	{
+				if (!m_bTHREAD_UPDATE_YIELD_UP && !m_bTHREAD_UPDATE_YIELD_DN && !m_bTHREAD_UPDATE_YIELD_INNER_UP && !m_bTHREAD_UPDATE_YIELD_INNER_DN
+					&& !m_bTHREAD_UPDATE_YIELD_ALLUP && !m_bTHREAD_UPDATE_YIELD_ALLDN && !m_bTHREAD_UPDATE_YIELD_INNER_ALLUP && !m_bTHREAD_UPDATE_YIELD_INNER_ALLDN)	// Left Shot의 수율과 Right Shot의 수율을 업데이트함.
+				{
 					UpdateYield(); // Cam[0],  Cam[1]
 					m_nMkStAuto++;
-			//	}
+				}
 			//}
 			break;
 
@@ -28315,13 +28321,13 @@ void CGvisR2R_PunchView::UpdateYield()
 	CString sLog;
 	if (m_nBufUpSerial[0] > 0) // Left 
 	{
-		sLog.Format(_T("m_ListSerialYield.Push(%d)"), m_nBufUpSerial[0]);
+		sLog.Format(_T("UpdateYield(): m_ListSerialYield.Push(%d)"), m_nBufUpSerial[0]);
 		pDoc->m_ListSerialYield.Push(m_nBufUpSerial[0]); pDoc->LogDebug(sLog);
 	}
 
 	if(m_nBufUpSerial[1] > 0) // Right
 	{
-		sLog.Format(_T("m_ListSerialYield.Push(%d)"), m_nBufUpSerial[1]);
+		sLog.Format(_T("UpdateYield(): m_ListSerialYield.Push(%d)"), m_nBufUpSerial[1]);
 		pDoc->m_ListSerialYield.Push(m_nBufUpSerial[1]); pDoc->LogDebug(sLog);
 	}
 
@@ -34931,6 +34937,9 @@ void CGvisR2R_PunchView::DeleteReelmapOnOffline()
 	CFileFind findfile;
 	CString sPath = _T("");
 
+	CString sLog;
+	sLog.Format(_T("DeleteReelmapOnOffline()")); pDoc->LogDebug(sLog);
+
 	if (pDoc->m_pReelMapUp)
 		sPath = pDoc->m_pReelMapUp->GetRmapPathOnOffline(RMAP_UP);
 	if (!sPath.IsEmpty())
@@ -34939,6 +34948,7 @@ void CGvisR2R_PunchView::DeleteReelmapOnOffline()
 		{
 			pDoc->m_pReelMapUp->GetLastRmapInfo();
 			DeleteFile(sPath);
+			pDoc->LogDebug(sPath);
 		}
 		sPath = _T("");
 	}
@@ -34951,6 +34961,7 @@ void CGvisR2R_PunchView::DeleteReelmapOnOffline()
 		{
 			pDoc->m_pReelMapDn->GetLastRmapInfo();
 			DeleteFile(sPath);
+			pDoc->LogDebug(sPath);
 		}
 		sPath = _T("");
 	}
@@ -34963,6 +34974,7 @@ void CGvisR2R_PunchView::DeleteReelmapOnOffline()
 		{
 			pDoc->m_pReelMapAllUp->GetLastRmapInfo();
 			DeleteFile(sPath);
+			pDoc->LogDebug(sPath);
 		}
 		sPath = _T("");
 	}
@@ -34975,6 +34987,7 @@ void CGvisR2R_PunchView::DeleteReelmapOnOffline()
 		{
 			pDoc->m_pReelMapAllDn->GetLastRmapInfo();
 			DeleteFile(sPath);
+			pDoc->LogDebug(sPath);
 		}
 		sPath = _T("");
 	}
@@ -35128,6 +35141,9 @@ BOOL CGvisR2R_PunchView::RemakeRmapFromPcr(int nLastShot, int nOffline)// [nOffl
 void CGvisR2R_PunchView::ResetYield(int nOffline)
 {
 	BOOL bDualTest = nOffline & 0x02;
+
+	CString sLog;
+	sLog.Format(_T("ResetYield(%d)"), nOffline); pDoc->LogDebug(sLog);
 
 	if (pDoc->m_pReelMapUp)
 		pDoc->m_pReelMapUp->ResetYield();
@@ -35294,12 +35310,18 @@ void CGvisR2R_PunchView::DeleteYieldOnOffline()
 	CFileFind findfile;
 	CString sPath = _T("");
 
+	CString sLog;
+	sLog.Format(_T("DeleteYieldOnOffline()")); pDoc->LogDebug(sLog);
+
 	if (pDoc->m_pReelMapUp)
 		sPath = pDoc->m_pReelMapUp->GetRmapPathOnOffline(RMAP_UP);
 	if (!sPath.IsEmpty())
 	{
 		if (findfile.FindFile(sPath))
+		{
 			DeleteFile(sPath);
+			pDoc->LogDebug(sPath);
+		}
 		sPath = _T("");
 	}
 
@@ -35308,7 +35330,10 @@ void CGvisR2R_PunchView::DeleteYieldOnOffline()
 	if (!sPath.IsEmpty())
 	{
 		if (findfile.FindFile(sPath))
+		{
 			DeleteFile(sPath);
+			pDoc->LogDebug(sPath);
+		}
 		sPath = _T("");
 	}
 
@@ -35317,7 +35342,10 @@ void CGvisR2R_PunchView::DeleteYieldOnOffline()
 	if (!sPath.IsEmpty())
 	{
 		if (findfile.FindFile(sPath))
+		{
 			DeleteFile(sPath);
+			pDoc->LogDebug(sPath);
+		}
 		sPath = _T("");
 	}
 
@@ -35326,7 +35354,10 @@ void CGvisR2R_PunchView::DeleteYieldOnOffline()
 	if (!sPath.IsEmpty())
 	{
 		if (findfile.FindFile(sPath))
+		{
 			DeleteFile(sPath);
+			pDoc->LogDebug(sPath);
+		}
 		sPath = _T("");
 	}
 }
@@ -35920,12 +35951,12 @@ void CGvisR2R_PunchView::Mk4PtShift2Mk() // MODE_INNER
 		case MK_ST + (Mk4PtIdx::Shift2Mk) :
 			//if (!m_bTHREAD_UPDATAE_YIELD[0] && !m_bTHREAD_UPDATAE_YIELD[1])
 			//{
-			//	if (!m_bTHREAD_UPDATE_YIELD_UP && !m_bTHREAD_UPDATE_YIELD_DN && !m_bTHREAD_UPDATE_YIELD_INNER_UP && !m_bTHREAD_UPDATE_YIELD_INNER_DN
-			//		&& !m_bTHREAD_UPDATE_YIELD_ALLUP && !m_bTHREAD_UPDATE_YIELD_ALLDN && !m_bTHREAD_UPDATE_YIELD_INNER_ALLUP && !m_bTHREAD_UPDATE_YIELD_INNER_ALLDN)	// Left Shot의 수율과 Right Shot의 수율을 업데이트함.
-			//	{
+				if (!m_bTHREAD_UPDATE_YIELD_UP && !m_bTHREAD_UPDATE_YIELD_DN && !m_bTHREAD_UPDATE_YIELD_INNER_UP && !m_bTHREAD_UPDATE_YIELD_INNER_DN
+					&& !m_bTHREAD_UPDATE_YIELD_ALLUP && !m_bTHREAD_UPDATE_YIELD_ALLDN && !m_bTHREAD_UPDATE_YIELD_INNER_ALLUP && !m_bTHREAD_UPDATE_YIELD_INNER_ALLDN)	// Left Shot의 수율과 Right Shot의 수율을 업데이트함.
+				{
 					UpdateYield(); // Cam[0],  Cam[1]
 					m_nMkStAuto++;
-			//	}
+				}
 			//}
 			break;
 

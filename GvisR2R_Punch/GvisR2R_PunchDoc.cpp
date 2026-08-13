@@ -10125,7 +10125,7 @@ void CGvisR2R_PunchDoc::SetTestMode(int nMode)
 {
 	WorkingInfo.LastJob.nTestMode = nMode; // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2, MODE_LASER = 3, MODE_ITS = 4
 
-	CString sData;
+	CString sData, sLog;
 	sData.Format(_T("%d"), nMode);
 	::WritePrivateProfileString(_T("Last Job"), _T("Test Mode"), sData, PATH_WORKING_INFO);
 
@@ -10143,6 +10143,7 @@ void CGvisR2R_PunchDoc::SetTestMode(int nMode)
 	{
 		if (pDoc->GetTestMode() == MODE_INNER)
 		{
+			sLog.Format(_T("SetTestMode MODE_INNER - 각인부 사용")); pDoc->LogDebug(sLog);
 			pView->MpeWrite(_T("MB40009A"), 0);															// 각인부 사용
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 1);// 내층 검사 사용/미사용 
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 0);// 외층 검사 사용/미사용
@@ -10153,6 +10154,7 @@ void CGvisR2R_PunchDoc::SetTestMode(int nMode)
 		}
 		else if (pDoc->GetTestMode() == MODE_OUTER)
 		{
+			sLog.Format(_T("SetTestMode MODE_OUTER - 각인부 미사용")); pDoc->LogDebug(sLog);
 			pView->MpeWrite(_T("MB40009A"), 1);															// 각인부 미사용
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 0);// 내층 검사 사용/미사용
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 1);// 외층 검사 사용/미사용
@@ -10163,6 +10165,7 @@ void CGvisR2R_PunchDoc::SetTestMode(int nMode)
 		}
 		else if (pDoc->GetTestMode() == MODE_LASER)
 		{
+			sLog.Format(_T("SetTestMode MODE_LASER - 각인부 사용")); pDoc->LogDebug(sLog);
 			pView->MpeWrite(_T("MB40009A"), 0);															// 각인부 사용
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 0);// 내층 검사 사용/미사용
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 0);// 외층 검사 사용/미사용
@@ -10173,6 +10176,7 @@ void CGvisR2R_PunchDoc::SetTestMode(int nMode)
 		}
 		else
 		{
+			sLog.Format(_T("SetTestMode MODE (%d) - 각인부 미사용"), nMode); pDoc->LogDebug(sLog);
 			pView->MpeWrite(_T("MB40009A"), 1);															// 각인부 미사용
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 0);// 내층 검사 사용/미사용
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 0);// 외층 검사 사용/미사용
@@ -10276,7 +10280,7 @@ BOOL CGvisR2R_PunchDoc::GetCurrentInfoEng()
 	if (finder.FindFile(sPath))
 	{
 		if (0 < ::GetPrivateProfileString(_T("Infomation"), _T("Test Mode"), NULL, szData, sizeof(szData), sPath)) // MODE_NONE = 0, MODE_INNER = 1, MODE_OUTER = 2, MODE_LASER = 3, MODE_ITS = 4
-			m_nEngTestMode = _ttoi(szData) > 0 ? TRUE : FALSE;
+			m_nEngTestMode = _ttoi(szData);
 		else
 			m_nEngTestMode = MODE_NONE;
 
@@ -15967,7 +15971,7 @@ void CGvisR2R_PunchDoc::SetAlignMethode()
 void CGvisR2R_PunchDoc::SetTestMode()
 {
 	TCHAR szData[200];
-	CString sVal, sPath = PATH_WORKING_INFO;
+	CString sVal, sLog, sPath = PATH_WORKING_INFO;
 
 	if (0 < ::GetPrivateProfileString(_T("Last Job"), _T("Test Mode"), NULL, szData, sizeof(szData), sPath))
 	{
@@ -15977,18 +15981,21 @@ void CGvisR2R_PunchDoc::SetTestMode()
 			WorkingInfo.System.bUseDual2dIts = TRUE;
 			WorkingInfo.System.bUseDualIts = FALSE;
 			pView->MpeWrite(_T("MB40009A"), 0);															// 각인부 사용
+			sLog.Format(_T("SetTestMode() MODE_LASER - 각인부 사용")); pDoc->LogDebug(sLog);
 		}
 		else if (WorkingInfo.LastJob.nTestMode == MODE_ITS)
 		{
 			WorkingInfo.System.bUseDual2dIts = FALSE;
 			WorkingInfo.System.bUseDualIts = TRUE;
 			pView->MpeWrite(_T("MB40009A"), 1);															// 각인부 미사용
+			sLog.Format(_T("SetTestMode() MODE_ITS - 각인부 미사용")); pDoc->LogDebug(sLog);
 		}
 		else
 		{
 			WorkingInfo.System.bUseDual2dIts = FALSE;
 			WorkingInfo.System.bUseDualIts = FALSE;
 			pView->MpeWrite(_T("MB40009A"), 1);															// 각인부 미사용
+			sLog.Format(_T("SetTestMode() else - 각인부 미사용")); pDoc->LogDebug(sLog);
 		}
 	}
 	else
@@ -16009,6 +16016,7 @@ void CGvisR2R_PunchDoc::SetTestMode()
 	{
 		if (pDoc->GetTestMode() == MODE_INNER)
 		{
+			sLog.Format(_T("SetTestMode() MODE_INNER - 각인부 사용")); pDoc->LogDebug(sLog);
 			pView->MpeWrite(_T("MB40009A"), 0);															// 각인부 사용
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 1);// 내층 검사 사용/미사용 
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 0);// 외층 검사 사용/미사용
@@ -16019,6 +16027,7 @@ void CGvisR2R_PunchDoc::SetTestMode()
 		}
 		else if (pDoc->GetTestMode() == MODE_OUTER)
 		{
+			sLog.Format(_T("SetTestMode() MODE_OUTER - 각인부 미사용")); pDoc->LogDebug(sLog);
 			pView->MpeWrite(_T("MB40009A"), 1);															// 각인부 미사용
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 0);// 내층 검사 사용/미사용
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 1);// 외층 검사 사용/미사용
@@ -16029,6 +16038,7 @@ void CGvisR2R_PunchDoc::SetTestMode()
 		}
 		else if (pDoc->GetTestMode() == MODE_LASER)
 		{
+			sLog.Format(_T("SetTestMode() MODE_LASER - 각인부 사용")); pDoc->LogDebug(sLog);
 			pView->MpeWrite(_T("MB40009A"), 0);															// 각인부 사용
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 0);// 내층 검사 사용/미사용
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 0);// 외층 검사 사용/미사용
@@ -16039,6 +16049,7 @@ void CGvisR2R_PunchDoc::SetTestMode()
 		}
 		else
 		{
+			sLog.Format(_T("SetTestMode() else - 각인부 미사용")); pDoc->LogDebug(sLog);
 			pView->MpeWrite(_T("MB40009A"), 1);															// 각인부 미사용
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeInner, 0);// 내층 검사 사용/미사용
 			pView->MpeWrite(pView->Plc.DlgInfo.ModeOutter, 0);// 외층 검사 사용/미사용
