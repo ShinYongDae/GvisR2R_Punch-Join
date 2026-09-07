@@ -161,17 +161,16 @@ END
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 194, 70
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "GvisR2R_Punch 정보"
 FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,14,7,20,20
     LTEXT           "GvisR2R_Punch, 버전 3.2.11",IDC_STATIC,42,7,114,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2026.08.13",IDC_STATIC,42,16,114,8
+    LTEXT           "Copyright (C) 2026.09.02",IDC_STATIC,42,16,114,8
     DEFPUSHBUTTON   "확인",IDOK,137,31,50,14,WS_GROUP
-    LTEXT           "LOSS 파일 from Result",IDC_STATIC,7,29,115,8
+    LTEXT           "LotEnd 이후 피딩이 완료되는 경우 디버깅",IDC_STATIC,7,29,115,8
     LTEXT           "시리얼 역순시 수율 시작 패치",IDC_STATIC,7,38,96,8
     LTEXT           "ITS: 외층만L1, 나머지L0",IDC_STATIC,7,57,141,8
-    LTEXT           "자동 중 수율 디버깅",IDC_STATIC,7,48,135,8
+    LTEXT           "Result결과생성",IDC_STATIC,7,48,135,8
 END
 
 IDD_GVISR2R_PUNCH_FORM DIALOGEX 0, 0, 630, 461

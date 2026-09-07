@@ -229,6 +229,7 @@ class CGvisR2R_PunchView : public CFormView
 
 	double m_dElecChkVal;
 	CString m_sMsg;
+	BOOL m_bDoneFeeding;
 
 	void InitMyMsg();
 	void CloseMyMsg();
@@ -1134,6 +1135,7 @@ public:
 	BOOL IsDoneRemakeReelmapInner();
 	void MakeSapp3();
 	void GetResult();
+	void GetResultInfo();
 	void MakeResult();
 	void MakeResultIts();
 	BOOL WriteLastRmapInfo();

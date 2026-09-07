@@ -476,12 +476,14 @@ BOOL CDlgMenu01::DispReelmap(int nSerial, BOOL bDumy)
 	if(nSerial <= 0)
 		return FALSE;
 
-	if (pDoc->WorkingInfo.System.bSaveLog)
-	{
-		CString strData;
-		strData.Format(_T("DispReelmap: Serial(%d), Dumy(%d)"), nSerial, bDumy);
-		SaveLog(strData);
-	}
+	//if (pDoc->WorkingInfo.System.bSaveLog)
+	//{
+	CString strData;
+	strData.Format(_T("BufUp : %d ~ %d"), pView->GetFirstBufferSerial(UP), pView->GetLastBufferSerial(UP));	pDoc->LogDebug(strData);
+	strData.Format(_T("BufDn : %d ~ %d"), pView->GetFirstBufferSerial(DN), pView->GetLastBufferSerial(DN));	pDoc->LogDebug(strData);
+	strData.Format(_T("DispReelmap: Serial(%d), Dumy(%d)"), nSerial, bDumy);	pDoc->LogDebug(strData);
+	
+	//}
 
 	if (pDoc->GetTestMode() == MODE_OUTER)
 	{
@@ -5973,7 +5975,7 @@ void CDlgMenu01::DispChangedModel()
 
 void CDlgMenu01::SwitchReelmapDisp(int nSelRmap)
 {
-	CString str;// , sPath;
+	CString str, sLog;// , sPath;
 
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
 	if (bDualTest)
@@ -5981,12 +5983,14 @@ void CDlgMenu01::SwitchReelmapDisp(int nSelRmap)
 		switch (nSelRmap) // pView->m_nSelRmap
 		{
 		case RMAP_UP:
+			sLog.Format(_T("Select DispReelmapUp"));	pDoc->LogDebug(sLog);
 			pDoc->m_pReelMapDisp = pDoc->m_pReelMapUp;
 			myBtn[12].SetCheck(TRUE);
 			myBtn[13].SetCheck(FALSE);
 			myBtn[14].SetCheck(FALSE);
 			break;
 		case RMAP_DN:
+			sLog.Format(_T("Select DispReelmapDn"));	pDoc->LogDebug(sLog);
 			pDoc->m_pReelMapDisp = pDoc->m_pReelMapDn;
 			myBtn[12].SetCheck(FALSE);
 			myBtn[13].SetCheck(TRUE);
@@ -5994,12 +5998,14 @@ void CDlgMenu01::SwitchReelmapDisp(int nSelRmap)
 			break;
 		case RMAP_ALLUP:
 		case RMAP_ALLDN:
+			sLog.Format(_T("Select DispReelmapAll"));	pDoc->LogDebug(sLog);
 			pDoc->m_pReelMapDisp = pDoc->m_pReelMapAllUp;
 			myBtn[12].SetCheck(FALSE);
 			myBtn[13].SetCheck(FALSE);
 			myBtn[14].SetCheck(TRUE);
 			break;
 		case RMAP_ITS:
+			sLog.Format(_T("Select DispReelmapITS"));	pDoc->LogDebug(sLog);
 			pDoc->m_pReelMapDisp = pDoc->m_pReelMapIts;
 			myBtn[12].SetCheck(FALSE);
 			myBtn[13].SetCheck(FALSE);
@@ -6009,6 +6015,7 @@ void CDlgMenu01::SwitchReelmapDisp(int nSelRmap)
 	}
 	else
 	{
+		sLog.Format(_T("Select DispReelmapUp"));	pDoc->LogDebug(sLog);
 		pDoc->m_pReelMapDisp = pDoc->m_pReelMapUp;
 	}
 

@@ -4927,6 +4927,7 @@ void CGvisR2R_PunchDoc::SetReelmap(int nDir)
 	if (!m_pReelMap->pFrmRgn || !m_pReelMap->pPcsRgn)
 		return;
 
+	CString sLog;
 	int i, k;
 	double fData1, fData2, fData3, fData4, fDistX, fDistY;
 	double fWidth, fHeight, fRight, fBottom;
@@ -4945,6 +4946,7 @@ void CGvisR2R_PunchDoc::SetReelmap(int nDir)
 		switch (nDir)
 		{
 		case ROT_NONE:
+			sLog.Format(_T("DispReelmap : ROT_NONE"));	pDoc->LogDebug(sLog);
 			fWidth = (m_Master[0].m_pPcsRgn->pPcs[0].right - m_Master[0].m_pPcsRgn->pPcs[0].left);
 			fHeight = (m_Master[0].m_pPcsRgn->pPcs[0].bottom - m_Master[0].m_pPcsRgn->pPcs[0].top);
 			fRight = m_Master[0].m_pPcsRgn->rtFrm.right - fWidth * (1.0 - RMAP_PCS_SCALE);
@@ -4985,6 +4987,7 @@ void CGvisR2R_PunchDoc::SetReelmap(int nDir)
 			}
 			break;
 		case ROT_CCW_90: // right->bottom, top->left, bottom->right, left->top ; Dir (x *= 1, y *= -1) 
+			sLog.Format(_T("DispReelmap : ROT_CCW_90"));	pDoc->LogDebug(sLog);
 			fDistX = 0;
 			fDistY = m_Master[0].m_pPcsRgn->rtFrm.left + m_Master[0].m_pPcsRgn->rtFrm.right;
 			m_pReelMap->pFrmRgn[k].left = (m_Master[0].m_pPcsRgn->rtFrm.bottom + MYGL_GAP_PNL*dScale)*(nTotPnl - 1 - k) + m_Master[0].m_pPcsRgn->rtFrm.top;

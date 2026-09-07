@@ -282,6 +282,7 @@ public:
 	stResult m_stResult;
 	void ResetReelmapPath();
 	BOOL GetResult(); // TRUE: Make Result, FALSE: Load Result or Failed.
+	BOOL GetResultInfo(); // TRUE: Make Result, FALSE: Load Result or Failed.
 	CString GetResultTxt();
 	CString GetSapp3Txt();
 	CString GetSapp3TxtReverse();
@@ -318,7 +319,7 @@ public:
 	int Rotate180(int nPcsId);// 180도 회전 = 좌우 미러링 & 상하 미러링
 	int MirrorUD(int nPcsId); // 상하 미러링
 
-	BOOL SetPcsMkOut(int nCam, int nPcsIdx); // 0: Left Cam Or 1: Right Cam , 불량 피스 인덱스 [ 0 ~ (Total Pcs - 1) ]
+	BOOL SetPcsMkOut(int nCam, int nSerial, int nPcsIdx); // 0: Left Cam Or 1: Right Cam , 불량 피스 인덱스 [ 0 ~ (Total Pcs - 1) ]
 	BOOL ShiftMkedPcsDef();
 	BOOL ShiftMkedPcsDef(int nSerial);
 

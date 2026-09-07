@@ -622,7 +622,7 @@ void CDlgOption01::OnBnClickedCheck16()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	BOOL bOn = ((CButton*)GetDlgItem(IDC_CHECK16))->GetCheck();
-	pDoc->m_bOffLogAuto = bOn;
+	pDoc->m_bOffLogDebug = bOn;
 
 	if (bOn)
 	{

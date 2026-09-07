@@ -632,6 +632,8 @@ CGvisR2R_PunchView::CGvisR2R_PunchView()
 	m_sLogAuto[1] = _T("");
 	m_bFailMkJudge[0] = FALSE;
 	m_bFailMkJudge[1] = FALSE;
+
+	m_bDoneFeeding = FALSE;
 }
 
 CGvisR2R_PunchView::~CGvisR2R_PunchView()
@@ -5023,6 +5025,8 @@ int CGvisR2R_PunchView::ChkSerial() // // 0: Continue, -: Previous, +: Discontin
 	int nSerial0 = GetBuffer0(); // 첫번째 버퍼 시리얼 : 상하 시리얼이 다르면 0
 	int nSerial1 = GetBuffer1(); // 두번째 버퍼 시리얼 : 상하 시리얼이 다르면 0
 	int nLastShot = pDoc->GetLastShotMk();
+	if (nSerial0 == m_nLotEndSerial)
+		return 0;
 	return (nSerial1 - nSerial0);
 	//int nSerial0 = GetBuffer0(); // 첫번째 버퍼 시리얼 : 상하 시리얼이 다르면 0
 	//int nSerial1 = GetBuffer1(); // 두번째 버퍼 시리얼 : 상하 시리얼이 다르면 0
@@ -10409,6 +10413,7 @@ void CGvisR2R_PunchView::InitAuto(BOOL bInit)
 		//}
 		ClrDispMsg();
 		UpdateRst();
+		pDoc->LogDebug(_T("이어가기-UpdateRst()"));
 #endif
 		DispLotStTime();
 		RestoreReelmap();
@@ -10852,7 +10857,7 @@ BOOL CGvisR2R_PunchView::InitMk()
 		{
 			m_bSerialDecrese = TRUE; pDoc->SetStatus(_T("General"), _T("bSerialDecrese"), m_bSerialDecrese);
 		}
-		else
+		else if (nRSer > 0)
 		{
 			m_bSerialDecrese = FALSE; pDoc->SetStatus(_T("General"), _T("bSerialDecrese"), m_bSerialDecrese);
 		}
@@ -12254,6 +12259,7 @@ UINT CGvisR2R_PunchView::ThreadProc6(LPVOID lpContext)	// UpdateRMapUp()
 	BOOL bLock = FALSE;
 	DWORD dwTick = GetTickCount();
 	DWORD dwShutdownEventCheckPeriod = 0; // thread shutdown event check period
+	CString sLog;
 
 	pThread->m_bThread[6] = TRUE;
 	while (WAIT_OBJECT_0 != WaitForSingleObject(pThread->m_Thread[6].GetShutdownEvent(), dwShutdownEventCheckPeriod))
@@ -12265,7 +12271,9 @@ UINT CGvisR2R_PunchView::ThreadProc6(LPVOID lpContext)	// UpdateRMapUp()
 		{
 			if (!pThread->m_bTHREAD_REELMAP_YIELD_UP) // Yield Reelmap
 			{
+				sLog.Format(_T("Serail(%d), ReelmapUp Write start."), pThread->m_nSerialRmapUpdate); pDoc->LogDebug(sLog);
 				pThread->UpdateRMapUp(); // Write Reelmap
+				sLog.Format(_T("Serail(%d), ReelmapUp Write end."), pThread->m_nSerialRmapUpdate); pDoc->LogDebug(sLog);
 				pThread->m_bTHREAD_UPDATE_REELMAP_UP = FALSE;
 				Sleep(0);
 			}
@@ -12289,6 +12297,7 @@ UINT CGvisR2R_PunchView::ThreadProc7(LPVOID lpContext)	// UpdateRMapDn()
 	BOOL bLock = FALSE;
 	DWORD dwTick = GetTickCount();
 	DWORD dwShutdownEventCheckPeriod = 0; // thread shutdown event check period
+	CString sLog;
 
 	pThread->m_bThread[7] = TRUE;
 	while (WAIT_OBJECT_0 != WaitForSingleObject(pThread->m_Thread[7].GetShutdownEvent(), dwShutdownEventCheckPeriod))
@@ -12300,7 +12309,9 @@ UINT CGvisR2R_PunchView::ThreadProc7(LPVOID lpContext)	// UpdateRMapDn()
 		{
 			if (!pThread->m_bTHREAD_REELMAP_YIELD_DN) // Yield Reelmap
 			{
+				sLog.Format(_T("Serail(%d), ReelmapDn Write start."), pThread->m_nSerialRmapUpdate); pDoc->LogDebug(sLog);
 				pThread->UpdateRMapDn(); // Write Reelmap
+				sLog.Format(_T("Serail(%d), ReelmapDn Write end."), pThread->m_nSerialRmapUpdate); pDoc->LogDebug(sLog);
 				pThread->m_bTHREAD_UPDATE_REELMAP_DN = FALSE; pDoc->SetStatus(_T("Thread"), _T("bTHREAD_UPDATE_REELMAP_DN"), pThread->m_bTHREAD_UPDATE_REELMAP_DN);
 				Sleep(0);
 			}
@@ -12324,6 +12335,7 @@ UINT CGvisR2R_PunchView::ThreadProc8(LPVOID lpContext)	// UpdateRMapAllUp()
 	BOOL bLock = FALSE;
 	DWORD dwTick = GetTickCount();
 	DWORD dwShutdownEventCheckPeriod = 0; // thread shutdown event check period
+	CString sLog;
 
 	pThread->m_bThread[8] = TRUE;
 	while (WAIT_OBJECT_0 != WaitForSingleObject(pThread->m_Thread[8].GetShutdownEvent(), dwShutdownEventCheckPeriod))
@@ -12335,7 +12347,9 @@ UINT CGvisR2R_PunchView::ThreadProc8(LPVOID lpContext)	// UpdateRMapAllUp()
 		{
 			if (!pThread->m_bTHREAD_REELMAP_YIELD_ALLUP) // Yield Reelmap
 			{
+				sLog.Format(_T("Serail(%d), ReelmapAllUp Write start."), pThread->m_nSerialRmapUpdate); pDoc->LogDebug(sLog);
 				pThread->UpdateRMapAllUp(); // Write Reelmap
+				sLog.Format(_T("Serail(%d), ReelmapAllUp Write end."), pThread->m_nSerialRmapUpdate); pDoc->LogDebug(sLog);
 				pThread->m_bTHREAD_UPDATE_REELMAP_ALLUP = FALSE; pDoc->SetStatus(_T("Thread"), _T("bTHREAD_UPDATE_REELMAP_ALLUP"), pThread->m_bTHREAD_UPDATE_REELMAP_ALLUP);
 				Sleep(0);
 			}
@@ -12359,6 +12373,7 @@ UINT CGvisR2R_PunchView::ThreadProc9(LPVOID lpContext)	// UpdateRMapAllDn()
 	BOOL bLock = FALSE;
 	DWORD dwTick = GetTickCount();
 	DWORD dwShutdownEventCheckPeriod = 0; // thread shutdown event check period
+	CString sLog;
 
 	pThread->m_bThread[9] = TRUE;
 	while (WAIT_OBJECT_0 != WaitForSingleObject(pThread->m_Thread[9].GetShutdownEvent(), dwShutdownEventCheckPeriod))
@@ -12370,7 +12385,9 @@ UINT CGvisR2R_PunchView::ThreadProc9(LPVOID lpContext)	// UpdateRMapAllDn()
 		{
 			if (!pThread->m_bTHREAD_REELMAP_YIELD_ALLDN) // Yield Reelmap
 			{
+				sLog.Format(_T("Serail(%d), ReelmapAllDn Write start."), pThread->m_nSerialRmapUpdate); pDoc->LogDebug(sLog);
 				pThread->UpdateRMapAllDn(); // Write Reelmap
+				sLog.Format(_T("Serail(%d), ReelmapAllDn Write end."), pThread->m_nSerialRmapUpdate); pDoc->LogDebug(sLog);
 				pThread->m_bTHREAD_UPDATE_REELMAP_ALLDN = FALSE; pDoc->SetStatus(_T("Thread"), _T("bTHREAD_UPDATE_REELMAP_ALLDN"), pThread->m_bTHREAD_UPDATE_REELMAP_ALLDN);
 				Sleep(0);
 			}
@@ -12974,7 +12991,7 @@ void CGvisR2R_PunchView::LotEnd()
 	m_bCont = FALSE;
 	SetLotEd();
 
-	MakeResultMDS();
+	MakeResultMDS();	// 20260819 - PLC에서 LotEnd() 이후에 피딩이 완료되는 경우를 의심해 볼 것.
 
 	if (pDoc->GetTestMode() == MODE_INNER || pDoc->GetTestMode() == MODE_OUTER || pDoc->WorkingInfo.System.bUseDualIts || pDoc->WorkingInfo.System.bUseDual2dIts)
 	{
@@ -16905,28 +16922,36 @@ BOOL CGvisR2R_PunchView::DoAutoGetLotEndSignal()
 			if (!m_bTHREAD_REELMAP_YIELD_UP && !m_bTHREAD_REELMAP_YIELD_DN && !m_bTHREAD_REELMAP_YIELD_ALLUP && !m_bTHREAD_REELMAP_YIELD_ALLDN) // Yield Reelmap
 			{
 				UpdateRst();
+				pDoc->LogDebug(_T("작업종료알람 - UpdateRst()"));
 				m_nLotEndAuto++;
 			}
 			break;
 		case LOT_END + 1:
 			MpeWrite(Plc.DlgMenu01.JobEnd, 1);		// 작업종료(PC가 On시키고, PLC가 확인하고 Off시킴)
 			//MpeWrite(_T("MB40019C"), 1);			// 작업종료알람(PC가 On시키고, PLC가 확인하고 Off시킴)
+			pDoc->LogDebug(_T("작업종료알람"));
 			DispMain(_T("작업종료"), RGB_RED);
 			pDoc->LogAuto(_T("작업 완료"));
 			m_nLotEndAuto++;
 			break;
 		case LOT_END + 2:
-			m_nLotEndAuto++;
+			if (m_bDoneFeeding)
+			{
+				pDoc->LogDebug(_T("DoneFeeding"));
+				m_nLotEndAuto++;
+			}
 			break;
 		case LOT_END + 3:
 			Buzzer(TRUE, 0);
 			TowerLamp(RGB_YELLOW, TRUE);
 			Stop();
-			LotEnd();					
+			pDoc->LogDebug(_T("LotEnd()"));
+			LotEnd();	// 20260819 - PLC에서 LotEnd() 이후에 피딩이 완료되는 경우를 의심해 볼 것.				
 			m_nLotEndAuto++;
 			break;
 
 		case LOT_END + 4:
+			pDoc->LogDebug(_T("작업 완료"));
 			pView->SetAlarmToPlc(UNIT_PUNCH);
 			MsgBox(_T("작업이 종료되었습니다."));
 			m_nLotEndAuto++;
@@ -20077,10 +20102,14 @@ void CGvisR2R_PunchView::Mk2PtInit()
 			}
 			else // Same Serial
 			{
-				Stop();
-				pView->SetAlarmToPlc(UNIT_PUNCH);
-				MsgBox(_T("Serial 연속 되지않습니다."));
-				TowerLamp(RGB_YELLOW, TRUE);
+				int nSerial = GetBuffer0(); // 첫번째 버퍼 시리얼 : 상하 시리얼이 다르면 0
+				if (nSerial != m_nLotEndSerial)
+				{
+					Stop();
+					pView->SetAlarmToPlc(UNIT_PUNCH);
+					MsgBox(_T("Serial 연속 되지않습니다."));
+					TowerLamp(RGB_YELLOW, TRUE);
+				}
 			}
 			//m_nMkStAuto++;
 			m_sLogAuto[0] = _T("");
@@ -21044,7 +21073,7 @@ void CGvisR2R_PunchView::Mk2PtDoMarking()
 			if (CheckMkPnt())
 			{
 				//pDoc->WorkingInfo.LastJob.sProcessNum = pDoc->GetProcessNum(); // for DTS
-
+				m_bDoneFeeding = FALSE;
 				if (pDoc->GetTestMode() == MODE_OUTER)
 					SetMkIts(TRUE);						// ITS 마킹 시작
 				else
@@ -21279,7 +21308,10 @@ void CGvisR2R_PunchView::Mk2PtDoMarking()
 				SetCycTime();
 				m_dwCycSt = GetTickCount();
 
-				UpdateRst();
+				UpdateRst();	// 20260819 - PLC에서 LotEnd() 이후에 실행될 경우를 의심해 볼 것. 
+				pDoc->LogDebug(_T("PLC 마킹 피딩 완료"));
+				m_bDoneFeeding = TRUE;
+
 				sMsg.Format(_T("Rst"));
 				pFrm->DispStatusBar(sMsg, 6);
 
@@ -21407,6 +21439,7 @@ void CGvisR2R_PunchView::Mk2PtShift2Mk() // MODE_INNER
 				if (!m_bTHREAD_UPDATE_YIELD_UP && !m_bTHREAD_UPDATE_YIELD_DN && !m_bTHREAD_UPDATE_YIELD_INNER_UP && !m_bTHREAD_UPDATE_YIELD_INNER_DN
 					&& !m_bTHREAD_UPDATE_YIELD_ALLUP && !m_bTHREAD_UPDATE_YIELD_ALLDN && !m_bTHREAD_UPDATE_YIELD_INNER_ALLUP && !m_bTHREAD_UPDATE_YIELD_INNER_ALLDN)	// Left Shot의 수율과 Right Shot의 수율을 업데이트함.
 				{
+					m_bDoneFeeding = FALSE;
 					UpdateYield(); // Cam[0],  Cam[1]
 					m_nMkStAuto++;
 				}
@@ -21479,6 +21512,8 @@ void CGvisR2R_PunchView::Mk2PtShift2Mk() // MODE_INNER
 						UpdateRst();
 						UpdateWorking();	// Update Working Info...
 						ChkYield();
+						pDoc->LogDebug(_T("PLC 마킹 피딩 완료"));
+						m_bDoneFeeding = TRUE;
 					}
 				}
 			//}
@@ -22115,10 +22150,14 @@ void CGvisR2R_PunchView::Mk4PtInit()
 			}
 			else // Same Serial
 			{
-				Stop();
-				pView->SetAlarmToPlc(UNIT_PUNCH);
-				MsgBox(_T("Serial 연속 되지않습니다."));
-				TowerLamp(RGB_YELLOW, TRUE);
+				int nSerial = GetBuffer0(); // 첫번째 버퍼 시리얼 : 상하 시리얼이 다르면 0
+				if (nSerial != m_nLotEndSerial)
+				{
+					Stop();
+					pView->SetAlarmToPlc(UNIT_PUNCH);
+					MsgBox(_T("Serial 연속 되지않습니다."));
+					TowerLamp(RGB_YELLOW, TRUE);
+				}
 			}
 			m_nMkStAuto++;
 			break;
@@ -32554,7 +32593,8 @@ void CGvisR2R_PunchView::MakeResultMDS()
 
 	// for SAPP3
 	WriteLastRmapInfo();
-	GetResult();		// Load data From Reelmap.txt
+	GetResult();		// Load data From Reelmap.txt 	// 20260819 - PLC에서 LotEnd() 이후에 피딩이 완료되는 경우를 의심해 볼 것. // 20260819 -> Delete for Prevent InitAuto
+	GetResultInfo();
 	MakeResult();		// Result.txt
 	MakeResultIts();	// Result.txt
 	MakeSapp3();		// GetSapp3Txt()
@@ -32717,9 +32757,34 @@ void CGvisR2R_PunchView::GetResult()
 	}
 }
 
+void CGvisR2R_PunchView::GetResultInfo()
+{
+	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
+
+	if (pDoc->GetTestMode() == MODE_OUTER)
+	{
+		if (pDoc->m_pReelMapIts)
+			pDoc->m_pReelMapIts->GetResultInfo();
+	}
+	else
+	{
+		if (bDualTest)
+		{
+			if (pDoc->m_pReelMapAllUp)
+				pDoc->m_pReelMapAllUp->GetResultInfo();
+		}
+		else
+		{
+			if (pDoc->m_pReelMapUp)
+				pDoc->m_pReelMapUp->GetResultInfo();
+		}
+	}
+}
+
 void CGvisR2R_PunchView::MakeResult()
 {	
 	// TODO: Add your control notification handler code here
+	CString sLog;
 	BOOL bDualTest = pDoc->WorkingInfo.LastJob.bDualTest;
 
 	// File Save......
@@ -32740,12 +32805,40 @@ void CGvisR2R_PunchView::MakeResult()
 	if (bDualTest)
 	{
 		if (pDoc->m_pReelMapAllUp)
+		{
 			strData = pDoc->m_pReelMapAllUp->GetResultTxt();
+			if (strData.IsEmpty())
+			{
+				sLog.Format(_T("m_pReelMapAllUp - GetResultTxt() is Empty")); pDoc->LogDebug(sLog);
+			}
+			else
+			{
+				sLog.Format(_T("m_pReelMapAllUp - GetResultTxt()")); pDoc->LogDebug(sLog);
+			}
+		}
+		else
+		{
+			sLog.Format(_T("m_pReelMapAllUp is NULL - Failed to GetResultTxt()")); pDoc->LogDebug(sLog);
+		}
 	}
 	else
 	{
 		if (pDoc->m_pReelMapUp)
+		{
 			strData = pDoc->m_pReelMapUp->GetResultTxt();
+			if (strData.IsEmpty())
+			{
+				sLog.Format(_T("m_pReelMapUp - GetResultTxt() is Empty")); pDoc->LogDebug(sLog);
+			}
+			else
+			{
+				sLog.Format(_T("m_pReelMapUp - GetResultTxt()")); pDoc->LogDebug(sLog);
+			}
+		}
+		else
+		{
+			sLog.Format(_T("m_pReelMapUp is NULL - Failed to GetResultTxt()")); pDoc->LogDebug(sLog);
+		}
 	}
 
 
@@ -32759,6 +32852,7 @@ void CGvisR2R_PunchView::MakeResult()
 		if (!file.Open(lpszCurDirPathFile, CFile::modeCreate | CFile::modeWrite, &pError))
 		{
 			// 파일 오픈에 실패시 
+			sLog.Format(_T("MakeResult() : File could not be opened")); pDoc->LogDebug(sLog);
 #ifdef _DEBUG
 			afxDump << _T("File could not be opened ") << pError.m_cause << _T("\n");
 #endif
@@ -35643,7 +35737,7 @@ BOOL CGvisR2R_PunchView::SetMkPcs0(int nSerial, int nMkPcs) // pcr 시리얼, pcr �
 			{
 				nDefPcsId = pDoc->m_pPcr[2][nIdx]->m_pDefPcs[nMkPcs];
 				if (pDoc->m_pReelMapAllUp)
-					pDoc->m_pReelMapAllUp->SetPcsMkOut(0, nDefPcsId);
+					pDoc->m_pReelMapAllUp->SetPcsMkOut(0, nSerial, nDefPcsId);
 				else
 					return FALSE;
 			}
@@ -35659,7 +35753,7 @@ BOOL CGvisR2R_PunchView::SetMkPcs0(int nSerial, int nMkPcs) // pcr 시리얼, pcr �
 			{
 				nDefPcsId = pDoc->m_pPcr[0][nIdx]->m_pDefPcs[nMkPcs];
 				if (pDoc->m_pReelMapUp)
-					pDoc->m_pReelMapUp->SetPcsMkOut(0, nDefPcsId);
+					pDoc->m_pReelMapUp->SetPcsMkOut(0, nSerial, nDefPcsId);
 			}
 			else
 				return FALSE;
@@ -35695,7 +35789,7 @@ BOOL CGvisR2R_PunchView::SetMkPcs1(int nSerial, int nMkPcs) // pcr 시리얼, pcr �
 			{
 				nDefPcsId = pDoc->m_pPcr[2][nIdx]->m_pDefPcs[nMkPcs];
 				if (pDoc->m_pReelMapAllUp)
-					pDoc->m_pReelMapAllUp->SetPcsMkOut(1, nDefPcsId);
+					pDoc->m_pReelMapAllUp->SetPcsMkOut(1, nSerial, nDefPcsId);
 				else
 					return FALSE;
 			}
@@ -35711,7 +35805,7 @@ BOOL CGvisR2R_PunchView::SetMkPcs1(int nSerial, int nMkPcs) // pcr 시리얼, pcr �
 			{
 				nDefPcsId = pDoc->m_pPcr[0][nIdx]->m_pDefPcs[nMkPcs];
 				if (pDoc->m_pReelMapUp)
-					pDoc->m_pReelMapUp->SetPcsMkOut(1, nDefPcsId);
+					pDoc->m_pReelMapUp->SetPcsMkOut(1, nSerial, nDefPcsId);
 			}
 			else
 				return FALSE;

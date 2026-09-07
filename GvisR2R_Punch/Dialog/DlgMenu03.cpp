@@ -3151,7 +3151,7 @@ BOOL CDlgMenu03::DoReset()
 			bInit = FALSE;
 		else
 		{
-			sLog.Format(_T("DoReset() : 초기화")); pDoc->LogDebug(sLog);
+			sLog.Format(_T("DoReset() : 초기화 (%s)"), pDoc->WorkingInfo.LastJob.sLot); pDoc->LogDebug(sLog);
 			pView->m_bCont = FALSE;
 			pView->m_pEngrave->SwEngAutoInit(TRUE);
 			pDoc->m_bDoneChgLot = FALSE; pDoc->SetStatus(_T("General"), _T("bDoneChgLot"), pDoc->m_bDoneChgLot);
@@ -3174,13 +3174,13 @@ BOOL CDlgMenu03::DoReset()
 
 			if(IDNO == pView->MsgBox(_T("이어가기를 하시겠습니까?"), 0, MB_YESNO, DEFAULT_TIME_OUT, TRUE))
 			{
-				sLog.Format(_T("DoReset() : 이어가기 No")); pDoc->LogDebug(sLog);
+				sLog.Format(_T("DoReset() : 이어가기 No (%s)"), pDoc->WorkingInfo.LastJob.sLot); pDoc->LogDebug(sLog);
 				pView->m_bCont = FALSE; pDoc->SetStatus(_T("General"), _T("bCont"), pView->m_bCont);
 				pView->Delay();
 				pView->m_pEngrave->SwEngAutoInitCont(pView->m_bCont);
 				return FALSE;
 			}
-			sLog.Format(_T("DoReset() : 이어가기 Yes")); pDoc->LogDebug(sLog);
+			sLog.Format(_T("DoReset() : 이어가기 Yes (%s)"), pDoc->WorkingInfo.LastJob.sLot); pDoc->LogDebug(sLog);
 
 			pView->m_bCont = TRUE; pDoc->SetStatus(_T("General"), _T("bCont"), pView->m_bCont);
 			pView->Delay();
